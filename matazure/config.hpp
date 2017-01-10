@@ -59,7 +59,7 @@ struct blank_t {};
 #define MATAZURE_STATIC_ASSERT_VALUE_TYPE_MATCHED(T1, T2) static_assert(std::is_same<typename T1::value_type, typename T2::value_type>::value, \
 "the value type is not matched")
 
-MATAZURE_STATIC_ASSERT_IS_MATRIX(_Matrix) static_assert(std::is_same<matazure::tensor_expression<_Matrix> , _Matrix>::value && _Matrix::dim == 2)
+#define MATAZURE_STATIC_ASSERT_IS_MATRIX(_Matrix) static_assert(std::is_same<matazure::tensor_expression<_Matrix> , _Matrix>::value && _Matrix::dim == 2)
 
 #define MATAZURE_CURRENT_FUNCTION "(unknown)"
 
