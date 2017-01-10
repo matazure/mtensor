@@ -259,8 +259,8 @@ private: \
 	_T2 x2_; \
 \
 public:\
-	STATIC_ASSERT_DIM_MATCHED(_T1, _T2); \
-	STATIC_ASSERT_VALUE_TYPE_MATCHED(_T1, _T2); \
+	MATAZURE_STATIC_ASSERT_DIM_MATCHED(_T1, _T2); \
+	MATAZURE_STATIC_ASSERT_VALUE_TYPE_MATCHED(_T1, _T2); \
 \
 	MATAZURE_GENERAL name(_T1 x1, _T2 x2) : x1_(x1), x2_(x2) {} \
 \
@@ -277,8 +277,8 @@ private: \
 	_T2 x2_; \
 \
 public:\
-	STATIC_ASSERT_DIM_MATCHED(_T1, _T2); \
-	STATIC_ASSERT_VALUE_TYPE_MATCHED(_T1, _T2); \
+	MATAZURE_STATIC_ASSERT_DIM_MATCHED(_T1, _T2); \
+	MATAZURE_STATIC_ASSERT_VALUE_TYPE_MATCHED(_T1, _T2); \
 	MATAZURE_GENERAL name(_T1 x1, _T2 x2) : x1_(x1), x2_(x2) {} \
 \
 	MATAZURE_GENERAL auto operator ()(const typename _T1::index_type &idx) const->decltype(this->x1_(idx) op this->x2_(idx)){ \

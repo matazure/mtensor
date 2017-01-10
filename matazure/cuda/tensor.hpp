@@ -89,7 +89,7 @@ using matrix = tensor<_ValueType, 2, _Layout>;
 
 template <typename _TensorSrc, typename _TensorDst>
 inline void mem_copy(_TensorSrc ts_src, _TensorDst cts_dst) {
-	STATIC_ASSERT_VALUE_TYPE_MATCHED(_TensorSrc, _TensorDst);
+	MATAZURE_STATIC_ASSERT_VALUE_TYPE_MATCHED(_TensorSrc, _TensorDst);
 	throw_on_error(cudaMemcpy(cts_dst.data(), ts_src.data(), sizeof(typename _TensorDst::value_type) * ts_src.size(), cudaMemcpyDefault));
 }
 

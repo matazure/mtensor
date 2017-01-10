@@ -17,10 +17,6 @@ struct local_t {};
 template <typename _Tensor>
 class tensor_expression;
 
-template <typename _TensorType>
-struct is_matrix_expression : std::integral_constant<bool, _TensorType::dim == 2> {
-};
-
 template <typename T>
 struct function_traits
 	: public function_traits<decltype(&T::operator())>

@@ -77,8 +77,8 @@ __device__ void for_index(pointi<2> extent, _Func fun) {
 
 template <int_t _Tile0, int_t _Tile1, typename _Tensor, typename _Mask>
 tensor<typename _Tensor::value_type, _Tensor::dim> conv(_Tensor ts, _Mask mask) {
-	STATIC_ASSERT_DIM_MATCHED(_Tensor, _Mask);
-	STATIC_ASSERT_VALUE_TYPE_MATCHED(_Tensor, _Mask);
+	MATAZURE_STATIC_ASSERT_DIM_MATCHED(_Tensor, _Mask);
+	MATAZURE_STATIC_ASSERT_VALUE_TYPE_MATCHED(_Tensor, _Mask);
 	typedef typename _Tensor::value_type value_type;
 
 	constexpr pointi<2> tile_ext{ _Tile0, _Tile1 };

@@ -57,8 +57,8 @@ auto inner_product(_VectorLhs vec_lhs, _VectorRhs vec_rhs) {
 
 template <typename _MatrixLhs, typename _MatrixRhs>
 auto product(_MatrixLhs mat_lhs, _MatrixRhs mat_rhs) {
-	static_assert(is_matrix_expression<_MatrixLhs>::value, "");
-	static_assert(is_matrix_expression<_MatrixRhs>::value, "");
+	MATAZURE_STATIC_ASSERT_IS_MATRIX(_MatrixLhs);
+	MATAZURE_STATIC_ASSERT_IS_MATRIX(_MatrixRhs);
 
 	assert(mat_lhs.extent()[1] == mat_rhs.extent()[0]);
 
@@ -75,8 +75,8 @@ auto product(_MatrixLhs mat_lhs, _MatrixRhs mat_rhs) {
 
 template <typename _MatrixLhs, typename _MatrixRhs>
 auto product_tmp(_MatrixLhs mat_lhs, _MatrixRhs mat_rhs) {
-	static_assert(is_matrix_expression<_MatrixLhs>::value, "");
-	static_assert(is_matrix_expression<_MatrixRhs>::value, "");
+	MATAZURE_STATIC_ASSERT_IS_MATRIX(_MatrixLhs);
+	MATAZURE_STATIC_ASSERT_IS_MATRIX(_MatrixRhs);
 
 	assert(mat_lhs.extent()[0] == mat_rhs.extent()[0]);
 
@@ -122,8 +122,8 @@ inline auto conv(_Tensor ts_input, _Weight weights, _Pos pos) {
 
 template <typename _Tensor, typename _Mask>
 inline auto conv(_Tensor ts_input, _Mask ts_mask) {
-	STATIC_ASSERT_DIM_MATCHED(_Tensor, _Mask);
-	STATIC_ASSERT_VALUE_TYPE_MATCHED(_Tensor, _Mask);
+	MATAZURE_STATIC_ASSERT_DIM_MATCHED(_Tensor, _Mask);
+	MATAZURE_STATIC_ASSERT_VALUE_TYPE_MATCHED(_Tensor, _Mask);
 
 	auto ts_offset_mask = detail::clone_int_t_tensor(ts_mask);
 	for (int_t i = 0; i < ts_offset_mask.size(); ++i) {
