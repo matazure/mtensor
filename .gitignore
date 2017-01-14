@@ -1,7 +1,3 @@
-build
-bin
-data
-
 # Compiled Object files
 *.slo
 *.lo
@@ -41,3 +37,5 @@ data
 
 vs
 build*
+bin
+data
