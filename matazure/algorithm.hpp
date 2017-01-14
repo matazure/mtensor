@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include <matazure/point.hpp>
-#include <matazure/type_traits.hpp>
 
 namespace matazure {
 
@@ -73,7 +72,7 @@ namespace matazure {
 
 	template <typename _T1, typename _T2>
 	void copy(_T1 lhs, _T2 rhs, enable_if_t<!are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
-		for_index(pointi<_T1::dim>::zeros(), lhs.extent(), [=](pointi<_T1::dim> idx) {
+		for_index(pointi<_T1::dim>::zeros(), lhs.extent(), [=] (pointi<_T1::dim> idx) {
 			rhs(idx) = lhs(idx);
 		});
 	}

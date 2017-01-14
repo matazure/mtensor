@@ -56,7 +56,7 @@ inline void parallel_for_index(pointi<_Dim> ext, _Fun fun) {
 template <typename _ExecutionPolicy, int_t _Dim, typename _Fun>
 inline void parallel_for_index(const _ExecutionPolicy &policy, pointi<_Dim> ext, _Fun fun) {
 	auto stride = matazure::get_stride(ext);
-	auto max_size = index2offset((ext - 1), stride, first_major_t{});
+	auto max_size = index2offset((ext - 1), stride, first_major_t{}) + 1; //要包含最后一个元素
 
 	parallel_for_index(policy, 0, max_size, [=] MATAZURE_DEVICE (int_t i) {
 		fun(offset2index(i, stride, first_major_t{}));

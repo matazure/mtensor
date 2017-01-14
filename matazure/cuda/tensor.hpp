@@ -47,6 +47,14 @@ public:
 		data_(sp_data_.get())
 	{ }
 
+	template <typename _VT>
+	tensor(const tensor<_VT, _Dim, _Layout> &ts) :
+		extent_(ts.extent()),
+		stride_(ts.stride()),
+		sp_data_(ts.shared_data()),
+		data_(ts.data())
+	{ }
+
 	shared_ptr<value_type> shared_data() const { return sp_data_; }
 
 	template <typename ..._Idx>
@@ -88,8 +96,9 @@ template <typename _ValueType, typename _Layout = first_major_t>
 using matrix = tensor<_ValueType, 2, _Layout>;
 
 template <typename _TensorSrc, typename _TensorDst>
-inline void mem_copy(_TensorSrc ts_src, _TensorDst cts_dst) {
+inline void mem_copy(_TensorSrc ts_src, _TensorDst cts_dst, enable_if_t<!are_host_memory<_TensorSrc, _TensorDst>::value && is_same<typename _TensorSrc::layout_type, typename _TensorDst::layout_type>::value>* = nullptr) {
 	MATAZURE_STATIC_ASSERT_VALUE_TYPE_MATCHED(_TensorSrc, _TensorDst);
+
 	throw_on_error(cudaMemcpy(cts_dst.data(), ts_src.data(), sizeof(typename _TensorDst::value_type) * ts_src.size(), cudaMemcpyDefault));
 }
 
@@ -269,6 +278,11 @@ template <typename _ValueType, int_t _Dim, typename _Layout = first_major_t>
 using cu_tensor = cuda::tensor<_ValueType, _Dim, _Layout>;
 
 template <typename _ValueType, typename _Layout = first_major_t>
+using cu_vector = cu_tensor<_ValueType, 1, _Layout>;
+
+template <typename _ValueType, typename _Layout = first_major_t>
 using cu_matrix = cu_tensor<_ValueType, 2, _Layout>;
+
+using cuda::mem_copy;
 
 }

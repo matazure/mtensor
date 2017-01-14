@@ -154,7 +154,7 @@ public:
 
 	template <typename ..._Ext>
 	explicit tensor(_Ext... ext) :
-		tensor(extent_type{ext...})
+		tensor(extent_type{ ext... })
 	{}
 
 	explicit tensor(extent_type extent) :
@@ -169,6 +169,14 @@ public:
 		stride_(get_stride(extent)),
 		sp_data_(sp_data),
 		data_(sp_data_.get())
+	{ }
+
+	template <typename _VT>
+	tensor(const tensor<_VT, _Dim, _Layout> &ts) :
+		extent_(ts.extent()),
+		stride_(ts.stride()),
+		sp_data_(ts.shared_data()),
+		data_(ts.data())
 	{ }
 
 	template <typename ..._Idx>
@@ -213,8 +221,11 @@ private:
 	value_type * const data_;
 };
 
-template <typename _Type>
-using matrix = tensor<_Type, 2>;
+template <typename _Type, typename _Layout = first_major_t>
+using vector = tensor<_Type, 1, _Layout>;
+
+template <typename _Type, typename _Layout = first_major_t>
+using matrix = tensor<_Type, 2, _Layout>;
 
 template <typename _Type, int_t _Col, int_t _Row>
 using static_matrix = static_tensor<_Type, _Col, _Row>;
@@ -247,7 +258,7 @@ public:
 	typedef matazure::pointi<dim>							extent_type;
 	typedef pointi<dim>										index_type;
 	typedef typename detail::get_functor_accessor_type<_Dim, _Func>::type
-															access_type;
+		access_type;
 	typedef host_t											memory_type;
 
 public:
@@ -270,7 +281,7 @@ public:
 		return offset_imp<access_type>(i);
 	}
 
-	tensor<value_type, dim> persist() const {
+	MATAZURE_GENERAL tensor<value_type, dim> persist() const {
 		tensor<value_type, dim> re(this->extent());
 		copy(*this, re);
 		return re;
@@ -313,5 +324,61 @@ private:
 	const extent_type stride_;
 	const _Func fun_;
 };
+
+template <typename _TensorSrc, typename _TensorDst>
+inline void mem_copy(_TensorSrc ts_src, _TensorDst cts_dst, enable_if_t<are_host_memory<_TensorSrc, _TensorDst>::value && is_same<typename _TensorSrc::layout_type, typename _TensorDst::layout_type>::value>* = nullptr) {
+	MATAZURE_STATIC_ASSERT_VALUE_TYPE_MATCHED(_TensorSrc, _TensorDst);
+	memcpy(cts_dst.data(), ts_src.data(), sizeof(typename _TensorDst::value_type) * ts_src.size());
+}
+
+namespace __walkaround {
+
+using tensor1b = tensor<byte, 1>;
+using tensor2b = tensor<byte, 2>;
+using tensor3b = tensor<byte, 3>;
+using tensor4b = tensor<byte, 4>;
+
+
+using tensor1s = tensor<short, 1>;
+using tensor2s = tensor<short, 2>;
+using tensor3s = tensor<short, 3>;
+using tensor4s = tensor<short, 4>;
+
+using tensor1us = tensor<unsigned short, 1>;
+using tensor2us = tensor<unsigned short, 2>;
+using tensor3us = tensor<unsigned short, 4>;
+using tensor4us = tensor<unsigned short, 4>;
+
+using tensor1i = tensor<int, 1>;
+using tensor2i = tensor<int, 2>;
+using tensor3i = tensor<int, 3>;
+using tensor4i = tensor<int, 4>;
+
+using tensor1ui = tensor<unsigned int, 1>;
+using tensor2ui = tensor<unsigned int, 2>;
+using tensor3ui = tensor<unsigned int, 3>;
+using tensor4ui = tensor<unsigned int, 4>;
+
+using tensor1l = tensor<long, 1>;
+using tensor2l = tensor<long, 2>;
+using tensor3l = tensor<long, 3>;
+using tensor4l = tensor<long, 4>;
+
+using tensor1ul = tensor<unsigned long, 1>;
+using tensor2ul = tensor<unsigned long, 2>;
+using tensor3ul = tensor<unsigned long, 3>;
+using tensor4ul = tensor<unsigned long, 4>;
+
+using tensor1f = tensor<float, 1>;
+using tensor2f = tensor<float, 2>;
+using tensor3f = tensor<float, 3>;
+using tensor4f = tensor<float, 4>;
+
+using tensor1d = tensor<double, 1>;
+using tensor2d = tensor<double, 1>;
+using tensor3d = tensor<double, 1>;
+using tensor4d = tensor<double, 1>;
+
+}
 
 }

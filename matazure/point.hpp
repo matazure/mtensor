@@ -33,37 +33,37 @@ public:
 };
 
 #define POINT_BINARY_OPERATOR(op) \
-	template <typename _T, int_t _Dim> \
-	inline MATAZURE_GENERAL auto operator op(const point<_T, _Dim> &lhs, const point<_T, _Dim> &rhs)->point<decltype(lhs[0] op rhs[0]), _Dim> { \
-		point<decltype(lhs[0] op rhs[0]), _Dim> re; \
-		for (int_t i = 0; i < _Dim; ++i) { \
-			re[i] = lhs[i] op rhs[i]; \
-		} \
-		return re; \
-	}
+template <typename _T, int_t _Dim> \
+inline MATAZURE_GENERAL auto operator op(const point<_T, _Dim> &lhs, const point<_T, _Dim> &rhs)->point<decltype(lhs[0] op rhs[0]), _Dim> { \
+	point<decltype(lhs[0] op rhs[0]), _Dim> re; \
+	for (int_t i = 0; i < _Dim; ++i) { \
+		re[i] = lhs[i] op rhs[i]; \
+	} \
+	return re; \
+}
 
 #define POINT_WITH_VALUE_BINARY_OPERATOR(op) \
-	template <typename _T, int_t _Dim>  \
-	inline MATAZURE_GENERAL auto operator op(const point<_T, _Dim> &container, typename point<_T, _Dim>::value_type value)->point<decltype(container[0] op value), _Dim> { \
-		point<decltype(container[0] op value), _Dim> re; \
-		for (int_t i = 0; i < _Dim; ++i) { \
-			re[i] = container[i] op value; \
-		} \
+template <typename _T, int_t _Dim>  \
+inline MATAZURE_GENERAL auto operator op(const point<_T, _Dim> &container, typename point<_T, _Dim>::value_type value)->point<decltype(container[0] op value), _Dim> { \
+	point<decltype(container[0] op value), _Dim> re; \
+	for (int_t i = 0; i < _Dim; ++i) { \
+		re[i] = container[i] op value; \
+	} \
 \
-	return re; \
-	}\
+return re; \
+}\
 \
-	template <typename _T, int_t _Dim>  \
-	inline MATAZURE_GENERAL auto operator op(typename point<_T, _Dim>::value_type value, const point<_T, _Dim> &container)->point<decltype(value op container[0]), _Dim> { \
-		point<decltype(value op container[0]), _Dim> re; \
-		for (int_t i = 0; i < _Dim; ++i) { \
-			re[i] = container[i] op value; \
-		} \
+template <typename _T, int_t _Dim>  \
+inline MATAZURE_GENERAL auto operator op(typename point<_T, _Dim>::value_type value, const point<_T, _Dim> &container)->point<decltype(value op container[0]), _Dim> { \
+	point<decltype(value op container[0]), _Dim> re; \
+	for (int_t i = 0; i < _Dim; ++i) { \
+		re[i] = container[i] op value; \
+	} \
 \
-	return re; \
-	}
+return re; \
+}
 
-	//Arithmetic
+//Arithmetic
 POINT_BINARY_OPERATOR(+)
 POINT_BINARY_OPERATOR(-)
 POINT_BINARY_OPERATOR(*)
