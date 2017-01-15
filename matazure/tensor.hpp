@@ -331,6 +331,18 @@ inline void mem_copy(_TensorSrc ts_src, _TensorDst cts_dst, enable_if_t<are_host
 	memcpy(cts_dst.data(), ts_src.data(), sizeof(typename _TensorDst::value_type) * ts_src.size());
 }
 
+template <typename _Tensor>
+inline auto mem_clone(_Tensor ts, host_t, enable_if_t<are_host_memory<_Tensor>::value>* = nullptr)->tensor<typename _Tensor::value_type, _Tensor::dim, typename _Tensor::layout_type> {
+	tensor<typename _Tensor::value_type, _Tensor::dim, typename _Tensor::layout_type> ts_re(ts.extent());
+	mem_copy(ts, ts_re);
+	return ts_re;
+}
+
+template <typename _Tensor>
+inline auto mem_clone(_Tensor ts, enable_if_t<are_host_memory<_Tensor>::value>* = nullptr)->decltype(mem_clone(ts, host_t{})) {
+	return mem_clone(ts, host_t{});
+}
+
 namespace __walkaround {
 
 using tensor1b = tensor<byte, 1>;

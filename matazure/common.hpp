@@ -298,7 +298,7 @@ private: \
 public:\
 	name(_T x, value_type v) : x_(x), v_(v) {} \
 \
-	MATAZURE_GENERAL auto operator()(const int_t &i) const->decltype(this->x_[i] op this->v_){ \
+__forceinline MATAZURE_GENERAL auto operator()(int_t i) const->decltype(this->x_[i] op this->v_){ \
 		return x_[i] op v_; \
 	} \
 \
