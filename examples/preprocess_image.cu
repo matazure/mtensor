@@ -8,7 +8,7 @@ using io::read_raw_data;
 using io::write_raw_data;
 using namespace std::chrono;
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])  {
 	std::string input_raw_data_path = "data/lena_rgb888_512x512.raw_data";
 
 	using rgb_t = point<byte, 3>;

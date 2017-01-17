@@ -343,6 +343,8 @@ inline auto mem_clone(_Tensor ts, enable_if_t<are_host_memory<_Tensor>::value>* 
 	return mem_clone(ts, host_t{});
 }
 
+#ifdef MATAZURE_CUDA
+
 namespace __walkaround {
 
 using tensor1b = tensor<byte, 1>;
@@ -392,5 +394,7 @@ using tensor3d = tensor<double, 1>;
 using tensor4d = tensor<double, 1>;
 
 }
+
+#endif
 
 }
