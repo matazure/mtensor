@@ -1,21 +1,34 @@
+//#define BENCHMARK_HAS_CXX11
+
+#include <benchmark/benchmark.h>
 #include <matazure/tensor>
-#include <chrono>
 
 using namespace matazure;
-using namespace std::chrono;
 
-int main() {
-	tensor<float, 1> ts_src(1024 * 1024);
-	tensor<float, 1> ts_dst(ts_src.extent());
+template <typename _TensorSrc, typename _TensorDst>
+static void BM_mem_copy(benchmark::State& state) {
+	_TensorSrc ts_src(state.range(0));
+	_TensorDst ts_dst(ts_src.extent());
 
-	auto t0 = high_resolution_clock::now();
+	while (state.KeepRunning()) {
+		mem_copy(ts_src, ts_dst);
+	}
 
-	mem_copy(ts_src, ts_dst);
-
-	auto t1 = high_resolution_clock::now();
-
-	auto all_bytes_g = ts_src.size() * sizeof(ts_src[0]) / double(1 << 30);
-	auto cost_time_s = (t1 - t0).count() / 1000.0 / 1000.0 / 1000.0;
-
-	printf("%f G per seconds.", all_bytes_g / cost_time_s);
+	auto bytes_size = static_cast<size_t>(ts_src.size()) * sizeof(typename _TensorSrc::value_type);
+	state.SetBytesProcessed(state.iterations() * bytes_size);
 }
+
+auto BM_host2host_mem_copy = BM_mem_copy<tensor<byte, 1>, tensor<byte, 1>>;
+auto BM_device2host_mem_copy = BM_mem_copy<cu_tensor<byte, 1>, tensor<byte, 1>>;
+auto BM_host2device_mem_copy = BM_mem_copy<tensor<byte, 1>, cu_tensor<byte, 1>>;
+auto BM_device2device_mem_copy = BM_mem_copy<cu_tensor<byte, 1>, cu_tensor<byte, 1>>;
+
+BENCHMARK(BM_host2host_mem_copy)->Range(1, 1 << 30)->UseRealTime();
+BENCHMARK(BM_device2host_mem_copy)->Range(1, 1 << 30)->UseRealTime();
+BENCHMARK(BM_host2device_mem_copy)->Range(1, 1 << 30)->UseRealTime();
+BENCHMARK(BM_device2device_mem_copy)->Range(1, 1 << 30)->UseRealTime();
+
+BENCHMARK_MAIN()
+
+
+

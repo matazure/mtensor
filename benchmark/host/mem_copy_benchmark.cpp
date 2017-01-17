@@ -1,21 +1,21 @@
-#include <matazure/tensor>
-#include <chrono>
+﻿#include "benchmark/benchmark.h"
+#include <list>
+#include <vector>
 
-using namespace matazure;
-using namespace std::chrono;
-
-int main() {
-	tensor<float, 1> ts_src(1024 * 1024);
-	tensor<float, 1> ts_dst(ts_src.extent());
-
-	auto t0 = high_resolution_clock::now();
-
-	mem_copy(ts_src, ts_dst);
-
-	auto t1 = high_resolution_clock::now();
-
-	auto all_bytes_g = ts_src.size() * sizeof(ts_src[0]) / double(1 << 30);
-	auto cost_time_s = (t1 - t0).count() / 1000.0 / 1000.0 / 1000.0;
-
-	printf("%f G per seconds.", all_bytes_g / cost_time_s);
+template <typename Container,
+          typename ValueType = typename Container::value_type>
+static void BM_Sequential(benchmark::State& state) {
+  ValueType v = 42;
+  while (state.KeepRunning()) {
+    Container c;
+    for (int i = state.range(0); --i;) c.push_back(v);
+  }
+  const size_t items_processed = state.iterations() * state.range(0);
+  state.SetItemsProcessed(items_processed);
+  state.SetBytesProcessed(items_processed * sizeof(v));
 }
+BENCHMARK_TEMPLATE2(BM_Sequential, std::vector<int>, int)
+    ->Range(1 << 0, 1 << 10);
+BENCHMARK_TEMPLATE(BM_Sequential, std::list<int>)->Range(1 << 0, 1 << 10);
+
+BENCHMARK_MAIN()
