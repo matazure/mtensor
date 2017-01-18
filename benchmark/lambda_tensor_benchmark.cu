@@ -1,7 +1,4 @@
-
-//#define BENCHMARK_HAS_CXX11
-
-#include <benchmark/benchmark.h>
+﻿#include <benchmark/benchmark.h>
 #include <matazure/tensor>
 
 using namespace matazure;
