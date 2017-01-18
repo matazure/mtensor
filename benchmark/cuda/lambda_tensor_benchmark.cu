@@ -6,31 +6,35 @@
 
 using namespace matazure;
 
-class BM_linear_lambda_tensor : public ::benchmark::Fixture {
-public:
-	void SetUp(const ::benchmark::State& state) {
-		/*uq_tsf1.reset(new tensor<float, 1>(state.range(0)));
-		fill(*uq_tsf1, 1.0f);*/
+static void BM_linear_lambda_tensor_persist_gold(benchmark::State &st) {
+	tensor<float, 1> tsf1(st.range(0));
+	while (st.KeepRunning()) {
+		tensor<float, 1> ts_re(tsf1.extent());
+		for (int_t i = 0; i < ts_re.size(); ++i) {
+			ts_re[i] = 2.0f * tsf1[i];
+		}
 	}
 
-	void TearDown(const ::benchmark::State& state) { }
+	auto bytes_size = static_cast<size_t>(tsf1.size()) * sizeof(decltype(tsf1[0]));
+	st.SetBytesProcessed(st.iterations() * bytes_size);
+}
 
-	std::unique_ptr<tensor<float, 1>> uq_tsf1;
-};
-
-BENCHMARK_F(BM_linear_lambda_tensor, Mul)(benchmark::State &st) {
+static void BM_linear_lambda_tensor_persist(benchmark::State &st) {
 	tensor<float, 1> tsf1(st.range(0));
 	while (st.KeepRunning()) {
 		auto tsf1_re = make_lambda(tsf1.extent(), [tsf1](int_t i) {
 			return 2.0f * tsf1[i];
-		});
+		}).persist();
 	}
+
+	auto bytes_size = static_cast<size_t>(tsf1.size()) * sizeof(decltype(tsf1[0]));
+	st.SetBytesProcessed(st.iterations() * bytes_size);
 }
 
+BENCHMARK(BM_linear_lambda_tensor_persist_gold)->Range(1 << 10, 1 << 28)->UseRealTime();
+BENCHMARK(BM_linear_lambda_tensor_persist)->Range(1 << 10, 1 << 28)->UseRealTime();
 
-
-BENCHMARK_REGISTER_F(BM_linear_lambda_tensor, Mul)->Range(;
-
+BENCHMARK(BM_linear_lambda_tensor_persist_gold)->Range(1 << 10, 1 << 28)->UseRealTime();
 
 BENCHMARK_MAIN()
 

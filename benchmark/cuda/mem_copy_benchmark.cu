@@ -23,10 +23,10 @@ auto BM_device2host_mem_copy = BM_mem_copy<cu_tensor<byte, 1>, tensor<byte, 1>>;
 auto BM_host2device_mem_copy = BM_mem_copy<tensor<byte, 1>, cu_tensor<byte, 1>>;
 auto BM_device2device_mem_copy = BM_mem_copy<cu_tensor<byte, 1>, cu_tensor<byte, 1>>;
 
-BENCHMARK(BM_host2host_mem_copy)->Range(1, 1 << 30)->UseRealTime();
-BENCHMARK(BM_device2host_mem_copy)->Range(1, 1 << 30)->UseRealTime();
-BENCHMARK(BM_host2device_mem_copy)->Range(1, 1 << 30)->UseRealTime();
-BENCHMARK(BM_device2device_mem_copy)->Range(1, 1 << 30)->UseRealTime();
+BENCHMARK(BM_host2host_mem_copy)->Range(1<<16, 1 << 30)->UseRealTime();
+BENCHMARK(BM_device2host_mem_copy)->Range(1<<16, 1 << 30)->UseRealTime();
+BENCHMARK(BM_host2device_mem_copy)->Range(1<<16, 1 << 30)->UseRealTime();
+BENCHMARK(BM_device2device_mem_copy)->Range(1<<16+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++, 1 << 30)->UseRealTime();
 
 BENCHMARK_MAIN()
 
