@@ -352,7 +352,6 @@ using tensor2b = tensor<byte, 2>;
 using tensor3b = tensor<byte, 3>;
 using tensor4b = tensor<byte, 4>;
 
-
 using tensor1s = tensor<short, 1>;
 using tensor2s = tensor<short, 2>;
 using tensor3s = tensor<short, 3>;

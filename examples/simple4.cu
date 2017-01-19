@@ -32,6 +32,13 @@ int main() {
 	//auto lts_2add2f = ts2 + ts2f; //Compiler error! 类型不匹配
 	auto lts_2add2f = tensor_cast<float>(ts2) + ts2f; //Compiler OK
 
+	auto ts_zip = zip(ts1, ts2);
+	auto v12 = ts_zip[0];
+	printf("ts_zip[0]: (%d, %d)\n", std::get<0>(v12), std::get<1>(v12));
+
+	get<0>(v12) = 14;
+	get<1>(v12) = 17;
+	printf("ts1[0]: %d; ts2[0]: %d\n", ts1[0], ts2[0]);
 
 #ifdef MATAZURE_CUDA
 

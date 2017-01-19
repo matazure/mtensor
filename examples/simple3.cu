@@ -1,4 +1,5 @@
 ﻿#include <matazure/tensor>
+#include <vector>
 
 using namespace matazure;
 
@@ -10,8 +11,9 @@ using namespace matazure;
 int main() {
 	//构造一个linear access的二维int型lambda_tensor
 	auto lts_linear = make_lambda(pointi<2>{ 4, 4 }, [] (int_t i)->int{
-		return i;
+		return std::move(i);
 	});
+
 	printf("linear access lts_linear.\n");
 	for (int_t i = 0; i < lts_linear.size(); ++i) {
 		printf("%d: %d\n", i, lts_linear[i]);
@@ -42,6 +44,16 @@ int main() {
 			printf("(%d, %d): %f\n", i, j, ts_array(pointi<2>{i, j}));
 		}
 	}
+
+	//lvalue lambda tensor
+	tensor<int, 2> ts_tmp(10, 10);
+	auto lts_rvalue = make_lambda(pointi<2>{10, 10}, [=](int_t i)->decltype(ts_tmp[0]){
+		return ts_tmp[i];
+	});
+	lts_rvalue[0] = 100;
+	auto&& dfsag = lts_rvalue[0];
+	auto t = ts_tmp[0];
+	printf("tmp value[0]: %d\n", t);
 
 #ifdef MATAZURE_CUDA
 

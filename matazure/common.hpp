@@ -167,7 +167,21 @@ public:
 	{}
 
 	MATAZURE_GENERAL typename _Tensor::value_type operator()(pointi<_Tensor::dim> idx) const {
-		return ts_(idx / stride_ + phase_);
+		return ts_(idx * stride_ + phase_);
+	}
+};
+
+template <typename _Tensor0, typename _Tensor1>
+struct zip_op{
+private:
+	_Tensor0 ts0_;
+	_Tensor1 ts1_;
+
+public:
+	zip_op(_Tensor0 ts0, _Tensor1 ts1): ts0_(ts0), ts1_(ts1){}
+
+	MATAZURE_GENERAL auto operator()(int_t i) const->decltype(tie(ts0_[0], ts1_[0])){
+		return tie(ts0_[i], ts1_[i]);
 	}
 };
 
@@ -250,6 +264,20 @@ inline auto stride(_Tensor ts, _StrideType stride, _PhaseType phase)->decltype(m
 //inline auto splice(_Tensor ts, int_t i) {
 //	return make_lambda()
 //}
+
+template <typename _Tensor0, typename _Tensor1>
+inline auto zip(_Tensor0 ts0, _Tensor1 ts1)->decltype(make_lambda(ts0.extent(), _internal::zip_op<_Tensor0, _Tensor1>(ts0, ts1))) {
+	return make_lambda(ts0.extent(), _internal::zip_op<_Tensor0, _Tensor1>(ts0, ts1));
+}
+
+// template <typename ..._Tensors>
+// inline auto zip(_Tensors... tensors){
+// 	auto tuple_tensors = make_tuple(tensors);
+// 	auto ext = get<0>(tuple_tensors).extent();
+// 	return make_lambda(ext, [=](int_t i){
+// 		return tie(tensors...[i]);
+// 	});
+// }
 
 #define __MATAZURE_LINEAR_ACCESS_TENSOR_BINARY_OPERATOR(name, op) \
 template <typename _T1, typename _T2> \

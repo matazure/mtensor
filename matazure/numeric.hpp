@@ -14,35 +14,6 @@ inline MATAZURE_GENERAL bool in_apron(point<_ValueType, _Dim> input, point<_Valu
 	return true;
 }
 
-template <typename _TS>
-typename _TS::value_type sum(_TS ts) {
-	typedef typename _TS::value_type value_type;
-	return reduce(ts, value_type(0), [=](value_type lhs, value_type rhs) {
-		return lhs + rhs;
-	});
-}
-
-template <typename _TS>
-typename _TS::value_type mean(_TS ts) {
-	return sum(ts) / ts.size();
-}
-
-template <typename _TS>
-typename _TS::value_type max(_TS ts) {
-	typedef typename _TS::value_type value_type;
-	return reduce(ts, remove_const_t<decay_t<value_type>>(ts[0]), [=](value_type lhs, value_type rhs) {
-		return rhs > lhs ? rhs : lhs;
-	});
-}
-
-template <typename _TS>
-typename _TS::value_type min(_TS ts) {
-	typedef typename _TS::value_type value_type;
-	return reduce(ts, numeric_limits<value_type>::max(), [=](value_type lhs, value_type rhs) {
-		return lhs <= rhs ? lhs : rhs;
-	});
-}
-
 template <typename _VectorLhs, typename _VectorRhs>
 auto inner_product(_VectorLhs vec_lhs, _VectorRhs vec_rhs) {
 	/*	assert(vec_lhs.size() == vec_rhs.size());*/

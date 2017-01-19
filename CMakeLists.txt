@@ -3,10 +3,14 @@ cmake_minimum_required(VERSION 3.0)
 project(MatazureTensor CXX C)
 
 option(WITH_CUDA "Enable CUDA" ON)
-option(WITH_BENCHMARK "Enable Benchmark" OFF) #unneccesary
+option(WITH_BENCHMARK "Enable Benchmark" ON) #unneccesary
 
 include_directories(.)
 set_property( GLOBAL PROPERTY USE_FOLDERS ON)
+
+if (WIN32)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+endif()
 
 if (WITH_CUDA)
 	if(NOT(CMAKE_SIZEOF_VOID_P EQUAL 8))
@@ -24,7 +28,7 @@ if (WITH_CUDA)
 else()
 	if (UNIX)
 		add_definitions("-x c++")
-		add_compile_options("-std=c++11")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}-s -O3 -Wall")
 	endif()
 endif()
