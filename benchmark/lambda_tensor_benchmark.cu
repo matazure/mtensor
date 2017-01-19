@@ -31,9 +31,4 @@ static void BM_linear_lambda_tensor_persist(benchmark::State &st) {
 BENCHMARK(BM_linear_lambda_tensor_persist_gold)->Range(1 << 10, 1 << 28)->UseRealTime();
 BENCHMARK(BM_linear_lambda_tensor_persist)->Range(1 << 10, 1 << 28)->UseRealTime();
 
-BENCHMARK(BM_linear_lambda_tensor_persist_gold)->Range(1 << 10, 1 << 28)->UseRealTime();
-
 BENCHMARK_MAIN()
-
-
-
