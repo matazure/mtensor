@@ -32,6 +32,8 @@ public:
 	value_type elements_[dim];
 };
 
+static_assert(std::is_pod<point<byte, 1>>::value, "point should be pod");
+
 #define POINT_BINARY_OPERATOR(op) \
 template <typename _T, int_t _Dim> \
 inline MATAZURE_GENERAL auto operator op(const point<_T, _Dim> &lhs, const point<_T, _Dim> &rhs)->point<decltype(lhs[0] op rhs[0]), _Dim> { \

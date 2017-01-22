@@ -54,33 +54,40 @@ void BM_host_stride_dim2_gold(benchmark::State &state) {
 	state.SetBytesProcessed(state.iterations() * bytes_size);
 }
 
- template <typename _Tensor>
- void BM_stride(benchmark::State &state) {
- 	_Tensor ts(state.range(1), state.range(1));
+template <typename _Tensor>
+void BM_stride(benchmark::State &state) {
+	auto ext = pointi<_Tensor::dim>::zeros();
+	for (int_t i = 0; i < ext.size(); ++i) {
+		ext[i] = state.range(1);
+	}
+
+	_Tensor ts(ext);
 	int_t ts_stride = state.range(0);
 	int_t ts_phase = ts_stride / 2;
 	auto ts_re_ext = ts.extent() / ts_stride;
- 	while (state.KeepRunning()) {
+	while (state.KeepRunning()) {
 		auto ts_re = stride(ts, ts_stride, ts_phase).persist();
- 	}
 
- 	auto bytes_size = static_cast<size_t>(prod(ts_re_ext)) * sizeof(decltype(ts[0]));
- 	state.SetBytesProcessed(state.iterations() * bytes_size);
- }
+	#ifdef MATAZURE_CUDA
+		cuda::barrier();
+	#endif
+
+	}
+
+	auto bytes_size = static_cast<size_t>(prod(ts_re_ext)) * sizeof(decltype(ts[0]));
+	state.SetBytesProcessed(state.iterations() * bytes_size);
+}
 
 //template <typename _ValueType>
-//__global__ void stride_dim2_gold_kenel(_ValueType *p_dst, _ValueType *p1, _ValueType *p2, int_t count){
+//__global__ void stride_dim1_gold_kenel(_ValueType *p_dst, _ValueType *p_src, int_t count, int_t stride){
 //	for (int_t i = threadIdx.x + blockIdx.x * blockDim.x; i < count; i += blockDim.x * gridDim.x) {
-//		p_dst[i] = p1[i] * p2[i];
+//		p_dst[i] = p_dst[i * stride];
 //	}
 //}
-//
+
 //template <typename _ValueType>
 //void BM_cu_stride_gold(benchmark::State& state) {
-//	cu_tensor<_ValueType, 1> ts1(state.range(0));
-//	cu_tensor<_ValueType, 1> ts2(state.range(0));
-//	fill(ts1, _ValueType(1));
-//	fill(ts2, _ValueType(1));
+//	cu_tensor<_ValueType, 1> ts(state.range(0));
 //
 //	while (state.KeepRunning()) {
 //		cu_tensor<float, 1> ts_re(ts1.extent());
@@ -125,8 +132,15 @@ BENCHMARK_TEMPLATE(BM_host_stride_dim2_gold, byte)->UseRealTime()->Apply(custom_
 //BENCHMARK_TEMPLATE(BM_host_stride_dim2_gold, float)->UseRealTime()->Apply(custom_arguments);
 //BENCHMARK_TEMPLATE(BM_host_stride_dim2_gold, double)->UseRealTime()->Apply(custom_arguments);
 
-auto BM_host_stride_dim2_stride = BM_stride<tensor<byte, 2>>;
-BENCHMARK(BM_host_stride_dim2_stride)->UseRealTime()->Apply(custom_arguments);
+auto BM_stride_tensor_byte_dim2 = BM_stride<tensor<byte, 2>>;
+BENCHMARK(BM_stride_tensor_byte_dim2)->UseRealTime()->Apply(custom_arguments);
+
+auto BM_stride_cu_tensor_byte_dim2 = BM_stride<cu_tensor<byte, 2>>;
+BENCHMARK(BM_stride_cu_tensor_byte_dim2)->UseRealTime()->Apply(custom_arguments);
+
+//auto BM_stride_cu_tensor_byte_dim1 = BM_stride<cu_tensor<byte, 1>>;
+//BENCHMARK(BM_stride_cu_tensor_byte_dim1)->UseRealTime()->Apply(custom_arguments);
+
 
 //BENCHMARK_TEMPLATE(BM_host_stride, float)->Range(1 << 10, 1 << 28)->UseRealTime();
 //
