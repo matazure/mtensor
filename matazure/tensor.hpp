@@ -221,8 +221,8 @@ private:
 	value_type * const data_;
 };
 
-template <typename _Type, typename _Layout = first_major_t>
-using vector = tensor<_Type, 1, _Layout>;
+// template <typename _Type, typename _Layout = first_major_t>
+// using vector = tensor<_Type, 1, _Layout>;
 
 template <typename _Type, typename _Layout = first_major_t>
 using matrix = tensor<_Type, 2, _Layout>;

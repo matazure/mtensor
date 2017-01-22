@@ -32,6 +32,8 @@ using std::numeric_limits;
 
 using std::tuple;
 using std::make_tuple;
+using std::tuple_size;
+using std::tuple_element;
 using std::tie;
 using std::get;
 

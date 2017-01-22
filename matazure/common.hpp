@@ -133,8 +133,16 @@ public:
 template <typename _OutValueType>
 struct cast_op {
 	template <typename _InValueType>
-	MATAZURE_GENERAL auto operator()(_InValueType v) const->decltype(static_cast<_OutValueType>(v)) {
+	MATAZURE_GENERAL _OutValueType operator()(_InValueType v) const {
 		return static_cast<_OutValueType>(v);
+	}
+};
+
+template <typename _OutPointValueType, int_t _Dim>
+struct cast_op<point<_OutPointValueType, _Dim>>{
+	template <typename _InPointValueType>
+	MATAZURE_GENERAL point<_OutPointValueType, _Dim> operator() (const point<_InPointValueType, _Dim> &p) const {
+		return point_cast<_OutPointValueType>(p);
 	}
 };
 
@@ -168,6 +176,25 @@ public:
 
 	MATAZURE_GENERAL typename _Tensor::value_type operator()(pointi<_Tensor::dim> idx) const {
 		return ts_(idx * stride_ + phase_);
+	}
+};
+
+template <typename _Tensor>
+struct resize_op{
+private:
+	_Tensor ts_;
+	pointi<_Tensor::dim> resize_ext_;
+	pointf<_Tensor::dim> resize_scale_;
+public:
+	resize_op(_Tensor ts, pointi<_Tensor::dim> resize_ext): ts_(ts), resize_ext_(resize_ext) {
+		resize_scale_ = point_cast<float>(ts_.extent()) / point_cast<float>(resize_ext_);
+
+		printf("resize_scale_: %f, %f\n", resize_scale_[0], resize_scale_[1]);
+	}
+
+	MATAZURE_GENERAL typename _Tensor::value_type operator()(const pointi<_Tensor::dim> &idx) const{
+		auto idx_f = point_cast<float>(idx) * resize_scale_;
+		return ts_(point_cast<int_t>(idx_f));
 	}
 };
 
@@ -259,6 +286,10 @@ inline auto stride(_Tensor ts, _StrideType stride, _PhaseType phase)->decltype(m
 	return make_lambda(ts.extent() / stride, _internal::stride_op<_Tensor, _StrideType, _PhaseType>(ts, stride, phase), typename _Tensor::memory_type{});
 }
 
+template <typename _Tensor>
+inline auto resize(_Tensor ts, const pointi<_Tensor::dim> &resize_ext)->decltype(make_lambda(resize_ext, _internal::resize_op<_Tensor>(ts, resize_ext), typename _Tensor::memory_type{})) {
+	return make_lambda(resize_ext, _internal::resize_op<_Tensor>(ts, resize_ext), typename _Tensor::memory_type{});
+}
 ///实现稍微有点难度
 //template <typename _Tensor, int_t _DimIdx>
 //inline auto splice(_Tensor ts, int_t i) {
