@@ -32,3 +32,4 @@ convert   lena_rgb888_512x512.jpg  -depth 8 gray:lena_gray8_512x512.raw_data
 convert  -size 512x512 -depth 8 rgb:lena_rgb888_512x512.raw_data lena_rgb888_512x512.jpg
 convert  -size 512x512 -depth 8 gray:lena_gray8_512x512.raw_data lena_gray8_512x512.jpg
 ```
+
