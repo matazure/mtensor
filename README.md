@@ -1,37 +1,35 @@
-## Welcome to GitHub Pages
+# Tensor
+tensor是matazure下的一个多维数组基础库, 具有以下的优点
+* 同时支持C++和CUDA
+* 具备泛型(多类型,多维度)tensor
+* 具备函数式lambda_tensor
+* 向量化的tensor操作和运算
+* 延迟计算
+* 内存回收
+* Header Only
+* 跨平台（CUDA部分仅支持64位系统）
 
-You can use the [editor on GitHub](https://github.com/Matazure/tensor/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+## 如何使用
+获取tensor项目后，将根目录加入到目标项目的头文件路径即可
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+## 示例
 
-### Markdown
+## 生成项目
+* Windows  
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+* Ubuntu 16
 
-```markdown
-Syntax highlighted code block
+## 其他
+安装[ImageMagic](http://www.imagemagick.org/)工具
 
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+将图像转换为二进制raw data
+```
+convert   lena_rgb888_512x512.jpg  -depth 8 rgb:lena_rgb888_512x512.raw_data
+convert   lena_rgb888_512x512.jpg  -depth 8 gray:lena_gray8_512x512.raw_data
+```
+将二进制raw data转换为图像
+```
+convert  -size 512x512 -depth 8 rgb:lena_rgb888_512x512.raw_data lena_rgb888_512x512.jpg
+convert  -size 512x512 -depth 8 gray:lena_gray8_512x512.raw_data lena_gray8_512x512.jpg
 ```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/Matazure/tensor/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
