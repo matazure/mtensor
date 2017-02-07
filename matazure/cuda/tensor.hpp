@@ -312,4 +312,11 @@ inline auto mem_clone(_Tensor cts, enable_if_t<are_device_memory<_Tensor>::value
 	return mem_clone(cts, device_t{});
 }
 
+template <typename _ValueType, int_t _Dim, typename _Layout, int_t _OutDim, typename _OutLayout = _Layout>
+inline auto reshape(cuda::tensor<_ValueType, _Dim, _Layout> ts, pointi<_OutDim> ext, _OutLayout* = nullptr)->cuda::tensor<_ValueType, _OutDim, _OutLayout>{
+	///TODO: assert size equal
+	cuda::tensor<_ValueType, _OutDim, _OutLayout> re(ext, ts.shared_data());
+	return re;
+}
+
 }

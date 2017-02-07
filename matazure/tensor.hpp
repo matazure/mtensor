@@ -343,6 +343,13 @@ inline auto mem_clone(_Tensor ts, enable_if_t<are_host_memory<_Tensor>::value>* 
 	return mem_clone(ts, host_t{});
 }
 
+template <typename _ValueType, int_t _Dim, typename _Layout, int_t _OutDim, typename _OutLayout = _Layout>
+inline auto reshape(tensor<_ValueType, _Dim, _Layout> ts, pointi<_OutDim> ext, _OutLayout* = nullptr)->tensor<_ValueType, _OutDim, _OutLayout>{
+	///TODO: assert size equal
+	tensor<_ValueType, _OutDim, _OutLayout> re(ext, ts.shared_data());
+	return re;
+}
+
 #ifdef MATAZURE_CUDA
 
 namespace __walkaround {
