@@ -212,20 +212,20 @@ public:
 	}
 };
 
-//template <typename _Tensor, int_t _DimI>
-//struct splice_op {
-//	splice_op(_Tensor ts, int_t splic_i):
-//		ts_(ts), splice_i_(splic_i)
-//	{}
-//
-//	MATAZURE_GENERAL auto operator()(pointi<_Tensor::dim-1> idx) const {
-//		return ts_();
-//	}
-//
-//private:
-//	_Tensor ts_;
-//	int_t splic_i_;
-//};
+template <typename _Tensor, int_t _SliceIdx>
+struct slice_op {
+	slice_op(_Tensor ts, int_t splic_i):
+		ts_(ts), slice_i_(splic_i)
+	{}
+
+	MATAZURE_GENERAL auto operator()(pointi<_Tensor::dim-1> idx) const {
+		return ts_();
+	}
+
+private:
+	_Tensor ts_;
+	int_t splic_i_;
+};
 
 }
 
@@ -290,9 +290,10 @@ template <typename _Tensor>
 inline auto resize(_Tensor ts, const pointi<_Tensor::dim> &resize_ext)->decltype(make_lambda(resize_ext, _internal::resize_op<_Tensor>(ts, resize_ext), typename _Tensor::memory_type{})) {
 	return make_lambda(resize_ext, _internal::resize_op<_Tensor>(ts, resize_ext), typename _Tensor::memory_type{});
 }
+
 ///实现稍微有点难度
 //template <typename _Tensor, int_t _DimIdx>
-//inline auto splice(_Tensor ts, int_t i) {
+//inline auto slice(_Tensor ts, int_t i) {
 //	return make_lambda()
 //}
 
