@@ -80,14 +80,14 @@ namespace matazure {
 	template <typename _T1, typename _T2, typename _TransFun>
 	inline void transform(_T1 lhs, _T2 rhs, _TransFun fun, enable_if_t<are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
 		for (int_t i = 0, size = rhs.size(); i < size; ++i) {
-			fun(rhs[i], lhs[i]);
+			fun(lhs[i], rhs[i]);
 		}
 	}
 
 	template <typename _T1, typename _T2, typename _TransFun>
-	inline void transform(_T1 lhs, _T2 rhs, enable_if_t<!are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
+	inline void transform(_T1 lhs, _T2 rhs, _TransFun fun, enable_if_t<!are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
 		for_index(pointi<_T1::dim>::zeros(), lhs.extent(), [=] (pointi<_T1::dim> idx) {
-			fun(rhs(idx) = lhs(idx));
+			fun(lhs(idx), rhs(idx));
 		});
 	}
 

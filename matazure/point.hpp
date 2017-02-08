@@ -172,7 +172,7 @@ template<int_t _Idx, class _Ty, int_t _Dim>
 MATAZURE_GENERAL constexpr _Ty&& get(point<_Ty, _Dim>&& pt) {
 	// return element at _Idx in point pt
 	static_assert(_Idx < _Dim, "point index out of bounds");
-	return (_STD move(pt.elements_[_Idx]));
+	return (move(pt.elements_[_Idx]));
 }
 
 template <int_t _Dim>

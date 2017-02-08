@@ -144,7 +144,7 @@ public:
 	typedef matazure::pointi<dim>			extent_type;
 	typedef pointi<dim>						index_type;
 	typedef _Layout							layout_type;
-	typedef linear_access_t					access_type;
+	typedef linear_access_t						access_type;
 	typedef host_t							memory_type;
 
 public:
@@ -184,7 +184,7 @@ public:
 		return (*this)(index_type{ idx... });
 	}
 
-	value_type & operator()(const index_type &index) const {
+	value_type& operator()(const index_type &index) const {
 		return (*this)[index2offset(index, stride_, layout_type{})];
 	}
 
