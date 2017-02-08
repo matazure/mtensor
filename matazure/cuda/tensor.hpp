@@ -140,7 +140,7 @@ public:
 	}
 
 	tensor<value_type, dim> persist() const {
-		tensor<value_type, dim> re(this->extent());
+		tensor<decay_t<value_type>, dim> re(this->extent());
 		copy(*this, re);
 		return re;
 	}

@@ -282,14 +282,14 @@ public:
 	}
 
 	MATAZURE_GENERAL tensor<value_type, dim> persist() const {
-		tensor<value_type, dim> re(this->extent());
+		tensor<decay_t<value_type>, dim> re(this->extent());
 		copy(*this, re);
 		return re;
 	}
 
 	template <int_t _S, int_t ..._Extents>
 	static_tensor<value_type, _S, _Extents...> persist() const {
-		static_tensor<value_type, _S, _Extents...> re;
+		static_tensor<decay_t<value_type>, _S, _Extents...> re;
 		copy(*this, re);
 		return re;
 	}
