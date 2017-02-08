@@ -21,6 +21,8 @@ void BM_cu_for_each_gold(benchmark::State& state) {
 			policy.getBlockSize(),
 			policy.getSharedMemBytes(),
 			policy.getStream() >>>(ts_src.data(), ts_src.size());
+
+		cuda::barrier();
 	}
 
 	auto bytes_size = static_cast<size_t>(ts_src.size()) * sizeof(_ValueType);
@@ -35,6 +37,8 @@ void BM_cu_for_each(benchmark::State& state) {
 		for_each(ts_src, [] __matazure__(_ValueType &e) {
 			e = 1.0f;
 		});
+
+		cuda::barrier();
 	}
 
 	auto bytes_size = static_cast<size_t>(ts_src.size()) * sizeof(_ValueType);
@@ -54,4 +58,3 @@ BENCHMARK_TEMPLATE1(BM_cu_for_each, int32_t)->Range(1<<10, 1 << 28)->UseRealTime
 BENCHMARK_TEMPLATE1(BM_cu_for_each, int64_t)->Range(1<<10, 1 << 28)->UseRealTime();
 BENCHMARK_TEMPLATE1(BM_cu_for_each, float)->Range(1<<10, 1 << 28)->UseRealTime();
 BENCHMARK_TEMPLATE1(BM_cu_for_each, double)->Range(1<<10, 1 << 28)->UseRealTime();
-
