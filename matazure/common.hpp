@@ -157,7 +157,7 @@ public:
 		ts_(ts), origin_(origin)
 	{}
 
-	MATAZURE_GENERAL typename _Tensor::value_type operator()(pointi<_Tensor::dim> idx) const {
+	MATAZURE_GENERAL auto operator()(pointi<_Tensor::dim> idx) const->decltype((ts_(idx + origin_))) {
 		return ts_(idx + origin_);
 	}
 };
@@ -174,7 +174,7 @@ public:
 		ts_(ts), stride_(stride), phase_(phase)
 	{}
 
-	MATAZURE_GENERAL typename _Tensor::value_type operator()(pointi<_Tensor::dim> idx) const {
+	MATAZURE_GENERAL auto operator()(pointi<_Tensor::dim> idx) const->decltype((ts_(idx * stride_ + phase_))){
 		return ts_(idx * stride_ + phase_);
 	}
 };

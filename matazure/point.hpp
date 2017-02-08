@@ -175,11 +175,10 @@ MATAZURE_GENERAL constexpr _Ty&& get(point<_Ty, _Dim>&& pt) {
 	return (move(pt.elements_[_Idx]));
 }
 
-template <int_t _Dim>
-using pointi = point<int_t, _Dim>;
-
-template <int_t _Dim>
-using pointf = point<float, _Dim>;
+template <int_t _Dim> using pointb = point<byte, _Dim>;
+template <int_t _Dim> using points = point<short, _Dim>;
+template <int_t _Dim> using pointi = point<int_t, _Dim>;
+template <int_t _Dim> using pointf = point<float, _Dim>;
 
 template <int_t _Dim>
 inline MATAZURE_GENERAL pointi<_Dim> get_stride(pointi<_Dim> ex) {
@@ -249,16 +248,18 @@ public:
 	point_viewer(const _Tuple &tp): _Tuple(tp){}
 
 	point_viewer &operator=(const point_type &tp) {
-		get<0>(*this) = tp[0];
-		get<1>(*this) = tp[1];
-		get<2>(*this) = tp[2];
+		get<0>(*static_cast<_Tuple *>(this)) = tp[0];
+		get<1>(*static_cast<_Tuple *>(this)) = tp[1];
+		get<2>(*static_cast<_Tuple *>(this)) = tp[2];
+
+		return *this;
 	}
 
 	operator point_type() const {
 		point_type re;
-		re[0] = get<0>(*this);
-		re[1] = get<1>(*this);
-		re[2] = get<2>(*this);
+		re[0] = get<0>(*static_cast<_Tuple *>(this));
+		re[1] = get<1>(*static_cast<_Tuple *>(this));
+		re[2] = get<2>(*static_cast<_Tuple *>(this));
 	}
 };
 
