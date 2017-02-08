@@ -144,7 +144,7 @@ public:
 	typedef matazure::pointi<dim>			extent_type;
 	typedef pointi<dim>						index_type;
 	typedef _Layout							layout_type;
-	typedef linear_access_t					access_type;
+	typedef linear_access_t						access_type;
 	typedef host_t							memory_type;
 
 public:
@@ -184,7 +184,7 @@ public:
 		return (*this)(index_type{ idx... });
 	}
 
-	value_type & operator()(const index_type &index) const {
+	value_type& operator()(const index_type &index) const {
 		return (*this)[index2offset(index, stride_, layout_type{})];
 	}
 
@@ -282,14 +282,14 @@ public:
 	}
 
 	MATAZURE_GENERAL tensor<value_type, dim> persist() const {
-		tensor<value_type, dim> re(this->extent());
+		tensor<decay_t<value_type>, dim> re(this->extent());
 		copy(*this, re);
 		return re;
 	}
 
 	template <int_t _S, int_t ..._Extents>
 	static_tensor<value_type, _S, _Extents...> persist() const {
-		static_tensor<value_type, _S, _Extents...> re;
+		static_tensor<decay_t<value_type>, _S, _Extents...> re;
 		copy(*this, re);
 		return re;
 	}
@@ -341,6 +341,13 @@ inline auto mem_clone(_Tensor ts, host_t, enable_if_t<are_host_memory<_Tensor>::
 template <typename _Tensor>
 inline auto mem_clone(_Tensor ts, enable_if_t<are_host_memory<_Tensor>::value>* = nullptr)->decltype(mem_clone(ts, host_t{})) {
 	return mem_clone(ts, host_t{});
+}
+
+template <typename _ValueType, int_t _Dim, typename _Layout, int_t _OutDim, typename _OutLayout = _Layout>
+inline auto reshape(tensor<_ValueType, _Dim, _Layout> ts, pointi<_OutDim> ext, _OutLayout* = nullptr)->tensor<_ValueType, _OutDim, _OutLayout>{
+	tensor<_ValueType, _OutDim, _OutLayout> re(ext, ts.shared_data());
+	MATAZURE_ASSERT_MSG(re.size() == ts.size(), "the size of tensors are not equal");
+	return re;
 }
 
 #ifdef MATAZURE_CUDA

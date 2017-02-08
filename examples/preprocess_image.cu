@@ -1,101 +1,36 @@
-#ifndef __CUDACC__
-
-#include <matazure/tensor>
-#include <chrono>
+﻿#include <matazure/tensor>
 
 using namespace matazure;
-using io::read_raw_data;
-using io::write_raw_data;
-using namespace std::chrono;
-
-int main(int argc, char *argv[])  {
-	std::string input_raw_data_path = "data/lena_rgb888_512x512.raw_data";
-
-	using rgb_t = point<byte, 3>;
-	tensor<rgb_t, 2> ts_rgb(512, 512);
-	read_raw_data(input_raw_data_path, ts_rgb);
-
-	auto lts_red = make_lambda(ts_rgb.extent(), [=](int_t i) {
-		return ts_rgb[i][0];
-	}).persist();
-
-	auto t0 = high_resolution_clock::now();
-
-
-
-	/*auto ts_normalized_red = make_lambda(lts_red.extent(), [=](int_t i) {
-		return lts_red[i] * 100;
-	}).persist();*/
-
-	//auto ts_normalized_red = make_lambda(lts_red.extent(), __mul_linear_access_tensor_with_value__<decltype(lts_red)>(lts_red, 100)).persist();
-
-
-	auto ts_normalized_red = (lts_red / 100).persist();
-
-	//auto ts_normalized_red = make_lambda(ts_rgb.extent(), [=](int_t i) {
-	//	return (ts_rgb[i][0] - 256) / 100;
-	//}).persist();
-
-	auto t1 = high_resolution_clock::now();
-
-	printf("cost time: %dns\n", (t1 - t0).count());
-
-	std::string output_red_chanel_raw_data_path = "data/lena_red8_256x256.raw_data";
-	std::string output_green_chanel_raw_data_path = "data/lena_green8_256x256.raw_data";
-	std::string output_blue_chanel_raw_data_path = "data/lena_blue8_256x256.raw_data";
-
-	return 0;
-}
-
-#else
-
-#include <matazure/tensor>
-#include <chrono>
-
-using namespace matazure;
-using io::read_raw_data;
-using io::write_raw_data;
-using namespace std::chrono;
 
 int main(int argc, char *argv[]) {
-	std::string input_raw_data_path = "data/lena_rgb888_512x512.raw_data";
+	tensor<point<byte, 3>, 2> ts_rgb(512, 512);
+	io::read_raw_data("data/lena_rgb888_512x512.raw_data", ts_rgb);
 
-	using rgb_t = point<byte, 3>;
-	tensor<rgb_t, 2> ts_rgb(512, 512);
-	read_raw_data(input_raw_data_path, ts_rgb);
+#ifdef MATAZURE_CUDA
 	auto cts_rgb = mem_clone(ts_rgb, device_t{});
+	auto lcts_rgb_shift_zero = cts_rgb - point<byte, 3>{128, 128, 128};
+	auto lcts_rgb_stride = stride(lcts_rgb_shift_zero, 2, 0);
+	auto lcts_rgb_normalized = tensor_cast<pointf<3>>(lcts_rgb_stride) / pointf<3>{128.0f, 128.0f, 128.0f};
+	auto cts_rgb_normalized = lcts_rgb_normalized.persist();
+	auto ts_rgb_normalized = mem_clone(cts_rgb_normalized, host_t{});
+#else
+	auto lts_rgb_shift_zero = ts_rgb - point<byte, 3>{128, 128, 128};
+	auto lts_rgb_stride = stride(lts_rgb_shift_zero, 2, 0);
+	auto lts_rgb_normalized = tensor_cast<pointf<3>>(lts_rgb_stride) / pointf<3>{128.0f, 128.0f, 128.0f};
+	auto ts_rgb_normalized = lts_rgb_normalized.persist();
+#endif
 
-	auto lcts_red = make_lambda(cts_rgb.extent(), [=] __matazure__(int_t i) {
-		return cts_rgb[i][0];
-	}).persist();
+	tensor<float, 2> ts_red(ts_rgb_normalized.extent());
+	tensor<float, 2> ts_green(ts_rgb_normalized.extent());
+	tensor<float, 2> ts_blue(ts_rgb_normalized.extent());
+	auto ts_zip_point = point_view(zip(ts_red, ts_green, ts_blue));
+	copy(ts_rgb_normalized, ts_zip_point);
 
-	auto t0 = high_resolution_clock::now();
-
-
-
-
-	auto cts_normalized_red = make_lambda(lcts_red.extent(), [=] __matazure__(int_t i) {
-		return lcts_red[i] * 100;
-	}).persist();
-
-	//auto ts_normalized_red = make_lambda(lts_red.extent(), __div_linear_access_tensor_with_value__<decltype(lts_red)>(lts_red, 100)).persist();
-
-
-	//auto cts_normalized_red = (lcts_red / 100).persist();
-
-	//auto ts_normalized_red = make_lambda(ts_rgb.extent(), [=](int_t i) {
-	//	return (ts_rgb[i][0] - 256) / 100;
-	//}).persist();
-
-	auto t1 = high_resolution_clock::now();
-
-	printf("cost time: %dns\n", (t1 - t0).count());
-
-	std::string output_red_chanel_raw_data_path = "data/lena_red8_256x256.raw_data";
-	std::string output_green_chanel_raw_data_path = "data/lena_green8_256x256.raw_data";
-	std::string output_blue_chanel_raw_data_path = "data/lena_blue8_256x256.raw_data";
+	io::write_raw_data("data/lena_red_float_256x256.raw_data", ts_red);
+	io::write_raw_data("data/lena_green_float_256x256.raw_data", ts_green);
+	io::write_raw_data("data/lena_blue_float_256x256.raw_data", ts_blue);
 
 	return 0;
 }
 
-#endif
+

@@ -18,13 +18,13 @@ public:
 
 	MATAZURE_GENERAL reference operator[](int_t index) { return elements_[index]; }
 
-	constexpr int_t size() const { return dim; }
+	MATAZURE_GENERAL constexpr int_t size() const { return dim; }
 
-	static constexpr point zeros() {
+	MATAZURE_GENERAL static constexpr point zeros() {
 		return{ 0 };
 	}
 
-	static constexpr point ones() {
+	MATAZURE_GENERAL static constexpr point ones() {
 		return{ 1 };
 	}
 
@@ -107,7 +107,7 @@ POINT_WITH_VALUE_BINARY_OPERATOR(==)
 POINT_WITH_VALUE_BINARY_OPERATOR(!=)
 
 template <typename _T, int_t _Dim>
-point<_T, _Dim> operator+(const point<_T, _Dim> &p) {
+MATAZURE_GENERAL point<_T, _Dim> operator+(const point<_T, _Dim> &p) {
 	point<_T, _Dim> temp;
 	for (int_t i = 0; i < _Dim; ++i) {
 		temp[i] = +p[i];
@@ -117,7 +117,7 @@ point<_T, _Dim> operator+(const point<_T, _Dim> &p) {
 }
 
 template <typename _T, int_t _Dim>
-point<_T, _Dim> operator-(const point<_T, _Dim> &p) {
+MATAZURE_GENERAL point<_T, _Dim> operator-(const point<_T, _Dim> &p) {
 	point<_T, _Dim> temp;
 	for (int_t i = 0; i < _Dim; ++i) {
 		temp[i] = -p[i];
@@ -127,7 +127,7 @@ point<_T, _Dim> operator-(const point<_T, _Dim> &p) {
 }
 
 template <typename _T, int_t _Dim>
-point<_T, _Dim>& operator++(point<_T, _Dim> &p) {
+MATAZURE_GENERAL point<_T, _Dim>& operator++(point<_T, _Dim> &p) {
 	for (int_t i = 0; i < _Dim; ++i) {
 		++p[i];
 	}
@@ -136,7 +136,7 @@ point<_T, _Dim>& operator++(point<_T, _Dim> &p) {
 }
 
 template <typename _T, int_t _Dim>
-point<_T, _Dim>& operator--(point<_T, _Dim> &p) {
+MATAZURE_GENERAL point<_T, _Dim>& operator--(point<_T, _Dim> &p) {
 	for (int_t i = 0; i < _Dim; ++i) {
 		--p[i];
 	}
@@ -145,7 +145,7 @@ point<_T, _Dim>& operator--(point<_T, _Dim> &p) {
 }
 
 template <typename _DstType, typename _T, int_t _Dim>
-point<_DstType, _Dim> point_cast(const point<_T, _Dim> &p) {
+MATAZURE_GENERAL point<_DstType, _Dim> point_cast(const point<_T, _Dim> &p) {
 	point<_DstType, _Dim> re;
 	for (int_t i = 0; i < _Dim; ++i) {
 		re[i] = static_cast<_DstType>(p[i]);
@@ -154,11 +154,31 @@ point<_DstType, _Dim> point_cast(const point<_T, _Dim> &p) {
 	return re;
 }
 
-template <int_t _Dim>
-using pointi = point<int_t, _Dim>;
+template<int_t _Idx, class _Ty, int_t _Dim>
+MATAZURE_GENERAL constexpr _Ty& get(point<_Ty, _Dim>& pt) {
+	// return element at _Idx in point pt
+	static_assert(_Idx < _Dim, "point index out of bounds");
+	return (pt.elements_[_Idx]);
+}
 
-template <int_t _Dim>
-using pointf = point<float, _Dim>;
+template<int_t _Idx, class _Ty, int_t _Dim>
+MATAZURE_GENERAL constexpr const _Ty& get(const point<_Ty, _Dim>& pt){
+	// return element at _Idx in point pt
+	static_assert(_Idx < _Dim, "point index out of bounds");
+	return (pt.elements_[_Idx]);
+}
+
+template<int_t _Idx, class _Ty, int_t _Dim>
+MATAZURE_GENERAL constexpr _Ty&& get(point<_Ty, _Dim>&& pt) {
+	// return element at _Idx in point pt
+	static_assert(_Idx < _Dim, "point index out of bounds");
+	return (move(pt.elements_[_Idx]));
+}
+
+template <int_t _Dim> using pointb = point<byte, _Dim>;
+template <int_t _Dim> using points = point<short, _Dim>;
+template <int_t _Dim> using pointi = point<int_t, _Dim>;
+template <int_t _Dim> using pointf = point<float, _Dim>;
 
 template <int_t _Dim>
 inline MATAZURE_GENERAL pointi<_Dim> get_stride(pointi<_Dim> ex) {
@@ -214,7 +234,7 @@ inline MATAZURE_GENERAL pointi<_Dim> offset2index(typename pointi<_Dim>::value_t
 	return id;
 }
 
-template <typename _Tuple, size_t dim = tuple_size<_Tuple>::value>
+template <typename _Tuple, int_t dim = tuple_size<_Tuple>::value>
 class point_viewer;
 
 template <typename _Tuple>
@@ -228,16 +248,18 @@ public:
 	point_viewer(const _Tuple &tp): _Tuple(tp){}
 
 	point_viewer &operator=(const point_type &tp) {
-		get<0>(*this) = tp[0];
-		get<1>(*this) = tp[1];
-		get<2>(*this) = tp[2];
+		get<0>(*static_cast<_Tuple *>(this)) = tp[0];
+		get<1>(*static_cast<_Tuple *>(this)) = tp[1];
+		get<2>(*static_cast<_Tuple *>(this)) = tp[2];
+
+		return *this;
 	}
 
 	operator point_type() const {
 		point_type re;
-		re[0] = get<0>(*this);
-		re[1] = get<1>(*this);
-		re[2] = get<2>(*this);
+		re[0] = get<0>(*static_cast<_Tuple *>(this));
+		re[1] = get<1>(*static_cast<_Tuple *>(this));
+		re[2] = get<2>(*static_cast<_Tuple *>(this));
 	}
 };
 

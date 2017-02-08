@@ -36,6 +36,10 @@ static void BM_mem_copy(benchmark::State& state) {
 
 	while (state.KeepRunning()) {
 		mem_copy(ts_src, ts_dst);
+
+	#ifdef MATAZURE_CUDA
+		cuda::barrier();
+	#endif
 	}
 
 	auto bytes_size = static_cast<size_t>(ts_src.size()) * sizeof(typename _TensorSrc::value_type);

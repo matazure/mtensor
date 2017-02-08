@@ -157,7 +157,7 @@ public:
 		ts_(ts), origin_(origin)
 	{}
 
-	MATAZURE_GENERAL typename _Tensor::value_type operator()(pointi<_Tensor::dim> idx) const {
+	MATAZURE_GENERAL auto operator()(pointi<_Tensor::dim> idx) const->decltype((ts_(idx + origin_))) {
 		return ts_(idx + origin_);
 	}
 };
@@ -174,7 +174,7 @@ public:
 		ts_(ts), stride_(stride), phase_(phase)
 	{}
 
-	MATAZURE_GENERAL typename _Tensor::value_type operator()(pointi<_Tensor::dim> idx) const {
+	MATAZURE_GENERAL auto operator()(pointi<_Tensor::dim> idx) const->decltype((ts_(idx * stride_ + phase_))){
 		return ts_(idx * stride_ + phase_);
 	}
 };
@@ -188,8 +188,6 @@ private:
 public:
 	resize_op(_Tensor ts, pointi<_Tensor::dim> resize_ext): ts_(ts), resize_ext_(resize_ext) {
 		resize_scale_ = point_cast<float>(ts_.extent()) / point_cast<float>(resize_ext_);
-
-		printf("resize_scale_: %f, %f\n", resize_scale_[0], resize_scale_[1]);
 	}
 
 	MATAZURE_GENERAL typename _Tensor::value_type operator()(const pointi<_Tensor::dim> &idx) const{
@@ -198,8 +196,11 @@ public:
 	}
 };
 
+template <typename ..._Tensors>
+struct zip_op;
+
 template <typename _Tensor0, typename _Tensor1>
-struct zip_op{
+struct zip_op<_Tensor0, _Tensor1>{
 private:
 	_Tensor0 ts0_;
 	_Tensor1 ts1_;
@@ -212,20 +213,70 @@ public:
 	}
 };
 
-//template <typename _Tensor, int_t _DimI>
-//struct splice_op {
-//	splice_op(_Tensor ts, int_t splic_i):
-//		ts_(ts), splice_i_(splic_i)
-//	{}
-//
-//	MATAZURE_GENERAL auto operator()(pointi<_Tensor::dim-1> idx) const {
-//		return ts_();
-//	}
-//
-//private:
-//	_Tensor ts_;
-//	int_t splic_i_;
-//};
+template <typename _Tensor0, typename _Tensor1, typename _Tensor2>
+struct zip_op<_Tensor0, _Tensor1, _Tensor2>{
+private:
+	_Tensor0 ts0_;
+	_Tensor1 ts1_;
+	_Tensor2 ts2_;
+public:
+	zip_op(_Tensor0 ts0, _Tensor1 ts1, _Tensor2 ts2): ts0_(ts0), ts1_(ts1), ts2_(ts2){}
+
+	MATAZURE_GENERAL auto operator()(int_t i) const->decltype(tie(ts0_[0], ts1_[0], ts2_[0])){
+		return tie(ts0_[i], ts1_[i], ts2_[i]);
+	}
+};
+
+template <int_t _SliceDimIdx>
+inline pointi<2> slice_point(pointi<3> pt);
+
+template < >
+inline pointi<2> slice_point<0>(pointi<3> pt){
+	return pointi<2>{get<1>(pt), get<2>(pt)};
+}
+
+template < >
+inline pointi<2> slice_point<1>(pointi<3> pt){
+	return pointi<2>{get<0>(pt), get<2>(pt)};
+}
+
+template < >
+inline pointi<2> slice_point<2>(pointi<3> pt){
+	return pointi<2>{get<0>(pt), get<1>(pt)};
+}
+
+template <int_t _CatDimIdx>
+inline pointi<3> cat_point(pointi<2> pt, int_t cat_i);
+
+template <>
+inline pointi<3> cat_point<0>(pointi<2> pt, int_t cat_i){
+	return pointi<3>{cat_i, get<0>(pt), get<1>(pt)};
+}
+
+template <>
+inline pointi<3> cat_point<1>(pointi<2> pt, int_t cat_i){
+	return pointi<3>{get<0>(pt), cat_i, get<1>(pt)};
+}
+
+template <>
+inline pointi<3> cat_point<2>(pointi<2> pt, int_t cat_i){
+	return pointi<3>{get<0>(pt), get<1>(pt), cat_i};
+}
+
+template <typename _Tensor, int_t _SliceDimIdx>
+struct slice_op {
+private:
+	_Tensor ts_;
+	int_t slice_i_;
+public:
+	slice_op(_Tensor ts, int_t slice_i):
+		ts_(ts), slice_i_(slice_i)
+	{}
+
+	MATAZURE_GENERAL auto operator()(pointi<_Tensor::dim-1> idx) const->decltype((ts_(cat_point<_SliceDimIdx>))){
+		return ts_(cat_point<_SliceDimIdx>(idx, slice_i_));
+	}
+};
 
 }
 
@@ -286,21 +337,27 @@ inline auto stride(_Tensor ts, _StrideType stride, _PhaseType phase)->decltype(m
 	return make_lambda(ts.extent() / stride, _internal::stride_op<_Tensor, _StrideType, _PhaseType>(ts, stride, phase), typename _Tensor::memory_type{});
 }
 
+template <int_t _DimIdx, typename _Tensor>
+inline auto slice(_Tensor ts, int_t i)->decltype(make_lambda(_internal::slice_point<_DimIdx>(ts.extent()), _internal::slice_op<_Tensor, _DimIdx>(ts, i), typename _Tensor::memory_type{})){
+	return make_lambda(_internal::slice_point<_DimIdx>(ts.extent()), _internal::slice_op<_Tensor, _DimIdx>(ts, i), typename _Tensor::memory_type{});
+}
+
 template <typename _Tensor>
 inline auto resize(_Tensor ts, const pointi<_Tensor::dim> &resize_ext)->decltype(make_lambda(resize_ext, _internal::resize_op<_Tensor>(ts, resize_ext), typename _Tensor::memory_type{})) {
 	return make_lambda(resize_ext, _internal::resize_op<_Tensor>(ts, resize_ext), typename _Tensor::memory_type{});
 }
-///实现稍微有点难度
-//template <typename _Tensor, int_t _DimIdx>
-//inline auto splice(_Tensor ts, int_t i) {
-//	return make_lambda()
-//}
 
 template <typename _Tensor0, typename _Tensor1>
 inline auto zip(_Tensor0 ts0, _Tensor1 ts1)->decltype(make_lambda(ts0.extent(), _internal::zip_op<_Tensor0, _Tensor1>(ts0, ts1))) {
 	return make_lambda(ts0.extent(), _internal::zip_op<_Tensor0, _Tensor1>(ts0, ts1));
 }
 
+template <typename _Tensor0, typename _Tensor1, typename _Tensor2>
+inline auto zip(_Tensor0 ts0, _Tensor1 ts1, _Tensor2 ts2)->decltype(make_lambda(ts0.extent(), _internal::zip_op<_Tensor0, _Tensor1, _Tensor2>(ts0, ts1, ts2))) {
+	return make_lambda(ts0.extent(), _internal::zip_op<_Tensor0, _Tensor1, _Tensor2>(ts0, ts1, ts2));
+}
+
+//TODO: use packed parameters
 // template <typename ..._Tensors>
 // inline auto zip(_Tensors... tensors){
 // 	auto tuple_tensors = make_tuple(tensors);
@@ -309,6 +366,11 @@ inline auto zip(_Tensor0 ts0, _Tensor1 ts1)->decltype(make_lambda(ts0.extent(), 
 // 		return tie(tensors...[i]);
 // 	});
 // }
+
+template <typename _Tensor>
+inline auto point_view(_Tensor ts)->decltype(tensor_cast<point_viewer<decltype(ts[0])>>(ts)){
+	return tensor_cast<point_viewer<decltype(ts[0])>>(ts);
+}
 
 #define __MATAZURE_LINEAR_ACCESS_TENSOR_BINARY_OPERATOR(name, op) \
 template <typename _T1, typename _T2> \
