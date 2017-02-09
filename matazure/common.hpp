@@ -351,6 +351,8 @@ inline auto slice(tensor<_T, _Dim, _Layout> ts, int_t i, enable_if_t<_DimIdx == 
 	return ts_re;
 }
 
+#ifdef MATAZURE_CUDA
+
 template <int_t _DimIdx, typename _T, int_t _Dim, typename _Layout>
 inline auto slice(cu_tensor<_T, _Dim, _Layout> ts, int_t i, enable_if_t<_DimIdx == _Dim-1>* = nullptr)->cu_tensor<_T, _Dim-1, _Layout>{
 	auto slice_ext = _internal::slice_point<_DimIdx>(ts.extent());
@@ -358,6 +360,8 @@ inline auto slice(cu_tensor<_T, _Dim, _Layout> ts, int_t i, enable_if_t<_DimIdx 
 	cu_tensor<_T, _Dim-1, _Layout> ts_re(slice_ext, shared_ptr<_T>(ts.shared_data().get() + i * slice_size, [ts](_T *){ }));
 	return ts_re;
 }
+
+#endif
 
 template <typename _Tensor>
 inline auto resize(_Tensor ts, const pointi<_Tensor::dim> &resize_ext)->decltype(make_lambda(resize_ext, _internal::resize_op<_Tensor>(ts, resize_ext), typename _Tensor::memory_type{})) {
