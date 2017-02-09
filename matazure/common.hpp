@@ -337,9 +337,26 @@ inline auto stride(_Tensor ts, _StrideType stride, _PhaseType phase)->decltype(m
 	return make_lambda(ts.extent() / stride, _internal::stride_op<_Tensor, _StrideType, _PhaseType>(ts, stride, phase), typename _Tensor::memory_type{});
 }
 
+///TODO: assert range out
 template <int_t _DimIdx, typename _Tensor>
 inline auto slice(_Tensor ts, int_t i)->decltype(make_lambda(_internal::slice_point<_DimIdx>(ts.extent()), _internal::slice_op<_Tensor, _DimIdx>(ts, i), typename _Tensor::memory_type{})){
 	return make_lambda(_internal::slice_point<_DimIdx>(ts.extent()), _internal::slice_op<_Tensor, _DimIdx>(ts, i), typename _Tensor::memory_type{});
+}
+
+template <int_t _DimIdx, typename _T, int_t _Dim, typename _Layout>
+inline auto slice(tensor<_T, _Dim, _Layout> ts, int_t i, enable_if_t<_DimIdx == _Dim-1>* = nullptr)->tensor<_T, _Dim-1, _Layout>{
+	auto slice_ext = _internal::slice_point<_DimIdx>(ts.extent());
+	auto slice_size = prod(slice_ext);
+	tensor<_T, _Dim-1, _Layout> ts_re(slice_ext, shared_ptr<_T>(ts.shared_data().get() + i * slice_size, [ts](_T *){ }));
+	return ts_re;
+}
+
+template <int_t _DimIdx, typename _T, int_t _Dim, typename _Layout>
+inline auto slice(cu_tensor<_T, _Dim, _Layout> ts, int_t i, enable_if_t<_DimIdx == _Dim-1>* = nullptr)->cu_tensor<_T, _Dim-1, _Layout>{
+	auto slice_ext = _internal::slice_point<_DimIdx>(ts.extent());
+	auto slice_size = prod(slice_ext);
+	cu_tensor<_T, _Dim-1, _Layout> ts_re(slice_ext, shared_ptr<_T>(ts.shared_data().get() + i * slice_size, [ts](_T *){ }));
+	return ts_re;
 }
 
 template <typename _Tensor>
