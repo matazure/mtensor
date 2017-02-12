@@ -4,6 +4,50 @@
 
 namespace matazure {
 
+template <int_t _Dim>
+inline MATAZURE_GENERAL typename pointi<_Dim>::value_type index2offset(const pointi<_Dim> &id, const pointi<_Dim> &stride, first_major_t) {
+	typename pointi<_Dim>::value_type offset = id[0];
+	for (int_t i = 1; i < _Dim; ++i) {
+		offset += id[i] * stride[i - 1];
+	}
+
+	return offset;
+};
+
+template <int_t _Dim>
+inline MATAZURE_GENERAL pointi<_Dim> offset2index(typename pointi<_Dim>::value_type offset, const pointi<_Dim> &stride, first_major_t) {
+	pointi<_Dim> id;
+	for (int_t i = _Dim - 1; i > 0; --i) {
+		id[i] = offset / stride[i - 1];
+		offset = offset % stride[i - 1];
+	}
+	id[0] = offset;
+
+	return id;
+}
+
+template <int_t _Dim>
+inline MATAZURE_GENERAL typename pointi<_Dim>::value_type index2offset(const pointi<_Dim> &id, const pointi<_Dim> &stride, last_major_t) {
+	typename pointi<_Dim>::value_type offset = id[_Dim - 1];
+	for (int_t i = 1; i < _Dim; ++i) {
+		offset += id[_Dim - 1 - i] * stride[i - 1];
+	}
+
+	return offset;
+};
+
+template <int_t _Dim>
+inline MATAZURE_GENERAL pointi<_Dim> offset2index(typename pointi<_Dim>::value_type offset, const pointi<_Dim> &stride, last_major_t) {
+	pointi<_Dim> id;
+	for (int_t i = _Dim - 1; i > 0; --i) {
+		id[_Dim - 1 - i] = offset / stride[i - 1];
+		offset = offset % stride[i - 1];
+	}
+	id[_Dim - 1] = offset;
+
+	return id;
+}
+
 template <typename _Tensor>
 class tensor_expression {
 public:
@@ -77,7 +121,7 @@ private:
 	typedef traits<_SArgs...> traits_t;
 
 public:
-	static	const int_t			dim = sizeof...(_SArgs);
+	static	const int_t				dim = sizeof...(_SArgs);
 	typedef _Type					value_type;
 	typedef value_type *			pointer;
 	typedef const pointer			const_pointer;
@@ -281,14 +325,14 @@ public:
 		return offset_imp<access_type>(i);
 	}
 
-	MATAZURE_GENERAL tensor<value_type, dim> persist() const {
+	MATAZURE_GENERAL tensor<decay_t<value_type>, dim> persist() const {
 		tensor<decay_t<value_type>, dim> re(this->extent());
 		copy(*this, re);
 		return re;
 	}
 
 	template <int_t _S, int_t ..._Extents>
-	static_tensor<value_type, _S, _Extents...> persist() const {
+	static_tensor<decay_t<value_type>, _S, _Extents...> persist() const {
 		static_tensor<decay_t<value_type>, _S, _Extents...> re;
 		copy(*this, re);
 		return re;

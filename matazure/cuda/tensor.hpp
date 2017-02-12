@@ -139,7 +139,7 @@ public:
 		return offset_imp<accessor_type>(i);
 	}
 
-	tensor<value_type, dim> persist() const {
+	tensor<decay_t<value_type>, dim> persist() const {
 		tensor<decay_t<value_type>, dim> re(this->extent());
 		copy(*this, re);
 		return re;
@@ -207,8 +207,8 @@ public:
 		return offset_imp<access_type>(i);
 	}
 
-	tensor<value_type, dim> persist() const {
-		tensor<value_type, dim> re(this->extent());
+	tensor<decay_t<value_type>, dim> persist() const {
+		tensor<decay_t<value_type>, dim> re(this->extent());
 		copy(*this, re);
 		return re;
 	}
