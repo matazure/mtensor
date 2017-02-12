@@ -24,9 +24,9 @@ public:
 		return{ 0 };
 	}
 
-	MATAZURE_GENERAL static constexpr point ones() {
-		return{ 1 };
-	}
+	//MATAZURE_GENERAL static constexpr point ones() {
+	//	return{ 1 };
+	//}
 
 public:
 	value_type elements_[dim];

@@ -45,47 +45,47 @@ namespace matazure {
 	}
 
 	template <typename _Tensor, typename _Fun>
-	inline void for_each(_Tensor ts, _Fun fun, enable_if_t<are_linear_access<_Tensor>::value && none_device_memory<_Tensor>::value>* =0) {
+	inline void for_each(_Tensor &ts, _Fun fun, enable_if_t<are_linear_access<_Tensor>::value && none_device_memory<_Tensor>::value>* =0) {
 		for (int_t i = 0; i < ts.size(); ++i) {
 			fun(ts[i]);
 		}
 	}
 
 	template <typename _Tensor, typename _Fun>
-	inline void for_each(_Tensor ts, _Fun fun, enable_if_t<!are_linear_access<_Tensor>::value && none_device_memory<_Tensor>::value>* = 0) {
+	inline void for_each(_Tensor &ts, _Fun fun, enable_if_t<!are_linear_access<_Tensor>::value && none_device_memory<_Tensor>::value>* = 0) {
 		for_index(pointi<_Tensor::dim>::zeor(), ts.extent(), [=](pointi<_Tensor::dim> idx) {
 			fun(ts(idx));
 		});
 	}
 
 	template <typename _Tensor>
-	inline void fill(_Tensor ts, typename _Tensor::value_type v, enable_if_t<none_device_memory<_Tensor>::value>* = 0) {
+	inline void fill(_Tensor &ts, typename _Tensor::value_type v, enable_if_t<none_device_memory<_Tensor>::value>* = 0) {
 		for_each(ts, [v](typename _Tensor::value_type &x) { x = v;});
 	}
 
 	template <typename _T1, typename _T2>
-	inline void copy(_T1 lhs, _T2 rhs, enable_if_t<are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
+	inline void copy(const _T1 &lhs, _T2 &rhs, enable_if_t<are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
 		for (int_t i = 0, size = rhs.size(); i < size; ++i) {
 			rhs[i] = lhs[i];
 		}
 	}
 
 	template <typename _T1, typename _T2>
-	inline void copy(_T1 lhs, _T2 rhs, enable_if_t<!are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
+	inline void copy(const _T1 &lhs, _T2 &rhs, enable_if_t<!are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
 		for_index(pointi<_T1::dim>::zeros(), lhs.extent(), [=] (pointi<_T1::dim> idx) {
 			rhs(idx) = lhs(idx);
 		});
 	}
 
 	template <typename _T1, typename _T2, typename _TransFun>
-	inline void transform(_T1 lhs, _T2 rhs, _TransFun fun, enable_if_t<are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
+	inline void transform(const _T1 &lhs, _T2 &rhs, _TransFun fun, enable_if_t<are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
 		for (int_t i = 0, size = rhs.size(); i < size; ++i) {
 			fun(lhs[i], rhs[i]);
 		}
 	}
 
 	template <typename _T1, typename _T2, typename _TransFun>
-	inline void transform(_T1 lhs, _T2 rhs, _TransFun fun, enable_if_t<!are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
+	inline void transform(const _T1 &lhs, _T2 &rhs, _TransFun fun, enable_if_t<!are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
 		for_index(pointi<_T1::dim>::zeros(), lhs.extent(), [=] (pointi<_T1::dim> idx) {
 			fun(lhs(idx), rhs(idx));
 		});
@@ -106,7 +106,7 @@ namespace matazure {
 	// }
 
 	template <typename _Tensor, typename _VT, typename _BinaryOp>
-	inline _VT reduce(_Tensor ts, _VT init, _BinaryOp binaryop, enable_if_t<none_device_memory<_Tensor>::value>* = 0) {
+	inline _VT reduce(const _Tensor &ts, _VT init, _BinaryOp binaryop, enable_if_t<none_device_memory<_Tensor>::value>* = 0) {
 		auto re = init;
 		for_each(ts, [&re, binaryop](_VT x) {
 			re = binaryop(re, x);
@@ -116,7 +116,7 @@ namespace matazure {
 	}
 
 	template <typename _TS>
-	inline typename _TS::value_type sum(_TS ts) {
+	inline typename _TS::value_type sum(const _TS &ts) {
 		typedef typename _TS::value_type value_type;
 		return reduce(ts, value_type(0), [=](value_type lhs, value_type rhs) {
 			return lhs + rhs;
@@ -124,7 +124,7 @@ namespace matazure {
 	}
 
 	template <typename _TS>
-	inline typename _TS::value_type prod(_TS ts) {
+	inline typename _TS::value_type prod(const _TS &ts) {
 		typedef typename _TS::value_type value_type;
 		return reduce(ts, value_type(1), [=](value_type lhs, value_type rhs) {
 			return lhs * rhs;
@@ -132,12 +132,12 @@ namespace matazure {
 	}
 
 	template <typename _TS>
-	inline typename _TS::value_type mean(_TS ts) {
+	inline typename _TS::value_type mean(const _TS &ts) {
 		return sum(ts) / ts.size();
 	}
 
 	template <typename _TS>
-	inline typename _TS::value_type max(_TS ts) {
+	inline typename _TS::value_type max(const _TS &ts) {
 		typedef typename _TS::value_type value_type;
 		return reduce(ts, ts[0], [=](value_type lhs, value_type rhs) {
 			return rhs > lhs ? rhs : lhs;
@@ -145,7 +145,7 @@ namespace matazure {
 	}
 
 	template <typename _TS>
-	inline typename _TS::value_type min(_TS ts) {
+	inline typename _TS::value_type min(const _TS &ts) {
 		typedef typename _TS::value_type value_type;
 		return reduce(ts, numeric_limits<value_type>::max(), [=](value_type lhs, value_type rhs) {
 			return lhs <= rhs ? lhs : rhs;

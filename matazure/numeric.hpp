@@ -4,9 +4,43 @@
 
 namespace matazure {
 
-template <typename _T, int_t _LhsRows, int_t _LhsCols, int_t _RhsRows, int_t _RhsCols>
-auto product(static_tensor<_T, SArgs...> ts, static_tensor<_)
+template <typename _T, int_t _LhsRows, int_t _LhsCols, int_t _RhsCols>
+MATAZURE_GENERAL auto product(static_tensor<_T, _LhsRows, _LhsCols> ts_lhs, static_tensor<_T, _LhsCols, _RhsCols> ts_rhs)->static_tensor<_T, _LhsRows, _RhsCols> {
+	auto ts_re = static_tensor<_T, _LhsRows, _RhsCols>::zeros();
+	for (int_t i = 0; i < _LhsRows; ++i) {
+		for (int_t j = 0; j < _RhsCols; ++j) {
+			for (int k = 0; k < _LhsCols; ++k) {
+				ts_re(i, j) += ts_lhs(i, k) * ts_rhs(k, j);
+			}
+		}
+	}
 
+	return ts_re;
+}
+
+template <typename _T, int_t _Rows, int_t _Cols>
+MATAZURE_GENERAL auto product(static_tensor<_T, _Rows, _Cols> mat, point<_T, _Cols> vec)->point<_T, _Rows> {
+	auto vec_re = point<_T, _Rows>::zeros();
+	for (int_t i = 0; i < _Rows; ++i) {
+		for (int j = 0; j < _Cols; ++j) {
+			vec_re[i] += mat(i, j) * vec[j];
+		}
+	}
+
+	return vec_re;
+}
+
+template <typename _T, int_t _Rows, int_t _Cols>
+MATAZURE_GENERAL auto product(static_tensor<_T, _Rows, _Cols> mat, static_tensor<_T, _Cols> vec)->static_tensor<_T, _Rows> {
+	auto vec_re = static_tensor<_T, _Rows>::zeros();
+	for (int_t i = 0; i < _Rows; ++i) {
+		for (int j = 0; j < _Cols; ++j) {
+			vec_re[i] += mat(i, j) * vec[j];
+		}
+	}
+
+	return vec_re;
+}
 
 
 // template <typename _VectorLhs, typename _VectorRhs>

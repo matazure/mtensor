@@ -2,3 +2,4 @@
 
 #include <matazure/io.hpp>
 #include <matazure/common.hpp>
+#include <matazure/numeric.hpp>

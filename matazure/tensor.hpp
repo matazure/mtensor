@@ -69,7 +69,7 @@ private:
 };
 
 template <typename _Type, int_t ..._SArgs>
-class static_tensor : public tensor_expression<static_tensor<_Type, _SArgs...>> {
+class static_tensor {
 private:
 	template <int_t ..._Ext>
 	struct traits;
@@ -172,6 +172,14 @@ public:
 	MATAZURE_GENERAL pointer data() {
 		return elements_;
 	}
+
+	MATAZURE_GENERAL static constexpr static_tensor zeros() {
+		return { 0 };
+	}
+
+	//MATAZURE_GENERAL static constexpr static_tensor ones() {
+	//	return { 1... };
+	//}
 
 public:
 	value_type			elements_[traits_t::size()];
