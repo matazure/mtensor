@@ -227,6 +227,34 @@ public:
 	}
 };
 
+//pointi<2>
+template <int_t _SliceDimIdx>
+inline pointi<1> slice_point(pointi<2> pt);
+
+template < >
+inline pointi<1> slice_point<0>(pointi<2> pt){
+	return pointi<1>{get<1>(pt)};
+}
+
+template < >
+inline pointi<1> slice_point<1>(pointi<2> pt){
+	return pointi<1>{get<0>(pt)};
+}
+
+template <int_t _CatDimIdx>
+inline pointi<2> cat_point(pointi<1> pt, int_t cat_i);
+
+template <>
+inline pointi<2> cat_point<0>(pointi<1> pt, int_t cat_i){
+	return pointi<2>{cat_i, get<0>(pt)};
+}
+
+template <>
+inline pointi<2> cat_point<1>(pointi<1> pt, int_t cat_i){
+	return pointi<2>{get<0>(pt), cat_i};
+}
+
+//pointi<3>
 template <int_t _SliceDimIdx>
 inline pointi<2> slice_point(pointi<3> pt);
 
@@ -273,7 +301,7 @@ public:
 		ts_(ts), slice_i_(slice_i)
 	{}
 
-	MATAZURE_GENERAL auto operator()(pointi<_Tensor::dim-1> idx) const->decltype((ts_(cat_point<_SliceDimIdx>))){
+	MATAZURE_GENERAL auto operator()(pointi<_Tensor::dim-1> idx) const->decltype((ts_(cat_point<_SliceDimIdx>(idx, slice_i_)))){
 		return ts_(cat_point<_SliceDimIdx>(idx, slice_i_));
 	}
 };
