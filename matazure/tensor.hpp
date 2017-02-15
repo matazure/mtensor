@@ -64,8 +64,6 @@ public:
 protected:
 	MATAZURE_GENERAL tensor_expression() {}
 	MATAZURE_GENERAL ~tensor_expression() {}
-private:
-	const tensor_expression& operator= (const tensor_expression &);
 };
 
 template <typename _Type, int_t ..._SArgs>
@@ -231,6 +229,16 @@ public:
 		data_(ts.data())
 	{ }
 
+	template <typename _VT>
+	const tensor &operator=(const tensor<_VT, _Dim, _Layout> &ts){
+		extent_ = ts.extent();
+		stride_ = ts.stride();
+		sp_data_ = ts.shared_data();
+		data_ = ts.data();
+
+		return *this;
+	}
+
 	template <typename ..._Idx>
 	value_type& operator()(_Idx... idx) const {
 		return (*this)(index_type{ idx... });
@@ -267,10 +275,10 @@ private:
 	}
 
 private:
-	const extent_type	extent_;
-	const extent_type	stride_;
-	const shared_ptr<value_type>	sp_data_;
-	value_type * const data_;
+	extent_type	extent_;
+	extent_type	stride_;
+	shared_ptr<value_type>	sp_data_;
+	value_type * 	data_;
 };
 
 // template <typename _Type, typename _Layout = first_major_t>

@@ -351,7 +351,7 @@ inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<array_access_t, typ
 #endif
 
 template <typename _ValueType, typename _Tensor>
-inline auto tensor_cast(_Tensor tensor)->decltype(map(tensor, _internal::cast_op<_ValueType>())) {
+inline auto tensor_cast(_Tensor tensor)->decltype(apply(tensor, _internal::cast_op<_ValueType>())) {
 	return apply(tensor, _internal::cast_op<_ValueType>());
 }
 
