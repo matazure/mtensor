@@ -147,35 +147,33 @@ struct cast_op<point<_OutPointValueType, _Dim>>{
 };
 
 template <typename _Tensor>
-struct section_op {
+struct shift_op {
 private:
 	_Tensor ts_;
-	typename _Tensor::index_type origin_;
+	typename _Tensor::index_type offset_;
 
 public:
-	section_op(_Tensor ts, typename _Tensor::index_type origin):
-		ts_(ts), origin_(origin)
+	shift_op(_Tensor ts, typename _Tensor::index_type offset):
+		ts_(ts), offset_(offset)
 	{}
 
-	MATAZURE_GENERAL auto operator()(pointi<_Tensor::dim> idx) const->decltype((ts_(idx + origin_))) {
-		return ts_(idx + origin_);
+	MATAZURE_GENERAL auto operator()(pointi<_Tensor::dim> idx) const->decltype((ts_(idx + offset_))) {
+		return ts_(idx + offset_);
 	}
 };
 
-template <typename _Tensor, typename _StrideType, typename _PhaseType>
+template <typename _Tensor, typename _StrideType>
 struct stride_op {
 private:
 	_Tensor ts_;
 	_StrideType stride_;
-	_PhaseType phase_;
-
 public:
-	stride_op(_Tensor ts, _StrideType stride, _PhaseType phase):
-		ts_(ts), stride_(stride), phase_(phase)
+	stride_op(_Tensor ts, _StrideType stride):
+		ts_(ts), stride_(stride)
 	{}
 
-	MATAZURE_GENERAL auto operator()(pointi<_Tensor::dim> idx) const->decltype((ts_(idx * stride_ + phase_))){
-		return ts_(idx * stride_ + phase_);
+	MATAZURE_GENERAL auto operator()(pointi<_Tensor::dim> idx) const->decltype((ts_(idx * stride_))){
+		return ts_(idx * stride_);
 	}
 };
 
@@ -356,13 +354,18 @@ inline auto tensor_cast(_Tensor tensor)->decltype(apply(tensor, _internal::cast_
 }
 
 template <typename _Tensor>
-inline auto section(_Tensor ts, typename _Tensor::index_type origin, typename _Tensor::extent_type ext)->decltype(make_lambda(ext, _internal::section_op<_Tensor>(ts, origin), typename _Tensor::memory_type{})) {
-	return make_lambda(ext, _internal::section_op<_Tensor>(ts, origin), typename _Tensor::memory_type{});
+inline auto shift(_Tensor ts, pointi<_Tensor::dim> offset)->decltype(make_lambda(ts.extent(), _internal::shift_op<_Tensor>(ts, offset), typename _Tensor::memory_type{})) {
+	return make_lambda(ts.extent(), _internal::shift_op<_Tensor>(ts, offset), typename _Tensor::memory_type{});
 }
 
-template <typename _Tensor, typename _StrideType, typename _PhaseType>
-inline auto stride(_Tensor ts, _StrideType stride, _PhaseType phase)->decltype(make_lambda(ts.extent() / stride, _internal::stride_op<_Tensor, _StrideType, _PhaseType>(ts, stride, phase), typename _Tensor::memory_type{})) {
-	return make_lambda(ts.extent() / stride, _internal::stride_op<_Tensor, _StrideType, _PhaseType>(ts, stride, phase), typename _Tensor::memory_type{});
+template <typename _Tensor>
+inline auto section(_Tensor ts, typename _Tensor::index_type origin, typename _Tensor::extent_type ext)->decltype(make_lambda(ext, _internal::shift_op<_Tensor>(ts, origin), typename _Tensor::memory_type{})) {
+	return make_lambda(ext, _internal::shift_op<_Tensor>(ts, origin), typename _Tensor::memory_type{});
+}
+
+template <typename _Tensor, typename _StrideType>
+inline auto stride(_Tensor ts, _StrideType stride)->decltype(make_lambda(ts.extent() / stride, _internal::stride_op<_Tensor, _StrideType>(ts, stride), typename _Tensor::memory_type{})) {
+	return make_lambda(ts.extent() / stride, _internal::stride_op<_Tensor, _StrideType>(ts, stride), typename _Tensor::memory_type{});
 }
 
 ///TODO: assert range out
