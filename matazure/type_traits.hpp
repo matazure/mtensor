@@ -14,6 +14,16 @@ struct host_t {};
 struct device_t {};
 struct local_t {};
 
+template <typename _T>
+struct zero;
+
+template <typename _T>
+struct zero{
+	static constexpr _T value(){
+		return 0;
+	};
+};
+
 template <typename _Tensor>
 class tensor_expression;
 

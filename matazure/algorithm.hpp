@@ -108,7 +108,7 @@ namespace matazure {
 	template <typename _Tensor, typename _VT, typename _BinaryOp>
 	inline _VT reduce(const _Tensor &ts, _VT init, _BinaryOp binaryop, enable_if_t<none_device_memory<_Tensor>::value>* = 0) {
 		auto re = init;
-		for_each(ts, [&re, binaryop](_VT x) {
+		for_each(ts, [&re, binaryop](decltype(ts[0]) x) {
 			re = binaryop(re, x);
 		});
 
@@ -116,9 +116,9 @@ namespace matazure {
 	}
 
 	template <typename _TS>
-	inline typename _TS::value_type sum(const _TS &ts) {
+	inline auto sum(const _TS &ts)->typename _TS::value_type{
 		typedef typename _TS::value_type value_type;
-		return reduce(ts, value_type(0), [=](value_type lhs, value_type rhs) {
+		return reduce(ts, zero<value_type>::value(), [=](value_type lhs, value_type rhs) {
 			return lhs + rhs;
 		});
 	}
@@ -132,7 +132,7 @@ namespace matazure {
 	}
 
 	template <typename _TS>
-	inline typename _TS::value_type mean(const _TS &ts) {
+	inline auto mean(const _TS &ts)->typename _TS::value_type{
 		return sum(ts) / ts.size();
 	}
 

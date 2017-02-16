@@ -180,6 +180,13 @@ template <int_t _Dim> using points = point<short, _Dim>;
 template <int_t _Dim> using pointi = point<int_t, _Dim>;
 template <int_t _Dim> using pointf = point<float, _Dim>;
 
+template <typename _T, int_t _Dim>
+struct zero<point<_T, _Dim>>{
+	static constexpr point<_T, _Dim> value(){
+		return {0};
+	};
+};
+
 template <int_t _Dim>
 inline MATAZURE_GENERAL pointi<_Dim> get_stride(pointi<_Dim> ex) {
 	pointi<_Dim>  stride;
@@ -218,7 +225,5 @@ public:
 		re[2] = get<2>(*static_cast<_Tuple *>(this));
 	}
 };
-
-
 
 }
