@@ -70,6 +70,10 @@ public:
 		return data_[i];
 	}
 
+	MATAZURE_GENERAL reference operator[](const index_type &idx) const{
+		return (*this)(idx);
+	}
+
 	MATAZURE_GENERAL extent_type extent() const { return extent_; }
 	MATAZURE_GENERAL extent_type stride() const { return stride_; }
 	MATAZURE_GENERAL int_t size() const { return stride_[dim - 1]; }
@@ -139,6 +143,10 @@ public:
 		return offset_imp<accessor_type>(i);
 	}
 
+	MATAZURE_GENERAL value_type operator[](const index_type &idx) const {
+		return (*this)(idx);
+	}
+
 	tensor<decay_t<value_type>, dim> persist() const {
 		tensor<decay_t<value_type>, dim> re(this->extent());
 		copy(*this, re);
@@ -205,6 +213,10 @@ public:
 
 	MATAZURE_GENERAL value_type operator[](int_t i) const {
 		return offset_imp<access_type>(i);
+	}
+
+	MATAZURE_GENERAL value_type operator[](const index_type &idx) const {
+		return (*this)(idx);
 	}
 
 	tensor<decay_t<value_type>, dim> persist() const {

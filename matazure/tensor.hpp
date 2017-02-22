@@ -161,6 +161,14 @@ public:
 
 	MATAZURE_GENERAL reference operator[](int_t i) { return elements_[i]; }
 
+	MATAZURE_GENERAL constexpr const_reference operator[](const pointi<dim> &idx) const {
+		return (*this)(idx);
+	}
+
+	MATAZURE_GENERAL reference operator[](const pointi<dim> &idx) {
+		return (*this)(idx);
+	}
+
 	MATAZURE_GENERAL constexpr int_t size() const { return traits_t::size(); }
 
 	MATAZURE_GENERAL const_pointer data() const {
@@ -250,6 +258,10 @@ public:
 
 	value_type& operator[](int_t i) const { return data_[i]; }
 
+	value_type& operator[](const index_type &idx) const {
+		return (*this)(idx);
+	}
+
 	extent_type extent() const { return extent_; }
 	extent_type stride() const { return stride_; }
 
@@ -280,9 +292,6 @@ private:
 	shared_ptr<value_type>	sp_data_;
 	value_type * 	data_;
 };
-
-// template <typename _Type, typename _Layout = first_major_t>
-// using vector = tensor<_Type, 1, _Layout>;
 
 template <typename _Type, typename _Layout = first_major_t>
 using matrix = tensor<_Type, 2, _Layout>;
