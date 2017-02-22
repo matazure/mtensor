@@ -5,6 +5,13 @@
 namespace matazure {
 
 	template <typename _Func>
+	inline void for_index(int_t first, int_t last, _Func fun) {
+		for (int_t i = first; i < last; ++i){
+			fun(i);
+		}
+	}
+
+	template <typename _Func>
 	inline void for_index(pointi<1> origin, pointi<1> extent, _Func fun) {
 		for (int_t i = origin[0]; i < extent[0]; ++i) {
 			fun(pointi<1>{ { i } });
@@ -46,9 +53,9 @@ namespace matazure {
 
 	template <typename _Tensor, typename _Fun>
 	inline void for_each(_Tensor &ts, _Fun fun, enable_if_t<are_linear_access<_Tensor>::value && none_device_memory<_Tensor>::value>* =0) {
-		for (int_t i = 0; i < ts.size(); ++i) {
+		for_index(0, ts.size(), [=](int_t i){
 			fun(ts[i]);
-		}
+		});
 	}
 
 	template <typename _Tensor, typename _Fun>
@@ -65,9 +72,9 @@ namespace matazure {
 
 	template <typename _T1, typename _T2>
 	inline void copy(const _T1 &lhs, _T2 &rhs, enable_if_t<are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
-		for (int_t i = 0, size = rhs.size(); i < size; ++i) {
+		for_index(0, lhs.size(), [=](int_t i){
 			rhs[i] = lhs[i];
-		}
+		});
 	}
 
 	template <typename _T1, typename _T2>
@@ -79,9 +86,9 @@ namespace matazure {
 
 	template <typename _T1, typename _T2, typename _TransFun>
 	inline void transform(const _T1 &lhs, _T2 &rhs, _TransFun fun, enable_if_t<are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
-		for (int_t i = 0, size = rhs.size(); i < size; ++i) {
+		for_index(0, lhs.size(), [=](int_t i){
 			fun(lhs[i], rhs[i]);
-		}
+		});
 	}
 
 	template <typename _T1, typename _T2, typename _TransFun>

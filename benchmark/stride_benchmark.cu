@@ -33,11 +33,9 @@ void BM_host_stride_dim2_gold(benchmark::State &state) {
 	int_t stride = state.range(0);
 	int_t phase = stride / 2;
 	auto ts_re_ext = ts.extent() / stride;
+	tensor<_ValueType, 2> ts_re(ts_re_ext);
 
 	while (state.KeepRunning()) {
-		tensor<_ValueType, 2> ts_re(ts_re_ext);
-		auto ts_ext = ts.extent();
-
 		int_t pos_i = 0;
 		int_t pos_j = 0;
 		for (int_t j = 0; j < ts_re_ext[1]; ++j) {
@@ -57,13 +55,18 @@ void BM_host_stride_dim2_gold(benchmark::State &state) {
 template <typename _Tensor>
 void BM_stride(benchmark::State &state) {
 	auto ext = pointi<_Tensor::dim>::zeros();
-	fill(ext, state.range(1));
-
+	//fill(ext, state.range(1));
+	for (int_t i = 0; i < ext.size(); ++i) {
+		ext[i] = state.range(1);
+	}
 	_Tensor ts(ext);
 	int_t ts_stride = state.range(0);
 	auto ts_re_ext = ts.extent() / ts_stride;
+	_Tensor ts_re(ts_re_ext);
+	
 	while (state.KeepRunning()) {
-		auto ts_re = stride(ts, ts_stride).persist();
+		auto lts_re = stride(ts, ts_stride);
+		copy(lts_re, ts_re);
 
 	#ifdef MATAZURE_CUDA
 		cuda::barrier();
