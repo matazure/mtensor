@@ -55,10 +55,7 @@ void BM_host_stride_dim2_gold(benchmark::State &state) {
 template <typename _Tensor>
 void BM_stride(benchmark::State &state) {
 	auto ext = pointi<_Tensor::dim>::zeros();
-	//fill(ext, state.range(1));
-	for (int_t i = 0; i < ext.size(); ++i) {
-		ext[i] = state.range(1);
-	}
+	fill(ext, state.range(1));
 	_Tensor ts(ext);
 	int_t ts_stride = state.range(0);
 	auto ts_re_ext = ts.extent() / ts_stride;

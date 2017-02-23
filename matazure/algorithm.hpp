@@ -53,14 +53,14 @@ namespace matazure {
 
 	template <typename _Tensor, typename _Fun>
 	inline void for_each(_Tensor &ts, _Fun fun, enable_if_t<are_linear_access<_Tensor>::value && none_device_memory<_Tensor>::value>* =0) {
-		for_index(0, ts.size(), [=](int_t i){
+		for_index(0, ts.size(), [&](int_t i){
 			fun(ts[i]);
 		});
 	}
 
 	template <typename _Tensor, typename _Fun>
 	inline void for_each(_Tensor &ts, _Fun fun, enable_if_t<!are_linear_access<_Tensor>::value && none_device_memory<_Tensor>::value>* = 0) {
-		for_index(pointi<_Tensor::dim>::zeor(), ts.extent(), [=](pointi<_Tensor::dim> idx) {
+		for_index(pointi<_Tensor::dim>::zeor(), ts.extent(), [&](pointi<_Tensor::dim> idx) {
 			fun(ts(idx));
 		});
 	}
@@ -72,28 +72,28 @@ namespace matazure {
 
 	template <typename _T1, typename _T2>
 	inline void copy(const _T1 &lhs, _T2 &rhs, enable_if_t<are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
-		for_index(0, lhs.size(), [=](int_t i){
+		for_index(0, lhs.size(), [&](int_t i){
 			rhs[i] = lhs[i];
 		});
 	}
 
 	template <typename _T1, typename _T2>
 	inline void copy(const _T1 &lhs, _T2 &rhs, enable_if_t<!are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
-		for_index(pointi<_T1::dim>::zeros(), lhs.extent(), [=] (pointi<_T1::dim> idx) {
+		for_index(pointi<_T1::dim>::zeros(), lhs.extent(), [&] (pointi<_T1::dim> idx) {
 			rhs(idx) = lhs(idx);
 		});
 	}
 
 	template <typename _T1, typename _T2, typename _TransFun>
 	inline void transform(const _T1 &lhs, _T2 &rhs, _TransFun fun, enable_if_t<are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
-		for_index(0, lhs.size(), [=](int_t i){
+		for_index(0, lhs.size(), [&](int_t i){
 			fun(lhs[i], rhs[i]);
 		});
 	}
 
 	template <typename _T1, typename _T2, typename _TransFun>
 	inline void transform(const _T1 &lhs, _T2 &rhs, _TransFun fun, enable_if_t<!are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
-		for_index(pointi<_T1::dim>::zeros(), lhs.extent(), [=] (pointi<_T1::dim> idx) {
+		for_index(pointi<_T1::dim>::zeros(), lhs.extent(), [&] (pointi<_T1::dim> idx) {
 			fun(lhs(idx), rhs(idx));
 		});
 	}
@@ -107,7 +107,7 @@ namespace matazure {
 	//
 	// template <typename _T1, typename _T2, typename _TransFun>
 	// inline void equal(_T1 lhs, _T2 rhs, _TransFun fun, enable_if_t<!are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
-	// 	for_index(pointi<_T1::dim>::zeros(), lhs.extent(), [=] (pointi<_T1::dim> idx) {
+	// 	for_index(pointi<_T1::dim>::zeros(), lhs.extent(), [&] (pointi<_T1::dim> idx) {
 	// 		fun(lhs(idx), rhs(idx));
 	// 	});
 	// }
@@ -125,7 +125,7 @@ namespace matazure {
 	template <typename _TS>
 	inline auto sum(const _TS &ts)->typename _TS::value_type{
 		typedef typename _TS::value_type value_type;
-		return reduce(ts, zero<value_type>::value(), [=](value_type lhs, value_type rhs) {
+		return reduce(ts, zero<value_type>::value(), [&](value_type lhs, value_type rhs) {
 			return lhs + rhs;
 		});
 	}
@@ -133,7 +133,7 @@ namespace matazure {
 	template <typename _TS>
 	inline typename _TS::value_type prod(const _TS &ts) {
 		typedef typename _TS::value_type value_type;
-		return reduce(ts, value_type(1), [=](value_type lhs, value_type rhs) {
+		return reduce(ts, value_type(1), [&](value_type lhs, value_type rhs) {
 			return lhs * rhs;
 		});
 	}
@@ -146,7 +146,7 @@ namespace matazure {
 	template <typename _TS>
 	inline typename _TS::value_type max(const _TS &ts) {
 		typedef typename _TS::value_type value_type;
-		return reduce(ts, ts[0], [=](value_type lhs, value_type rhs) {
+		return reduce(ts, ts[0], [&](value_type lhs, value_type rhs) {
 			return rhs > lhs ? rhs : lhs;
 		});
 	}
@@ -154,7 +154,7 @@ namespace matazure {
 	template <typename _TS>
 	inline typename _TS::value_type min(const _TS &ts) {
 		typedef typename _TS::value_type value_type;
-		return reduce(ts, numeric_limits<value_type>::max(), [=](value_type lhs, value_type rhs) {
+		return reduce(ts, numeric_limits<value_type>::max(), [&](value_type lhs, value_type rhs) {
 			return lhs <= rhs ? lhs : rhs;
 		});
 	}
