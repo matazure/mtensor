@@ -83,9 +83,9 @@ public:
 private:
 	shared_ptr<value_type> malloc_shared_memory(int_t size) {
 		decay_t<value_type> *data = nullptr;
-		throw_on_error(cudaMalloc(&data, size * sizeof(value_type)));
+		assert_runtime_success(cudaMalloc(&data, size * sizeof(value_type)));
 		return shared_ptr<value_type>(data, [](value_type *ptr) {
-			throw_on_error(cudaFree(const_cast<decay_t<value_type> *>(ptr)));
+			assert_runtime_success(cudaFree(const_cast<decay_t<value_type> *>(ptr)));
 		});
 	}
 
@@ -103,12 +103,12 @@ template <typename _TensorSrc, typename _TensorDst>
 inline void mem_copy(_TensorSrc ts_src, _TensorDst cts_dst, enable_if_t<!are_host_memory<_TensorSrc, _TensorDst>::value && is_same<typename _TensorSrc::layout_type, typename _TensorDst::layout_type>::value>* = nullptr) {
 	MATAZURE_STATIC_ASSERT_VALUE_TYPE_MATCHED(_TensorSrc, _TensorDst);
 
-	throw_on_error(cudaMemcpy(cts_dst.data(), ts_src.data(), sizeof(typename _TensorDst::value_type) * ts_src.size(), cudaMemcpyDefault));
+	assert_runtime_success(cudaMemcpy(cts_dst.data(), ts_src.data(), sizeof(typename _TensorDst::value_type) * ts_src.size(), cudaMemcpyDefault));
 }
 
 template <typename _TensorSrc, typename _TensorSymbol>
 inline void copy_symbol(_TensorSrc src, _TensorSymbol &symbol_dst) {
-	throw_on_error(cudaMemcpyToSymbol(symbol_dst, src.data(), src.size() * sizeof(typename _TensorSrc::value_type)));
+	assert_runtime_success(cudaMemcpyToSymbol(symbol_dst, src.data(), src.size() * sizeof(typename _TensorSrc::value_type)));
 }
 
 template <typename _ValueType, typename _AccessMode, int_t _Dim, typename _Func>
@@ -267,12 +267,12 @@ inline auto make_general_lambda(pointi<_Dim> extent, _Func fun)->general_lambda_
 }
 
 inline void barrier() {
-	throw_on_error(cudaDeviceSynchronize());
+	assert_runtime_success(cudaDeviceSynchronize());
 }
 
 template <typename _ValueType, int_t _Dim>
 inline void memset(tensor<_ValueType, _Dim> ts, int v) {
-	throw_on_error(cudaMemset(ts.shared_data().get(), v, ts.size() * sizeof(_ValueType)));
+	assert_runtime_success(cudaMemset(ts.shared_data().get(), v, ts.size() * sizeof(_ValueType)));
 }
 
 }//cuda

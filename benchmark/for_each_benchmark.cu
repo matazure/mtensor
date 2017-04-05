@@ -15,12 +15,13 @@ void BM_cu_for_each_gold(benchmark::State& state) {
 	cu_tensor<_ValueType, 1> ts_src(state.range(0));
 
 	while (state.KeepRunning()) {
-		cuda::ExecutionPolicy policy;
-		cuda::throw_on_error(cuda::condigure_grid(policy, for_each_gold_kenel<_ValueType>));
-		for_each_gold_kenel<<< policy.getGridSize(),
-			policy.getBlockSize(),
-			policy.getSharedMemBytes(),
-			policy.getStream() >>>(ts_src.data(), ts_src.size());
+		cuda::parallel_execution_policy policy;
+		policy.parallel_size(ts_src.size());
+		cuda::configure_grid(policy, for_each_gold_kenel<_ValueType>);
+		for_each_gold_kenel<<< policy.grid_size(),
+			policy.block_size(),
+			policy.shared_mem_bytes(),
+			policy.stream() >>>(ts_src.data(), ts_src.size());
 
 		cuda::barrier();
 	}

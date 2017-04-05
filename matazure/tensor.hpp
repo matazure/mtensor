@@ -279,9 +279,9 @@ private:
 		});
 	#else
 		decay_t<value_type> *data = nullptr;
-		cuda::throw_on_error(cudaMallocHost(&data, size * sizeof(value_type)));
+		cuda::assert_runtime_success(cudaMallocHost(&data, size * sizeof(value_type)));
 		return shared_ptr<value_type>(data, [](value_type *ptr) {
-			cuda::throw_on_error(cudaFreeHost(const_cast<decay_t<value_type> *>(ptr)));
+			cuda::assert_runtime_success(cudaFreeHost(const_cast<decay_t<value_type> *>(ptr)));
 		});
 	#endif
 	}

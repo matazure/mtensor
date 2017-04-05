@@ -401,14 +401,14 @@ inline auto resize(_Tensor ts, const pointi<_Tensor::dim> &resize_ext)->decltype
 
 template <typename _Tensor0, typename _Tensor1>
 inline auto zip(_Tensor0 ts0, _Tensor1 ts1)->decltype(make_lambda(ts0.extent(), _internal::zip_op<_Tensor0, _Tensor1>(ts0, ts1))) {
-	MATAZURE_ASSERT(equal(ts0, ts1));
+	MATAZURE_ASSERT(equal(ts0.extent(), ts1.extent()));
 	return make_lambda(ts0.extent(), _internal::zip_op<_Tensor0, _Tensor1>(ts0, ts1));
 }
 
 template <typename _Tensor0, typename _Tensor1, typename _Tensor2>
 inline auto zip(_Tensor0 ts0, _Tensor1 ts1, _Tensor2 ts2)->decltype(make_lambda(ts0.extent(), _internal::zip_op<_Tensor0, _Tensor1, _Tensor2>(ts0, ts1, ts2))) {
-	MATAZURE_ASSERT(equal(ts0, ts1));
-	MATAZURE_ASSERT(equal(ts2, ts1));
+	MATAZURE_ASSERT(equal(ts0.extent(), ts1.extent()));
+	MATAZURE_ASSERT(equal(ts2.extent(), ts1.extent()));
 	return make_lambda(ts0.extent(), _internal::zip_op<_Tensor0, _Tensor1, _Tensor2>(ts0, ts1, ts2));
 }
 

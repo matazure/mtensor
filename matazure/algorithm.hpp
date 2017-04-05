@@ -110,7 +110,7 @@ namespace matazure {
 	template <typename _T1, typename _T2>
 	inline bool equal(_T1 lhs, _T2 rhs, enable_if_t<none_device_memory<_T1, _T2>::value>* = 0) {
 		for (int_t i = 0; i < lhs.size(); ++i){
-			if (MATAZURE_UNLIKE(lhs[i] != rhs[i])) return false;
+			if (MATAZURE_UNLIKELY(lhs[i] != rhs[i])) return false;
 		}
 
 		return true;

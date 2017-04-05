@@ -88,12 +88,12 @@ void BM_stride(benchmark::State &state) {
 //
 //	while (state.KeepRunning()) {
 //		cu_tensor<float, 1> ts_re(ts1.extent());
-//		cuda::ExecutionPolicy policy;
-//		cuda::throw_on_error(cuda::condigure_grid(policy, tensor_operation_gold_kenel<_ValueType>));
-//		tensor_operation_gold_kenel<<< policy.getGridSize(),
-//			policy.getBlockSize(),
-//			policy.getSharedMemBytes(),
-//			policy.getStream() >>>(ts_re.data(), ts1.data(), ts2.data(), ts_re.size());
+//		cuda::execution_policy policy;
+//		cuda::assert_runtime_success(cuda::configure_grid(policy, tensor_operation_gold_kenel<_ValueType>));
+//		tensor_operation_gold_kenel<<< policy.grid_size(),
+//			policy.block_size(),
+//			policy.shared_mem_bytes(),
+//			policy.stream() >>>(ts_re.data(), ts1.data(), ts2.data(), ts_re.size());
 //	}
 //
 //	auto bytes_size = static_cast<size_t>(ts1.size()) * sizeof(_ValueType);

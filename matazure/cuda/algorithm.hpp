@@ -15,31 +15,27 @@ MATAZURE_GLOBAL void kenel(Function f, Arguments... args)
 template <typename _Fun, typename... _Args>
 inline void launch(_Fun f, _Args... args)
 {
-	ExecutionPolicy p;
-	launch(p, f, args...);
+	execution_policy exe_policy;
+	launch(exe_policy, f, args...);
 }
 
 template <typename _ExecutionPolicy, typename _Fun, typename... _Args>
-inline void launch(const _ExecutionPolicy &policy, _Fun f, _Args... args)
+inline void launch(_ExecutionPolicy exe_policy, _Fun f, _Args... args)
 {
-	ExecutionPolicy p = policy;
-	throw_on_error(condigure_grid(p, kenel<_Fun, _Args...>));
-	kenel<<< p.getGridSize(),
-		p.getBlockSize(),
-		p.getSharedMemBytes(),
-		p.getStream() >>>(f, args...);
-
-	throw_on_error(cudaGetLastError());
+	configure_grid(exe_policy, kenel<_Fun, _Args...>);
+	kenel<<< exe_policy.grid_size(), exe_policy.block_size(), exe_policy.shared_mem_bytes(), exe_policy.stream() >>>(f, args...);
+	assert_runtime_success(cudaGetLastError());
 }
 
 template <typename _Fun>
 inline void parallel_for_index(int_t first, int_t last, _Fun fun) {
-	ExecutionPolicy p;
-	parallel_for_index(p, first, last, fun);
+	parallel_execution_policy parallel_policy;
+	parallel_policy.parallel_size(last - first);
+	parallel_for_index(parallel_policy, first, last, fun);
 }
 
 template <typename _ExecutionPolicy, typename _Fun>
-inline void parallel_for_index(const _ExecutionPolicy &policy, int_t first, int_t last, _Fun fun) {
+inline void parallel_for_index(_ExecutionPolicy policy, int_t first, int_t last, _Fun fun) {
 	launch(policy, [=] MATAZURE_DEVICE() {
 		for (int_t i = first + threadIdx.x + blockIdx.x * blockDim.x; i < last; i += blockDim.x * gridDim.x) {
 			fun(i);
@@ -49,12 +45,12 @@ inline void parallel_for_index(const _ExecutionPolicy &policy, int_t first, int_
 
 template <int_t _Dim, typename _Fun>
 inline void parallel_for_index(pointi<_Dim> ext, _Fun fun) {
-	ExecutionPolicy p;
+	execution_policy p;
 	parallel_for_index(p, ext, fun);
 }
 
 template <typename _ExecutionPolicy, int_t _Dim, typename _Fun>
-inline void parallel_for_index(const _ExecutionPolicy &policy, pointi<_Dim> ext, _Fun fun) {
+inline void parallel_for_index(_ExecutionPolicy policy, pointi<_Dim> ext, _Fun fun) {
 	auto stride = matazure::get_stride(ext);
 	auto max_size = index2offset((ext - 1), stride, first_major_t{}) + 1; //要包含最后一个元素
 
@@ -109,7 +105,7 @@ inline void tile_for_index(pointi<2> grid_ext, _Fun fun) {
 		fun(tile_idx);
 	});
 
-	throw_on_error(cudaGetLastError());
+	assert_runtime_success(cudaGetLastError());
 }
 
 template <int_t _S0, int_t _S1, int_t _S2, typename _Fun>
