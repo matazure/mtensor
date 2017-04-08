@@ -3,6 +3,7 @@
 #include <cuda_runtime.h>
 #include <matazure/tensor.hpp>
 #include <matazure/cuda/algorithm.hpp>
+#include <matazure/cuda/runtime.hpp>
 
 namespace matazure {
 namespace cuda {

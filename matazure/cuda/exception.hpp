@@ -1,7 +1,7 @@
 #pragma once
 
 #include <matazure/config.hpp>
-#include <cuda_device_runtime_api.h>
+#include <cuda_runtime.h>
 
 namespace matazure {
 namespace cuda {
