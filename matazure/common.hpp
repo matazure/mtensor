@@ -304,6 +304,30 @@ public:
 	}
 };
 
+template <typename _Tensor>
+struct padding_zero_op {
+private:
+	_Tensor ts_;
+	pointi<_Tensor::dim> padding0_;
+	pointi<_Tensor::dim> padding1_;
+
+public:
+	padding_zero_op(_Tensor ts, pointi<_Tensor::dim> padding0, pointi<_Tensor::dim> padding1) :
+		ts_(ts),
+		padding0_(padding0),
+		padding1_(padding1)
+	{}
+
+	MATAZURE_GENERAL auto operator()(pointi<_Tensor::dim> idx) const->decltype(zero<typename _Tensor::value_type>::value()) {
+		if (MATAZURE_LIKELY(inside(idx, padding0_, padding0_ + ts_.extent()))) {
+			return ts_(idx - padding0_);
+		}
+		else {
+			return zero<typename _Tensor::value_type>::value();
+		}
+	}
+};
+
 }
 
 #ifndef MATAZURE_CUDA
@@ -366,6 +390,11 @@ inline auto section(_Tensor ts, typename _Tensor::index_type origin, typename _T
 template <typename _Tensor, typename _StrideType>
 inline auto stride(_Tensor ts, _StrideType stride)->decltype(make_lambda(ts.extent() / stride, _internal::stride_op<_Tensor, _StrideType>(ts, stride), typename _Tensor::memory_type{})) {
 	return make_lambda(ts.extent() / stride, _internal::stride_op<_Tensor, _StrideType>(ts, stride), typename _Tensor::memory_type{});
+}
+
+template <typename _Tensor>
+inline auto padding_zero(_Tensor ts, pointi<_Tensor::dim> padding0, pointi<_Tensor::dim> padding1)->decltype(make_lambda(ts.extent() + padding0 + padding1, _internal::padding_zero_op<_Tensor>(ts, padding0, padding1), typename _Tensor::memory_type{})) {
+	return make_lambda(ts.extent() + padding0 + padding1, _internal::padding_zero_op<_Tensor>(ts, padding0, padding1), typename _Tensor::memory_type{});
 }
 
 ///TODO: assert range out

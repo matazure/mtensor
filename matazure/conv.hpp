@@ -1,6 +1,6 @@
 ﻿
 template <typename _ValueType, int_t _Dim>
-inline MATAZURE_GENERAL bool in_apron(point<_ValueType, _Dim> input, point<_ValueType, _Dim> halo, point<_ValueType, _Dim> extent) {
+inline MATAZURE_GENERAL bool outside(point<_ValueType, _Dim> input, point<_ValueType, _Dim> halo, point<_ValueType, _Dim> extent) {
 	for (int_t i = 0; i < _Dim; ++i) {
 		if (input[i] < halo[i] || input[i] >= extent[i] - halo[i])
 			return false;
@@ -8,7 +8,6 @@ inline MATAZURE_GENERAL bool in_apron(point<_ValueType, _Dim> input, point<_Valu
 
 	return true;
 }
-
 
 namespace detail {
 

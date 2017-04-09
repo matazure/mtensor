@@ -32,6 +32,8 @@ int main() {
 	//auto lts_2add2f = ts2 + ts2f; //Compiler error! 类型不匹配
 	auto lts_2add2f = tensor_cast<float>(ts2) + ts2f; //Compiler OK
 
+	auto padding_tmp = padding_zero(ts1, pointi<2>{1, 1}, pointi<2>{1,1});
+
 	auto ts_zip = zip(ts1, ts2);
 	auto v12 = ts_zip[0];
 	printf("ts_zip[0]: (%d, %d)\n", std::get<0>(v12), std::get<1>(v12));

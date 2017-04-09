@@ -60,63 +60,63 @@ inline void parallel_for_index(_ExecutionPolicy policy, pointi<_Dim> ext, _Fun f
 }
 
 template <int_t ..._Dims>
-class tile_index;
+class block_index;
 
 template <int_t _S0, int_t _S1>
-class tile_index<_S0, _S1> {
+class block_index<_S0, _S1> {
 public:
-	MATAZURE_GENERAL tile_index(pointi<2> grid_extent, pointi<2> local_idx, pointi<2> tile_idx, pointi<2> global_idx) :
-		tile_extent{ _S0, _S1 },
+	MATAZURE_GENERAL block_index(pointi<2> grid_extent, pointi<2> local_idx, pointi<2> block_idx, pointi<2> global_idx) :
+		block_extent{ _S0, _S1 },
 		grid_extent(grid_extent),
-		global_extent(tile_extent * grid_extent),
+		global_extent(block_extent * grid_extent),
 		local(local_idx),
-		tile(tile_idx),
+		block(block_idx),
 		global(global_idx)
 	{}
 
 public:
-	const pointi<2> tile_extent;
+	const pointi<2> block_extent;
 	const pointi<2> grid_extent;
 	const pointi<2> global_extent;
 	const pointi<2> local;
-	const pointi<2> tile;
+	const pointi<2> block;
 	const pointi<2> global;
 };
 
 template <int_t _S0, int_t _S1, int_t _S2>
-class tile_index<_S0, _S1, _S2> {
+class block_index<_S0, _S1, _S2> {
 public:
 
 };
 
 template <int_t _BlockSize, typename _Fun>
-inline void tile_for_index(int_t grid_size, _Fun fun) {
+inline void block_for_index(int_t grid_size, _Fun fun) {
 	kenel<<< grid_size, _BlockSize >>>(fun);
 }
 
 template <int_t _S0, int_t _S1, typename _Fun>
-inline void tile_for_index(pointi<2> grid_ext, _Fun fun) {
+inline void block_for_index(pointi<2> grid_ext, _Fun fun) {
 	kenel <<< dim3(grid_ext[0], grid_ext[1], 1), dim3(_S0, _S1, 1) >>> ([=] MATAZURE_DEVICE() {
 	 pointi<2> local = { static_cast<int_t>(threadIdx.x), static_cast<int_t>(threadIdx.y) };
-	 pointi<2> tile = { static_cast<int_t>(blockIdx.x), static_cast<int_t>(blockIdx.y) };
+	 pointi<2> block = { static_cast<int_t>(blockIdx.x), static_cast<int_t>(blockIdx.y) };
 	 pointi<2> block_ext = { _S0, _S1 };
-	 pointi<2> global = tile * block_ext + local;
-		tile_index<_S0, _S1> tile_idx(grid_ext, local, tile, global);
-		fun(tile_idx);
+	 pointi<2> global = block * block_ext + local;
+		block_index<_S0, _S1> block_idx(grid_ext, local, block, global);
+		fun(block_idx);
 	});
 
 	assert_runtime_success(cudaGetLastError());
 }
 
 template <int_t _S0, int_t _S1, int_t _S2, typename _Fun>
-inline void tile_for_index(pointi<3> grid_ext, _Fun fun) {
+inline void block_for_index(pointi<3> grid_ext, _Fun fun) {
 	kenel << < dim3(grid_ext[0], grid_ext[1], grid_ext[2]), dim3(_S0, _S1, _S2) >> > ([=] MATAZURE_DEVICE() {
 	 pointi<3> local = { static_cast<int_t>(threadIdx.x), static_cast<int_t>(threadIdx.y), static_cast<int_t>(threadIdx.z) };
-	 pointi<3> tile = { static_cast<int_t>(blockIdx.x), static_cast<int_t>(blockIdx.y), static_cast<int_t>(blockIdx.z) };
+	 pointi<3> block = { static_cast<int_t>(blockIdx.x), static_cast<int_t>(blockIdx.y), static_cast<int_t>(blockIdx.z) };
 	 pointi<3> block_ext = { _S0, _S1, _S2 };
-	 pointi<3> global = tile * block_ext + local;
-		tile_index<_S0, _S1, _S2> tile_idx(grid_ext, local, tile, global);
-		fun(tile_idx);
+	 pointi<3> global = block * block_ext + local;
+		block_index<_S0, _S1, _S2> block_idx(grid_ext, local, block, global);
+		fun(block_idx);
 	});
 }
 
