@@ -63,6 +63,9 @@ cd ../..
 mkdir build
 cmake ..
 ```
+##
+CUDA 8.0 64bit  
+support unified virtual addressing(memory copy)
 
 ## 其他
 安装[ImageMagic](http://www.imagemagick.org/)工具  
