@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cuda_occupancy.h>
 #include <matazure/config.hpp>
 #include <cuda_runtime.h>
 

@@ -14,6 +14,9 @@ struct host_t {};
 struct device_t {};
 struct local_t {};
 
+struct pinned_t{};
+struct unpinned_t{};
+
 template <typename _T>
 struct zero;
 

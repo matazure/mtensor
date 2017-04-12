@@ -2,6 +2,10 @@
 
 #include <matazure/algorithm.hpp>
 
+#ifdef MATAZURE_CUDA
+#include <matazure/cuda/exception.hpp>
+#endif
+
 namespace matazure {
 
 template <int_t _Dim>
@@ -215,12 +219,36 @@ public:
 		tensor(extent_type{ ext... })
 	{}
 
+	#ifndef MATZURE_CUDA
+
 	explicit tensor(extent_type extent) :
 		extent_(extent),
 		stride_(get_stride(extent)),
 		sp_data_(malloc_shared_memory(stride_[dim - 1])),
 		data_(sp_data_.get())
 	{ }
+
+	#else
+
+	explicit tensor(extent_type extent):
+		tensor(extent, pinned_t{})
+	{}
+
+	explicit tensor(extent_type extent, pinned_t pinned_v) :
+		extent_(extent),
+		stride_(get_stride(extent)),
+		sp_data_(malloc_shared_memory(stride_[dim - 1], pinned_v)),
+		data_(sp_data_.get())
+	{ }
+
+	explicit tensor(extent_type extent, unpinned_t) :
+		extent_(extent),
+		stride_(get_stride(extent)),
+		sp_data_(malloc_shared_memory(stride_[dim - 1])),
+		data_(sp_data_.get())
+	{ }
+
+	#endif
 
 	explicit tensor(extent_type extent, std::shared_ptr<value_type> sp_data) :
 		extent_(extent),
@@ -272,19 +300,21 @@ public:
 
 private:
 	shared_ptr<value_type> malloc_shared_memory(int_t size) {
-	#ifndef MATAZURE_CUDA
 		value_type *data = new decay_t<value_type>[size];
 		return shared_ptr<value_type>(data, [](value_type *ptr) {
 			delete[] ptr;
 		});
-	#else
+	}
+
+	#ifdef MATAZURE_CUDA
+	shared_ptr<value_type> malloc_shared_memory(int_t size, pinned_t) {
 		decay_t<value_type> *data = nullptr;
 		cuda::assert_runtime_success(cudaMallocHost(&data, size * sizeof(value_type)));
 		return shared_ptr<value_type>(data, [](value_type *ptr) {
 			cuda::assert_runtime_success(cudaFreeHost(const_cast<decay_t<value_type> *>(ptr)));
 		});
-	#endif
 	}
+	#endif
 
 private:
 	extent_type	extent_;
