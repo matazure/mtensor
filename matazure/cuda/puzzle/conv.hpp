@@ -14,15 +14,55 @@ __device__ void for_index(pointi<2> extent, _Func fun) {
 	}
 }
 
-}
-}
+namespace puzzle {
+
+} //puzzle
+
+} //cuda
+} //matazure
+
+#define MATAZURE_PUZZEL_CONV_GLOBAL(conv_global, mask)														\
+namespace matazure{namespace cuda{ namespace puzzle {														\
+																											\
+namespace _internal {																						\
+																											\
+__constant__ static_tensor<float, 5, 5> mask;																\
+																											\
+template <typename _Tensor>																					\
+struct conv_op {																							\
+private:																									\
+	_Tensor ts_;																							\
+public:																										\
+	conv_op(_Tensor ts) :																					\
+		ts_(ts)																								\
+	{}																										\
+																											\
+	MATAZURE_GENERAL typename _Tensor::value_type operator()(const pointi<_Tensor::dim> &idx) const {		\
+		auto mask_radius = mask.extent() / 2;																\
+		auto sum = zero<typename _Tensor::value_type>::value();												\
+		cuda::for_index(mask.extent(), [&](const pointi<2> &idx) {											\
+			sum += ts_(idx - mask_radius) * mask(idx);														\
+		});																									\
+		return sum;																							\
+	}																										\
+};																											\
+																											\
+}																											\
+																											\
+template <typename _Tensor>																					\
+inline auto conv_global(_Tensor ts)																			\
+->decltype(make_lambda(ts.extent(), _internal::conv_op<_Tensor>(ts), typename _Tensor::memory_type{})) {	\
+	return make_lambda(ts.extent(), _internal::conv_op<_Tensor>(ts), typename _Tensor::memory_type{});		\
+}																											\
+																											\
+}}} //matazure/cuda/puzzle
 
 /// 卷积需要使用__constant__的mask，但不同的mask必须以静态的方式分别声明，故而定义一个宏，以便在外面使用
-#define MATAZURE_PUZZEL_CONV_BLOCK(fun, mask)																	\
+#define MATAZURE_PUZZEL_CONV_BLOCK(conv_block, mask)															\
 namespace matazure{namespace cuda{namespace puzzle{																\
 																												\
 template <int_t _Block0, int_t _Block1, typename _Tensor, typename _TensorRe>									\
-inline tensor<typename _Tensor::value_type, _Tensor::dim> fun(_Tensor ts, _TensorRe &ts_re) {					\
+inline tensor<typename _Tensor::value_type, _Tensor::dim> conv_block(_Tensor ts, _TensorRe &ts_re) {			\
 	MATAZURE_STATIC_ASSERT_DIM_MATCHED(_Tensor, decltype(mask));												\
 	MATAZURE_STATIC_ASSERT_VALUE_TYPE_MATCHED(_Tensor, decltype(mask));											\
 	typedef typename _Tensor::value_type value_type;															\
@@ -56,9 +96,9 @@ inline tensor<typename _Tensor::value_type, _Tensor::dim> fun(_Tensor ts, _Tenso
 																												\
 																												\
 template <int_t _Block0, int_t _Block1, typename _Tensor>														\
-inline tensor<typename _Tensor::value_type, _Tensor::dim> fun(_Tensor ts) {										\
+inline tensor<typename _Tensor::value_type, _Tensor::dim> conv_block(_Tensor ts) {								\
 	tensor<typename _Tensor::value_type, _Tensor::dim> ts_re(ts.extent());										\
-	fun<_Block0, _Block1>(ts, ts_re);																			\
+	conv_block<_Block0, _Block1>(ts, ts_re);																	\
 	return ts_re;																								\
 }																												\
 																												\

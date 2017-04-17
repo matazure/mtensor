@@ -328,6 +328,26 @@ public:
 	}
 };
 
+template <typename _Tensor>
+struct clamp_zero_op {
+private:
+	_Tensor ts_;
+
+public:
+	clamp_zero_op(_Tensor ts) :
+		ts_(ts)
+	{}
+
+	MATAZURE_GENERAL auto operator()(pointi<_Tensor::dim> idx) const->decltype(zero<typename _Tensor::value_type>::value()) {
+		if (MATAZURE_LIKELY(inside(idx, pointi<_Tensor::dim>::zero(), ts_.extent()))) {
+			return ts_(idx);
+		}
+		else {
+			return zero<typename _Tensor::value_type>::value();
+		}
+	}
+};
+
 }
 
 #ifndef MATAZURE_CUDA
@@ -392,11 +412,6 @@ inline auto stride(_Tensor ts, _StrideType stride)->decltype(make_lambda(ts.exte
 	return make_lambda(ts.extent() / stride, _internal::stride_op<_Tensor, _StrideType>(ts, stride), typename _Tensor::memory_type{});
 }
 
-template <typename _Tensor>
-inline auto padding_zero(_Tensor ts, pointi<_Tensor::dim> padding0, pointi<_Tensor::dim> padding1)->decltype(make_lambda(ts.extent() + padding0 + padding1, _internal::padding_zero_op<_Tensor>(ts, padding0, padding1), typename _Tensor::memory_type{})) {
-	return make_lambda(ts.extent() + padding0 + padding1, _internal::padding_zero_op<_Tensor>(ts, padding0, padding1), typename _Tensor::memory_type{});
-}
-
 ///TODO: assert range out
 template <int_t _DimIdx, typename _Tensor>
 inline auto slice(_Tensor ts, int_t i)->decltype(make_lambda(_internal::slice_point<_DimIdx>(ts.extent()), _internal::slice_op<_Tensor, _DimIdx>(ts, i), typename _Tensor::memory_type{})){
@@ -422,6 +437,16 @@ inline auto slice(cu_tensor<_T, _Dim, _Layout> ts, int_t i, enable_if_t<_DimIdx 
 }
 
 #endif
+
+template <typename _Tensor>
+inline auto padding_zero(_Tensor ts, pointi<_Tensor::dim> padding0, pointi<_Tensor::dim> padding1)->decltype(make_lambda(ts.extent() + padding0 + padding1, _internal::padding_zero_op<_Tensor>(ts, padding0, padding1), typename _Tensor::memory_type{})) {
+	return make_lambda(ts.extent() + padding0 + padding1, _internal::padding_zero_op<_Tensor>(ts, padding0, padding1), typename _Tensor::memory_type{});
+}
+
+template <typename _Tensor>
+inline auto clamp_zero(_Tensor ts)->decltype(make_lambda(ts.extent(), _internal::clamp_zero_op<_Tensor>(ts), typename _Tensor::memory_type{})) {
+	return make_lambda(ts.extent(), _internal::clamp_zero_op<_Tensor>(ts), typename _Tensor::memory_type{});
+}
 
 template <typename _Tensor>
 inline auto resize(_Tensor ts, const pointi<_Tensor::dim> &resize_ext)->decltype(make_lambda(resize_ext, _internal::resize_op<_Tensor>(ts, resize_ext), typename _Tensor::memory_type{})) {
