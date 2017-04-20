@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <matazure/tensor.hpp>
+#include <matazure/algorithm.hpp>
 
 #ifdef MATAZURE_CUDA
 #include <matazure/cuda/tensor.hpp>
@@ -339,7 +340,7 @@ public:
 	{}
 
 	MATAZURE_GENERAL auto operator()(pointi<_Tensor::dim> idx) const->decltype(zero<typename _Tensor::value_type>::value()) {
-		if (MATAZURE_LIKELY(inside(idx, pointi<_Tensor::dim>::zero(), ts_.extent()))) {
+		if (MATAZURE_LIKELY(inside(idx, pointi<_Tensor::dim>::zeros(), ts_.extent()))) {
 			return ts_(idx);
 		}
 		else {

@@ -35,7 +35,7 @@ matrix<typename _Matrix1::value_type>  block_product(_Matrix1 cmat_lhs, _Matrix2
 	auto lhs_ext = cmat_lhs.extent();
 	auto rhs_ext = cmat_rhs.extent();
 	matrix<value_type> cmat_re({ lhs_ext[0], rhs_ext[1] });
- pointi<2> block_ext{ _BlockSize, _BlockSize };
+	pointi<2> block_ext{ _BlockSize, _BlockSize };
 
 	block_for_index<_BlockSize, _BlockSize>(cmat_re.extent() / block_ext, [=] MATAZURE_DEVICE(block_index<_BlockSize, _BlockSize> t_idx) {
 		auto row = t_idx.local[0];

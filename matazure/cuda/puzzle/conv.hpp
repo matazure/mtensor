@@ -6,7 +6,7 @@ namespace matazure {
 namespace cuda {
 
 template <typename _Func>
-__device__ void for_index(pointi<2> extent, _Func fun) {
+inline __device__ void for_index(pointi<2> extent, _Func fun) {
 	for (int_t j = 0; j < extent[1]; ++j) {
 		for (int_t i = 0; i < extent[0]; ++i) {
 			fun(pointi<2>{ { i, j } });
@@ -40,8 +40,8 @@ public:																										\
 	MATAZURE_GENERAL typename _Tensor::value_type operator()(const pointi<_Tensor::dim> &idx) const {		\
 		auto mask_radius = mask.extent() / 2;																\
 		auto sum = zero<typename _Tensor::value_type>::value();												\
-		cuda::for_index(mask.extent(), [&](const pointi<2> &idx) {											\
-			sum += ts_(idx - mask_radius) * mask(idx);														\
+		cuda::for_index(mask.extent(), [&] (const pointi<2> &mask_idx) {									\
+			sum += ts_(idx + mask_idx - mask_radius) * 0.11f;												\
 		});																									\
 		return sum;																							\
 	}																										\
@@ -96,8 +96,8 @@ inline tensor<typename _Tensor::value_type, _Tensor::dim> conv_block(_Tensor ts,
 																												\
 																												\
 template <int_t _Block0, int_t _Block1, typename _Tensor>														\
-inline tensor<typename _Tensor::value_type, _Tensor::dim> conv_block(_Tensor ts) {								\
-	tensor<typename _Tensor::value_type, _Tensor::dim> ts_re(ts.extent());										\
+inline cuda::tensor<typename _Tensor::value_type, _Tensor::dim> conv_block(_Tensor ts) {								\
+	cuda::tensor<typename _Tensor::value_type, _Tensor::dim> ts_re(ts.extent());										\
 	conv_block<_Block0, _Block1>(ts, ts_re);																	\
 	return ts_re;																								\
 }																												\

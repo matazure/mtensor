@@ -17,12 +17,16 @@ struct local_t {};
 struct pinned_t{};
 struct unpinned_t{};
 
+struct static_t{};
+struct dynamic_t{};
+struct saturate_t{};
+
 template <typename _T>
 struct zero;
 
 template <typename _T>
 struct zero{
-	static constexpr _T value(){
+	MATAZURE_GENERAL static constexpr _T value(){
 		return 0;
 	};
 };

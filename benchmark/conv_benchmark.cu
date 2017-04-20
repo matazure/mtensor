@@ -39,7 +39,7 @@ void BM_cu_conv_global(benchmark::State& state) {
 	cuda::copy_symbol(host_mask, mask);
 
 	while (state.KeepRunning()) {
-		copy(cuda::puzzle::conv_global(ts_src), ts_re);
+		copy(cuda::puzzle::conv_global(clamp_zero(ts_src)), ts_re);
 		cuda::barrier();
 	}
 
