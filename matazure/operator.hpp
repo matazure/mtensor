@@ -15,8 +15,8 @@ template <typename _Type>
 struct saturate_convert {
 	template <typename _SrcType>
 	MATAZURE_GENERAL _Type operator()(_SrcType v) const {
-		if (v < std::numeric_limits<_SrcType>::min())	return std::numeric_limits<_SrcType>::min();
-		if (v > std::numeric_limits<_SrcType>::max())	return std::numeric_limits<_SrcType>::max();
+		if (v < std::numeric_limits<_Type>::min())	return std::numeric_limits<_Type>::min();
+		if (v > std::numeric_limits<_Type>::max())	return std::numeric_limits<_Type>::max();
 		return static_cast<_Type>(v);
 	}
 };
