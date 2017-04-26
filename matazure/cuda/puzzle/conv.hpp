@@ -74,7 +74,7 @@ inline tensor<typename _Tensor::value_type, _Tensor::dim> conv_block(_Tensor ts,
 	auto mask_radius = mask_extent / 2;																			\
 																												\
 	block_for_index<_Block0, _Block1>(grid_ext, [=] MATAZURE_DEVICE(block_index<_Block0, _Block1> block_idx) {	\
-		__shared__ static_tensor<value_type,meta::array< _Block0 + 3,  _Block1 + 3>> shared_ts_block;							\
+		__shared__ static_tensor<value_type,meta::array< _Block0 + 3,  _Block1 + 3>> shared_ts_block;			\
 																												\
 		shared_ts_block(block_idx.local) = ts(block_idx.global + pointi<2>{-1, -1});							\
 		shared_ts_block(block_idx.local + pointi<2>{2, 0}) = ts(block_idx.global + pointi<2>{1, -1});			\
@@ -89,10 +89,8 @@ inline tensor<typename _Tensor::value_type, _Tensor::dim> conv_block(_Tensor ts,
 		ts_re(block_idx.global) = sum;																			\
 	});																											\
 																												\
-	cuda::barrier();																							\
 	return ts_re;																								\
 }																												\
-																												\
 																												\
 template <int_t _Block0, int_t _Block1, typename _Tensor>														\
 inline cuda::tensor<typename _Tensor::value_type, _Tensor::dim> conv_block(_Tensor ts) {						\
@@ -122,7 +120,7 @@ inline tensor<typename _Tensor::value_type, _Tensor::dim> conv_block_crack(_Tens
 	auto mask_radius = mask_extent / 2;																			\
 																												\
 	block_for_index<_Block0, _Block1>(grid_ext, [=] __device__ (block_index<_Block0, _Block1> block_idx) {		\
-		__shared__ static_tensor<value_type,meta::array< _Block0,  _Block1>> shared_ts_block;									\
+		__shared__ static_tensor<value_type,meta::array< _Block0,  _Block1>> shared_ts_block;					\
 		shared_ts_block(block_idx.local) = ts(block_idx.global);												\
 		device::barrier();																						\
 																												\
@@ -137,10 +135,8 @@ inline tensor<typename _Tensor::value_type, _Tensor::dim> conv_block_crack(_Tens
 		}																										\
 	});																											\
 																												\
-	barrier();																									\
 	return ts_re;																								\
 }																												\
-																												\
 																												\
 template <int_t _Block0, int_t _Block1, typename _Tensor>														\
 inline cuda::tensor<typename _Tensor::value_type, _Tensor::dim> conv_block_crack(_Tensor ts) {					\
