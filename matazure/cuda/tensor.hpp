@@ -3,6 +3,7 @@
 #include <cuda_runtime.h>
 #include <matazure/tensor.hpp>
 #include <matazure/cuda/algorithm.hpp>
+#include <matazure/cuda/runtime.hpp>
 
 namespace matazure {
 namespace cuda {
@@ -70,6 +71,10 @@ public:
 		return data_[i];
 	}
 
+	MATAZURE_GENERAL reference operator[](const index_type &idx) const{
+		return (*this)(idx);
+	}
+
 	MATAZURE_GENERAL extent_type extent() const { return extent_; }
 	MATAZURE_GENERAL extent_type stride() const { return stride_; }
 	MATAZURE_GENERAL int_t size() const { return stride_[dim - 1]; }
@@ -79,9 +84,9 @@ public:
 private:
 	shared_ptr<value_type> malloc_shared_memory(int_t size) {
 		decay_t<value_type> *data = nullptr;
-		throw_on_error(cudaMalloc(&data, size * sizeof(value_type)));
+		assert_runtime_success(cudaMalloc(&data, size * sizeof(value_type)));
 		return shared_ptr<value_type>(data, [](value_type *ptr) {
-			throw_on_error(cudaFree(const_cast<decay_t<value_type> *>(ptr)));
+			assert_runtime_success(cudaFree(const_cast<decay_t<value_type> *>(ptr)));
 		});
 	}
 
@@ -99,12 +104,12 @@ template <typename _TensorSrc, typename _TensorDst>
 inline void mem_copy(_TensorSrc ts_src, _TensorDst cts_dst, enable_if_t<!are_host_memory<_TensorSrc, _TensorDst>::value && is_same<typename _TensorSrc::layout_type, typename _TensorDst::layout_type>::value>* = nullptr) {
 	MATAZURE_STATIC_ASSERT_VALUE_TYPE_MATCHED(_TensorSrc, _TensorDst);
 
-	throw_on_error(cudaMemcpy(cts_dst.data(), ts_src.data(), sizeof(typename _TensorDst::value_type) * ts_src.size(), cudaMemcpyDefault));
+	assert_runtime_success(cudaMemcpy(cts_dst.data(), ts_src.data(), sizeof(typename _TensorDst::value_type) * ts_src.size(), cudaMemcpyDefault));
 }
 
 template <typename _TensorSrc, typename _TensorSymbol>
 inline void copy_symbol(_TensorSrc src, _TensorSymbol &symbol_dst) {
-	throw_on_error(cudaMemcpyToSymbol(symbol_dst, src.data(), src.size() * sizeof(typename _TensorSrc::value_type)));
+	assert_runtime_success(cudaMemcpyToSymbol(symbol_dst, src.data(), src.size() * sizeof(typename _TensorSrc::value_type)));
 }
 
 template <typename _ValueType, typename _AccessMode, int_t _Dim, typename _Func>
@@ -139,7 +144,11 @@ public:
 		return offset_imp<accessor_type>(i);
 	}
 
-	tensor<value_type, dim> persist() const {
+	MATAZURE_GENERAL value_type operator[](const index_type &idx) const {
+		return (*this)(idx);
+	}
+
+	tensor<decay_t<value_type>, dim> persist() const {
 		tensor<decay_t<value_type>, dim> re(this->extent());
 		copy(*this, re);
 		return re;
@@ -207,8 +216,12 @@ public:
 		return offset_imp<access_type>(i);
 	}
 
-	tensor<value_type, dim> persist() const {
-		tensor<value_type, dim> re(this->extent());
+	MATAZURE_GENERAL value_type operator[](const index_type &idx) const {
+		return (*this)(idx);
+	}
+
+	tensor<decay_t<value_type>, dim> persist() const {
+		tensor<decay_t<value_type>, dim> re(this->extent());
 		copy(*this, re);
 		return re;
 	}
@@ -255,15 +268,13 @@ inline auto make_general_lambda(pointi<_Dim> extent, _Func fun)->general_lambda_
 }
 
 inline void barrier() {
-	throw_on_error(cudaDeviceSynchronize());
+	assert_runtime_success(cudaDeviceSynchronize());
 }
 
 template <typename _ValueType, int_t _Dim>
 inline void memset(tensor<_ValueType, _Dim> ts, int v) {
-	throw_on_error(cudaMemset(ts.shared_data().get(), v, ts.size() * sizeof(_ValueType)));
+	assert_runtime_success(cudaMemset(ts.shared_data().get(), v, ts.size() * sizeof(_ValueType)));
 }
-
-}//cuda
 
 namespace device {
 
@@ -272,6 +283,35 @@ inline void MATAZURE_DEVICE barrier() {
 }
 
 } //device
+
+template <typename _Type, int_t _Dim, typename _Layout>
+inline tensor<_Type, _Dim, _Layout> mem_clone(tensor<_Type, _Dim, _Layout> ts, device_t) {
+	tensor<_Type, _Dim, _Layout> ts_re(ts.extent());
+	mem_copy(ts, ts_re);
+	return ts_re;
+}
+
+template <typename _Type, int_t _Dim, typename _Layout>
+inline tensor<_Type, _Dim, _Layout> mem_clone(tensor<_Type, _Dim, _Layout> ts) {
+	return mem_clone(ts, device_t{});
+}
+
+template <typename _Type, int_t _Dim, typename _Layout>
+inline tensor<_Type, _Dim, _Layout> mem_clone(matazure::tensor<_Type, _Dim, _Layout> ts, device_t) {
+	tensor<_Type, _Dim, _Layout> ts_re(ts.extent());
+	mem_copy(ts, ts_re);
+	return ts_re;
+}
+
+template <typename _Type, int_t _Dim, typename _Layout>
+inline matazure::tensor<_Type, _Dim, _Layout> mem_clone(tensor<_Type, _Dim, _Layout> ts, host_t) {
+	matazure::tensor<_Type, _Dim, _Layout> ts_re(ts.extent());
+	mem_copy(ts, ts_re);
+	return ts_re;
+}
+
+}//cuda
+
 
 // alias in matazure
 template <typename _ValueType, int_t _Dim, typename _Layout = first_major_t>
@@ -284,33 +324,7 @@ template <typename _ValueType, typename _Layout = first_major_t>
 using cu_matrix = cu_tensor<_ValueType, 2, _Layout>;
 
 using cuda::mem_copy;
-
-template <typename _Tensor>
-inline auto mem_clone(_Tensor cts, device_t, enable_if_t<are_device_memory<_Tensor>::value>* = nullptr)->cu_tensor<typename _Tensor::value_type, _Tensor::dim, typename _Tensor::layout_type> {
-	cu_tensor<typename _Tensor::value_type, _Tensor::dim, typename _Tensor::layout_type> cts_re(cts.extent());
-	mem_copy(cts, cts_re);
-	return cts_re;
-}
-
-template <typename _Tensor>
-inline auto mem_clone(_Tensor ts, device_t, enable_if_t<are_host_memory<_Tensor>::value>* = nullptr)->cu_tensor<typename _Tensor::value_type, _Tensor::dim, typename _Tensor::layout_type> {
-	cu_tensor<typename _Tensor::value_type, _Tensor::dim, typename _Tensor::layout_type> cts_re(ts.extent());
-	mem_copy(ts, cts_re);
-	return cts_re;
-}
-
-template <typename _Tensor>
-inline auto mem_clone(_Tensor cts, host_t, enable_if_t<are_device_memory<_Tensor>::value>* = nullptr)->tensor<typename _Tensor::value_type, _Tensor::dim, typename _Tensor::layout_type> {
-	tensor<typename _Tensor::value_type, _Tensor::dim, typename _Tensor::layout_type> ts_re(cts.extent());
-	mem_copy(cts, ts_re);
-	return ts_re;
-}
-
-
-template <typename _Tensor>
-inline auto mem_clone(_Tensor cts, enable_if_t<are_device_memory<_Tensor>::value>* = nullptr)->decltype(mem_clone(cts, device_t{})) {
-	return mem_clone(cts, device_t{});
-}
+using cuda::mem_clone;
 
 template <typename _ValueType, int_t _Dim, typename _Layout, int_t _OutDim, typename _OutLayout = _Layout>
 inline auto reshape(cuda::tensor<_ValueType, _Dim, _Layout> ts, pointi<_OutDim> ext, _OutLayout* = nullptr)->cuda::tensor<_ValueType, _OutDim, _OutLayout>{

@@ -21,11 +21,7 @@ public:
 	MATAZURE_GENERAL constexpr int_t size() const { return dim; }
 
 	MATAZURE_GENERAL static constexpr point zeros() {
-		return{ 0 };
-	}
-
-	MATAZURE_GENERAL static constexpr point ones() {
-		return{ 1 };
+		return { 0 };
 	}
 
 public:
@@ -180,6 +176,13 @@ template <int_t _Dim> using points = point<short, _Dim>;
 template <int_t _Dim> using pointi = point<int_t, _Dim>;
 template <int_t _Dim> using pointf = point<float, _Dim>;
 
+template <typename _T, int_t _Dim>
+struct zero<point<_T, _Dim>>{
+	static constexpr point<_T, _Dim> value(){
+		return {0};
+	};
+};
+
 template <int_t _Dim>
 inline MATAZURE_GENERAL pointi<_Dim> get_stride(pointi<_Dim> ex) {
 	pointi<_Dim>  stride;
@@ -188,50 +191,6 @@ inline MATAZURE_GENERAL pointi<_Dim> get_stride(pointi<_Dim> ex) {
 		stride[i] = ex[i] * stride[i - 1];
 	}
 	return stride;
-}
-
-template <int_t _Dim>
-inline MATAZURE_GENERAL typename pointi<_Dim>::value_type index2offset(const pointi<_Dim> &id, const pointi<_Dim> &stride, first_major_t) {
-	typename pointi<_Dim>::value_type offset = id[0];
-	for (int_t i = 1; i < _Dim; ++i) {
-		offset += id[i] * stride[i - 1];
-	}
-
-	return offset;
-};
-
-template <int_t _Dim>
-inline MATAZURE_GENERAL pointi<_Dim> offset2index(typename pointi<_Dim>::value_type offset, const pointi<_Dim> &stride, first_major_t) {
-	pointi<_Dim> id;
-	for (int_t i = _Dim - 1; i > 0; --i) {
-		id[i] = offset / stride[i - 1];
-		offset = offset % stride[i - 1];
-	}
-	id[0] = offset;
-
-	return id;
-}
-
-template <int_t _Dim>
-inline MATAZURE_GENERAL typename pointi<_Dim>::value_type index2offset(const pointi<_Dim> &id, const pointi<_Dim> &stride, last_major_t) {
-	typename pointi<_Dim>::value_type offset = id[_Dim - 1];
-	for (int_t i = 1; i < _Dim; ++i) {
-		offset += id[_Dim - 1 - i] * stride[i - 1];
-	}
-
-	return offset;
-};
-
-template <int_t _Dim>
-inline MATAZURE_GENERAL pointi<_Dim> offset2index(typename pointi<_Dim>::value_type offset, const pointi<_Dim> &stride, last_major_t) {
-	pointi<_Dim> id;
-	for (int_t i = _Dim - 1; i > 0; --i) {
-		id[_Dim - 1 - i] = offset / stride[i - 1];
-		offset = offset % stride[i - 1];
-	}
-	id[_Dim - 1] = offset;
-
-	return id;
 }
 
 template <typename _Tuple, int_t dim = tuple_size<_Tuple>::value>
@@ -262,15 +221,5 @@ public:
 		re[2] = get<2>(*static_cast<_Tuple *>(this));
 	}
 };
-
-namespace detail {
-
-//template <int_t _DimI, typename _ValueType, int_t _Dim>
-//auto slice(const point<_ValueType, _Dim> &pt) {
-//	point<_ValueType, _Dim - 1> re;
-//	for ()
-//}
-
-}
 
 }

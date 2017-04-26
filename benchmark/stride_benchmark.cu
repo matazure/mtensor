@@ -33,17 +33,15 @@ void BM_host_stride_dim2_gold(benchmark::State &state) {
 	int_t stride = state.range(0);
 	int_t phase = stride / 2;
 	auto ts_re_ext = ts.extent() / stride;
+	tensor<_ValueType, 2> ts_re(ts_re_ext);
 
 	while (state.KeepRunning()) {
-		tensor<_ValueType, 2> ts_re(ts_re_ext);
-		auto ts_ext = ts.extent();
-
 		int_t pos_i = 0;
 		int_t pos_j = 0;
 		for (int_t j = 0; j < ts_re_ext[1]; ++j) {
 			pos_i = 0;
 			for (int_t i = 0; i < ts_re_ext[0]; ++i) {
-				ts_re(i, j) = ts(pos_i + phase, pos_j + phase);
+				ts_re(i, j) = ts(pos_i, pos_j);
 				pos_i += stride;
 			}
 			pos_j += stride;
@@ -57,16 +55,15 @@ void BM_host_stride_dim2_gold(benchmark::State &state) {
 template <typename _Tensor>
 void BM_stride(benchmark::State &state) {
 	auto ext = pointi<_Tensor::dim>::zeros();
-	for (int_t i = 0; i < ext.size(); ++i) {
-		ext[i] = state.range(1);
-	}
-
+	fill(ext, state.range(1));
 	_Tensor ts(ext);
 	int_t ts_stride = state.range(0);
-	int_t ts_phase = ts_stride / 2;
 	auto ts_re_ext = ts.extent() / ts_stride;
+	_Tensor ts_re(ts_re_ext);
+	
 	while (state.KeepRunning()) {
-		auto ts_re = stride(ts, ts_stride, ts_phase).persist();
+		auto lts_re = stride(ts, ts_stride);
+		copy(lts_re, ts_re);
 
 	#ifdef MATAZURE_CUDA
 		cuda::barrier();
@@ -91,12 +88,12 @@ void BM_stride(benchmark::State &state) {
 //
 //	while (state.KeepRunning()) {
 //		cu_tensor<float, 1> ts_re(ts1.extent());
-//		cuda::ExecutionPolicy policy;
-//		cuda::throw_on_error(cuda::condigure_grid(policy, tensor_operation_gold_kenel<_ValueType>));
-//		tensor_operation_gold_kenel<<< policy.getGridSize(),
-//			policy.getBlockSize(),
-//			policy.getSharedMemBytes(),
-//			policy.getStream() >>>(ts_re.data(), ts1.data(), ts2.data(), ts_re.size());
+//		cuda::execution_policy policy;
+//		cuda::assert_runtime_success(cuda::configure_grid(policy, tensor_operation_gold_kenel<_ValueType>));
+//		tensor_operation_gold_kenel<<< policy.grid_size(),
+//			policy.block_size(),
+//			policy.shared_mem_bytes(),
+//			policy.stream() >>>(ts_re.data(), ts1.data(), ts2.data(), ts_re.size());
 //	}
 //
 //	auto bytes_size = static_cast<size_t>(ts1.size()) * sizeof(_ValueType);

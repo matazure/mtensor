@@ -20,12 +20,12 @@ void BM_cu_tensor_operation_gold(benchmark::State& state) {
 
 	while (state.KeepRunning()) {
 		cu_tensor<_ValueType, 1> ts_re(ts1.extent());
-		cuda::ExecutionPolicy policy;
-		cuda::throw_on_error(cuda::condigure_grid(policy, tensor_operation_gold_kenel<_ValueType>));
-		tensor_operation_gold_kenel<<< policy.getGridSize(),
-			policy.getBlockSize(),
-			policy.getSharedMemBytes(),
-			policy.getStream() >>>(ts_re.data(), ts1.data(), ts2.data(), ts_re.size());
+		cuda::execution_policy policy;
+		cuda::configure_grid(policy, tensor_operation_gold_kenel<_ValueType>);
+		tensor_operation_gold_kenel<<< policy.grid_size(),
+			policy.block_size(),
+			policy.shared_mem_bytes(),
+			policy.stream() >>>(ts_re.data(), ts1.data(), ts2.data(), ts_re.size());
 
 		cuda::barrier();
 	}

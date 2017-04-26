@@ -1,8 +1,57 @@
 ﻿#pragma once
 
+#include <matazure/meta.hpp>
 #include <matazure/algorithm.hpp>
 
+#ifdef MATAZURE_CUDA
+#include <matazure/cuda/exception.hpp>
+#endif
+
 namespace matazure {
+
+template <int_t _Dim>
+inline MATAZURE_GENERAL typename pointi<_Dim>::value_type index2offset(const pointi<_Dim> &id, const pointi<_Dim> &stride, first_major_t) {
+	typename pointi<_Dim>::value_type offset = id[0];
+	for (int_t i = 1; i < _Dim; ++i) {
+		offset += id[i] * stride[i - 1];
+	}
+
+	return offset;
+};
+
+template <int_t _Dim>
+inline MATAZURE_GENERAL pointi<_Dim> offset2index(typename pointi<_Dim>::value_type offset, const pointi<_Dim> &stride, first_major_t) {
+	pointi<_Dim> id;
+	for (int_t i = _Dim - 1; i > 0; --i) {
+		id[i] = offset / stride[i - 1];
+		offset = offset % stride[i - 1];
+	}
+	id[0] = offset;
+
+	return id;
+}
+
+template <int_t _Dim>
+inline MATAZURE_GENERAL typename pointi<_Dim>::value_type index2offset(const pointi<_Dim> &id, const pointi<_Dim> &stride, last_major_t) {
+	typename pointi<_Dim>::value_type offset = id[_Dim - 1];
+	for (int_t i = 1; i < _Dim; ++i) {
+		offset += id[_Dim - 1 - i] * stride[i - 1];
+	}
+
+	return offset;
+};
+
+template <int_t _Dim>
+inline MATAZURE_GENERAL pointi<_Dim> offset2index(typename pointi<_Dim>::value_type offset, const pointi<_Dim> &stride, last_major_t) {
+	pointi<_Dim> id;
+	for (int_t i = _Dim - 1; i > 0; --i) {
+		id[_Dim - 1 - i] = offset / stride[i - 1];
+		offset = offset % stride[i - 1];
+	}
+	id[_Dim - 1] = offset;
+
+	return id;
+}
 
 template <typename _Tensor>
 class tensor_expression {
@@ -20,14 +69,12 @@ public:
 protected:
 	MATAZURE_GENERAL tensor_expression() {}
 	MATAZURE_GENERAL ~tensor_expression() {}
-private:
-	const tensor_expression& operator= (const tensor_expression &);
 };
 
-template <typename _Type, int_t ..._SArgs>
-class static_tensor : public tensor_expression<static_tensor<_Type, _SArgs...>> {
+template <typename _Type, typename _Ext>
+class static_tensor {
 private:
-	template <int_t ..._Ext>
+	template <int_t ..._Values>
 	struct traits;
 
 	template <int_t _S0>
@@ -74,10 +121,30 @@ private:
 		}
 	};
 
-	typedef traits<_SArgs...> traits_t;
+	template <typename _T>
+	struct traits_helper;
+
+	template <int_t ..._Values>
+	struct traits_helper<meta::array<_Values...>> {
+		typedef traits<_Values...> type;
+	};
+
+	typedef typename traits_helper<_Ext>::type traits_t;
+
+	template <typename _T>
+	struct extent_helper;
+
+	template <int_t ..._Values>
+	struct extent_helper<meta::array<_Values...>> {
+		MATAZURE_GENERAL static constexpr pointi<sizeof...(_Values)> value() {
+			return{ _Values... };
+		};
+	};
 
 public:
-	static	const int_t			dim = sizeof...(_SArgs);
+	typedef _Ext					meta_extent_type;
+	static	const int_t				dim = meta_extent_type::size();
+
 	typedef _Type					value_type;
 	typedef value_type *			pointer;
 	typedef const pointer			const_pointer;
@@ -93,8 +160,7 @@ public:
 	}
 
 	MATAZURE_GENERAL constexpr extent_type extent() const {
-
-		return{ _SArgs ... };
+		return extent_helper<meta_extent_type>::value();
 	}
 
 	MATAZURE_GENERAL constexpr const_reference operator()(const pointi<dim> &idx) const {
@@ -119,6 +185,14 @@ public:
 
 	MATAZURE_GENERAL reference operator[](int_t i) { return elements_[i]; }
 
+	MATAZURE_GENERAL constexpr const_reference operator[](const pointi<dim> &idx) const {
+		return (*this)(idx);
+	}
+
+	MATAZURE_GENERAL reference operator[](const pointi<dim> &idx) {
+		return (*this)(idx);
+	}
+
 	MATAZURE_GENERAL constexpr int_t size() const { return traits_t::size(); }
 
 	MATAZURE_GENERAL const_pointer data() const {
@@ -133,6 +207,7 @@ public:
 	value_type			elements_[traits_t::size()];
 };
 
+
 template <typename _Type, int_t _Dim, typename _Layout = first_major_t>
 class tensor : public tensor_expression<tensor<_Type, _Dim, _Layout>> {
 public:
@@ -144,7 +219,7 @@ public:
 	typedef matazure::pointi<dim>			extent_type;
 	typedef pointi<dim>						index_type;
 	typedef _Layout							layout_type;
-	typedef linear_access_t						access_type;
+	typedef linear_access_t					access_type;
 	typedef host_t							memory_type;
 
 public:
@@ -157,12 +232,36 @@ public:
 		tensor(extent_type{ ext... })
 	{}
 
+	#ifndef MATZURE_CUDA
+
 	explicit tensor(extent_type extent) :
 		extent_(extent),
 		stride_(get_stride(extent)),
 		sp_data_(malloc_shared_memory(stride_[dim - 1])),
 		data_(sp_data_.get())
 	{ }
+
+	#else
+
+	explicit tensor(extent_type extent):
+		tensor(extent, pinned_t{})
+	{}
+
+	explicit tensor(extent_type extent, pinned_t pinned_v) :
+		extent_(extent),
+		stride_(get_stride(extent)),
+		sp_data_(malloc_shared_memory(stride_[dim - 1], pinned_v)),
+		data_(sp_data_.get())
+	{ }
+
+	explicit tensor(extent_type extent, unpinned_t) :
+		extent_(extent),
+		stride_(get_stride(extent)),
+		sp_data_(malloc_shared_memory(stride_[dim - 1])),
+		data_(sp_data_.get())
+	{ }
+
+	#endif
 
 	explicit tensor(extent_type extent, std::shared_ptr<value_type> sp_data) :
 		extent_(extent),
@@ -172,12 +271,24 @@ public:
 	{ }
 
 	template <typename _VT>
-	tensor(const tensor<_VT, _Dim, _Layout> &ts) :
+	explicit tensor(const tensor<_VT, _Dim, _Layout> &ts) :
 		extent_(ts.extent()),
 		stride_(ts.stride()),
 		sp_data_(ts.shared_data()),
 		data_(ts.data())
 	{ }
+
+	tensor(std::initializer_list<int_t> v) = delete;
+
+	template <typename _VT>
+	const tensor &operator=(const tensor<_VT, _Dim, _Layout> &ts) {
+		extent_ = ts.extent();
+		stride_ = ts.stride();
+		sp_data_ = ts.shared_data();
+		data_ = ts.data();
+
+		return *this;
+	}
 
 	template <typename ..._Idx>
 	value_type& operator()(_Idx... idx) const {
@@ -190,6 +301,10 @@ public:
 
 	value_type& operator[](int_t i) const { return data_[i]; }
 
+	value_type& operator[](const index_type &idx) const {
+		return (*this)(idx);
+	}
+
 	extent_type extent() const { return extent_; }
 	extent_type stride() const { return stride_; }
 
@@ -200,35 +315,34 @@ public:
 
 private:
 	shared_ptr<value_type> malloc_shared_memory(int_t size) {
-	#ifndef MATAZURE_CUDA
 		value_type *data = new decay_t<value_type>[size];
 		return shared_ptr<value_type>(data, [](value_type *ptr) {
 			delete[] ptr;
 		});
-	#else
-		decay_t<value_type> *data = nullptr;
-		cuda::throw_on_error(cudaMallocHost(&data, size * sizeof(value_type)));
-		return shared_ptr<value_type>(data, [](value_type *ptr) {
-			cuda::throw_on_error(cudaFreeHost(const_cast<decay_t<value_type> *>(ptr)));
-		});
-	#endif
 	}
 
-private:
-	const extent_type	extent_;
-	const extent_type	stride_;
-	const shared_ptr<value_type>	sp_data_;
-	value_type * const data_;
-};
+	#ifdef MATAZURE_CUDA
+	shared_ptr<value_type> malloc_shared_memory(int_t size, pinned_t) {
+		decay_t<value_type> *data = nullptr;
+		cuda::assert_runtime_success(cudaMallocHost(&data, size * sizeof(value_type)));
+		return shared_ptr<value_type>(data, [](value_type *ptr) {
+			cuda::assert_runtime_success(cudaFreeHost(const_cast<decay_t<value_type> *>(ptr)));
+		});
+	}
+	#endif
 
-// template <typename _Type, typename _Layout = first_major_t>
-// using vector = tensor<_Type, 1, _Layout>;
+private:
+	extent_type	extent_;
+	extent_type	stride_;
+	shared_ptr<value_type>	sp_data_;
+	value_type * 	data_;
+};
 
 template <typename _Type, typename _Layout = first_major_t>
 using matrix = tensor<_Type, 2, _Layout>;
 
-template <typename _Type, int_t _Col, int_t _Row>
-using static_matrix = static_tensor<_Type, _Col, _Row>;
+//template <typename _Type, int_t _Col, int_t _Row>
+//using static_matrix = static_tensor<_Type,meta::array< _Col,  _Row>>;
 
 namespace detail {
 
@@ -281,15 +395,8 @@ public:
 		return offset_imp<access_type>(i);
 	}
 
-	MATAZURE_GENERAL tensor<value_type, dim> persist() const {
+	MATAZURE_GENERAL tensor<decay_t<value_type>, dim> persist() const {
 		tensor<decay_t<value_type>, dim> re(this->extent());
-		copy(*this, re);
-		return re;
-	}
-
-	template <int_t _S, int_t ..._Extents>
-	static_tensor<value_type, _S, _Extents...> persist() const {
-		static_tensor<decay_t<value_type>, _S, _Extents...> re;
 		copy(*this, re);
 		return re;
 	}
@@ -331,20 +438,20 @@ inline void mem_copy(_TensorSrc ts_src, _TensorDst cts_dst, enable_if_t<are_host
 	memcpy(cts_dst.data(), ts_src.data(), sizeof(typename _TensorDst::value_type) * ts_src.size());
 }
 
-template <typename _Tensor>
-inline auto mem_clone(_Tensor ts, host_t, enable_if_t<are_host_memory<_Tensor>::value>* = nullptr)->tensor<typename _Tensor::value_type, _Tensor::dim, typename _Tensor::layout_type> {
-	tensor<typename _Tensor::value_type, _Tensor::dim, typename _Tensor::layout_type> ts_re(ts.extent());
+template <typename _Type, int_t _Dim, typename _Layout>
+inline tensor<_Type, _Dim, _Layout> mem_clone(tensor<_Type, _Dim, _Layout> ts, host_t) {
+	tensor<_Type, _Dim, _Layout> ts_re(ts.extent());
 	mem_copy(ts, ts_re);
 	return ts_re;
 }
 
-template <typename _Tensor>
-inline auto mem_clone(_Tensor ts, enable_if_t<are_host_memory<_Tensor>::value>* = nullptr)->decltype(mem_clone(ts, host_t{})) {
+template <typename _Type, int_t _Dim, typename _Layout>
+inline auto mem_clone(tensor<_Type, _Dim, _Layout> ts)->decltype(mem_clone(ts, host_t{})) {
 	return mem_clone(ts, host_t{});
 }
 
 template <typename _ValueType, int_t _Dim, typename _Layout, int_t _OutDim, typename _OutLayout = _Layout>
-inline auto reshape(tensor<_ValueType, _Dim, _Layout> ts, pointi<_OutDim> ext, _OutLayout* = nullptr)->tensor<_ValueType, _OutDim, _OutLayout>{
+inline auto reshape(tensor<_ValueType, _Dim, _Layout> ts, pointi<_OutDim> ext, _OutLayout* = nullptr)->tensor<_ValueType, _OutDim, _OutLayout> {
 	tensor<_ValueType, _OutDim, _OutLayout> re(ext, ts.shared_data());
 	MATAZURE_ASSERT_MSG(re.size() == ts.size(), "the size of tensors are not equal");
 	return re;

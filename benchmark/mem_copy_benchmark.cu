@@ -16,12 +16,12 @@ void BM_each_copy_gold(benchmark::State& state) {
 	_Tensor ts_dst(ts_src.extent());
 
 	while (state.KeepRunning()) {
-		cuda::ExecutionPolicy policy;
-		cuda::throw_on_error(cuda::condigure_grid(policy, each_copy_gold_kenel<typename _Tensor::value_type>));
-		each_copy_gold_kenel<<< policy.getGridSize(),
-			policy.getBlockSize(),
-			policy.getSharedMemBytes(),
-			policy.getStream() >>>(ts_dst.data(), ts_src.data(), ts_src.size());
+		cuda::execution_policy policy;
+		cuda::configure_grid(policy, each_copy_gold_kenel<typename _Tensor::value_type>);
+		each_copy_gold_kenel<<< policy.grid_size(),
+			policy.block_size(),
+			policy.shared_mem_bytes(),
+			policy.stream() >>>(ts_dst.data(), ts_src.data(), ts_src.size());
 		cuda::barrier();
 	}
 

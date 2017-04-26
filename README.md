@@ -1,6 +1,6 @@
 # Tensor
-tensor是matazure下的一个多维数组基础库, 具有以下的特点
-* 异构计算的C++接口, 同时支持原生C++和CUDA C++
+tensor作为matazure下的一个C++异构计算库, 具有以下的特点
+* C++风格的异构计算接口，同时支持原生C++和CUDA
 * 具备泛型(多类型,多维度)tensor，函数式lambda_tensor
 * 丰富的向量化tensor操作和运算
 * 延迟计算
@@ -63,6 +63,9 @@ cd ../..
 mkdir build
 cmake ..
 ```
+##
+CUDA 8.0 64bit  
+support unified virtual addressing(memory copy)
 
 ## 其他
 安装[ImageMagic](http://www.imagemagick.org/)工具  

@@ -4,106 +4,90 @@
 
 namespace matazure {
 
-template <typename _ValueType, int_t _Dim>
-inline MATAZURE_GENERAL bool in_apron(point<_ValueType, _Dim> input, point<_ValueType, _Dim> halo, point<_ValueType, _Dim> extent) {
-	for (int_t i = 0; i < _Dim; ++i) {
-		if (input[i] < halo[i] || input[i] >= extent[i] - halo[i])
-			return false;
+template <typename _T, int_t _LhsRows, int_t _LhsCols, int_t _RhsCols>
+MATAZURE_GENERAL auto product(static_tensor<_T, _LhsRows, _LhsCols> ts_lhs, static_tensor<_T, _LhsCols, _RhsCols> ts_rhs)->static_tensor<_T,meta::array< _LhsRows,  _RhsCols>> {
+	auto ts_re = static_tensor<_T,meta::array< _LhsRows,  _RhsCols>>::zeros();
+	for (int_t i = 0; i < _LhsRows; ++i) {
+		for (int_t j = 0; j < _RhsCols; ++j) {
+			for (int k = 0; k < _LhsCols; ++k) {
+				ts_re(i, j) += ts_lhs(i, k) * ts_rhs(k, j);
+			}
+		}
 	}
 
-	return true;
+	return ts_re;
 }
 
-template <typename _VectorLhs, typename _VectorRhs>
-auto inner_product(_VectorLhs vec_lhs, _VectorRhs vec_rhs) {
-	/*	assert(vec_lhs.size() == vec_rhs.size());*/
-
-	decltype(vec_lhs[0]) re = 0;
-	for (int_t i = 0; i < vec_lhs.size(); ++i) {
-		re += vec_lhs[i] * vec_rhs[i];
+template <typename _T, int_t _Rows, int_t _Cols>
+MATAZURE_GENERAL auto product(static_tensor<_T, _Rows, _Cols> mat, point<_T,meta::array< _Cols> vec)->point<_T,  _Rows>> {
+	auto vec_re = point<_T, _Rows>::zeros();
+	for (int_t i = 0; i < _Rows; ++i) {
+		for (int j = 0; j < _Cols; ++j) {
+			vec_re[i] += mat(i, j) * vec[j];
+		}
 	}
 
-	return re;
+	return vec_re;
 }
 
-template <typename _MatrixLhs, typename _MatrixRhs>
-auto product(_MatrixLhs mat_lhs, _MatrixRhs mat_rhs) {
-	MATAZURE_STATIC_ASSERT_IS_MATRIX(_MatrixLhs);
-	MATAZURE_STATIC_ASSERT_IS_MATRIX(_MatrixRhs);
-
-	assert(mat_lhs.extent()[1] == mat_rhs.extent()[0]);
-
-	return make_lambda(pointi<2>{ mat_lhs.extent()[0], mat_rhs.extent()[1] }, [=](pointi<2> idx) {
-		//return inner_product(row(mat_lhs, idx[0]), column(mat_rhs, idx[1]));
-		float re = 0;
-		for (int_t k = 0; k < mat_lhs.extent()[1]; ++k) {
-			re += mat_lhs({ idx[0], k }) * mat_rhs({ k, idx[1] });
+template <typename _T, int_t _Rows, int_t _Cols>
+MATAZURE_GENERAL auto product(static_tensor<_T, _Rows, _Cols> mat, static_tensor<_T,meta::array< _Cols> vec)->static_tensor<_T,  _Rows>> {
+	auto vec_re = static_tensor<_T, _Rows>::zeros();
+	for (int_t i = 0; i < _Rows; ++i) {
+		for (int j = 0; j < _Cols; ++j) {
+			vec_re[i] += mat(i, j) * vec[j];
 		}
-
-		return re;
-	});
-}
-
-template <typename _MatrixLhs, typename _MatrixRhs>
-auto product_tmp(_MatrixLhs mat_lhs, _MatrixRhs mat_rhs) {
-	MATAZURE_STATIC_ASSERT_IS_MATRIX(_MatrixLhs);
-	MATAZURE_STATIC_ASSERT_IS_MATRIX(_MatrixRhs);
-
-	assert(mat_lhs.extent()[0] == mat_rhs.extent()[0]);
-
-	return make_lambda(pointi<2>{ mat_rhs.extent()[1], mat_lhs.extent()[1] }, [=](pointi<2> i) {
-		float re = 0;
-		for (int_t k = 0; k < mat_rhs.extent()[0]; ++k) {
-			re += mat_lhs({ k, i[1] }) * mat_rhs({ k, i[0] });
-		}
-
-		return re;
-	});
-}
-
-namespace detail {
-
-template <typename _Tensor>
-inline auto clone_int_t_tensor(_Tensor ts) {
-	return matazure::tensor<int_t, _Tensor::dim>(ts.extent());
-}
-
-template <typename _T, int_t ...SArgs>
-inline auto clone_int_t_tensor(const static_tensor<_T, SArgs...> &) {
-	return static_tensor<int_t, SArgs...>{};
-}
-}
-
-template <typename _Tensor, typename _Weight, typename _Pos>
-inline auto conv(_Tensor ts_input, _Weight weights, _Pos pos) {
-	return make_lambda(ts_input.extent(), [=](int_t offset) {
-		typename _Tensor::value_type re = 0;
-
-		if (offset + pos[0] < 0 || offset + pos[pos.size() - 1] >= ts_input.size())
-			return decltype(re)(0.0);
-
-		for (int_t i = 0; i < weights.size(); ++i) {
-			auto tmp_offset = offset + pos[i];
-			re += ts_input[tmp_offset] * weights[i];
-		}
-
-		return re;
-	});
-}
-
-template <typename _Tensor, typename _Mask>
-inline auto conv(_Tensor ts_input, _Mask ts_mask) {
-	MATAZURE_STATIC_ASSERT_DIM_MATCHED(_Tensor, _Mask);
-	MATAZURE_STATIC_ASSERT_VALUE_TYPE_MATCHED(_Tensor, _Mask);
-
-	auto ts_offset_mask = detail::clone_int_t_tensor(ts_mask);
-	for (int_t i = 0; i < ts_offset_mask.size(); ++i) {
-		auto tmp_index = offset2index(i, ts_offset_mask.stride());
-		auto tmp_offset = index2offset(tmp_index, ts_input.stride());
-		ts_offset_mask[i] = tmp_offset;
 	}
 
-	return conv(ts_input, ts_mask, ts_offset_mask);
+	return vec_re;
 }
+
+
+// template <typename _VectorLhs, typename _VectorRhs>
+// auto inner_product(_VectorLhs vec_lhs, _VectorRhs vec_rhs) {
+// 	/*	assert(vec_lhs.size() == vec_rhs.size());*/
+//
+// 	decltype(vec_lhs[0]) re = 0;
+// 	for (int_t i = 0; i < vec_lhs.size(); ++i) {
+// 		re += vec_lhs[i] * vec_rhs[i];
+// 	}
+//
+// 	return re;
+// }
+//
+// template <typename _MatrixLhs, typename _MatrixRhs>
+// auto product(_MatrixLhs mat_lhs, _MatrixRhs mat_rhs) {
+// 	MATAZURE_STATIC_ASSERT_IS_MATRIX(_MatrixLhs);
+// 	MATAZURE_STATIC_ASSERT_IS_MATRIX(_MatrixRhs);
+//
+// 	assert(mat_lhs.extent()[1] == mat_rhs.extent()[0]);
+//
+// 	return make_lambda(pointi<2>{ mat_lhs.extent()[0], mat_rhs.extent()[1] }, [=](pointi<2> idx) {
+// 		//return inner_product(row(mat_lhs, idx[0]), column(mat_rhs, idx[1]));
+// 		float re = 0;
+// 		for (int_t k = 0; k < mat_lhs.extent()[1]; ++k) {
+// 			re += mat_lhs({ idx[0], k }) * mat_rhs({ k, idx[1] });
+// 		}
+//
+// 		return re;
+// 	});
+// }
+//
+// template <typename _MatrixLhs, typename _MatrixRhs>
+// auto product_tmp(_MatrixLhs mat_lhs, _MatrixRhs mat_rhs) {
+// 	MATAZURE_STATIC_ASSERT_IS_MATRIX(_MatrixLhs);
+// 	MATAZURE_STATIC_ASSERT_IS_MATRIX(_MatrixRhs);
+//
+// 	assert(mat_lhs.extent()[0] == mat_rhs.extent()[0]);
+//
+// 	return make_lambda(pointi<2>{ mat_rhs.extent()[1], mat_lhs.extent()[1] }, [=](pointi<2> i) {
+// 		float re = 0;
+// 		for (int_t k = 0; k < mat_rhs.extent()[0]; ++k) {
+// 			re += mat_lhs({ k, i[1] }) * mat_rhs({ k, i[0] });
+// 		}
+//
+// 		return re;
+// 	});
+// }
 
 }

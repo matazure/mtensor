@@ -1,7 +1,8 @@
-#pragma once
+﻿#pragma once
 
 #include <cstdlib>
 #include <cassert>
+#include <cstring>
 #include <type_traits>
 #include <stdexcept>
 #include <limits>
@@ -72,6 +73,9 @@ struct blank_t {};
 #if __has_builtin(__builtin_expect)
 #define MATAZURE_LIKELY(x) __builtin_expect(x, 1)
 #define MATAZURE_UNLIKELY(x) __builtin_expect(x, 0)
+#else
+#define MATAZURE_LIKELY(x) x
+#define MATAZURE_UNLIKELY(x) x
 #endif
 #else
 #define MATAZURE_LIKELY(x) x
@@ -126,33 +130,5 @@ void assertion_failed_msg(char const * expr, char const * msg, char const * func
 #define MATAZURE_GLOBAL
 
 #define __matazure__
-
-#endif
-
-#ifdef MATAZURE_CUDA
-
-#include <cuda_device_runtime_api.h>
-
-namespace matazure {
-namespace cuda {
-
-class runtime_error : public std::runtime_error {
-public:
-	runtime_error(cudaError_t error_code) : std::runtime_error(cudaGetErrorString(error_code)), error_code_(error_code)
-	{}
-
-private:
-	cudaError_t error_code_;
-};
-
-inline void throw_on_error(cudaError_t result) throw(runtime_error)
-{
-	if (result != cudaSuccess) {
-		throw runtime_error(result);
-	}
-}
-
-}
-}
 
 #endif

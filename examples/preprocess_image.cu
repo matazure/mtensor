@@ -9,13 +9,13 @@ int main(int argc, char *argv[]) {
 #ifdef MATAZURE_CUDA
 	auto cts_rgb = mem_clone(ts_rgb, device_t{});
 	auto lcts_rgb_shift_zero = cts_rgb - point<byte, 3>{128, 128, 128};
-	auto lcts_rgb_stride = stride(lcts_rgb_shift_zero, 2, 0);
+	auto lcts_rgb_stride = stride(lcts_rgb_shift_zero, 2);
 	auto lcts_rgb_normalized = tensor_cast<pointf<3>>(lcts_rgb_stride) / pointf<3>{128.0f, 128.0f, 128.0f};
 	auto cts_rgb_normalized = lcts_rgb_normalized.persist();
 	auto ts_rgb_normalized = mem_clone(cts_rgb_normalized, host_t{});
 #else
 	auto lts_rgb_shift_zero = ts_rgb - point<byte, 3>{128, 128, 128};
-	auto lts_rgb_stride = stride(lts_rgb_shift_zero, 2, 0);
+	auto lts_rgb_stride = stride(lts_rgb_shift_zero, 2);
 	auto lts_rgb_normalized = tensor_cast<pointf<3>>(lts_rgb_stride) / pointf<3>{128.0f, 128.0f, 128.0f};
 	auto ts_rgb_normalized = lts_rgb_normalized.persist();
 #endif
