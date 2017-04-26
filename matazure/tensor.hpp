@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include <matazure/meta.hpp>
 #include <matazure/algorithm.hpp>
 
 #ifdef MATAZURE_CUDA
@@ -70,10 +71,10 @@ protected:
 	MATAZURE_GENERAL ~tensor_expression() {}
 };
 
-template <typename _Type, int_t ..._SArgs>
+template <typename _Type, typename _Ext>
 class static_tensor {
 private:
-	template <int_t ..._Ext>
+	template <int_t ..._Values>
 	struct traits;
 
 	template <int_t _S0>
@@ -120,10 +121,30 @@ private:
 		}
 	};
 
-	typedef traits<_SArgs...> traits_t;
+	template <typename _T>
+	struct traits_helper;
+
+	template <int_t ..._Values>
+	struct traits_helper<meta::array<_Values...>> {
+		typedef traits<_Values...> type;
+	};
+
+	typedef typename traits_helper<_Ext>::type traits_t;
+
+	template <typename _T>
+	struct extent_helper;
+
+	template <int_t ..._Values>
+	struct extent_helper<meta::array<_Values...>> {
+		MATAZURE_GENERAL static constexpr pointi<sizeof...(_Values)> value() {
+			return{ _Values... };
+		};
+	};
 
 public:
-	static	const int_t				dim = sizeof...(_SArgs);
+	typedef _Ext					meta_extent_type;
+	static	const int_t				dim = meta_extent_type::size();
+
 	typedef _Type					value_type;
 	typedef value_type *			pointer;
 	typedef const pointer			const_pointer;
@@ -139,8 +160,7 @@ public:
 	}
 
 	MATAZURE_GENERAL constexpr extent_type extent() const {
-
-		return{ _SArgs ... };
+		return extent_helper<meta_extent_type>::value();
 	}
 
 	MATAZURE_GENERAL constexpr const_reference operator()(const pointi<dim> &idx) const {
@@ -183,17 +203,10 @@ public:
 		return elements_;
 	}
 
-	MATAZURE_GENERAL static constexpr static_tensor zeros() {
-		return { 0 };
-	}
-
-	//MATAZURE_GENERAL static constexpr static_tensor ones() {
-	//	return { 1... };
-	//}
-
 public:
 	value_type			elements_[traits_t::size()];
 };
+
 
 template <typename _Type, int_t _Dim, typename _Layout = first_major_t>
 class tensor : public tensor_expression<tensor<_Type, _Dim, _Layout>> {
@@ -258,12 +271,14 @@ public:
 	{ }
 
 	template <typename _VT>
-	tensor(const tensor<_VT, _Dim, _Layout> &ts) :
+	explicit tensor(const tensor<_VT, _Dim, _Layout> &ts) :
 		extent_(ts.extent()),
 		stride_(ts.stride()),
 		sp_data_(ts.shared_data()),
 		data_(ts.data())
 	{ }
+
+	tensor(std::initializer_list<int_t> v) = delete;
 
 	template <typename _VT>
 	const tensor &operator=(const tensor<_VT, _Dim, _Layout> &ts) {
@@ -326,8 +341,8 @@ private:
 template <typename _Type, typename _Layout = first_major_t>
 using matrix = tensor<_Type, 2, _Layout>;
 
-template <typename _Type, int_t _Col, int_t _Row>
-using static_matrix = static_tensor<_Type, _Col, _Row>;
+//template <typename _Type, int_t _Col, int_t _Row>
+//using static_matrix = static_tensor<_Type,meta::array< _Col,  _Row>>;
 
 namespace detail {
 
@@ -386,13 +401,6 @@ public:
 		return re;
 	}
 
-	template <int_t _S, int_t ..._Extents>
-	static_tensor<decay_t<value_type>, _S, _Extents...> persist() const {
-		static_tensor<decay_t<value_type>, _S, _Extents...> re;
-		copy(*this, re);
-		return re;
-	}
-
 	extent_type extent() const { return extent_; }
 	extent_type stride() const { return stride_; }
 	int_t size() const { return stride_[dim - 1]; }
@@ -430,15 +438,15 @@ inline void mem_copy(_TensorSrc ts_src, _TensorDst cts_dst, enable_if_t<are_host
 	memcpy(cts_dst.data(), ts_src.data(), sizeof(typename _TensorDst::value_type) * ts_src.size());
 }
 
-template <typename _Tensor>
-inline auto mem_clone(_Tensor ts, host_t, enable_if_t<are_host_memory<_Tensor>::value>* = nullptr)->tensor<typename _Tensor::value_type, _Tensor::dim, typename _Tensor::layout_type> {
-	tensor<typename _Tensor::value_type, _Tensor::dim, typename _Tensor::layout_type> ts_re(ts.extent());
+template <typename _Type, int_t _Dim, typename _Layout>
+inline tensor<_Type, _Dim, _Layout> mem_clone(tensor<_Type, _Dim, _Layout> ts, host_t) {
+	tensor<_Type, _Dim, _Layout> ts_re(ts.extent());
 	mem_copy(ts, ts_re);
 	return ts_re;
 }
 
-template <typename _Tensor>
-inline auto mem_clone(_Tensor ts, enable_if_t<are_host_memory<_Tensor>::value>* = nullptr)->decltype(mem_clone(ts, host_t{})) {
+template <typename _Type, int_t _Dim, typename _Layout>
+inline auto mem_clone(tensor<_Type, _Dim, _Layout> ts)->decltype(mem_clone(ts, host_t{})) {
 	return mem_clone(ts, host_t{});
 }
 

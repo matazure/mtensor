@@ -3,4 +3,5 @@
 #include <matazure/io.hpp>
 #include <matazure/operator.hpp>
 #include <matazure/common.hpp>
-#include <matazure/numeric.hpp>
+#include <matazure/cuda/puzzle/conv.hpp>
+#include <matazure/meta.hpp>
