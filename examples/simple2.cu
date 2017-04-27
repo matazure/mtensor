@@ -22,7 +22,7 @@ int main() {
 	}
 	printf("\n");
 
-	tensor<int, 2> ts2(ts.extent());
+	tensor<int, 2> ts2(ts.shape());
 	copy(ts, ts2);
 	auto re = reduce(ts2, 0, [](int lhs, int rhs) {
 		return lhs + rhs;
@@ -38,10 +38,10 @@ int main() {
 		e = 10;
 	});
 
-	cu_tensor<int, 2> cts2(cts.extent());
+	cu_tensor<int, 2> cts2(cts.shape());
 	copy(cts, cts2);
 
-	tensor<int, 2> ts_tmp(cts2.extent());
+	tensor<int, 2> ts_tmp(cts2.shape());
 	mem_copy(cts2, ts_tmp);
 	for (int_t i = 0; i < ts_tmp.size(); ++i) {
 		printf("%d, ", ts_tmp[i]);

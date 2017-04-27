@@ -10,11 +10,11 @@ using namespace matazure;
 //	tensor<_ValueType, 2> ts(state.range(1), state.range(1));
 //	int_t stride = state.range(0);
 //	int_t phase = stride / 2;
-//	auto ts_re_ext = ts.extent() / stride;
+//	auto ts_re_ext = ts.shape() / stride;
 //
 //	while (state.KeepRunning()) {
 //		tensor<_ValueType, 2> ts_re(ts_re_ext);
-//		auto ts_ext = ts.extent();
+//		auto ts_ext = ts.shape();
 //		for (int_t j = 0; j < ts_re_ext[1]; ++j) {
 //			for (int_t i = 0; i < ts_re_ext[0]; ++i) {
 //				pointi<2> idx = { i,j };
@@ -32,7 +32,7 @@ void BM_host_stride_dim2_gold(benchmark::State &state) {
 	tensor<_ValueType, 2> ts(state.range(1), state.range(1));
 	int_t stride = state.range(0);
 	int_t phase = stride / 2;
-	auto ts_re_ext = ts.extent() / stride;
+	auto ts_re_ext = ts.shape() / stride;
 	tensor<_ValueType, 2> ts_re(ts_re_ext);
 
 	while (state.KeepRunning()) {
@@ -58,7 +58,7 @@ void BM_stride(benchmark::State &state) {
 	fill(ext, state.range(1));
 	_Tensor ts(ext);
 	int_t ts_stride = state.range(0);
-	auto ts_re_ext = ts.extent() / ts_stride;
+	auto ts_re_ext = ts.shape() / ts_stride;
 	_Tensor ts_re(ts_re_ext);
 	
 	while (state.KeepRunning()) {
@@ -87,7 +87,7 @@ void BM_stride(benchmark::State &state) {
 //	cu_tensor<_ValueType, 1> ts(state.range(0));
 //
 //	while (state.KeepRunning()) {
-//		cu_tensor<float, 1> ts_re(ts1.extent());
+//		cu_tensor<float, 1> ts_re(ts1.shape());
 //		cuda::execution_policy policy;
 //		cuda::assert_runtime_success(cuda::configure_grid(policy, tensor_operation_gold_kenel<_ValueType>));
 //		tensor_operation_gold_kenel<<< policy.grid_size(),

@@ -69,7 +69,7 @@ inline void for_each(_Tensor &ts, _Fun fun, enable_if_t<are_linear_access<_Tenso
 
 template <typename _Tensor, typename _Fun>
 inline void for_each(_Tensor &ts, _Fun fun, enable_if_t<!are_linear_access<_Tensor>::value && none_device_memory<_Tensor>::value>* = 0) {
-	for_index(pointi<_Tensor::rank>::zeor(), ts.extent(), [&](pointi<_Tensor::rank> idx) {
+	for_index(pointi<_Tensor::rank>::zeor(), ts.shape(), [&](pointi<_Tensor::rank> idx) {
 		fun(ts(idx));
 	});
 }
@@ -88,7 +88,7 @@ inline void copy(const _T1 &lhs, _T2 &rhs, enable_if_t<are_linear_access<_T1, _T
 
 template <typename _T1, typename _T2>
 inline void copy(const _T1 &lhs, _T2 &rhs, enable_if_t<!are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
-	for_index(pointi<_T1::rank>::zeros(), lhs.extent(), [&](pointi<_T1::rank> idx) {
+	for_index(pointi<_T1::rank>::zeros(), lhs.shape(), [&](pointi<_T1::rank> idx) {
 		rhs(idx) = lhs(idx);
 	});
 }
@@ -102,7 +102,7 @@ inline void transform(const _T1 &lhs, _T2 &rhs, _TransFun fun, enable_if_t<are_l
 
 template <typename _T1, typename _T2, typename _TransFun>
 inline void transform(const _T1 &lhs, _T2 &rhs, _TransFun fun, enable_if_t<!are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
-	for_index(pointi<_T1::rank>::zeros(), lhs.extent(), [&](pointi<_T1::rank> idx) {
+	for_index(pointi<_T1::rank>::zeros(), lhs.shape(), [&](pointi<_T1::rank> idx) {
 		fun(lhs(idx), rhs(idx));
 	});
 }

@@ -7,9 +7,9 @@ using namespace matazure;
 template <typename _ValueType>
 void BM_host_zip_gold(benchmark::State &state) {
 	tensor<_ValueType, 1> ts0(state.range(0));
-	tensor<_ValueType, 1> ts1(ts0.extent());
-	tensor<_ValueType, 1> ts_re0(ts0.extent());
-	tensor<_ValueType, 1> ts_re1(ts0.extent());
+	tensor<_ValueType, 1> ts1(ts0.shape());
+	tensor<_ValueType, 1> ts_re0(ts0.shape());
+	tensor<_ValueType, 1> ts_re1(ts0.shape());
 
 	while (state.KeepRunning()) {
 		for (int_t i = 0; i < ts0.size(); ++i) {
@@ -25,9 +25,9 @@ void BM_host_zip_gold(benchmark::State &state) {
 template <typename _Tensor>
 void BM_zip(benchmark::State &state) {
 	_Tensor ts0(state.range(0));
-	_Tensor ts1(ts0.extent());
-	_Tensor ts_re0(ts0.extent());
-	_Tensor ts_re1(ts0.extent());
+	_Tensor ts1(ts0.shape());
+	_Tensor ts_re0(ts0.shape());
+	_Tensor ts_re1(ts0.shape());
 
 	while (state.KeepRunning()) {
 		auto ts_zip = zip(ts0, ts1);
@@ -54,7 +54,7 @@ void BM_zip(benchmark::State &state) {
 //	fill(ts2, _ValueType(1));
 //
 //	while (state.KeepRunning()) {
-//		cu_tensor<float, 1> ts_re(ts1.extent());
+//		cu_tensor<float, 1> ts_re(ts1.shape());
 //		cuda::execution_policy policy;
 //		cuda::assert_runtime_success(cuda::configure_grid(policy, tensor_operation_gold_kenel<_ValueType>));
 //		tensor_operation_gold_kenel<<< policy.grid_size(),

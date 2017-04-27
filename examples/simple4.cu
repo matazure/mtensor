@@ -8,11 +8,11 @@ int main() {
 
 	tensor<int, 2> ts1(10, 10);
 	fill(ts1, 1);
-	tensor<int, 2> ts2(ts1.extent());
+	tensor<int, 2> ts2(ts1.shape());
 	fill(ts2, 2);
-	tensor<float, 2> ts2f(ts1.extent());
+	tensor<float, 2> ts2f(ts1.shape());
 	fill(ts2f, 2.0f);
-	tensor<int, 2> ts3(ts1.extent());
+	tensor<int, 2> ts3(ts1.shape());
 	fill(ts3, 3);
 
 	// 返回一个相加的lambda_tensor
@@ -50,7 +50,7 @@ int main() {
 	fill(cts2, 2.0f);
 	auto lcts_1add2 = cts1 + cts2;
 
-	auto lcts_1add2_by_lambda = make_lambda(cts1.extent(), [=] __matazure__(int_t i) {
+	auto lcts_1add2_by_lambda = make_lambda(cts1.shape(), [=] __matazure__(int_t i) {
 		return cts1[i] + cts2[i];
 	});
 

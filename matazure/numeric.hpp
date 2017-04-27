@@ -60,12 +60,12 @@ MATAZURE_GENERAL auto product(static_tensor<_T, _Rows, _Cols> mat, static_tensor
 // 	MATAZURE_STATIC_ASSERT_IS_MATRIX(_MatrixLhs);
 // 	MATAZURE_STATIC_ASSERT_IS_MATRIX(_MatrixRhs);
 //
-// 	assert(mat_lhs.extent()[1] == mat_rhs.extent()[0]);
+// 	assert(mat_lhs.shape()[1] == mat_rhs.shape()[0]);
 //
-// 	return make_lambda(pointi<2>{ mat_lhs.extent()[0], mat_rhs.extent()[1] }, [=](pointi<2> idx) {
+// 	return make_lambda(pointi<2>{ mat_lhs.shape()[0], mat_rhs.shape()[1] }, [=](pointi<2> idx) {
 // 		//return inner_product(row(mat_lhs, idx[0]), column(mat_rhs, idx[1]));
 // 		float re = 0;
-// 		for (int_t k = 0; k < mat_lhs.extent()[1]; ++k) {
+// 		for (int_t k = 0; k < mat_lhs.shape()[1]; ++k) {
 // 			re += mat_lhs({ idx[0], k }) * mat_rhs({ k, idx[1] });
 // 		}
 //
@@ -78,11 +78,11 @@ MATAZURE_GENERAL auto product(static_tensor<_T, _Rows, _Cols> mat, static_tensor
 // 	MATAZURE_STATIC_ASSERT_IS_MATRIX(_MatrixLhs);
 // 	MATAZURE_STATIC_ASSERT_IS_MATRIX(_MatrixRhs);
 //
-// 	assert(mat_lhs.extent()[0] == mat_rhs.extent()[0]);
+// 	assert(mat_lhs.shape()[0] == mat_rhs.shape()[0]);
 //
-// 	return make_lambda(pointi<2>{ mat_rhs.extent()[1], mat_lhs.extent()[1] }, [=](pointi<2> i) {
+// 	return make_lambda(pointi<2>{ mat_rhs.shape()[1], mat_lhs.shape()[1] }, [=](pointi<2> i) {
 // 		float re = 0;
-// 		for (int_t k = 0; k < mat_rhs.extent()[0]; ++k) {
+// 		for (int_t k = 0; k < mat_rhs.shape()[0]; ++k) {
 // 			re += mat_lhs({ k, i[1] }) * mat_rhs({ k, i[0] });
 // 		}
 //

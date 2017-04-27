@@ -19,7 +19,7 @@ void BM_cu_tensor_operation_gold(benchmark::State& state) {
 	fill(ts2, _ValueType(1));
 
 	while (state.KeepRunning()) {
-		cu_tensor<_ValueType, 1> ts_re(ts1.extent());
+		cu_tensor<_ValueType, 1> ts_re(ts1.shape());
 		cuda::execution_policy policy;
 		cuda::configure_grid(policy, tensor_operation_gold_kenel<_ValueType>);
 		tensor_operation_gold_kenel<<< policy.grid_size(),
@@ -42,7 +42,7 @@ void BM_host_tensor_operation_gold(benchmark::State &st) {
 	fill(ts2, _ValueType(1));
 
 	while (st.KeepRunning()) {
-		tensor<_ValueType, 1> ts_re(ts1.extent());
+		tensor<_ValueType, 1> ts_re(ts1.shape());
 		for (int_t i = 0; i < ts_re.size(); ++i) {
 			ts_re[i] = ts1[i] * ts2[i] / ts1[i] + ts2[i];
 		}

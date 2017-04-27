@@ -15,7 +15,7 @@ void BM_cu_conv_global(benchmark::State& state) {
 	pointi<2> ext;
 	fill(ext, state.range(0));
 	cu_tensor<_ValueType, 2> ts_src(ext);
-	cu_tensor<_ValueType, 2> ts_re(ts_src.extent());
+	cu_tensor<_ValueType, 2> ts_re(ts_src.shape());
 	fill(host_mask, 1.0f / host_mask.size());
 	cuda::copy_symbol(host_mask, mask);
 
@@ -34,7 +34,7 @@ void BM_cu_conv_block(benchmark::State& state) {
 	pointi<2> ext;
 	fill(ext, state.range(0));
 	cu_tensor<_ValueType, 2> ts_src(ext);
-	cu_tensor<_ValueType, 2> ts_re(ts_src.extent());
+	cu_tensor<_ValueType, 2> ts_re(ts_src.shape());
 	fill(host_mask, 1.0f / host_mask.size());
 	cuda::copy_symbol(host_mask, mask);
 
@@ -52,7 +52,7 @@ void BM_cu_conv_block_crack(benchmark::State& state) {
 	pointi<2> ext;
 	fill(ext, state.range(0));
 	cu_tensor<_ValueType, 2> ts_src(ext);
-	cu_tensor<_ValueType, 2> ts_re(ts_src.extent());
+	cu_tensor<_ValueType, 2> ts_re(ts_src.shape());
 	fill(host_mask, 1.0f / host_mask.size());
 	cuda::copy_symbol(host_mask, mask);
 

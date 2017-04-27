@@ -13,7 +13,7 @@ namespace detail {
 
 template <typename _Tensor>
 inline auto clone_int_t_tensor(_Tensor ts) {
-	return matazure::tensor<int_t, _Tensor::rank>(ts.extent());
+	return matazure::tensor<int_t, _Tensor::rank>(ts.shape());
 }
 
 template <typename _T, int_t ...SArgs>
@@ -25,7 +25,7 @@ inline auto clone_int_t_tensor(const static_tensor<_T, SArgs...> &) {
 
 template <typename _Tensor, typename _Weight, typename _Pos>
 inline auto conv(_Tensor ts_input, _Weight weights, _Pos pos) {
-	return make_lambda(ts_input.extent(), [=](int_t offset) {
+	return make_lambda(ts_input.shape(), [=](int_t offset) {
 		typename _Tensor::value_type re = 0;
 
 		if (offset + pos[0] < 0 || offset + pos[pos.size() - 1] >= ts_input.size())

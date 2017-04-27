@@ -18,7 +18,7 @@ public:
 	typedef value_type &					reference;
 	typedef value_type *					pointer;
 
-	typedef pointi<rank>						extent_type;
+	typedef pointi<rank>						shape_type;
 	typedef pointi<rank>						index_type;
 
 	typedef linear_access_t					access_type;
@@ -26,22 +26,22 @@ public:
 	typedef device_t						memory_type;
 
 	tensor() :
-		tensor(extent_type::zeros())
+		tensor(shape_type::zeros())
 	{}
 
 	template <typename ..._Ext>
 	explicit tensor(_Ext... ext) :
-		tensor(extent_type{ext...})
+		tensor(shape_type{ext...})
 	{}
 
-	explicit tensor(extent_type extent) :
+	explicit tensor(shape_type extent) :
 		extent_(extent),
 		stride_(matazure::get_stride(extent)),
 		sp_data_(malloc_shared_memory(stride_[rank - 1])),
 		data_(sp_data_.get())
 	{ }
 
-	explicit tensor(extent_type extent, std::shared_ptr<value_type> sp_data) :
+	explicit tensor(shape_type extent, std::shared_ptr<value_type> sp_data) :
 		extent_(extent),
 		stride_(matazure::get_stride(extent)),
 		sp_data_(sp_data),
@@ -50,7 +50,7 @@ public:
 
 	template <typename _VT>
 	tensor(const tensor<_VT, _Dim, _Layout> &ts) :
-		extent_(ts.extent()),
+		extent_(ts.shape()),
 		stride_(ts.stride()),
 		sp_data_(ts.shared_data()),
 		data_(ts.data())
@@ -75,8 +75,8 @@ public:
 		return (*this)(idx);
 	}
 
-	MATAZURE_GENERAL extent_type extent() const { return extent_; }
-	MATAZURE_GENERAL extent_type stride() const { return stride_; }
+	MATAZURE_GENERAL shape_type shape() const { return extent_; }
+	MATAZURE_GENERAL shape_type stride() const { return stride_; }
 	MATAZURE_GENERAL int_t size() const { return stride_[rank - 1]; }
 
 	MATAZURE_GENERAL pointer data() const { return data_; }
@@ -91,8 +91,8 @@ private:
 	}
 
 private:
-	const extent_type	extent_;
-	const extent_type	stride_;
+	const shape_type	extent_;
+	const shape_type	stride_;
 	const shared_ptr<value_type>	sp_data_;
 	const pointer data_;
 };
@@ -117,7 +117,7 @@ class device_lambda_tensor {
 public:
 	static const int_t									rank = _Dim;
 	typedef _ValueType									value_type;
-	typedef pointi<rank>									extent_type;
+	typedef pointi<rank>									shape_type;
 	typedef pointi<rank>									index_type;
 	typedef _AccessMode									accessor_type;
 	typedef device_t									memory_type;
@@ -125,7 +125,7 @@ public:
 public:
 	device_lambda_tensor() = delete;
 
-	device_lambda_tensor(const extent_type &extent, _Func fun) :
+	device_lambda_tensor(const shape_type &extent, _Func fun) :
 		extent_(extent),
 		stride_(matazure::get_stride(extent)),
 		fun_(fun)
@@ -149,13 +149,13 @@ public:
 	}
 
 	tensor<decay_t<value_type>, rank> persist() const {
-		tensor<decay_t<value_type>, rank> re(this->extent());
+		tensor<decay_t<value_type>, rank> re(this->shape());
 		copy(*this, re);
 		return re;
 	}
 
-	MATAZURE_GENERAL extent_type extent() const { return extent_; }
-	MATAZURE_GENERAL extent_type stride() const { return stride_; }
+	MATAZURE_GENERAL shape_type shape() const { return extent_; }
+	MATAZURE_GENERAL shape_type stride() const { return stride_; }
 	MATAZURE_GENERAL int_t size() const { return stride_[rank - 1]; }
 
 private:
@@ -184,8 +184,8 @@ private:
 	}
 
 private:
-	const extent_type extent_;
-	const extent_type stride_;
+	const shape_type extent_;
+	const shape_type stride_;
 	const _Func fun_;
 };
 
@@ -195,14 +195,14 @@ class general_lambda_tensor : public tensor_expression<general_lambda_tensor<_Di
 public:
 	static const int_t										rank = _Dim;
 	typedef typename functor_traits::result_type			value_type;
-	typedef matazure::pointi<rank>							extent_type;
+	typedef matazure::pointi<rank>							shape_type;
 	typedef pointi<rank>										index_type;
 	typedef typename detail::get_functor_accessor_type<_Dim, _Func>::type		access_type;
 	typedef device_t										memory_type;
 
 
 public:
-	general_lambda_tensor(const extent_type &extent, _Func fun) :
+	general_lambda_tensor(const shape_type &extent, _Func fun) :
 		extent_(extent),
 		stride_(matazure::get_stride(extent)),
 		fun_(fun)
@@ -221,13 +221,13 @@ public:
 	}
 
 	tensor<decay_t<value_type>, rank> persist() const {
-		tensor<decay_t<value_type>, rank> re(this->extent());
+		tensor<decay_t<value_type>, rank> re(this->shape());
 		copy(*this, re);
 		return re;
 	}
 
-	MATAZURE_GENERAL extent_type extent() const { return extent_; }
-	MATAZURE_GENERAL extent_type stride() const { return stride_; }
+	MATAZURE_GENERAL shape_type shape() const { return extent_; }
+	MATAZURE_GENERAL shape_type stride() const { return stride_; }
 	MATAZURE_GENERAL int_t size() const { return stride_[rank - 1]; }
 
 public:
@@ -252,8 +252,8 @@ public:
 	}
 
 private:
-	const extent_type extent_;
-	const extent_type stride_;
+	const shape_type extent_;
+	const shape_type stride_;
 	const _Func fun_;
 };
 
@@ -286,7 +286,7 @@ inline void MATAZURE_DEVICE barrier() {
 
 template <typename _Type, int_t _Dim, typename _Layout>
 inline tensor<_Type, _Dim, _Layout> mem_clone(tensor<_Type, _Dim, _Layout> ts, device_t) {
-	tensor<_Type, _Dim, _Layout> ts_re(ts.extent());
+	tensor<_Type, _Dim, _Layout> ts_re(ts.shape());
 	mem_copy(ts, ts_re);
 	return ts_re;
 }
@@ -298,14 +298,14 @@ inline tensor<_Type, _Dim, _Layout> mem_clone(tensor<_Type, _Dim, _Layout> ts) {
 
 template <typename _Type, int_t _Dim, typename _Layout>
 inline tensor<_Type, _Dim, _Layout> mem_clone(matazure::tensor<_Type, _Dim, _Layout> ts, device_t) {
-	tensor<_Type, _Dim, _Layout> ts_re(ts.extent());
+	tensor<_Type, _Dim, _Layout> ts_re(ts.shape());
 	mem_copy(ts, ts_re);
 	return ts_re;
 }
 
 template <typename _Type, int_t _Dim, typename _Layout>
 inline matazure::tensor<_Type, _Dim, _Layout> mem_clone(tensor<_Type, _Dim, _Layout> ts, host_t) {
-	matazure::tensor<_Type, _Dim, _Layout> ts_re(ts.extent());
+	matazure::tensor<_Type, _Dim, _Layout> ts_re(ts.shape());
 	mem_copy(ts, ts_re);
 	return ts_re;
 }

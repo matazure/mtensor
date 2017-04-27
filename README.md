@@ -32,9 +32,9 @@ int main(int argc, char *argv[]) {
 	auto ts_rgb_normalized = lts_rgb_normalized.persist();
 #endif
 
-	tensor<float, 2> ts_red(ts_rgb_normalized.extent());
-	tensor<float, 2> ts_green(ts_rgb_normalized.extent());
-	tensor<float, 2> ts_blue(ts_rgb_normalized.extent());
+	tensor<float, 2> ts_red(ts_rgb_normalized.shape());
+	tensor<float, 2> ts_green(ts_rgb_normalized.shape());
+	tensor<float, 2> ts_blue(ts_rgb_normalized.shape());
 	auto ts_zip_point = point_view(zip(ts_red, ts_green, ts_blue));
 	copy(ts_rgb_normalized, ts_zip_point);
 

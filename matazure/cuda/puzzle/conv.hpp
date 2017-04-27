@@ -37,9 +37,9 @@ public:																										\
 	{}																										\
 																											\
 	MATAZURE_GENERAL typename _Tensor::value_type operator()(const pointi<_Tensor::rank> &idx) const {		\
-		auto mask_radius = mask.extent() / 2;																\
+		auto mask_radius = mask.shape() / 2;																\
 		auto sum = zero<typename _Tensor::value_type>::value();												\
-		cuda::for_index(mask.extent(), [&] (const pointi<2> &mask_idx) {									\
+		cuda::for_index(mask.shape(), [&] (const pointi<2> &mask_idx) {									\
 			sum += ts_(idx + mask_idx - mask_radius) * mask(mask_idx);										\
 		});																									\
 		return sum;																							\
@@ -50,8 +50,8 @@ public:																										\
 																											\
 template <typename _Tensor>																					\
 inline auto conv_global(_Tensor ts)																			\
-->decltype(make_lambda(ts.extent(), _internal::conv_op<_Tensor>(ts), typename _Tensor::memory_type{})) {	\
-	return make_lambda(ts.extent(), _internal::conv_op<_Tensor>(ts), typename _Tensor::memory_type{});		\
+->decltype(make_lambda(ts.shape(), _internal::conv_op<_Tensor>(ts), typename _Tensor::memory_type{})) {	\
+	return make_lambda(ts.shape(), _internal::conv_op<_Tensor>(ts), typename _Tensor::memory_type{});		\
 }																											\
 																											\
 }}} //matazure/cuda/puzzle
@@ -66,11 +66,11 @@ inline tensor<typename _Tensor::value_type, _Tensor::rank> conv_block(_Tensor ts
 	typedef typename _Tensor::value_type value_type;															\
 																												\
 	constexpr pointi<2> block_ext{ _Block0, _Block1 };															\
-	pointi<2> grid_ext = ts.extent() / block_ext;																\
-	MATAZURE_ASSERT(equal(grid_ext * block_ext, ts.extent()));													\
-	MATAZURE_ASSERT(equal(ts.extent(), ts_re.extent()));														\
+	pointi<2> grid_ext = ts.shape() / block_ext;																\
+	MATAZURE_ASSERT(equal(grid_ext * block_ext, ts.shape()));													\
+	MATAZURE_ASSERT(equal(ts.shape(), ts_re.shape()));														\
 																												\
-	auto mask_extent = mask.extent();																			\
+	auto mask_extent = mask.shape();																			\
 	auto mask_radius = mask_extent / 2;																			\
 																												\
 	block_for_index<_Block0, _Block1>(grid_ext, [=] MATAZURE_DEVICE(block_index<_Block0, _Block1> block_idx) {	\
@@ -94,7 +94,7 @@ inline tensor<typename _Tensor::value_type, _Tensor::rank> conv_block(_Tensor ts
 																												\
 template <int_t _Block0, int_t _Block1, typename _Tensor>														\
 inline cuda::tensor<typename _Tensor::value_type, _Tensor::rank> conv_block(_Tensor ts) {						\
-	cuda::tensor<typename _Tensor::value_type, _Tensor::rank> ts_re(ts.extent());								\
+	cuda::tensor<typename _Tensor::value_type, _Tensor::rank> ts_re(ts.shape());								\
 	conv_block<_Block0, _Block1>(ts, ts_re);																	\
 	return ts_re;																								\
 }																												\
@@ -112,11 +112,11 @@ inline tensor<typename _Tensor::value_type, _Tensor::rank> conv_block_crack(_Ten
 	typedef typename _Tensor::value_type value_type;															\
 																												\
 	constexpr pointi<2> block_ext{ _Block0, _Block1 };															\
-	pointi<2> grid_ext = ts.extent() / block_ext;																\
-	MATAZURE_ASSERT(equal(grid_ext * block_ext, ts.extent()));													\
-	MATAZURE_ASSERT(equal(ts.extent(), ts_re.extent()));														\
+	pointi<2> grid_ext = ts.shape() / block_ext;																\
+	MATAZURE_ASSERT(equal(grid_ext * block_ext, ts.shape()));													\
+	MATAZURE_ASSERT(equal(ts.shape(), ts_re.shape()));														\
 																												\
-	auto mask_extent = mask.extent();																			\
+	auto mask_extent = mask.shape();																			\
 	auto mask_radius = mask_extent / 2;																			\
 																												\
 	block_for_index<_Block0, _Block1>(grid_ext, [=] __device__ (block_index<_Block0, _Block1> block_idx) {		\
@@ -140,7 +140,7 @@ inline tensor<typename _Tensor::value_type, _Tensor::rank> conv_block_crack(_Ten
 																												\
 template <int_t _Block0, int_t _Block1, typename _Tensor>														\
 inline cuda::tensor<typename _Tensor::value_type, _Tensor::rank> conv_block_crack(_Tensor ts) {					\
-	cuda::tensor<typename _Tensor::value_type, _Tensor::rank> ts_re(ts.extent());								\
+	cuda::tensor<typename _Tensor::value_type, _Tensor::rank> ts_re(ts.shape());								\
 	conv_block_crack<_Block0, _Block1>(ts, ts_re);																\
 	return ts_re;																								\
 }																												\

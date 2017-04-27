@@ -10,7 +10,7 @@ int main() {
 	tensor<float, 2> tsf2(10, 10);
 
 	//返回tensor的extent
-	pointi<2> tsf2_ext = tsf2.extent();
+	pointi<2> tsf2_ext = tsf2.shape();
 	printf("tsf2 extent is (%d, %d)\n", tsf2_ext[0], tsf2_ext[1]);
 
 	for (int_t j = 0; j < tsf2_ext[1]; ++j) {
@@ -27,8 +27,8 @@ int main() {
 
 	printf("array access\n");
 	//按数组访问的方式打印值
-	for (int_t j = 0; j < tsf2.extent()[1]; ++j) {
-		for (int_t i = 0; i < tsf2.extent()[0]; ++i) {
+	for (int_t j = 0; j < tsf2.shape()[1]; ++j) {
+		for (int_t i = 0; i < tsf2.shape()[0]; ++i) {
 			//通过pointi来访问tensor
 			printf("(%d, %d): %f\n", i, j, tsf2(pointi<2>{i, j}));
 		}
@@ -38,17 +38,17 @@ int main() {
 #ifdef MATAZURE_CUDA
 
 	//构造一个tsf2一样大小的cuda::tensor
-	cu_tensor<float, 2> cts(tsf2.extent());
-	printf("success construct %dx%d cu_tensor.\n", cts.extent()[0], cts.extent()[1]);
+	cu_tensor<float, 2> cts(tsf2.shape());
+	printf("success construct %dx%d cu_tensor.\n", cts.shape()[0], cts.shape()[1]);
 	//cts[100] = 3; //runtime error! cu_tensor只有在device函数里可以访问数据
 	//将主机端的tsf2值拷贝到cts
 	mem_copy(tsf2, cts);
 
-	cu_tensor<float, 2> cts2(cts.extent());
+	cu_tensor<float, 2> cts2(cts.shape());
 	//设备到设备的值拷贝
 	mem_copy(cts, cts2);
 
-	tensor<float, 2> ts_tmp(cts2.extent());
+	tensor<float, 2> ts_tmp(cts2.shape());
 	//将设备端cts值拷贝到主机端ts_temp
 	mem_copy(cts2, ts_tmp);
 

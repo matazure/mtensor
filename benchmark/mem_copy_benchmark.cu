@@ -13,7 +13,7 @@ __global__ void each_copy_gold_kenel(_ValueType *p_dst, _ValueType *p_src, int_t
 template <typename _Tensor>
 void BM_each_copy_gold(benchmark::State& state) {
 	_Tensor ts_src(state.range(0));
-	_Tensor ts_dst(ts_src.extent());
+	_Tensor ts_dst(ts_src.shape());
 
 	while (state.KeepRunning()) {
 		cuda::execution_policy policy;
@@ -32,7 +32,7 @@ void BM_each_copy_gold(benchmark::State& state) {
 template <typename _TensorSrc, typename _TensorDst>
 static void BM_mem_copy(benchmark::State& state) {
 	_TensorSrc ts_src(state.range(0));
-	_TensorDst ts_dst(ts_src.extent());
+	_TensorDst ts_dst(ts_src.shape());
 
 	while (state.KeepRunning()) {
 		mem_copy(ts_src, ts_dst);

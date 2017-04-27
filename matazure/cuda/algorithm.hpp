@@ -129,7 +129,7 @@ inline void for_each(_Tensor ts, _Fun fun, enable_if_t<are_device_memory<_Tensor
 
 template <typename _Tensor, typename _Fun>
 inline void for_each(_Tensor ts, _Fun fun, enable_if_t<are_device_memory<_Tensor>::value && !are_linear_access<_Tensor>::value>* = 0) {
-	parallel_for_index(ts.extent(), [=] MATAZURE_DEVICE(pointi<_Tensor::rank> idx) {
+	parallel_for_index(ts.shape(), [=] MATAZURE_DEVICE(pointi<_Tensor::rank> idx) {
 		fun(ts(idx));
 	});
 }
@@ -150,7 +150,7 @@ void copy(_T1 lhs, _T2 rhs, enable_if_t<are_linear_access<_T1, _T2>::value && ar
 
 template <typename _T1, typename _T2>
 void copy(_T1 lhs, _T2 rhs, enable_if_t<!are_linear_access<_T1, _T2>::value && are_device_memory<_T1, _T2>::value>* = 0) {
-	parallel_for_index(lhs.extent(), [=] MATAZURE_DEVICE (pointi<_T1::rank> idx) {
+	parallel_for_index(lhs.shape(), [=] MATAZURE_DEVICE (pointi<_T1::rank> idx) {
 		rhs(idx) = lhs(idx);
 	});
 }
