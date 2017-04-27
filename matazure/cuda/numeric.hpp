@@ -43,8 +43,8 @@ matrix<typename _Matrix1::value_type>  block_product(_Matrix1 cmat_lhs, _Matrix2
 		auto global_row = t_idx.global[0];
 		auto global_col = t_idx.global[1];
 
-		__shared__ static_tensor<value_type,meta::array< _BlockSize,  _BlockSize>> local_lhs;
-		__shared__ static_tensor<value_type,meta::array< _BlockSize,  _BlockSize>> local_rhs;
+		__shared__ static_tensor<value_type,dim< _BlockSize,  _BlockSize>> local_lhs;
+		__shared__ static_tensor<value_type,dim< _BlockSize,  _BlockSize>> local_rhs;
 
 		value_type sum = 0;
 		for (int_t i = 0; i < lhs_ext[0]; i += _BlockSize) {
@@ -89,7 +89,7 @@ tensor<typename _Tensor::value_type, _Tensor::rank> conv(_Tensor ts, _Mask mask)
 	tensor<value_type, _Tensor::rank> cts_re(ts.extent());
 
 	block_for_index<_Block0, _Block1>(grid_ext, [=] MATAZURE_DEVICE(block_index<_Block0, _Block1> block_idx) {
-		__shared__ static_tensor<value_type,meta::array< _Block0,  _Block1>> sts_apron;
+		__shared__ static_tensor<value_type,dim< _Block0,  _Block1>> sts_apron;
 		sts_apron(block_idx.local) = ts(block_idx.global);
 		device::barrier();
 

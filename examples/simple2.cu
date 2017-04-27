@@ -3,7 +3,7 @@
 using namespace matazure;
 
 int main() {
-	static_tensor<int, meta::array<3,  3>> sts;
+	static_tensor<int, dim<3,  3>> sts;
 
 	tensor<int, 2> ts(10, 10);
 	fill(ts, 1);

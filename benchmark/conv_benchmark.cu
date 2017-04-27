@@ -4,8 +4,8 @@
 
 using namespace matazure;
 
-static_tensor<float,meta::array< 3,  3>> host_mask;
-__constant__ static_tensor<float,meta::array< 3,  3>> mask;
+static_tensor<float,dim< 3,  3>> host_mask;
+__constant__ static_tensor<float,dim< 3,  3>> mask;
 MATAZURE_PUZZEL_CONV_GLOBAL(conv_global, mask)
 MATAZURE_PUZZEL_CONV_BLOCK(conv_block, mask)
 MATAZURE_PUZZEL_CONV_BLOCK_WITH_CRACK(conv_block_crack, mask)

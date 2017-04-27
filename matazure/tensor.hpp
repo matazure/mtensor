@@ -9,6 +9,9 @@
 
 namespace matazure {
 
+template <int_t... _Values>
+using dim = meta::array<_Values ...>;
+
 template <int_t _Dim>
 inline MATAZURE_GENERAL typename pointi<_Dim>::value_type index2offset(const pointi<_Dim> &id, const pointi<_Dim> &stride, first_major_t) {
 	typename pointi<_Dim>::value_type offset = id[0];
@@ -125,7 +128,7 @@ private:
 	struct traits_helper;
 
 	template <int_t ..._Values>
-	struct traits_helper<meta::array<_Values...>> {
+	struct traits_helper<dim<_Values...>> {
 		typedef traits<_Values...> type;
 	};
 
@@ -135,7 +138,7 @@ private:
 	struct extent_helper;
 
 	template <int_t ..._Values>
-	struct extent_helper<meta::array<_Values...>> {
+	struct extent_helper<dim<_Values...>> {
 		MATAZURE_GENERAL static constexpr pointi<sizeof...(_Values)> value() {
 			return{ _Values... };
 		};
@@ -346,7 +349,7 @@ template <typename _Type, typename _Layout = first_major_t>
 using matrix = tensor<_Type, 2, _Layout>;
 
 //template <typename _Type, int_t _Col, int_t _Row>
-//using static_matrix = static_tensor<_Type,meta::array< _Col,  _Row>>;
+//using static_matrix = static_tensor<_Type,dim< _Col,  _Row>>;
 
 namespace detail {
 

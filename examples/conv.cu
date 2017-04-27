@@ -3,14 +3,14 @@
 
 using namespace matazure;
 
-__constant__ static_tensor<float,meta::array< 3,  3>> mask;
+__constant__ static_tensor<float,dim< 3,  3>> mask;
 MATAZURE_PUZZEL_CONV_GLOBAL(conv_global, mask)
 MATAZURE_PUZZEL_CONV_BLOCK(conv_block, mask)
 MATAZURE_PUZZEL_CONV_BLOCK_WITH_CRACK(conv_block_crack, mask)
 
 int main() {
 	try {
-		static_tensor<float,meta::array< 3,  3>> host_mask;
+		static_tensor<float,dim< 3,  3>> host_mask;
 		fill(host_mask, 1.0f / host_mask.size());
 		cuda::copy_symbol(host_mask, mask);
 
