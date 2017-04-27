@@ -155,6 +155,10 @@ public:
 	typedef pointi<dim>				index_type;
 	typedef local_t					memory_type;
 
+	static constexpr meta_extent_type meta_extent() {
+		return meta_extent_type();
+	}
+
 	MATAZURE_GENERAL constexpr extent_type stride() const {
 		return traits_t::stride();
 	}
