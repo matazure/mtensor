@@ -143,7 +143,7 @@ private:
 
 public:
 	typedef _Ext					meta_extent_type;
-	static	const int_t				dim = meta_extent_type::size();
+	static	const int_t				rank = meta_extent_type::size();
 
 	typedef _Type					value_type;
 	typedef value_type *			pointer;
@@ -151,8 +151,8 @@ public:
 	typedef value_type &			reference;
 	typedef const value_type &		const_reference;
 	typedef linear_access_t			access_type;
-	typedef matazure::pointi<dim>	extent_type;
-	typedef pointi<dim>				index_type;
+	typedef matazure::pointi<rank>	extent_type;
+	typedef pointi<rank>				index_type;
 	typedef local_t					memory_type;
 
 	static constexpr meta_extent_type meta_extent() {
@@ -167,11 +167,11 @@ public:
 		return extent_helper<meta_extent_type>::value();
 	}
 
-	MATAZURE_GENERAL constexpr const_reference operator()(const pointi<dim> &idx) const {
+	MATAZURE_GENERAL constexpr const_reference operator()(const pointi<rank> &idx) const {
 		return (*this)[index2offset(idx, stride(), first_major_t{})];
 	}
 
-	MATAZURE_GENERAL reference operator()(const pointi<dim> &idx) {
+	MATAZURE_GENERAL reference operator()(const pointi<rank> &idx) {
 		return (*this)[index2offset(idx, stride(), first_major_t{})];
 	}
 
@@ -189,11 +189,11 @@ public:
 
 	MATAZURE_GENERAL reference operator[](int_t i) { return elements_[i]; }
 
-	MATAZURE_GENERAL constexpr const_reference operator[](const pointi<dim> &idx) const {
+	MATAZURE_GENERAL constexpr const_reference operator[](const pointi<rank> &idx) const {
 		return (*this)(idx);
 	}
 
-	MATAZURE_GENERAL reference operator[](const pointi<dim> &idx) {
+	MATAZURE_GENERAL reference operator[](const pointi<rank> &idx) {
 		return (*this)(idx);
 	}
 
@@ -217,11 +217,11 @@ class tensor : public tensor_expression<tensor<_Type, _Dim, _Layout>> {
 public:
 	static_assert(std::is_pod<_Type>::value, "only supports pod type now");
 
-	static const int_t						dim = _Dim;
+	static const int_t						rank = _Dim;
 	typedef _Type							value_type;
 
-	typedef matazure::pointi<dim>			extent_type;
-	typedef pointi<dim>						index_type;
+	typedef matazure::pointi<rank>			extent_type;
+	typedef pointi<rank>						index_type;
 	typedef _Layout							layout_type;
 	typedef linear_access_t					access_type;
 	typedef host_t							memory_type;
@@ -241,7 +241,7 @@ public:
 	explicit tensor(extent_type extent) :
 		extent_(extent),
 		stride_(get_stride(extent)),
-		sp_data_(malloc_shared_memory(stride_[dim - 1])),
+		sp_data_(malloc_shared_memory(stride_[rank - 1])),
 		data_(sp_data_.get())
 	{ }
 
@@ -254,14 +254,14 @@ public:
 	explicit tensor(extent_type extent, pinned_t pinned_v) :
 		extent_(extent),
 		stride_(get_stride(extent)),
-		sp_data_(malloc_shared_memory(stride_[dim - 1], pinned_v)),
+		sp_data_(malloc_shared_memory(stride_[rank - 1], pinned_v)),
 		data_(sp_data_.get())
 	{ }
 
 	explicit tensor(extent_type extent, unpinned_t) :
 		extent_(extent),
 		stride_(get_stride(extent)),
-		sp_data_(malloc_shared_memory(stride_[dim - 1])),
+		sp_data_(malloc_shared_memory(stride_[rank - 1])),
 		data_(sp_data_.get())
 	{ }
 
@@ -312,7 +312,7 @@ public:
 	extent_type extent() const { return extent_; }
 	extent_type stride() const { return stride_; }
 
-	int_t size() const { return stride_[dim - 1]; }
+	int_t size() const { return stride_[rank - 1]; }
 
 	shared_ptr<value_type> shared_data() const { return sp_data_; }
 	value_type * data() const { return sp_data_.get(); }
@@ -371,10 +371,10 @@ template <int_t _Dim, typename _Func>
 class lambda_tensor : public tensor_expression<lambda_tensor<_Dim, _Func>> {
 	typedef function_traits<_Func>						functor_traits;
 public:
-	static const int_t										dim = _Dim;
+	static const int_t										rank = _Dim;
 	typedef typename functor_traits::result_type			value_type;
-	typedef matazure::pointi<dim>							extent_type;
-	typedef pointi<dim>										index_type;
+	typedef matazure::pointi<rank>							extent_type;
+	typedef pointi<rank>										index_type;
 	typedef typename detail::get_functor_accessor_type<_Dim, _Func>::type
 		access_type;
 	typedef host_t											memory_type;
@@ -399,15 +399,15 @@ public:
 		return offset_imp<access_type>(i);
 	}
 
-	MATAZURE_GENERAL tensor<decay_t<value_type>, dim> persist() const {
-		tensor<decay_t<value_type>, dim> re(this->extent());
+	MATAZURE_GENERAL tensor<decay_t<value_type>, rank> persist() const {
+		tensor<decay_t<value_type>, rank> re(this->extent());
 		copy(*this, re);
 		return re;
 	}
 
 	extent_type extent() const { return extent_; }
 	extent_type stride() const { return stride_; }
-	int_t size() const { return stride_[dim - 1]; }
+	int_t size() const { return stride_[rank - 1]; }
 
 private:
 	template <typename _Mode>

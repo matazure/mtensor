@@ -98,7 +98,7 @@ private:
 public:
 	array_map_op(_Tensor ts, _Func fun) : ts_(ts), fun_(fun) {}
 
-	MATAZURE_GENERAL auto operator()(pointi<_Tensor::dim> idx) const->decltype(this->fun_(this->ts_(idx))) {
+	MATAZURE_GENERAL auto operator()(pointi<_Tensor::rank> idx) const->decltype(this->fun_(this->ts_(idx))) {
 		return fun_(ts_(idx));
 	}
 };
@@ -126,7 +126,7 @@ private:
 public:
 	device_array_map_op(_Tensor ts, _Func fun) : ts_(ts), fun_(fun) {}
 
-	MATAZURE_DEVICE auto operator()(pointi<_Tensor::dim> idx) const->decltype(this->fun_(this->ts_(idx))) {
+	MATAZURE_DEVICE auto operator()(pointi<_Tensor::rank> idx) const->decltype(this->fun_(this->ts_(idx))) {
 		return fun_(ts_(idx));
 	}
 };
@@ -158,7 +158,7 @@ public:
 		ts_(ts), offset_(offset)
 	{}
 
-	MATAZURE_GENERAL auto operator()(pointi<_Tensor::dim> idx) const->decltype((ts_(idx + offset_))) {
+	MATAZURE_GENERAL auto operator()(pointi<_Tensor::rank> idx) const->decltype((ts_(idx + offset_))) {
 		return ts_(idx + offset_);
 	}
 };
@@ -173,7 +173,7 @@ public:
 		ts_(ts), stride_(stride)
 	{}
 
-	MATAZURE_GENERAL auto operator()(pointi<_Tensor::dim> idx) const->decltype((ts_(idx * stride_))){
+	MATAZURE_GENERAL auto operator()(pointi<_Tensor::rank> idx) const->decltype((ts_(idx * stride_))){
 		return ts_(idx * stride_);
 	}
 };
@@ -182,14 +182,14 @@ template <typename _Tensor>
 struct resize_op{
 private:
 	_Tensor ts_;
-	pointi<_Tensor::dim> resize_ext_;
-	pointf<_Tensor::dim> resize_scale_;
+	pointi<_Tensor::rank> resize_ext_;
+	pointf<_Tensor::rank> resize_scale_;
 public:
-	resize_op(_Tensor ts, pointi<_Tensor::dim> resize_ext): ts_(ts), resize_ext_(resize_ext) {
+	resize_op(_Tensor ts, pointi<_Tensor::rank> resize_ext): ts_(ts), resize_ext_(resize_ext) {
 		resize_scale_ = point_cast<float>(ts_.extent()) / point_cast<float>(resize_ext_);
 	}
 
-	MATAZURE_GENERAL typename _Tensor::value_type operator()(const pointi<_Tensor::dim> &idx) const{
+	MATAZURE_GENERAL typename _Tensor::value_type operator()(const pointi<_Tensor::rank> &idx) const{
 		auto idx_f = point_cast<float>(idx) * resize_scale_;
 		return ts_(point_cast<int_t>(idx_f));
 	}
@@ -300,7 +300,7 @@ public:
 		ts_(ts), slice_i_(slice_i)
 	{}
 
-	MATAZURE_GENERAL auto operator()(pointi<_Tensor::dim-1> idx) const->decltype((ts_(cat_point<_SliceDimIdx>(idx, slice_i_)))){
+	MATAZURE_GENERAL auto operator()(pointi<_Tensor::rank-1> idx) const->decltype((ts_(cat_point<_SliceDimIdx>(idx, slice_i_)))){
 		return ts_(cat_point<_SliceDimIdx>(idx, slice_i_));
 	}
 };
@@ -309,17 +309,17 @@ template <typename _Tensor>
 struct padding_zero_op {
 private:
 	_Tensor ts_;
-	pointi<_Tensor::dim> padding0_;
-	pointi<_Tensor::dim> padding1_;
+	pointi<_Tensor::rank> padding0_;
+	pointi<_Tensor::rank> padding1_;
 
 public:
-	padding_zero_op(_Tensor ts, pointi<_Tensor::dim> padding0, pointi<_Tensor::dim> padding1) :
+	padding_zero_op(_Tensor ts, pointi<_Tensor::rank> padding0, pointi<_Tensor::rank> padding1) :
 		ts_(ts),
 		padding0_(padding0),
 		padding1_(padding1)
 	{}
 
-	MATAZURE_GENERAL auto operator()(pointi<_Tensor::dim> idx) const->decltype(zero<typename _Tensor::value_type>::value()) {
+	MATAZURE_GENERAL auto operator()(pointi<_Tensor::rank> idx) const->decltype(zero<typename _Tensor::value_type>::value()) {
 		if (MATAZURE_LIKELY(inside(idx, padding0_, padding0_ + ts_.extent()))) {
 			return ts_(idx - padding0_);
 		}
@@ -339,8 +339,8 @@ public:
 		ts_(ts)
 	{}
 
-	MATAZURE_GENERAL auto operator()(pointi<_Tensor::dim> idx) const->decltype(zero<typename _Tensor::value_type>::value()) {
-		if (MATAZURE_LIKELY(inside(idx, pointi<_Tensor::dim>::zeros(), ts_.extent()))) {
+	MATAZURE_GENERAL auto operator()(pointi<_Tensor::rank> idx) const->decltype(zero<typename _Tensor::value_type>::value()) {
+		if (MATAZURE_LIKELY(inside(idx, pointi<_Tensor::rank>::zeros(), ts_.extent()))) {
 			return ts_(idx);
 		}
 		else {
@@ -399,7 +399,7 @@ inline auto tensor_cast(_Tensor tensor)->decltype(apply(tensor, _internal::cast_
 }
 
 template <typename _Tensor>
-inline auto shift(_Tensor ts, pointi<_Tensor::dim> offset)->decltype(make_lambda(ts.extent(), _internal::shift_op<_Tensor>(ts, offset), typename _Tensor::memory_type{})) {
+inline auto shift(_Tensor ts, pointi<_Tensor::rank> offset)->decltype(make_lambda(ts.extent(), _internal::shift_op<_Tensor>(ts, offset), typename _Tensor::memory_type{})) {
 	return make_lambda(ts.extent(), _internal::shift_op<_Tensor>(ts, offset), typename _Tensor::memory_type{});
 }
 
@@ -440,7 +440,7 @@ inline auto slice(cu_tensor<_T, _Dim, _Layout> ts, int_t i, enable_if_t<_DimIdx 
 #endif
 
 template <typename _Tensor>
-inline auto padding_zero(_Tensor ts, pointi<_Tensor::dim> padding0, pointi<_Tensor::dim> padding1)->decltype(make_lambda(ts.extent() + padding0 + padding1, _internal::padding_zero_op<_Tensor>(ts, padding0, padding1), typename _Tensor::memory_type{})) {
+inline auto padding_zero(_Tensor ts, pointi<_Tensor::rank> padding0, pointi<_Tensor::rank> padding1)->decltype(make_lambda(ts.extent() + padding0 + padding1, _internal::padding_zero_op<_Tensor>(ts, padding0, padding1), typename _Tensor::memory_type{})) {
 	return make_lambda(ts.extent() + padding0 + padding1, _internal::padding_zero_op<_Tensor>(ts, padding0, padding1), typename _Tensor::memory_type{});
 }
 
@@ -450,7 +450,7 @@ inline auto clamp_zero(_Tensor ts)->decltype(make_lambda(ts.extent(), _internal:
 }
 
 template <typename _Tensor>
-inline auto resize(_Tensor ts, const pointi<_Tensor::dim> &resize_ext)->decltype(make_lambda(resize_ext, _internal::resize_op<_Tensor>(ts, resize_ext), typename _Tensor::memory_type{})) {
+inline auto resize(_Tensor ts, const pointi<_Tensor::rank> &resize_ext)->decltype(make_lambda(resize_ext, _internal::resize_op<_Tensor>(ts, resize_ext), typename _Tensor::memory_type{})) {
 	return make_lambda(resize_ext, _internal::resize_op<_Tensor>(ts, resize_ext), typename _Tensor::memory_type{});
 }
 
@@ -591,12 +591,12 @@ public:\
 #define TENSOR_BINARY_OPERATOR(name, op) \
 __MATAZURE_LINEAR_ACCESS_TENSOR_BINARY_OPERATOR(__##name##_linear_access_tensor__, op) \
 template <typename _TS1, typename _TS2> \
-inline enable_if_t< none_device_memory<_TS1, _TS2>::value && are_linear_access<_TS1, _TS2>::value, lambda_tensor<_TS1::dim, __##name##_linear_access_tensor__<_TS1, _TS2>>> operator op(const tensor_expression<_TS1> &e_lhs, const tensor_expression<_TS2> &e_rhs) { \
+inline enable_if_t< none_device_memory<_TS1, _TS2>::value && are_linear_access<_TS1, _TS2>::value, lambda_tensor<_TS1::rank, __##name##_linear_access_tensor__<_TS1, _TS2>>> operator op(const tensor_expression<_TS1> &e_lhs, const tensor_expression<_TS2> &e_rhs) { \
 	return make_lambda(e_lhs().extent(), __##name##_linear_access_tensor__<_TS1, _TS2>(e_lhs(), e_rhs()), host_t{}); \
 } \
 __MATAZURE_ARRAY_ACCESS_TENSOR_BINARY_OPERATOR(__##name##_array_access_tensor__, op) \
 template <typename _TS1, typename _TS2> \
-inline enable_if_t< none_device_memory<_TS1, _TS2>::value && !are_linear_access<_TS1, _TS2>::value, lambda_tensor<_TS1::dim, __##name##_array_access_tensor__<_TS1, _TS2>>> operator op(const tensor_expression<_TS1> &e_lhs, const tensor_expression<_TS2> &e_rhs) { \
+inline enable_if_t< none_device_memory<_TS1, _TS2>::value && !are_linear_access<_TS1, _TS2>::value, lambda_tensor<_TS1::rank, __##name##_array_access_tensor__<_TS1, _TS2>>> operator op(const tensor_expression<_TS1> &e_lhs, const tensor_expression<_TS2> &e_rhs) { \
 	return make_lambda(e_lhs().extent(), __##name##_array_access_tensor__<_TS1, _TS2>(e_lhs(), e_rhs())); \
 }
 
@@ -604,58 +604,58 @@ inline enable_if_t< none_device_memory<_TS1, _TS2>::value && !are_linear_access<
 __MATAZURE_LINEAR_ACCESS_TENSOR_WITH_VALUE_BINARY_OPERATOR(__##name##_linear_access_tensor_with_value__, op) \
 \
 template <typename _TS> \
-inline enable_if_t< none_device_memory<_TS>::value && are_linear_access<_TS>::value, lambda_tensor<_TS::dim, __##name##_linear_access_tensor_with_value__<_TS>>> operator op(const tensor_expression<_TS> &e_ts, typename _TS::value_type v) { \
+inline enable_if_t< none_device_memory<_TS>::value && are_linear_access<_TS>::value, lambda_tensor<_TS::rank, __##name##_linear_access_tensor_with_value__<_TS>>> operator op(const tensor_expression<_TS> &e_ts, typename _TS::value_type v) { \
 	return make_lambda(e_ts().extent(), __##name##_linear_access_tensor_with_value__<_TS>(e_ts(), v)); \
 } \
 \
 __MATAZURE_VALUE_WITH_LINEAR_ACCESS_TENSOR_BINARY_OPERATOR(__##name##_value_with_linear_access_tensor__, op) \
 template <typename _TS> \
-inline enable_if_t< none_device_memory<_TS>::value && are_linear_access<_TS>::value, lambda_tensor<_TS::dim, __##name##_value_with_linear_access_tensor__<_TS>>> operator op(typename _TS::value_type v, const tensor_expression<_TS> &e_ts) { \
+inline enable_if_t< none_device_memory<_TS>::value && are_linear_access<_TS>::value, lambda_tensor<_TS::rank, __##name##_value_with_linear_access_tensor__<_TS>>> operator op(typename _TS::value_type v, const tensor_expression<_TS> &e_ts) { \
 	return make_lambda(e_ts().extent(), __##name##_value_with_linear_access_tensor__<_TS>(v, e_ts())); \
 } \
 \
 __MATAZURE_ARRAY_ACCESS_TENSOR_WITH_VALUE_BINARY_OPERATOR(__##name##_array_access_tensor_with_value__, op) \
 template <typename _TS> \
-inline enable_if_t< none_device_memory<_TS>::value && !are_linear_access<_TS>::value, lambda_tensor<_TS::dim, __##name##_array_access_tensor_with_value__<_TS>>> operator op(const tensor_expression<_TS> &e_ts, typename _TS::value_type v) { \
+inline enable_if_t< none_device_memory<_TS>::value && !are_linear_access<_TS>::value, lambda_tensor<_TS::rank, __##name##_array_access_tensor_with_value__<_TS>>> operator op(const tensor_expression<_TS> &e_ts, typename _TS::value_type v) { \
 	return make_lambda(e_ts().extent(), __##name##_array_access_tensor_with_value__<_TS>(e_ts(), v)); \
 }\
 \
 __MATAZURE_VALUE_WITH_ARRAY_ACCESS_TENSOR_BINARY_OPERATOR(__##name##_value_with_array_access_tensor__, op) \
 template <typename _TS> \
-inline enable_if_t< none_device_memory<_TS>::value && !are_linear_access<_TS>::value, lambda_tensor<_TS::dim, __##name##_value_with_array_access_tensor__<_TS>>> operator op(typename _TS::value_type v, const tensor_expression<_TS> &e_ts) { \
+inline enable_if_t< none_device_memory<_TS>::value && !are_linear_access<_TS>::value, lambda_tensor<_TS::rank, __##name##_value_with_array_access_tensor__<_TS>>> operator op(typename _TS::value_type v, const tensor_expression<_TS> &e_ts) { \
 	return make_lambda(e_ts().extent(), __##name##_value_with_array_access_tensor__<_TS>(v, e_ts())); \
 }
 
 //device tensor operations
 #define CU_TENSOR_BINARY_OPERATOR(name, op) \
 template <typename _TS1, typename _TS2> \
-inline enable_if_t<are_device_memory<_TS1, _TS2>::value && are_linear_access<_TS1, _TS2>::value, cuda::general_lambda_tensor<_TS1::dim, __##name##_linear_access_tensor__<_TS1, _TS2>>> operator op(const tensor_expression<_TS1> &e_lhs, const tensor_expression<_TS2> &e_rhs) { \
+inline enable_if_t<are_device_memory<_TS1, _TS2>::value && are_linear_access<_TS1, _TS2>::value, cuda::general_lambda_tensor<_TS1::rank, __##name##_linear_access_tensor__<_TS1, _TS2>>> operator op(const tensor_expression<_TS1> &e_lhs, const tensor_expression<_TS2> &e_rhs) { \
 	return make_lambda(e_lhs().extent(), __##name##_linear_access_tensor__<_TS1, _TS2>(e_lhs(), e_rhs()), device_t{}); \
 } \
 template <typename _TS1, typename _TS2> \
-inline enable_if_t< are_device_memory<_TS1, _TS2>::value && !are_linear_access<_TS1, _TS2>::value, cuda::general_lambda_tensor<_TS1::dim, __##name##_array_access_tensor__<_TS1, _TS2>>> operator op(const tensor_expression<_TS1> &e_lhs, const tensor_expression<_TS2> &e_rhs) { \
+inline enable_if_t< are_device_memory<_TS1, _TS2>::value && !are_linear_access<_TS1, _TS2>::value, cuda::general_lambda_tensor<_TS1::rank, __##name##_array_access_tensor__<_TS1, _TS2>>> operator op(const tensor_expression<_TS1> &e_lhs, const tensor_expression<_TS2> &e_rhs) { \
 	return make_lambda(e_lhs().extent(), __##name##_array_access_tensor__<_TS1, _TS2>(e_lhs(), e_rhs()), device_t{}); \
 }
 
 #define CU_TENSOR_WITH_VALUE_BINARY_OPERATOR(name, op) \
 \
 template <typename _TS> \
-inline enable_if_t< are_device_memory<_TS>::value && are_linear_access<_TS>::value, cuda::general_lambda_tensor<_TS::dim, __##name##_linear_access_tensor_with_value__<_TS>>> operator op(const tensor_expression<_TS> &e_ts, typename _TS::value_type v) { \
+inline enable_if_t< are_device_memory<_TS>::value && are_linear_access<_TS>::value, cuda::general_lambda_tensor<_TS::rank, __##name##_linear_access_tensor_with_value__<_TS>>> operator op(const tensor_expression<_TS> &e_ts, typename _TS::value_type v) { \
 	return make_lambda(e_ts().extent(), __##name##_linear_access_tensor_with_value__<_TS>(e_ts(), v), device_t{}); \
 } \
 \
 template <typename _TS> \
-inline enable_if_t< are_device_memory<_TS>::value && are_linear_access<_TS>::value, cuda::general_lambda_tensor<_TS::dim, __##name##_value_with_linear_access_tensor__<_TS>>> operator op(typename _TS::value_type v, const tensor_expression<_TS> &e_ts) { \
+inline enable_if_t< are_device_memory<_TS>::value && are_linear_access<_TS>::value, cuda::general_lambda_tensor<_TS::rank, __##name##_value_with_linear_access_tensor__<_TS>>> operator op(typename _TS::value_type v, const tensor_expression<_TS> &e_ts) { \
 	return make_lambda(e_ts().extent(), __##name##_value_with_linear_access_tensor__<_TS>(v, e_ts()), device_t{}); \
 } \
 \
 template <typename _TS> \
-inline enable_if_t< are_device_memory<_TS>::value && !are_linear_access<_TS>::value, cuda::general_lambda_tensor<_TS::dim, __##name##_array_access_tensor_with_value__<_TS>>> operator op(const tensor_expression<_TS> &e_ts, typename _TS::value_type v) { \
+inline enable_if_t< are_device_memory<_TS>::value && !are_linear_access<_TS>::value, cuda::general_lambda_tensor<_TS::rank, __##name##_array_access_tensor_with_value__<_TS>>> operator op(const tensor_expression<_TS> &e_ts, typename _TS::value_type v) { \
 	return make_lambda(e_ts().extent(), __##name##_array_access_tensor_with_value__<_TS>(e_ts(), v), device_t{}); \
 }\
 \
 template <typename _TS> \
-inline enable_if_t< are_device_memory<_TS>::value && !are_linear_access<_TS>::value, cuda::general_lambda_tensor<_TS::dim, __##name##_value_with_array_access_tensor__<_TS>>> operator op(typename _TS::value_type v, const tensor_expression<_TS> &e_ts) { \
+inline enable_if_t< are_device_memory<_TS>::value && !are_linear_access<_TS>::value, cuda::general_lambda_tensor<_TS::rank, __##name##_value_with_array_access_tensor__<_TS>>> operator op(typename _TS::value_type v, const tensor_expression<_TS> &e_ts) { \
 	return make_lambda(e_ts().extent(), __##name##_value_with_array_access_tensor__<_TS>(v, e_ts()), device_t{}); \
 }
 

@@ -76,7 +76,7 @@ __device__ void for_index(pointi<2> extent, _Func fun) {
 
 
 template <int_t _Block0, int_t _Block1, typename _Tensor, typename _Mask>
-tensor<typename _Tensor::value_type, _Tensor::dim> conv(_Tensor ts, _Mask mask) {
+tensor<typename _Tensor::value_type, _Tensor::rank> conv(_Tensor ts, _Mask mask) {
 	MATAZURE_STATIC_ASSERT_DIM_MATCHED(_Tensor, _Mask);
 	MATAZURE_STATIC_ASSERT_VALUE_TYPE_MATCHED(_Tensor, _Mask);
 	typedef typename _Tensor::value_type value_type;
@@ -86,7 +86,7 @@ tensor<typename _Tensor::value_type, _Tensor::dim> conv(_Tensor ts, _Mask mask) 
 	//MATAZURE_ASSERT(grid_ext * block_ext == ts.extent());
 	auto mask_extent = mask.extent();
 	auto mask_radius = mask_extent / 2;
-	tensor<value_type, _Tensor::dim> cts_re(ts.extent());
+	tensor<value_type, _Tensor::rank> cts_re(ts.extent());
 
 	block_for_index<_Block0, _Block1>(grid_ext, [=] MATAZURE_DEVICE(block_index<_Block0, _Block1> block_idx) {
 		__shared__ static_tensor<value_type,meta::array< _Block0,  _Block1>> sts_apron;

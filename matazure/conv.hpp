@@ -13,7 +13,7 @@ namespace detail {
 
 template <typename _Tensor>
 inline auto clone_int_t_tensor(_Tensor ts) {
-	return matazure::tensor<int_t, _Tensor::dim>(ts.extent());
+	return matazure::tensor<int_t, _Tensor::rank>(ts.extent());
 }
 
 template <typename _T, int_t ...SArgs>

@@ -7,7 +7,7 @@ namespace matazure {
 template <typename _Type, int_t _Dim>
 class point {
 public:
-	static const int_t				dim = _Dim;
+	static const int_t				rank = _Dim;
 	typedef _Type					value_type;
 	typedef value_type &			reference;
 	typedef const value_type &		const_reference;
@@ -18,14 +18,14 @@ public:
 
 	MATAZURE_GENERAL reference operator[](int_t index) { return elements_[index]; }
 
-	MATAZURE_GENERAL constexpr int_t size() const { return dim; }
+	MATAZURE_GENERAL constexpr int_t size() const { return rank; }
 
 	MATAZURE_GENERAL static constexpr point zeros() {
 		return { 0 };
 	}
 
 public:
-	value_type elements_[dim];
+	value_type elements_[rank];
 };
 
 static_assert(std::is_pod<point<byte, 1>>::value, "point should be pod");
@@ -193,16 +193,16 @@ inline MATAZURE_GENERAL pointi<_Dim> get_stride(pointi<_Dim> ex) {
 	return stride;
 }
 
-template <typename _Tuple, int_t dim = tuple_size<_Tuple>::value>
+template <typename _Tuple, int_t rank = tuple_size<_Tuple>::value>
 class point_viewer;
 
 template <typename _Tuple>
 class point_viewer<_Tuple, 3> : public _Tuple{
 public:
 	static_assert(tuple_size<_Tuple>::value == 3, "");
-	const static int_t dim = 3;
+	const static int_t rank = 3;
 	typedef decay_t<typename tuple_element<0, _Tuple>::type> value_type;
-	typedef point<value_type, dim> point_type;
+	typedef point<value_type, rank> point_type;
 
 	point_viewer(const _Tuple &tp): _Tuple(tp){}
 

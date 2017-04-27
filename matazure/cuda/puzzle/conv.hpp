@@ -36,7 +36,7 @@ public:																										\
 		ts_(ts)																								\
 	{}																										\
 																											\
-	MATAZURE_GENERAL typename _Tensor::value_type operator()(const pointi<_Tensor::dim> &idx) const {		\
+	MATAZURE_GENERAL typename _Tensor::value_type operator()(const pointi<_Tensor::rank> &idx) const {		\
 		auto mask_radius = mask.extent() / 2;																\
 		auto sum = zero<typename _Tensor::value_type>::value();												\
 		cuda::for_index(mask.extent(), [&] (const pointi<2> &mask_idx) {									\
@@ -60,7 +60,7 @@ inline auto conv_global(_Tensor ts)																			\
 namespace matazure { namespace cuda{ namespace puzzle{															\
 																												\
 template <int_t _Block0, int_t _Block1, typename _Tensor, typename _TensorRe>									\
-inline tensor<typename _Tensor::value_type, _Tensor::dim> conv_block(_Tensor ts, _TensorRe &ts_re) {			\
+inline tensor<typename _Tensor::value_type, _Tensor::rank> conv_block(_Tensor ts, _TensorRe &ts_re) {			\
 	MATAZURE_STATIC_ASSERT_DIM_MATCHED(_Tensor, decltype(mask));												\
 	MATAZURE_STATIC_ASSERT_VALUE_TYPE_MATCHED(_Tensor, decltype(mask));											\
 	typedef typename _Tensor::value_type value_type;															\
@@ -93,8 +93,8 @@ inline tensor<typename _Tensor::value_type, _Tensor::dim> conv_block(_Tensor ts,
 }																												\
 																												\
 template <int_t _Block0, int_t _Block1, typename _Tensor>														\
-inline cuda::tensor<typename _Tensor::value_type, _Tensor::dim> conv_block(_Tensor ts) {						\
-	cuda::tensor<typename _Tensor::value_type, _Tensor::dim> ts_re(ts.extent());								\
+inline cuda::tensor<typename _Tensor::value_type, _Tensor::rank> conv_block(_Tensor ts) {						\
+	cuda::tensor<typename _Tensor::value_type, _Tensor::rank> ts_re(ts.extent());								\
 	conv_block<_Block0, _Block1>(ts, ts_re);																	\
 	return ts_re;																								\
 }																												\
@@ -106,7 +106,7 @@ inline cuda::tensor<typename _Tensor::value_type, _Tensor::dim> conv_block(_Tens
 namespace matazure{namespace cuda{namespace puzzle{																\
 																												\
 template <int_t _Block0, int_t _Block1, typename _Tensor, typename _TensorRe>									\
-inline tensor<typename _Tensor::value_type, _Tensor::dim> conv_block_crack(_Tensor ts, _TensorRe &ts_re) {		\
+inline tensor<typename _Tensor::value_type, _Tensor::rank> conv_block_crack(_Tensor ts, _TensorRe &ts_re) {		\
 	MATAZURE_STATIC_ASSERT_DIM_MATCHED(_Tensor, decltype(mask));												\
 	MATAZURE_STATIC_ASSERT_VALUE_TYPE_MATCHED(_Tensor, decltype(mask));											\
 	typedef typename _Tensor::value_type value_type;															\
@@ -139,8 +139,8 @@ inline tensor<typename _Tensor::value_type, _Tensor::dim> conv_block_crack(_Tens
 }																												\
 																												\
 template <int_t _Block0, int_t _Block1, typename _Tensor>														\
-inline cuda::tensor<typename _Tensor::value_type, _Tensor::dim> conv_block_crack(_Tensor ts) {					\
-	cuda::tensor<typename _Tensor::value_type, _Tensor::dim> ts_re(ts.extent());								\
+inline cuda::tensor<typename _Tensor::value_type, _Tensor::rank> conv_block_crack(_Tensor ts) {					\
+	cuda::tensor<typename _Tensor::value_type, _Tensor::rank> ts_re(ts.extent());								\
 	conv_block_crack<_Block0, _Block1>(ts, ts_re);																\
 	return ts_re;																								\
 }																												\

@@ -13,13 +13,13 @@ class tensor : public tensor_expression<tensor<_Type, _Dim, first_major_t>> {
 public:
 	static_assert(std::is_pod<_Type>::value, "only supports pod type now");
 
-	static const int_t						dim = _Dim;
+	static const int_t						rank = _Dim;
 	typedef _Type							value_type;
 	typedef value_type &					reference;
 	typedef value_type *					pointer;
 
-	typedef pointi<dim>						extent_type;
-	typedef pointi<dim>						index_type;
+	typedef pointi<rank>						extent_type;
+	typedef pointi<rank>						index_type;
 
 	typedef linear_access_t					access_type;
 	typedef _Layout							layout_type;
@@ -37,7 +37,7 @@ public:
 	explicit tensor(extent_type extent) :
 		extent_(extent),
 		stride_(matazure::get_stride(extent)),
-		sp_data_(malloc_shared_memory(stride_[dim - 1])),
+		sp_data_(malloc_shared_memory(stride_[rank - 1])),
 		data_(sp_data_.get())
 	{ }
 
@@ -77,7 +77,7 @@ public:
 
 	MATAZURE_GENERAL extent_type extent() const { return extent_; }
 	MATAZURE_GENERAL extent_type stride() const { return stride_; }
-	MATAZURE_GENERAL int_t size() const { return stride_[dim - 1]; }
+	MATAZURE_GENERAL int_t size() const { return stride_[rank - 1]; }
 
 	MATAZURE_GENERAL pointer data() const { return data_; }
 
@@ -115,10 +115,10 @@ inline void copy_symbol(_TensorSrc src, _TensorSymbol &symbol_dst) {
 template <typename _ValueType, typename _AccessMode, int_t _Dim, typename _Func>
 class device_lambda_tensor {
 public:
-	static const int_t									dim = _Dim;
+	static const int_t									rank = _Dim;
 	typedef _ValueType									value_type;
-	typedef pointi<dim>									extent_type;
-	typedef pointi<dim>									index_type;
+	typedef pointi<rank>									extent_type;
+	typedef pointi<rank>									index_type;
 	typedef _AccessMode									accessor_type;
 	typedef device_t									memory_type;
 
@@ -148,15 +148,15 @@ public:
 		return (*this)(idx);
 	}
 
-	tensor<decay_t<value_type>, dim> persist() const {
-		tensor<decay_t<value_type>, dim> re(this->extent());
+	tensor<decay_t<value_type>, rank> persist() const {
+		tensor<decay_t<value_type>, rank> re(this->extent());
 		copy(*this, re);
 		return re;
 	}
 
 	MATAZURE_GENERAL extent_type extent() const { return extent_; }
 	MATAZURE_GENERAL extent_type stride() const { return stride_; }
-	MATAZURE_GENERAL int_t size() const { return stride_[dim - 1]; }
+	MATAZURE_GENERAL int_t size() const { return stride_[rank - 1]; }
 
 private:
 	template <typename _Mode>
@@ -193,10 +193,10 @@ template <int_t _Dim, typename _Func>
 class general_lambda_tensor : public tensor_expression<general_lambda_tensor<_Dim, _Func>> {
 	typedef function_traits<_Func>						functor_traits;
 public:
-	static const int_t										dim = _Dim;
+	static const int_t										rank = _Dim;
 	typedef typename functor_traits::result_type			value_type;
-	typedef matazure::pointi<dim>							extent_type;
-	typedef pointi<dim>										index_type;
+	typedef matazure::pointi<rank>							extent_type;
+	typedef pointi<rank>										index_type;
 	typedef typename detail::get_functor_accessor_type<_Dim, _Func>::type		access_type;
 	typedef device_t										memory_type;
 
@@ -220,15 +220,15 @@ public:
 		return (*this)(idx);
 	}
 
-	tensor<decay_t<value_type>, dim> persist() const {
-		tensor<decay_t<value_type>, dim> re(this->extent());
+	tensor<decay_t<value_type>, rank> persist() const {
+		tensor<decay_t<value_type>, rank> re(this->extent());
 		copy(*this, re);
 		return re;
 	}
 
 	MATAZURE_GENERAL extent_type extent() const { return extent_; }
 	MATAZURE_GENERAL extent_type stride() const { return stride_; }
-	MATAZURE_GENERAL int_t size() const { return stride_[dim - 1]; }
+	MATAZURE_GENERAL int_t size() const { return stride_[rank - 1]; }
 
 public:
 	template <typename _Mode>
