@@ -39,7 +39,8 @@ void BM_cu_conv_block(benchmark::State& state) {
 	cuda::copy_symbol(host_mask, mask);
 
 	while (state.KeepRunning()) {
-		cuda::puzzle::conv_block<16,16>(clamp_zero(ts_src), ts_re);
+		cuda::puzzle::conv_block<dim<16,16>>(clamp_zero(ts_src), ts_re);
+		cuda::barrier();
 	}
 
 	auto bytes_size = static_cast<size_t>(ts_src.size()) * sizeof(_ValueType);
@@ -57,7 +58,8 @@ void BM_cu_conv_block_crack(benchmark::State& state) {
 	cuda::copy_symbol(host_mask, mask);
 
 	while (state.KeepRunning()) {
-		cuda::puzzle::conv_block_crack<16,16>(ts_src, ts_re);
+		cuda::puzzle::conv_block_crack<dim<16,16>>(ts_src, ts_re);
+		cuda::barrier();
 	}
 
 	auto bytes_size = static_cast<size_t>(ts_src.size()) * sizeof(_ValueType);
@@ -65,7 +67,3 @@ void BM_cu_conv_block_crack(benchmark::State& state) {
 }
 
 BENCHMARK_TEMPLATE1(BM_cu_conv_block_crack, float)->RangeMultiplier(2)->Range(128, 4096)->UseRealTime();
-
-
-
-

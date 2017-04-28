@@ -56,71 +56,72 @@ inline auto conv_global(_Tensor ts)																			\
 																											\
 }}} //matazure/cuda/puzzle
 
-#define MATAZURE_PUZZEL_CONV_BLOCK(conv_block, mask)															\
-namespace matazure { namespace cuda{ namespace puzzle{															\
-																												\
-template <int_t _Block0, int_t _Block1, typename _Tensor, typename _TensorRe>									\
-inline tensor<typename _Tensor::value_type, _Tensor::rank> conv_block(_Tensor ts, _TensorRe &ts_re) {			\
-	MATAZURE_STATIC_ASSERT_DIM_MATCHED(_Tensor, decltype(mask));												\
-	MATAZURE_STATIC_ASSERT_VALUE_TYPE_MATCHED(_Tensor, decltype(mask));											\
-	typedef typename _Tensor::value_type value_type;															\
-																												\
-	constexpr pointi<2> block_ext{ _Block0, _Block1 };															\
-	pointi<2> grid_ext = ts.shape() / block_ext;																\
-	MATAZURE_ASSERT(equal(grid_ext * block_ext, ts.shape()));													\
-	MATAZURE_ASSERT(equal(ts.shape(), ts_re.shape()));															\
-																												\
-	auto mask_extent = mask.shape();																			\
-	auto mask_radius = mask_extent / 2;																			\
-																												\
-	block_for_index<_Block0, _Block1>(grid_ext, [=] MATAZURE_DEVICE(block_index<_Block0, _Block1> block_idx) {	\
-		__shared__ static_tensor<value_type,dim< _Block0 + 3,  _Block1 + 3>> shared_ts_block;					\
-																												\
-		shared_ts_block(block_idx.local) = ts(block_idx.global + pointi<2>{-1, -1});							\
-		shared_ts_block(block_idx.local + pointi<2>{2, 0}) = ts(block_idx.global + pointi<2>{1, -1});			\
-		shared_ts_block(block_idx.local + pointi<2>{0, 2}) = ts(block_idx.global + pointi<2>{-1, 1});			\
-		shared_ts_block(block_idx.local + pointi<2>{2, 2}) = ts(block_idx.global + pointi<2>{1, 1});			\
-		device::barrier();																						\
-																												\
-		auto sum = zero<value_type>::value();																	\
-		cuda::for_index(mask_extent, [&](const pointi<2> &idx) {												\
-			sum += shared_ts_block(block_idx.local + idx) * mask(idx);											\
-		});																										\
-		ts_re(block_idx.global) = sum;																			\
-	});																											\
-																												\
-	return ts_re;																								\
-}																												\
-																												\
-template <int_t _Block0, int_t _Block1, typename _Tensor>														\
-inline cuda::tensor<typename _Tensor::value_type, _Tensor::rank> conv_block(_Tensor ts) {						\
-	cuda::tensor<typename _Tensor::value_type, _Tensor::rank> ts_re(ts.shape());								\
-	conv_block<_Block0, _Block1>(ts, ts_re);																	\
-	return ts_re;																								\
-}																												\
-																												\
+#define MATAZURE_PUZZEL_CONV_BLOCK(conv_block, mask)															   \
+namespace matazure { namespace cuda{ namespace puzzle{															   \
+																												   \
+template <typename _BlockDim, typename _Tensor, typename _TensorRe>												   \
+inline tensor<typename _Tensor::value_type, _Tensor::rank> conv_block(_Tensor ts, _TensorRe &ts_re) {			   \
+	MATAZURE_STATIC_ASSERT_DIM_MATCHED(_Tensor, decltype(mask));												   \
+	MATAZURE_STATIC_ASSERT_VALUE_TYPE_MATCHED(_Tensor, decltype(mask));											   \
+	typedef typename _Tensor::value_type value_type;															   \
+																												   \
+	constexpr auto block_ext = meta::array_to_pointi(_BlockDim{});												   \
+	auto grid_ext = ts.shape() / block_ext;																		   \
+	MATAZURE_ASSERT(equal(grid_ext * block_ext, ts.shape()));													   \
+	MATAZURE_ASSERT(equal(ts.shape(), ts_re.shape()));															   \
+																												   \
+	auto mask_extent = mask.shape();																			   \
+	auto mask_radius = mask_extent / 2;																			   \
+																												   \
+	block_for_index<_BlockDim>(grid_ext, [=] MATAZURE_DEVICE(block_index<_BlockDim> block_idx) {				   \
+		auto shsts_shape = meta::sub_c(meta::add_c(_BlockDim{}, decltype(mask)::meta_shape()), meta::int_t_c<1>{});\
+		__shared__ static_tensor<value_type, decltype(shsts_shape)> shared_ts_block;							   \
+																												   \
+		shared_ts_block(block_idx.local) = ts(block_idx.global + pointi<2>{-1, -1});							   \
+		shared_ts_block(block_idx.local + pointi<2>{2, 0}) = ts(block_idx.global + pointi<2>{1, -1});			   \
+		shared_ts_block(block_idx.local + pointi<2>{0, 2}) = ts(block_idx.global + pointi<2>{-1, 1});			   \
+		shared_ts_block(block_idx.local + pointi<2>{2, 2}) = ts(block_idx.global + pointi<2>{1, 1});			   \
+		device::barrier();																						   \
+																												   \
+		auto sum = zero<value_type>::value();																	   \
+		cuda::for_index(mask_extent, [&](const pointi<2> &idx) {												   \
+			sum += shared_ts_block(block_idx.local + idx) * mask(idx);											   \
+		});																										   \
+		ts_re(block_idx.global) = sum;																			   \
+	});																											   \
+																												   \
+	return ts_re;																								   \
+}																												   \
+																												   \
+template <typename _BlockDim, typename _Tensor>																	   \
+inline cuda::tensor<typename _Tensor::value_type, _Tensor::rank> conv_block(_Tensor ts) {						   \
+	cuda::tensor<typename _Tensor::value_type, _Tensor::rank> ts_re(ts.shape());								   \
+	conv_block<_BlockDim>(ts, ts_re);																			   \
+	return ts_re;																								   \
+}																												   \
+																												   \
 }}}
 
 /// 卷积需要使用__constant__的mask，但不同的mask必须以静态的方式分别声明，故而定义一个宏，以便在外面使用
 #define MATAZURE_PUZZEL_CONV_BLOCK_WITH_CRACK(conv_block_crack, mask)											\
 namespace matazure{namespace cuda{namespace puzzle{																\
 																												\
-template <int_t _Block0, int_t _Block1, typename _Tensor, typename _TensorRe>									\
+template <typename _BlockDim, typename _Tensor, typename _TensorRe>												\
 inline tensor<typename _Tensor::value_type, _Tensor::rank> conv_block_crack(_Tensor ts, _TensorRe &ts_re) {		\
 	MATAZURE_STATIC_ASSERT_DIM_MATCHED(_Tensor, decltype(mask));												\
 	MATAZURE_STATIC_ASSERT_VALUE_TYPE_MATCHED(_Tensor, decltype(mask));											\
 	typedef typename _Tensor::value_type value_type;															\
 																												\
-	constexpr pointi<2> block_ext{ _Block0, _Block1 };															\
-	pointi<2> grid_ext = ts.shape() / block_ext;																\
+	constexpr auto block_ext = meta::array_to_pointi(_BlockDim{});												\
+	auto grid_ext = ts.shape() / block_ext;																		\
 	MATAZURE_ASSERT(equal(grid_ext * block_ext, ts.shape()));													\
 	MATAZURE_ASSERT(equal(ts.shape(), ts_re.shape()));															\
 																												\
 	auto mask_extent = mask.shape();																			\
 	auto mask_radius = mask_extent / 2;																			\
 																												\
-	block_for_index<_Block0, _Block1>(grid_ext, [=] __device__ (block_index<_Block0, _Block1> block_idx) {		\
-		__shared__ static_tensor<value_type,dim< _Block0,  _Block1>> shared_ts_block;							\
+	block_for_index<_BlockDim>(grid_ext, [=] __device__ (block_index<_BlockDim> block_idx) {					\
+		__shared__ static_tensor<value_type, _BlockDim> shared_ts_block;										\
 		shared_ts_block(block_idx.local) = ts(block_idx.global);												\
 		device::barrier();																						\
 																												\
@@ -138,10 +139,10 @@ inline tensor<typename _Tensor::value_type, _Tensor::rank> conv_block_crack(_Ten
 	return ts_re;																								\
 }																												\
 																												\
-template <int_t _Block0, int_t _Block1, typename _Tensor>														\
+template <typename _BlockDim, typename _Tensor>																	\
 inline cuda::tensor<typename _Tensor::value_type, _Tensor::rank> conv_block_crack(_Tensor ts) {					\
 	cuda::tensor<typename _Tensor::value_type, _Tensor::rank> ts_re(ts.shape());								\
-	conv_block_crack<_Block0, _Block1>(ts, ts_re);																\
+	conv_block_crack<_BlockDim>(ts, ts_re);																		\
 	return ts_re;																								\
 }																												\
 																												\

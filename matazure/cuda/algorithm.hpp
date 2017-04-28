@@ -39,11 +39,11 @@ namespace internal{
 	}
 
 	inline MATAZURE_GENERAL dim3 pointi_to_dim3(pointi<1> p) {
-		return{ static_cast<unsigned int>(p[0]), 0, 0 };
+		return{ static_cast<unsigned int>(p[0]), 1, 1 };
 	}
 
 	inline MATAZURE_GENERAL dim3 pointi_to_dim3(pointi<2> p) {
-		return{ static_cast<unsigned int>(p[0]), static_cast<unsigned int>(p[1]), 0 };
+		return{ static_cast<unsigned int>(p[0]), static_cast<unsigned int>(p[1]), 1 };
 	}
 
 	inline MATAZURE_GENERAL dim3 pointi_to_dim3(pointi<3> p) {
@@ -123,14 +123,37 @@ inline void parallel_for_index(_ExecutionPolicy policy, pointi<_Rank> ext, _Fun 
 	});
 }
 
-template <int_t ..._Dims>
-class block_index;
+//template <int_t ..._Dims>
+//class block_index;
+//
+//template <int_t _S0, int_t _S1>
+//class block_index<_S0, _S1> {
+//public:
+//	MATAZURE_GENERAL block_index(pointi<2> grid_extent, pointi<2> local_idx, pointi<2> block_idx, pointi<2> global_idx) :
+//		block_extent{ _S0, _S1 },
+//		grid_extent(grid_extent),
+//		global_extent(block_extent * grid_extent),
+//		local(local_idx),
+//		block(block_idx),
+//		global(global_idx)
+//	{}
+//
+//public:
+//	const pointi<2> block_extent;
+//	const pointi<2> grid_extent;
+//	const pointi<2> global_extent;
+//	const pointi<2> local;
+//	const pointi<2> block;
+//	const pointi<2> global;
+//};
 
-template <int_t _S0, int_t _S1>
-class block_index<_S0, _S1> {
+template <typename _BlockDim>
+class block_index{
 public:
-	MATAZURE_GENERAL block_index(pointi<2> grid_extent, pointi<2> local_idx, pointi<2> block_idx, pointi<2> global_idx) :
-		block_extent{ _S0, _S1 },
+	const static int_t rank = _BlockDim::size();
+
+	MATAZURE_GENERAL block_index(pointi<rank> grid_extent, pointi<rank> local_idx, pointi<rank> block_idx, pointi<rank> global_idx) :
+		block_extent(meta::array_to_pointi(_BlockDim{})),
 		grid_extent(grid_extent),
 		global_extent(block_extent * grid_extent),
 		local(local_idx),
@@ -139,55 +162,55 @@ public:
 	{}
 
 public:
-	const pointi<2> block_extent;
-	const pointi<2> grid_extent;
-	const pointi<2> global_extent;
-	const pointi<2> local;
-	const pointi<2> block;
-	const pointi<2> global;
+	const pointi<rank> block_extent;
+	const pointi<rank> grid_extent;
+	const pointi<rank> global_extent;
+	const pointi<rank> local;
+	const pointi<rank> block;
+	const pointi<rank> global;
 };
 
-template <int_t _S0, int_t _S1, int_t _S2>
-class block_index<_S0, _S1, _S2> {
-public:
-
-};
-
-template <int_t _BlockSize, typename _Fun>
-inline void block_for_index(int_t grid_size, _Fun fun) {
-	kenel <<< grid_size, _BlockSize >>> (fun);
-}
-
-//template <typename _Ext, typename _Fun>
-//inline void block_for_index(pointi<_Ext::size()>, _Fun fun){
-//	kenel<<<dim3()
-//}
-
-template <int_t _S0, int_t _S1, typename _Fun>
-inline void block_for_index(pointi<2> grid_ext, _Fun fun) {
-	kenel <<< internal::pointi_to_dim3(grid_ext), dim3(_S0, _S1, 1) >>> ([=] MATAZURE_DEVICE() {
-		pointi<2> local = internal::uint3_to_pointi<2>(threadIdx);
-		pointi<2> block = { static_cast<int_t>(blockIdx.x), static_cast<int_t>(blockIdx.y) };
-		pointi<2> block_ext = { _S0, _S1 };
-		pointi<2> global = block * block_ext + local;
-		block_index<_S0, _S1> block_idx(grid_ext, local, block, global);
+template <typename _Ext, typename _Fun>
+inline void block_for_index(pointi<_Ext::size()> grid_ext, _Fun fun) {
+	auto grid_dim = internal::pointi_to_dim3(grid_ext);
+	auto block_dim = internal::pointi_to_dim3(meta::array_to_pointi(_Ext{}));
+	kenel <<<grid_dim, block_dim>>> ([=] MATAZURE_DEVICE() {
+		auto local = internal::uint3_to_pointi<_Ext::size()>(threadIdx);
+		auto block = internal::uint3_to_pointi<_Ext::size()>(blockIdx);
+		auto block_dim = internal::dim3_to_pointi<_Ext::size()>(blockDim);
+		auto global = block * block_dim + local;
+		block_index<_Ext> block_idx(grid_ext, local, block, global);
 		fun(block_idx);
 	});
 
 	assert_runtime_success(cudaGetLastError());
 }
 
-template <int_t _S0, int_t _S1, int_t _S2, typename _Fun>
-inline void block_for_index(pointi<3> grid_ext, _Fun fun) {
-	kenel <<< dim3(grid_ext[0], grid_ext[1], grid_ext[2]), dim3(_S0, _S1, _S2) >>> ([=] MATAZURE_DEVICE() {
-		pointi<3> local = { static_cast<int_t>(threadIdx.x), static_cast<int_t>(threadIdx.y), static_cast<int_t>(threadIdx.z) };
-		pointi<3> block = { static_cast<int_t>(blockIdx.x), static_cast<int_t>(blockIdx.y), static_cast<int_t>(blockIdx.z) };
-		pointi<3> block_ext = { _S0, _S1, _S2 };
-		pointi<3> global = block * block_ext + local;
-		block_index<_S0, _S1, _S2> block_idx(grid_ext, local, block, global);
-		fun(block_idx);
-	});
-}
+//template <int_t _S0, int_t _S1, typename _Fun>
+//inline void block_for_index(pointi<2> grid_ext, _Fun fun) {
+//	kenel <<< internal::pointi_to_dim3(grid_ext), dim3(_S0, _S1, 1) >>> ([=] MATAZURE_DEVICE() {
+//		pointi<2> local = internal::uint3_to_pointi<2>(threadIdx);
+//		pointi<2> block = { static_cast<int_t>(blockIdx.x), static_cast<int_t>(blockIdx.y) };
+//		pointi<2> block_ext = { _S0, _S1 };
+//		pointi<2> global = block * block_ext + local;
+//		block_index<_S0, _S1> block_idx(grid_ext, local, block, global);
+//		fun(block_idx);
+//	});
+//
+//	assert_runtime_success(cudaGetLastError());
+//}
+
+//template <int_t _S0, int_t _S1, int_t _S2, typename _Fun>
+//inline void block_for_index(pointi<3> grid_ext, _Fun fun) {
+//	kenel <<< dim3(grid_ext[0], grid_ext[1], grid_ext[2]), dim3(_S0, _S1, _S2) >>> ([=] MATAZURE_DEVICE() {
+//		pointi<3> local = { static_cast<int_t>(threadIdx.x), static_cast<int_t>(threadIdx.y), static_cast<int_t>(threadIdx.z) };
+//		pointi<3> block = { static_cast<int_t>(blockIdx.x), static_cast<int_t>(blockIdx.y), static_cast<int_t>(blockIdx.z) };
+//		pointi<3> block_ext = { _S0, _S1, _S2 };
+//		pointi<3> global = block * block_ext + local;
+//		block_index<_S0, _S1, _S2> block_idx(grid_ext, local, block, global);
+//		fun(block_idx);
+//	});
+//}
 
 template <typename _Tensor, typename _Fun>
 inline void for_each(_Tensor ts, _Fun fun, enable_if_t<are_device_memory<_Tensor>::value && are_linear_access<_Tensor>::value>* = 0) {

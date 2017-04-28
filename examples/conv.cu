@@ -24,13 +24,13 @@ int main() {
 		auto ts_conv = mem_clone(cts_conv, host_t{});
 		io::write_raw_data("data/lena_gray8_conv_512x512.raw_data", ts_conv);
 
-		auto cts_conv_block = cuda::puzzle::conv_block<16, 16>(tensor_cast<float>(cu_gray));
+		auto cts_conv_block = cuda::puzzle::conv_block<dim<16, 16>>(tensor_cast<float>(cu_gray));
 		auto cts_byte_conv_block = apply(cts_conv_block, op::saturate_convert<byte>{}).persist();
 		cuda::barrier();
 		auto ts_byte_conv_block = mem_clone(cts_byte_conv_block, host_t{});
 		io::write_raw_data("data/lena_gray8_conv_block_512x512.raw_data", ts_byte_conv_block);
 
-		auto cts_conv_block_crack = cuda::puzzle::conv_block_crack<32, 32>(tensor_cast<float>(clamp_zero(cu_gray)));
+		auto cts_conv_block_crack = cuda::puzzle::conv_block_crack<dim<32, 32>>(tensor_cast<float>(clamp_zero(cu_gray)));
 		auto cts_byte_conv_block_crack = apply(cts_conv_block_crack, op::saturate_convert<byte>{}).persist();
 		cuda::barrier();
 		auto ts_byte_conv_block_crack = mem_clone(cts_byte_conv_block_crack, host_t{});
