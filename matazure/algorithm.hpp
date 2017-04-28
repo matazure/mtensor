@@ -51,7 +51,7 @@ inline void for_index(pointi<4> origin, pointi<4> extent, _Func fun) {
 	}
 }
 
-// namespace detail{
+// namespace internal{
 //
 // 	template <typename _T1, typename _T2>
 // 	struct assert_extent_matched{

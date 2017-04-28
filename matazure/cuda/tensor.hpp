@@ -197,7 +197,7 @@ public:
 	typedef typename functor_traits::result_type			value_type;
 	typedef matazure::pointi<rank>							shape_type;
 	typedef pointi<rank>										index_type;
-	typedef typename detail::get_functor_accessor_type<_Rank, _Func>::type		access_type;
+	typedef typename matazure::internal::get_functor_accessor_type<_Rank, _Func>::type		access_type;
 	typedef device_t										memory_type;
 
 

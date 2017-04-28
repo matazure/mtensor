@@ -9,7 +9,7 @@ inline MATAZURE_GENERAL bool outside(point<_ValueType, _Rank> input, point<_Valu
 	return true;
 }
 
-namespace detail {
+namespace internal {
 
 template <typename _Tensor>
 inline auto clone_int_t_tensor(_Tensor ts) {
@@ -45,7 +45,7 @@ inline auto conv(_Tensor ts_input, _Mask ts_mask) {
 	MATAZURE_STATIC_ASSERT_DIM_MATCHED(_Tensor, _Mask);
 	MATAZURE_STATIC_ASSERT_VALUE_TYPE_MATCHED(_Tensor, _Mask);
 
-	auto ts_offset_mask = detail::clone_int_t_tensor(ts_mask);
+	auto ts_offset_mask = internal::clone_int_t_tensor(ts_mask);
 	for (int_t i = 0; i < ts_offset_mask.size(); ++i) {
 		auto tmp_index = offset2index(i, ts_offset_mask.stride());
 		auto tmp_offset = index2offset(tmp_index, ts_input.stride());

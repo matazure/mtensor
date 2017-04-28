@@ -12,6 +12,16 @@ namespace matazure {
 template <int_t... _Values>
 using dim = meta::array<_Values ...>;
 
+namespace internal{
+
+template <int_t... _Values>
+pointi<sizeof...(_Values)> dim_to_pointi(dim<_Values...>){
+	return {_Values ...};
+}
+
+}
+
+
 template <int_t _Rank>
 inline MATAZURE_GENERAL typename pointi<_Rank>::value_type index2offset(const pointi<_Rank> &id, const pointi<_Rank> &stride, first_major_t) {
 	typename pointi<_Rank>::value_type offset = id[0];
@@ -134,19 +144,9 @@ private:
 
 	typedef typename traits_helper<_Ext>::type traits_t;
 
-	template <typename _T>
-	struct extent_helper;
-
-	template <int_t ..._Values>
-	struct extent_helper<dim<_Values...>> {
-		MATAZURE_GENERAL static constexpr pointi<sizeof...(_Values)> value() {
-			return{ _Values... };
-		};
-	};
-
 public:
-	typedef _Ext					meta_extent_type;
-	static	const int_t				rank = meta_extent_type::size();
+	typedef _Ext					meta_shape_type;
+	static	const int_t				rank = meta_shape_type::size();
 
 	typedef _Type					value_type;
 	typedef value_type *			pointer;
@@ -155,11 +155,11 @@ public:
 	typedef const value_type &		const_reference;
 	typedef linear_access_t			access_type;
 	typedef matazure::pointi<rank>	shape_type;
-	typedef pointi<rank>				index_type;
+	typedef pointi<rank>			index_type;
 	typedef local_t					memory_type;
 
-	static constexpr meta_extent_type meta_shape() {
-		return meta_extent_type();
+	static constexpr meta_shape_type meta_shape() {
+		return meta_shape_type();
 	}
 
 	MATAZURE_GENERAL constexpr shape_type stride() const {
@@ -167,7 +167,7 @@ public:
 	}
 
 	MATAZURE_GENERAL constexpr shape_type shape() const {
-		return extent_helper<meta_extent_type>::value();
+		return internal::dim_to_pointi(meta_shape());
 	}
 
 	MATAZURE_GENERAL constexpr const_reference operator()(const pointi<rank> &idx) const {
@@ -351,7 +351,7 @@ using matrix = tensor<_Type, 2, _Layout>;
 //template <typename _Type, int_t _Col, int_t _Row>
 //using static_matrix = static_tensor<_Type,dim< _Col,  _Row>>;
 
-namespace detail {
+namespace internal {
 
 template <int_t _Rank, typename _Func>
 struct get_functor_accessor_type {
@@ -378,7 +378,7 @@ public:
 	typedef typename functor_traits::result_type			value_type;
 	typedef matazure::pointi<rank>							shape_type;
 	typedef pointi<rank>										index_type;
-	typedef typename detail::get_functor_accessor_type<_Rank, _Func>::type
+	typedef typename internal::get_functor_accessor_type<_Rank, _Func>::type
 		access_type;
 	typedef host_t											memory_type;
 

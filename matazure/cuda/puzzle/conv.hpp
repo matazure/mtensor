@@ -25,7 +25,7 @@ namespace puzzle {
 #define MATAZURE_PUZZEL_CONV_GLOBAL(conv_global, mask)														\
 namespace matazure{namespace cuda{ namespace puzzle {														\
 																											\
-namespace _internal {																						\
+namespace internal {																						\
 																											\
 template <typename _Tensor>																					\
 struct conv_op {																							\
@@ -50,8 +50,8 @@ public:																										\
 																											\
 template <typename _Tensor>																					\
 inline auto conv_global(_Tensor ts)																			\
-->decltype(make_lambda(ts.shape(), _internal::conv_op<_Tensor>(ts), typename _Tensor::memory_type{})) {		\
-	return make_lambda(ts.shape(), _internal::conv_op<_Tensor>(ts), typename _Tensor::memory_type{});		\
+->decltype(make_lambda(ts.shape(), internal::conv_op<_Tensor>(ts), typename _Tensor::memory_type{})) {		\
+	return make_lambda(ts.shape(), internal::conv_op<_Tensor>(ts), typename _Tensor::memory_type{});		\
 }																											\
 																											\
 }}} //matazure/cuda/puzzle

@@ -9,7 +9,7 @@
 namespace matazure {
 namespace cuda {
 
-namespace _internal {
+namespace internal {
 
 class device_properties_cache
 {
@@ -77,7 +77,7 @@ template <typename __KernelFunc>
 inline void configure_grid(execution_policy &exe_policy, __KernelFunc k)
 {
 	cudaDeviceProp *props;
-	props = &_internal::device_properties_cache::get();
+	props = &internal::device_properties_cache::get();
 
 	cudaFuncAttributes attribs;
 	cudaOccDeviceProp occProp(*props);
@@ -102,7 +102,7 @@ inline void configure_grid(execution_policy &exe_policy, __KernelFunc k)
 
 	int smemGranularity = 0;
 	assert_occupancy_success(cudaOccSMemAllocationGranularity(&smemGranularity, &occProp));
-	size_t sbytes = _internal::availableSharedBytesPerBlock(props->sharedMemPerBlock, attribs.sharedSizeBytes, __occDivideRoundUp(exe_policy.grid_size(), numSMs), smemGranularity);
+	size_t sbytes = internal::availableSharedBytesPerBlock(props->sharedMemPerBlock, attribs.sharedSizeBytes, __occDivideRoundUp(exe_policy.grid_size(), numSMs), smemGranularity);
 
 	exe_policy.shared_mem_bytes(sbytes);
 }
@@ -121,7 +121,7 @@ template <typename __KernelFunc>
 inline void configure_grid(parallel_execution_policy &exe_policy, __KernelFunc k)
 {
 	cudaDeviceProp *props;
-	props = &_internal::device_properties_cache::get();
+	props = &internal::device_properties_cache::get();
 
 	cudaFuncAttributes attribs;
 	cudaOccDeviceProp occProp(*props);
@@ -152,7 +152,7 @@ inline void configure_grid(parallel_execution_policy &exe_policy, __KernelFunc k
 
 	int smemGranularity = 0;
 	assert_occupancy_success(cudaOccSMemAllocationGranularity(&smemGranularity, &occProp));
-	size_t sbytes = _internal::availableSharedBytesPerBlock(props->sharedMemPerBlock, attribs.sharedSizeBytes, __occDivideRoundUp(exe_policy.grid_size(), numSMs), smemGranularity);
+	size_t sbytes = internal::availableSharedBytesPerBlock(props->sharedMemPerBlock, attribs.sharedSizeBytes, __occDivideRoundUp(exe_policy.grid_size(), numSMs), smemGranularity);
 
 	exe_policy.shared_mem_bytes(sbytes);
 }

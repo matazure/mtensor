@@ -6,6 +6,70 @@
 namespace matazure {
 namespace cuda {
 
+namespace internal{
+
+	inline MATAZURE_GENERAL uint3 pointi_to_uint3(pointi<1> p) {
+		return{ static_cast<unsigned int>(p[0]), 0, 0 };
+	}
+
+	inline MATAZURE_GENERAL uint3 pointi_to_uint3(pointi<2> p) {
+		return{ static_cast<unsigned int>(p[0]), static_cast<unsigned int>(p[1]), 0 };
+	}
+
+	inline MATAZURE_GENERAL uint3 pointi_to_uint3(pointi<3> p) {
+		return{ static_cast<unsigned int>(p[0]), static_cast<unsigned int>(p[1]), static_cast<unsigned int>(p[2]) };
+	}
+
+	template <int_t _Rank>
+	inline MATAZURE_GENERAL pointi<_Rank> uint3_to_pointi(uint3 u);
+
+	template <>
+	inline MATAZURE_GENERAL pointi<1> uint3_to_pointi(uint3 u) {
+		return{ static_cast<int_t>(u.x) };
+	}
+
+	template <>
+	inline MATAZURE_GENERAL pointi<2> uint3_to_pointi(uint3 u) {
+		return{ static_cast<int_t>(u.x), static_cast<int>(u.y) };
+	}
+
+	template <>
+	inline MATAZURE_GENERAL pointi<3> uint3_to_pointi(uint3 u) {
+		return{ static_cast<int>(u.x), static_cast<int>(u.y), static_cast<int>(u.z) };
+	}
+
+	inline MATAZURE_GENERAL dim3 pointi_to_dim3(pointi<1> p) {
+		return{ static_cast<unsigned int>(p[0]), 0, 0 };
+	}
+
+	inline MATAZURE_GENERAL dim3 pointi_to_dim3(pointi<2> p) {
+		return{ static_cast<unsigned int>(p[0]), static_cast<unsigned int>(p[1]), 0 };
+	}
+
+	inline MATAZURE_GENERAL dim3 pointi_to_dim3(pointi<3> p) {
+		return{ static_cast<unsigned int>(p[0]), static_cast<unsigned int>(p[1]), static_cast<unsigned int>(p[2]) };
+	}
+
+	template <int_t _Rank>
+	inline MATAZURE_GENERAL pointi<_Rank> dim3_to_pointi(dim3 u);
+
+	template <>
+	inline MATAZURE_GENERAL pointi<1> dim3_to_pointi(dim3 u) {
+		return{ static_cast<int_t>(u.x) };
+	}
+
+	template <>
+	inline MATAZURE_GENERAL pointi<2> dim3_to_pointi(dim3 u) {
+		return{ static_cast<int_t>(u.x), static_cast<int>(u.y) };
+	}
+
+	template <>
+	inline MATAZURE_GENERAL pointi<3> dim3_to_pointi(dim3 u) {
+		return{ static_cast<int>(u.x), static_cast<int>(u.y), static_cast<int>(u.z) };
+	}
+
+}
+
 template <typename Function, typename... Arguments>
 MATAZURE_GLOBAL void kenel(Function f, Arguments... args)
 {
@@ -23,7 +87,7 @@ template <typename _ExecutionPolicy, typename _Fun, typename... _Args>
 inline void launch(_ExecutionPolicy exe_policy, _Fun f, _Args... args)
 {
 	configure_grid(exe_policy, kenel<_Fun, _Args...>);
-	kenel<<< exe_policy.grid_size(), exe_policy.block_size(), exe_policy.shared_mem_bytes(), exe_policy.stream() >>>(f, args...);
+	kenel <<< exe_policy.grid_size(), exe_policy.block_size(), exe_policy.shared_mem_bytes(), exe_policy.stream() >>> (f, args...);
 	assert_runtime_success(cudaGetLastError());
 }
 
@@ -54,7 +118,7 @@ inline void parallel_for_index(_ExecutionPolicy policy, pointi<_Rank> ext, _Fun 
 	auto stride = matazure::get_stride(ext);
 	auto max_size = index2offset((ext - 1), stride, first_major_t{}) + 1; //要包含最后一个元素
 
-	parallel_for_index(policy, 0, max_size, [=] MATAZURE_DEVICE (int_t i) {
+	parallel_for_index(policy, 0, max_size, [=] MATAZURE_DEVICE(int_t i) {
 		fun(offset2index(i, stride, first_major_t{}));
 	});
 }
@@ -91,16 +155,21 @@ public:
 
 template <int_t _BlockSize, typename _Fun>
 inline void block_for_index(int_t grid_size, _Fun fun) {
-	kenel<<< grid_size, _BlockSize >>>(fun);
+	kenel <<< grid_size, _BlockSize >>> (fun);
 }
+
+//template <typename _Ext, typename _Fun>
+//inline void block_for_index(pointi<_Ext::size()>, _Fun fun){
+//	kenel<<<dim3()
+//}
 
 template <int_t _S0, int_t _S1, typename _Fun>
 inline void block_for_index(pointi<2> grid_ext, _Fun fun) {
-	kenel <<< dim3(grid_ext[0], grid_ext[1], 1), dim3(_S0, _S1, 1) >>> ([=] MATAZURE_DEVICE() {
-	 pointi<2> local = { static_cast<int_t>(threadIdx.x), static_cast<int_t>(threadIdx.y) };
-	 pointi<2> block = { static_cast<int_t>(blockIdx.x), static_cast<int_t>(blockIdx.y) };
-	 pointi<2> block_ext = { _S0, _S1 };
-	 pointi<2> global = block * block_ext + local;
+	kenel <<< internal::pointi_to_dim3(grid_ext), dim3(_S0, _S1, 1) >>> ([=] MATAZURE_DEVICE() {
+		pointi<2> local = internal::uint3_to_pointi<2>(threadIdx);
+		pointi<2> block = { static_cast<int_t>(blockIdx.x), static_cast<int_t>(blockIdx.y) };
+		pointi<2> block_ext = { _S0, _S1 };
+		pointi<2> global = block * block_ext + local;
 		block_index<_S0, _S1> block_idx(grid_ext, local, block, global);
 		fun(block_idx);
 	});
@@ -110,11 +179,11 @@ inline void block_for_index(pointi<2> grid_ext, _Fun fun) {
 
 template <int_t _S0, int_t _S1, int_t _S2, typename _Fun>
 inline void block_for_index(pointi<3> grid_ext, _Fun fun) {
-	kenel << < dim3(grid_ext[0], grid_ext[1], grid_ext[2]), dim3(_S0, _S1, _S2) >> > ([=] MATAZURE_DEVICE() {
-	 pointi<3> local = { static_cast<int_t>(threadIdx.x), static_cast<int_t>(threadIdx.y), static_cast<int_t>(threadIdx.z) };
-	 pointi<3> block = { static_cast<int_t>(blockIdx.x), static_cast<int_t>(blockIdx.y), static_cast<int_t>(blockIdx.z) };
-	 pointi<3> block_ext = { _S0, _S1, _S2 };
-	 pointi<3> global = block * block_ext + local;
+	kenel <<< dim3(grid_ext[0], grid_ext[1], grid_ext[2]), dim3(_S0, _S1, _S2) >>> ([=] MATAZURE_DEVICE() {
+		pointi<3> local = { static_cast<int_t>(threadIdx.x), static_cast<int_t>(threadIdx.y), static_cast<int_t>(threadIdx.z) };
+		pointi<3> block = { static_cast<int_t>(blockIdx.x), static_cast<int_t>(blockIdx.y), static_cast<int_t>(blockIdx.z) };
+		pointi<3> block_ext = { _S0, _S1, _S2 };
+		pointi<3> global = block * block_ext + local;
 		block_index<_S0, _S1, _S2> block_idx(grid_ext, local, block, global);
 		fun(block_idx);
 	});
@@ -122,7 +191,7 @@ inline void block_for_index(pointi<3> grid_ext, _Fun fun) {
 
 template <typename _Tensor, typename _Fun>
 inline void for_each(_Tensor ts, _Fun fun, enable_if_t<are_device_memory<_Tensor>::value && are_linear_access<_Tensor>::value>* = 0) {
-	parallel_for_index(0, ts.size(), [=] MATAZURE_DEVICE (int_t i) {
+	parallel_for_index(0, ts.size(), [=] MATAZURE_DEVICE(int_t i) {
 		fun(ts[i]);
 	});
 }
@@ -136,21 +205,21 @@ inline void for_each(_Tensor ts, _Fun fun, enable_if_t<are_device_memory<_Tensor
 
 template <typename _Tensor>
 inline void fill(_Tensor ts, typename _Tensor::value_type v, enable_if_t<are_device_memory<_Tensor>::value>* = 0) {
-	for_each(ts, [v] MATAZURE_DEVICE (typename _Tensor::value_type &element) {
+	for_each(ts, [v] MATAZURE_DEVICE(typename _Tensor::value_type &element) {
 		element = v;
 	});
 }
 
 template <typename _T1, typename _T2>
 void copy(_T1 lhs, _T2 rhs, enable_if_t<are_linear_access<_T1, _T2>::value && are_device_memory<_T1, _T2>::value>* = 0) {
-	parallel_for_index(0, lhs.size(), [=] MATAZURE_DEVICE (int_t i) {
+	parallel_for_index(0, lhs.size(), [=] MATAZURE_DEVICE(int_t i) {
 		rhs[i] = lhs[i];
 	});
 }
 
 template <typename _T1, typename _T2>
 void copy(_T1 lhs, _T2 rhs, enable_if_t<!are_linear_access<_T1, _T2>::value && are_device_memory<_T1, _T2>::value>* = 0) {
-	parallel_for_index(lhs.shape(), [=] MATAZURE_DEVICE (pointi<_T1::rank> idx) {
+	parallel_for_index(lhs.shape(), [=] MATAZURE_DEVICE(pointi<_T1::rank> idx) {
 		rhs(idx) = lhs(idx);
 	});
 }
