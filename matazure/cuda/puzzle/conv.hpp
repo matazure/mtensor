@@ -39,7 +39,7 @@ public:																										\
 	MATAZURE_GENERAL typename _Tensor::value_type operator()(const pointi<_Tensor::rank> &idx) const {		\
 		auto mask_radius = mask.shape() / 2;																\
 		auto sum = zero<typename _Tensor::value_type>::value();												\
-		cuda::for_index(mask.shape(), [&] (const pointi<2> &mask_idx) {									\
+		cuda::for_index(mask.shape(), [&] (const pointi<2> &mask_idx) {										\
 			sum += ts_(idx + mask_idx - mask_radius) * mask(mask_idx);										\
 		});																									\
 		return sum;																							\
@@ -50,7 +50,7 @@ public:																										\
 																											\
 template <typename _Tensor>																					\
 inline auto conv_global(_Tensor ts)																			\
-->decltype(make_lambda(ts.shape(), _internal::conv_op<_Tensor>(ts), typename _Tensor::memory_type{})) {	\
+->decltype(make_lambda(ts.shape(), _internal::conv_op<_Tensor>(ts), typename _Tensor::memory_type{})) {		\
 	return make_lambda(ts.shape(), _internal::conv_op<_Tensor>(ts), typename _Tensor::memory_type{});		\
 }																											\
 																											\
@@ -68,13 +68,13 @@ inline tensor<typename _Tensor::value_type, _Tensor::rank> conv_block(_Tensor ts
 	constexpr pointi<2> block_ext{ _Block0, _Block1 };															\
 	pointi<2> grid_ext = ts.shape() / block_ext;																\
 	MATAZURE_ASSERT(equal(grid_ext * block_ext, ts.shape()));													\
-	MATAZURE_ASSERT(equal(ts.shape(), ts_re.shape()));														\
+	MATAZURE_ASSERT(equal(ts.shape(), ts_re.shape()));															\
 																												\
 	auto mask_extent = mask.shape();																			\
 	auto mask_radius = mask_extent / 2;																			\
 																												\
 	block_for_index<_Block0, _Block1>(grid_ext, [=] MATAZURE_DEVICE(block_index<_Block0, _Block1> block_idx) {	\
-		__shared__ static_tensor<value_type,dim< _Block0 + 3,  _Block1 + 3>> shared_ts_block;			\
+		__shared__ static_tensor<value_type,dim< _Block0 + 3,  _Block1 + 3>> shared_ts_block;					\
 																												\
 		shared_ts_block(block_idx.local) = ts(block_idx.global + pointi<2>{-1, -1});							\
 		shared_ts_block(block_idx.local + pointi<2>{2, 0}) = ts(block_idx.global + pointi<2>{1, -1});			\
@@ -114,13 +114,13 @@ inline tensor<typename _Tensor::value_type, _Tensor::rank> conv_block_crack(_Ten
 	constexpr pointi<2> block_ext{ _Block0, _Block1 };															\
 	pointi<2> grid_ext = ts.shape() / block_ext;																\
 	MATAZURE_ASSERT(equal(grid_ext * block_ext, ts.shape()));													\
-	MATAZURE_ASSERT(equal(ts.shape(), ts_re.shape()));														\
+	MATAZURE_ASSERT(equal(ts.shape(), ts_re.shape()));															\
 																												\
 	auto mask_extent = mask.shape();																			\
 	auto mask_radius = mask_extent / 2;																			\
 																												\
 	block_for_index<_Block0, _Block1>(grid_ext, [=] __device__ (block_index<_Block0, _Block1> block_idx) {		\
-		__shared__ static_tensor<value_type,dim< _Block0,  _Block1>> shared_ts_block;					\
+		__shared__ static_tensor<value_type,dim< _Block0,  _Block1>> shared_ts_block;							\
 		shared_ts_block(block_idx.local) = ts(block_idx.global);												\
 		device::barrier();																						\
 																												\

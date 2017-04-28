@@ -1,7 +1,7 @@
 ﻿
-template <typename _ValueType, int_t _Dim>
-inline MATAZURE_GENERAL bool outside(point<_ValueType, _Dim> input, point<_ValueType, _Dim> halo, point<_ValueType, _Dim> extent) {
-	for (int_t i = 0; i < _Dim; ++i) {
+template <typename _ValueType, int_t _Rank>
+inline MATAZURE_GENERAL bool outside(point<_ValueType, _Rank> input, point<_ValueType, _Rank> halo, point<_ValueType, _Rank> extent) {
+	for (int_t i = 0; i < _Rank; ++i) {
 		if (input[i] < halo[i] || input[i] >= extent[i] - halo[i])
 			return false;
 	}

@@ -12,20 +12,20 @@ namespace matazure {
 template <int_t... _Values>
 using dim = meta::array<_Values ...>;
 
-template <int_t _Dim>
-inline MATAZURE_GENERAL typename pointi<_Dim>::value_type index2offset(const pointi<_Dim> &id, const pointi<_Dim> &stride, first_major_t) {
-	typename pointi<_Dim>::value_type offset = id[0];
-	for (int_t i = 1; i < _Dim; ++i) {
+template <int_t _Rank>
+inline MATAZURE_GENERAL typename pointi<_Rank>::value_type index2offset(const pointi<_Rank> &id, const pointi<_Rank> &stride, first_major_t) {
+	typename pointi<_Rank>::value_type offset = id[0];
+	for (int_t i = 1; i < _Rank; ++i) {
 		offset += id[i] * stride[i - 1];
 	}
 
 	return offset;
 };
 
-template <int_t _Dim>
-inline MATAZURE_GENERAL pointi<_Dim> offset2index(typename pointi<_Dim>::value_type offset, const pointi<_Dim> &stride, first_major_t) {
-	pointi<_Dim> id;
-	for (int_t i = _Dim - 1; i > 0; --i) {
+template <int_t _Rank>
+inline MATAZURE_GENERAL pointi<_Rank> offset2index(typename pointi<_Rank>::value_type offset, const pointi<_Rank> &stride, first_major_t) {
+	pointi<_Rank> id;
+	for (int_t i = _Rank - 1; i > 0; --i) {
 		id[i] = offset / stride[i - 1];
 		offset = offset % stride[i - 1];
 	}
@@ -34,24 +34,24 @@ inline MATAZURE_GENERAL pointi<_Dim> offset2index(typename pointi<_Dim>::value_t
 	return id;
 }
 
-template <int_t _Dim>
-inline MATAZURE_GENERAL typename pointi<_Dim>::value_type index2offset(const pointi<_Dim> &id, const pointi<_Dim> &stride, last_major_t) {
-	typename pointi<_Dim>::value_type offset = id[_Dim - 1];
-	for (int_t i = 1; i < _Dim; ++i) {
-		offset += id[_Dim - 1 - i] * stride[i - 1];
+template <int_t _Rank>
+inline MATAZURE_GENERAL typename pointi<_Rank>::value_type index2offset(const pointi<_Rank> &id, const pointi<_Rank> &stride, last_major_t) {
+	typename pointi<_Rank>::value_type offset = id[_Rank - 1];
+	for (int_t i = 1; i < _Rank; ++i) {
+		offset += id[_Rank - 1 - i] * stride[i - 1];
 	}
 
 	return offset;
 };
 
-template <int_t _Dim>
-inline MATAZURE_GENERAL pointi<_Dim> offset2index(typename pointi<_Dim>::value_type offset, const pointi<_Dim> &stride, last_major_t) {
-	pointi<_Dim> id;
-	for (int_t i = _Dim - 1; i > 0; --i) {
-		id[_Dim - 1 - i] = offset / stride[i - 1];
+template <int_t _Rank>
+inline MATAZURE_GENERAL pointi<_Rank> offset2index(typename pointi<_Rank>::value_type offset, const pointi<_Rank> &stride, last_major_t) {
+	pointi<_Rank> id;
+	for (int_t i = _Rank - 1; i > 0; --i) {
+		id[_Rank - 1 - i] = offset / stride[i - 1];
 		offset = offset % stride[i - 1];
 	}
-	id[_Dim - 1] = offset;
+	id[_Rank - 1] = offset;
 
 	return id;
 }
@@ -215,12 +215,12 @@ public:
 };
 
 
-template <typename _Type, int_t _Dim, typename _Layout = first_major_t>
-class tensor : public tensor_expression<tensor<_Type, _Dim, _Layout>> {
+template <typename _Type, int_t _Rank, typename _Layout = first_major_t>
+class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout>> {
 public:
 	static_assert(std::is_pod<_Type>::value, "only supports pod type now");
 
-	static const int_t						rank = _Dim;
+	static const int_t						rank = _Rank;
 	typedef _Type							value_type;
 
 	typedef matazure::pointi<rank>			shape_type;
@@ -278,7 +278,7 @@ public:
 	{ }
 
 	template <typename _VT>
-	explicit tensor(const tensor<_VT, _Dim, _Layout> &ts) :
+	explicit tensor(const tensor<_VT, _Rank, _Layout> &ts) :
 		extent_(ts.shape()),
 		stride_(ts.stride()),
 		sp_data_(ts.shared_data()),
@@ -288,7 +288,7 @@ public:
 	tensor(std::initializer_list<int_t> v) = delete;
 
 	template <typename _VT>
-	const tensor &operator=(const tensor<_VT, _Dim, _Layout> &ts) {
+	const tensor &operator=(const tensor<_VT, _Rank, _Layout> &ts) {
 		extent_ = ts.shape();
 		stride_ = ts.stride();
 		sp_data_ = ts.shared_data();
@@ -353,7 +353,7 @@ using matrix = tensor<_Type, 2, _Layout>;
 
 namespace detail {
 
-template <int_t _Dim, typename _Func>
+template <int_t _Rank, typename _Func>
 struct get_functor_accessor_type {
 private:
 	typedef function_traits<_Func>						functor_traits;
@@ -364,21 +364,21 @@ public:
 	typedef conditional_t<
 		is_same<int_t, _tmp_type>::value,
 		linear_access_t,
-		conditional_t<is_same<_tmp_type, pointi<_Dim>>::value, array_access_t, void>
+		conditional_t<is_same<_tmp_type, pointi<_Rank>>::value, array_access_t, void>
 	> type;
 };
 
 }
 
-template <int_t _Dim, typename _Func>
-class lambda_tensor : public tensor_expression<lambda_tensor<_Dim, _Func>> {
+template <int_t _Rank, typename _Func>
+class lambda_tensor : public tensor_expression<lambda_tensor<_Rank, _Func>> {
 	typedef function_traits<_Func>						functor_traits;
 public:
-	static const int_t										rank = _Dim;
+	static const int_t										rank = _Rank;
 	typedef typename functor_traits::result_type			value_type;
 	typedef matazure::pointi<rank>							shape_type;
 	typedef pointi<rank>										index_type;
-	typedef typename detail::get_functor_accessor_type<_Dim, _Func>::type
+	typedef typename detail::get_functor_accessor_type<_Rank, _Func>::type
 		access_type;
 	typedef host_t											memory_type;
 
@@ -445,20 +445,20 @@ inline void mem_copy(_TensorSrc ts_src, _TensorDst cts_dst, enable_if_t<are_host
 	memcpy(cts_dst.data(), ts_src.data(), sizeof(typename _TensorDst::value_type) * ts_src.size());
 }
 
-template <typename _Type, int_t _Dim, typename _Layout>
-inline tensor<_Type, _Dim, _Layout> mem_clone(tensor<_Type, _Dim, _Layout> ts, host_t) {
-	tensor<_Type, _Dim, _Layout> ts_re(ts.shape());
+template <typename _Type, int_t _Rank, typename _Layout>
+inline tensor<_Type, _Rank, _Layout> mem_clone(tensor<_Type, _Rank, _Layout> ts, host_t) {
+	tensor<_Type, _Rank, _Layout> ts_re(ts.shape());
 	mem_copy(ts, ts_re);
 	return ts_re;
 }
 
-template <typename _Type, int_t _Dim, typename _Layout>
-inline auto mem_clone(tensor<_Type, _Dim, _Layout> ts)->decltype(mem_clone(ts, host_t{})) {
+template <typename _Type, int_t _Rank, typename _Layout>
+inline auto mem_clone(tensor<_Type, _Rank, _Layout> ts)->decltype(mem_clone(ts, host_t{})) {
 	return mem_clone(ts, host_t{});
 }
 
-template <typename _ValueType, int_t _Dim, typename _Layout, int_t _OutDim, typename _OutLayout = _Layout>
-inline auto reshape(tensor<_ValueType, _Dim, _Layout> ts, pointi<_OutDim> ext, _OutLayout* = nullptr)->tensor<_ValueType, _OutDim, _OutLayout> {
+template <typename _ValueType, int_t _Rank, typename _Layout, int_t _OutDim, typename _OutLayout = _Layout>
+inline auto reshape(tensor<_ValueType, _Rank, _Layout> ts, pointi<_OutDim> ext, _OutLayout* = nullptr)->tensor<_ValueType, _OutDim, _OutLayout> {
 	tensor<_ValueType, _OutDim, _OutLayout> re(ext, ts.shared_data());
 	MATAZURE_ASSERT_MSG(re.size() == ts.size(), "the size of tensors are not equal");
 	return re;

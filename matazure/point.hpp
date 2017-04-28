@@ -4,10 +4,10 @@
 
 namespace matazure {
 
-template <typename _Type, int_t _Dim>
+template <typename _Type, int_t _Rank>
 class point {
 public:
-	static const int_t				rank = _Dim;
+	static const int_t				rank = _Rank;
 	typedef _Type					value_type;
 	typedef value_type &			reference;
 	typedef const value_type &		const_reference;
@@ -31,30 +31,30 @@ public:
 static_assert(std::is_pod<point<byte, 1>>::value, "point should be pod");
 
 #define POINT_BINARY_OPERATOR(op) \
-template <typename _T, int_t _Dim> \
-inline MATAZURE_GENERAL auto operator op(const point<_T, _Dim> &lhs, const point<_T, _Dim> &rhs)->point<decltype(lhs[0] op rhs[0]), _Dim> { \
-	point<decltype(lhs[0] op rhs[0]), _Dim> re; \
-	for (int_t i = 0; i < _Dim; ++i) { \
+template <typename _T, int_t _Rank> \
+inline MATAZURE_GENERAL auto operator op(const point<_T, _Rank> &lhs, const point<_T, _Rank> &rhs)->point<decltype(lhs[0] op rhs[0]), _Rank> { \
+	point<decltype(lhs[0] op rhs[0]), _Rank> re; \
+	for (int_t i = 0; i < _Rank; ++i) { \
 		re[i] = lhs[i] op rhs[i]; \
 	} \
 	return re; \
 }
 
 #define POINT_WITH_VALUE_BINARY_OPERATOR(op) \
-template <typename _T, int_t _Dim>  \
-inline MATAZURE_GENERAL auto operator op(const point<_T, _Dim> &container, typename point<_T, _Dim>::value_type value)->point<decltype(container[0] op value), _Dim> { \
-	point<decltype(container[0] op value), _Dim> re; \
-	for (int_t i = 0; i < _Dim; ++i) { \
+template <typename _T, int_t _Rank>  \
+inline MATAZURE_GENERAL auto operator op(const point<_T, _Rank> &container, typename point<_T, _Rank>::value_type value)->point<decltype(container[0] op value), _Rank> { \
+	point<decltype(container[0] op value), _Rank> re; \
+	for (int_t i = 0; i < _Rank; ++i) { \
 		re[i] = container[i] op value; \
 	} \
 \
 return re; \
 }\
 \
-template <typename _T, int_t _Dim>  \
-inline MATAZURE_GENERAL auto operator op(typename point<_T, _Dim>::value_type value, const point<_T, _Dim> &container)->point<decltype(value op container[0]), _Dim> { \
-	point<decltype(value op container[0]), _Dim> re; \
-	for (int_t i = 0; i < _Dim; ++i) { \
+template <typename _T, int_t _Rank>  \
+inline MATAZURE_GENERAL auto operator op(typename point<_T, _Rank>::value_type value, const point<_T, _Rank> &container)->point<decltype(value op container[0]), _Rank> { \
+	point<decltype(value op container[0]), _Rank> re; \
+	for (int_t i = 0; i < _Rank; ++i) { \
 		re[i] = container[i] op value; \
 	} \
 \
@@ -102,92 +102,92 @@ POINT_WITH_VALUE_BINARY_OPERATOR(<=)
 POINT_WITH_VALUE_BINARY_OPERATOR(==)
 POINT_WITH_VALUE_BINARY_OPERATOR(!=)
 
-template <typename _T, int_t _Dim>
-MATAZURE_GENERAL point<_T, _Dim> operator+(const point<_T, _Dim> &p) {
-	point<_T, _Dim> temp;
-	for (int_t i = 0; i < _Dim; ++i) {
+template <typename _T, int_t _Rank>
+MATAZURE_GENERAL point<_T, _Rank> operator+(const point<_T, _Rank> &p) {
+	point<_T, _Rank> temp;
+	for (int_t i = 0; i < _Rank; ++i) {
 		temp[i] = +p[i];
 	}
 
 	return temp;
 }
 
-template <typename _T, int_t _Dim>
-MATAZURE_GENERAL point<_T, _Dim> operator-(const point<_T, _Dim> &p) {
-	point<_T, _Dim> temp;
-	for (int_t i = 0; i < _Dim; ++i) {
+template <typename _T, int_t _Rank>
+MATAZURE_GENERAL point<_T, _Rank> operator-(const point<_T, _Rank> &p) {
+	point<_T, _Rank> temp;
+	for (int_t i = 0; i < _Rank; ++i) {
 		temp[i] = -p[i];
 	}
 
 	return temp;
 }
 
-template <typename _T, int_t _Dim>
-MATAZURE_GENERAL point<_T, _Dim>& operator++(point<_T, _Dim> &p) {
-	for (int_t i = 0; i < _Dim; ++i) {
+template <typename _T, int_t _Rank>
+MATAZURE_GENERAL point<_T, _Rank>& operator++(point<_T, _Rank> &p) {
+	for (int_t i = 0; i < _Rank; ++i) {
 		++p[i];
 	}
 
 	return p;
 }
 
-template <typename _T, int_t _Dim>
-MATAZURE_GENERAL point<_T, _Dim>& operator--(point<_T, _Dim> &p) {
-	for (int_t i = 0; i < _Dim; ++i) {
+template <typename _T, int_t _Rank>
+MATAZURE_GENERAL point<_T, _Rank>& operator--(point<_T, _Rank> &p) {
+	for (int_t i = 0; i < _Rank; ++i) {
 		--p[i];
 	}
 
 	return p;
 }
 
-template <typename _DstType, typename _T, int_t _Dim>
-MATAZURE_GENERAL point<_DstType, _Dim> point_cast(const point<_T, _Dim> &p) {
-	point<_DstType, _Dim> re;
-	for (int_t i = 0; i < _Dim; ++i) {
+template <typename _DstType, typename _T, int_t _Rank>
+MATAZURE_GENERAL point<_DstType, _Rank> point_cast(const point<_T, _Rank> &p) {
+	point<_DstType, _Rank> re;
+	for (int_t i = 0; i < _Rank; ++i) {
 		re[i] = static_cast<_DstType>(p[i]);
 	}
 
 	return re;
 }
 
-template<int_t _Idx, class _Ty, int_t _Dim>
-MATAZURE_GENERAL constexpr _Ty& get(point<_Ty, _Dim>& pt) {
+template<int_t _Idx, class _Ty, int_t _Rank>
+MATAZURE_GENERAL constexpr _Ty& get(point<_Ty, _Rank>& pt) {
 	// return element at _Idx in point pt
-	static_assert(_Idx < _Dim, "point index out of bounds");
+	static_assert(_Idx < _Rank, "point index out of bounds");
 	return (pt.elements_[_Idx]);
 }
 
-template<int_t _Idx, class _Ty, int_t _Dim>
-MATAZURE_GENERAL constexpr const _Ty& get(const point<_Ty, _Dim>& pt){
+template<int_t _Idx, class _Ty, int_t _Rank>
+MATAZURE_GENERAL constexpr const _Ty& get(const point<_Ty, _Rank>& pt){
 	// return element at _Idx in point pt
-	static_assert(_Idx < _Dim, "point index out of bounds");
+	static_assert(_Idx < _Rank, "point index out of bounds");
 	return (pt.elements_[_Idx]);
 }
 
-template<int_t _Idx, class _Ty, int_t _Dim>
-MATAZURE_GENERAL constexpr _Ty&& get(point<_Ty, _Dim>&& pt) {
+template<int_t _Idx, class _Ty, int_t _Rank>
+MATAZURE_GENERAL constexpr _Ty&& get(point<_Ty, _Rank>&& pt) {
 	// return element at _Idx in point pt
-	static_assert(_Idx < _Dim, "point index out of bounds");
+	static_assert(_Idx < _Rank, "point index out of bounds");
 	return (move(pt.elements_[_Idx]));
 }
 
-template <int_t _Dim> using pointb = point<byte, _Dim>;
-template <int_t _Dim> using points = point<short, _Dim>;
-template <int_t _Dim> using pointi = point<int_t, _Dim>;
-template <int_t _Dim> using pointf = point<float, _Dim>;
+template <int_t _Rank> using pointb = point<byte, _Rank>;
+template <int_t _Rank> using points = point<short, _Rank>;
+template <int_t _Rank> using pointi = point<int_t, _Rank>;
+template <int_t _Rank> using pointf = point<float, _Rank>;
 
-template <typename _T, int_t _Dim>
-struct zero<point<_T, _Dim>>{
-	static constexpr point<_T, _Dim> value(){
+template <typename _T, int_t _Rank>
+struct zero<point<_T, _Rank>>{
+	static constexpr point<_T, _Rank> value(){
 		return {0};
 	};
 };
 
-template <int_t _Dim>
-inline MATAZURE_GENERAL pointi<_Dim> get_stride(pointi<_Dim> ex) {
-	pointi<_Dim>  stride;
+template <int_t _Rank>
+inline MATAZURE_GENERAL pointi<_Rank> get_stride(pointi<_Rank> ex) {
+	pointi<_Rank>  stride;
 	stride[0] = ex[0];
-	for (int_t i = 1; i < _Dim; ++i) {
+	for (int_t i = 1; i < _Rank; ++i) {
 		stride[i] = ex[i] * stride[i - 1];
 	}
 	return stride;

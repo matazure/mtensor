@@ -13,61 +13,61 @@ namespace matazure {
 
 #ifndef MATAZURE_CUDA
 
-template <int_t _Dim, typename _Func>
-inline auto make_lambda(pointi<_Dim> extent, _Func fun)->lambda_tensor<_Dim, _Func>{
-	return lambda_tensor<_Dim, _Func>(extent, fun);
+template <int_t _Rank, typename _Func>
+inline auto make_lambda(pointi<_Rank> extent, _Func fun)->lambda_tensor<_Rank, _Func>{
+	return lambda_tensor<_Rank, _Func>(extent, fun);
 }
 
-template <int_t _Dim, typename _Func>
-inline auto make_lambda(pointi<_Dim> extent, _Func fun, host_t)->lambda_tensor<_Dim, _Func>{
-	return lambda_tensor<_Dim, _Func>(extent, fun);
+template <int_t _Rank, typename _Func>
+inline auto make_lambda(pointi<_Rank> extent, _Func fun, host_t)->lambda_tensor<_Rank, _Func>{
+	return lambda_tensor<_Rank, _Func>(extent, fun);
 }
 
 #else
 
-template <int_t _Dim, typename _Func>
-inline auto make_host_lambda(pointi<_Dim> extent, _Func fun)->lambda_tensor<_Dim, _Func>{
-	return lambda_tensor<_Dim, _Func>(extent, fun);
+template <int_t _Rank, typename _Func>
+inline auto make_host_lambda(pointi<_Rank> extent, _Func fun)->lambda_tensor<_Rank, _Func>{
+	return lambda_tensor<_Rank, _Func>(extent, fun);
 }
 
-template <int_t _Dim, typename _Func>
-inline auto make_lambda(pointi<_Dim> ext, _Func fun, enable_if_t<!MATAZURE_IS_D_LAMBDA(_Func) && !MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)->decltype(make_host_lambda(ext, fun)){
+template <int_t _Rank, typename _Func>
+inline auto make_lambda(pointi<_Rank> ext, _Func fun, enable_if_t<!MATAZURE_IS_D_LAMBDA(_Func) && !MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)->decltype(make_host_lambda(ext, fun)){
 	return make_host_lambda(ext, fun);
 }
 
-template <int_t _Dim, typename _Func>
-inline auto make_lambda(pointi<_Dim> ext, _Func fun, host_t, enable_if_t<!MATAZURE_IS_D_LAMBDA(_Func) && !MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)->decltype(make_host_lambda(ext, fun)) {
+template <int_t _Rank, typename _Func>
+inline auto make_lambda(pointi<_Rank> ext, _Func fun, host_t, enable_if_t<!MATAZURE_IS_D_LAMBDA(_Func) && !MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)->decltype(make_host_lambda(ext, fun)) {
 	return make_host_lambda(ext, fun);
 }
 
 ///TODO: not support device struct operator
-template <int_t _Dim, typename _Func>
-inline auto make_lambda(pointi<_Dim> ext, _Func fun, device_t, enable_if_t<!MATAZURE_IS_D_LAMBDA(_Func) && !MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)->decltype(cuda::make_general_lambda(ext, fun)) {
+template <int_t _Rank, typename _Func>
+inline auto make_lambda(pointi<_Rank> ext, _Func fun, device_t, enable_if_t<!MATAZURE_IS_D_LAMBDA(_Func) && !MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)->decltype(cuda::make_general_lambda(ext, fun)) {
 	return cuda::make_general_lambda(ext, fun);
 }
 
-template <int_t _Dim, typename _Func>
-inline auto make_lambda(pointi<_Dim> ext, _Func fun, enable_if_t<MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)->decltype(cuda::make_general_lambda(ext, fun)) {
+template <int_t _Rank, typename _Func>
+inline auto make_lambda(pointi<_Rank> ext, _Func fun, enable_if_t<MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)->decltype(cuda::make_general_lambda(ext, fun)) {
 	return cuda::make_general_lambda(ext, fun);
 }
 
-template <int_t _Dim, typename _Func>
-inline auto make_lambda(pointi<_Dim> ext, _Func fun, device_t, enable_if_t<MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)->decltype(cuda::make_general_lambda(ext, fun)) {
+template <int_t _Rank, typename _Func>
+inline auto make_lambda(pointi<_Rank> ext, _Func fun, device_t, enable_if_t<MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)->decltype(cuda::make_general_lambda(ext, fun)) {
 	return cuda::make_general_lambda(ext, fun);
 }
 
-template <int_t _Dim, typename _Func>
-inline auto make_lambda(pointi<_Dim> ext, _Func fun, host_t, enable_if_t<MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)->decltype(make_host_lambda(ext, fun)) {
+template <int_t _Rank, typename _Func>
+inline auto make_lambda(pointi<_Rank> ext, _Func fun, host_t, enable_if_t<MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)->decltype(make_host_lambda(ext, fun)) {
 	return make_host_lambda(ext, fun);
 }
 
-template <typename _ValueType, typename _Access, int_t _Dim, typename _Func>
-inline auto make_lambda(pointi<_Dim> ext, _Func fun, enable_if_t<MATAZURE_IS_D_LAMBDA(_Func)>* = nullptr)->decltype(cuda::make_device_lambda<_ValueType, _Access>(ext, fun)) {
+template <typename _ValueType, typename _Access, int_t _Rank, typename _Func>
+inline auto make_lambda(pointi<_Rank> ext, _Func fun, enable_if_t<MATAZURE_IS_D_LAMBDA(_Func)>* = nullptr)->decltype(cuda::make_device_lambda<_ValueType, _Access>(ext, fun)) {
 	return cuda::make_device_lambda<_ValueType, _Access>(ext, fun);
 }
 
-template <typename _ValueType, typename _Access, int_t _Dim, typename _Func>
-inline auto make_lambda(pointi<_Dim> ext, _Func fun, device_t, enable_if_t<MATAZURE_IS_D_LAMBDA(_Func)>* = nullptr)->decltype(cuda::make_device_lambda<_ValueType, _Access>(ext, fun)) {
+template <typename _ValueType, typename _Access, int_t _Rank, typename _Func>
+inline auto make_lambda(pointi<_Rank> ext, _Func fun, device_t, enable_if_t<MATAZURE_IS_D_LAMBDA(_Func)>* = nullptr)->decltype(cuda::make_device_lambda<_ValueType, _Access>(ext, fun)) {
 	return cuda::make_device_lambda<_ValueType, _Access>(ext, fun);
 }
 
@@ -139,10 +139,10 @@ struct cast_op {
 	}
 };
 
-template <typename _OutPointValueType, int_t _Dim>
-struct cast_op<point<_OutPointValueType, _Dim>>{
+template <typename _OutPointValueType, int_t _Rank>
+struct cast_op<point<_OutPointValueType, _Rank>>{
 	template <typename _InPointValueType>
-	MATAZURE_GENERAL point<_OutPointValueType, _Dim> operator() (const point<_InPointValueType, _Dim> &p) const {
+	MATAZURE_GENERAL point<_OutPointValueType, _Rank> operator() (const point<_InPointValueType, _Rank> &p) const {
 		return point_cast<_OutPointValueType>(p);
 	}
 };
@@ -419,21 +419,21 @@ inline auto slice(_Tensor ts, int_t i)->decltype(make_lambda(_internal::slice_po
 	return make_lambda(_internal::slice_point<_DimIdx>(ts.shape()), _internal::slice_op<_Tensor, _DimIdx>(ts, i), typename _Tensor::memory_type{});
 }
 
-template <int_t _DimIdx, typename _T, int_t _Dim, typename _Layout>
-inline auto slice(tensor<_T, _Dim, _Layout> ts, int_t i, enable_if_t<_DimIdx == _Dim-1>* = nullptr)->tensor<_T, _Dim-1, _Layout>{
+template <int_t _DimIdx, typename _T, int_t _Rank, typename _Layout>
+inline auto slice(tensor<_T, _Rank, _Layout> ts, int_t i, enable_if_t<_DimIdx == _Rank-1>* = nullptr)->tensor<_T, _Rank-1, _Layout>{
 	auto slice_ext = _internal::slice_point<_DimIdx>(ts.shape());
 	auto slice_size = prod(slice_ext);
-	tensor<_T, _Dim-1, _Layout> ts_re(slice_ext, shared_ptr<_T>(ts.shared_data().get() + i * slice_size, [ts](_T *){ }));
+	tensor<_T, _Rank-1, _Layout> ts_re(slice_ext, shared_ptr<_T>(ts.shared_data().get() + i * slice_size, [ts](_T *){ }));
 	return ts_re;
 }
 
 #ifdef MATAZURE_CUDA
 
-template <int_t _DimIdx, typename _T, int_t _Dim, typename _Layout>
-inline auto slice(cu_tensor<_T, _Dim, _Layout> ts, int_t i, enable_if_t<_DimIdx == _Dim-1>* = nullptr)->cu_tensor<_T, _Dim-1, _Layout>{
+template <int_t _DimIdx, typename _T, int_t _Rank, typename _Layout>
+inline auto slice(cu_tensor<_T, _Rank, _Layout> ts, int_t i, enable_if_t<_DimIdx == _Rank-1>* = nullptr)->cu_tensor<_T, _Rank-1, _Layout>{
 	auto slice_ext = _internal::slice_point<_DimIdx>(ts.shape());
 	auto slice_size = prod(slice_ext);
-	cu_tensor<_T, _Dim-1, _Layout> ts_re(slice_ext, shared_ptr<_T>(ts.shared_data().get() + i * slice_size, [ts](_T *){ }));
+	cu_tensor<_T, _Rank-1, _Layout> ts_re(slice_ext, shared_ptr<_T>(ts.shared_data().get() + i * slice_size, [ts](_T *){ }));
 	return ts_re;
 }
 

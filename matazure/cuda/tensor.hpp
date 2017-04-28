@@ -8,12 +8,12 @@
 namespace matazure {
 namespace cuda {
 
-template <typename _Type, int_t _Dim, typename _Layout = first_major_t>
-class tensor : public tensor_expression<tensor<_Type, _Dim, first_major_t>> {
+template <typename _Type, int_t _Rank, typename _Layout = first_major_t>
+class tensor : public tensor_expression<tensor<_Type, _Rank, first_major_t>> {
 public:
 	static_assert(std::is_pod<_Type>::value, "only supports pod type now");
 
-	static const int_t						rank = _Dim;
+	static const int_t						rank = _Rank;
 	typedef _Type							value_type;
 	typedef value_type &					reference;
 	typedef value_type *					pointer;
@@ -49,7 +49,7 @@ public:
 	{ }
 
 	template <typename _VT>
-	tensor(const tensor<_VT, _Dim, _Layout> &ts) :
+	tensor(const tensor<_VT, _Rank, _Layout> &ts) :
 		extent_(ts.shape()),
 		stride_(ts.stride()),
 		sp_data_(ts.shared_data()),
@@ -112,10 +112,10 @@ inline void copy_symbol(_TensorSrc src, _TensorSymbol &symbol_dst) {
 	assert_runtime_success(cudaMemcpyToSymbol(symbol_dst, src.data(), src.size() * sizeof(typename _TensorSrc::value_type)));
 }
 
-template <typename _ValueType, typename _AccessMode, int_t _Dim, typename _Func>
+template <typename _ValueType, typename _AccessMode, int_t _Rank, typename _Func>
 class device_lambda_tensor {
 public:
-	static const int_t									rank = _Dim;
+	static const int_t									rank = _Rank;
 	typedef _ValueType									value_type;
 	typedef pointi<rank>									shape_type;
 	typedef pointi<rank>									index_type;
@@ -189,15 +189,15 @@ private:
 	const _Func fun_;
 };
 
-template <int_t _Dim, typename _Func>
-class general_lambda_tensor : public tensor_expression<general_lambda_tensor<_Dim, _Func>> {
+template <int_t _Rank, typename _Func>
+class general_lambda_tensor : public tensor_expression<general_lambda_tensor<_Rank, _Func>> {
 	typedef function_traits<_Func>						functor_traits;
 public:
-	static const int_t										rank = _Dim;
+	static const int_t										rank = _Rank;
 	typedef typename functor_traits::result_type			value_type;
 	typedef matazure::pointi<rank>							shape_type;
 	typedef pointi<rank>										index_type;
-	typedef typename detail::get_functor_accessor_type<_Dim, _Func>::type		access_type;
+	typedef typename detail::get_functor_accessor_type<_Rank, _Func>::type		access_type;
 	typedef device_t										memory_type;
 
 
@@ -257,22 +257,22 @@ private:
 	const _Func fun_;
 };
 
-template <typename _ValueType, typename _AccessMode, int_t _Dim, typename _Func>
-inline auto make_device_lambda(pointi<_Dim> extent, _Func fun)->cuda::device_lambda_tensor<_ValueType, _AccessMode, _Dim, _Func>{
-	return cuda::device_lambda_tensor<_ValueType, _AccessMode, _Dim, _Func>(extent, fun);
+template <typename _ValueType, typename _AccessMode, int_t _Rank, typename _Func>
+inline auto make_device_lambda(pointi<_Rank> extent, _Func fun)->cuda::device_lambda_tensor<_ValueType, _AccessMode, _Rank, _Func>{
+	return cuda::device_lambda_tensor<_ValueType, _AccessMode, _Rank, _Func>(extent, fun);
 }
 
-template <int_t _Dim, typename _Func>
-inline auto make_general_lambda(pointi<_Dim> extent, _Func fun)->general_lambda_tensor<_Dim, _Func>{
-	return general_lambda_tensor<_Dim, _Func>(extent, fun);
+template <int_t _Rank, typename _Func>
+inline auto make_general_lambda(pointi<_Rank> extent, _Func fun)->general_lambda_tensor<_Rank, _Func>{
+	return general_lambda_tensor<_Rank, _Func>(extent, fun);
 }
 
 inline void barrier() {
 	assert_runtime_success(cudaDeviceSynchronize());
 }
 
-template <typename _ValueType, int_t _Dim>
-inline void memset(tensor<_ValueType, _Dim> ts, int v) {
+template <typename _ValueType, int_t _Rank>
+inline void memset(tensor<_ValueType, _Rank> ts, int v) {
 	assert_runtime_success(cudaMemset(ts.shared_data().get(), v, ts.size() * sizeof(_ValueType)));
 }
 
@@ -284,28 +284,28 @@ inline void MATAZURE_DEVICE barrier() {
 
 } //device
 
-template <typename _Type, int_t _Dim, typename _Layout>
-inline tensor<_Type, _Dim, _Layout> mem_clone(tensor<_Type, _Dim, _Layout> ts, device_t) {
-	tensor<_Type, _Dim, _Layout> ts_re(ts.shape());
+template <typename _Type, int_t _Rank, typename _Layout>
+inline tensor<_Type, _Rank, _Layout> mem_clone(tensor<_Type, _Rank, _Layout> ts, device_t) {
+	tensor<_Type, _Rank, _Layout> ts_re(ts.shape());
 	mem_copy(ts, ts_re);
 	return ts_re;
 }
 
-template <typename _Type, int_t _Dim, typename _Layout>
-inline tensor<_Type, _Dim, _Layout> mem_clone(tensor<_Type, _Dim, _Layout> ts) {
+template <typename _Type, int_t _Rank, typename _Layout>
+inline tensor<_Type, _Rank, _Layout> mem_clone(tensor<_Type, _Rank, _Layout> ts) {
 	return mem_clone(ts, device_t{});
 }
 
-template <typename _Type, int_t _Dim, typename _Layout>
-inline tensor<_Type, _Dim, _Layout> mem_clone(matazure::tensor<_Type, _Dim, _Layout> ts, device_t) {
-	tensor<_Type, _Dim, _Layout> ts_re(ts.shape());
+template <typename _Type, int_t _Rank, typename _Layout>
+inline tensor<_Type, _Rank, _Layout> mem_clone(matazure::tensor<_Type, _Rank, _Layout> ts, device_t) {
+	tensor<_Type, _Rank, _Layout> ts_re(ts.shape());
 	mem_copy(ts, ts_re);
 	return ts_re;
 }
 
-template <typename _Type, int_t _Dim, typename _Layout>
-inline matazure::tensor<_Type, _Dim, _Layout> mem_clone(tensor<_Type, _Dim, _Layout> ts, host_t) {
-	matazure::tensor<_Type, _Dim, _Layout> ts_re(ts.shape());
+template <typename _Type, int_t _Rank, typename _Layout>
+inline matazure::tensor<_Type, _Rank, _Layout> mem_clone(tensor<_Type, _Rank, _Layout> ts, host_t) {
+	matazure::tensor<_Type, _Rank, _Layout> ts_re(ts.shape());
 	mem_copy(ts, ts_re);
 	return ts_re;
 }
@@ -314,8 +314,8 @@ inline matazure::tensor<_Type, _Dim, _Layout> mem_clone(tensor<_Type, _Dim, _Lay
 
 
 // alias in matazure
-template <typename _ValueType, int_t _Dim, typename _Layout = first_major_t>
-using cu_tensor = cuda::tensor<_ValueType, _Dim, _Layout>;
+template <typename _ValueType, int_t _Rank, typename _Layout = first_major_t>
+using cu_tensor = cuda::tensor<_ValueType, _Rank, _Layout>;
 
 template <typename _ValueType, typename _Layout = first_major_t>
 using cu_vector = cu_tensor<_ValueType, 1, _Layout>;
@@ -326,8 +326,8 @@ using cu_matrix = cu_tensor<_ValueType, 2, _Layout>;
 using cuda::mem_copy;
 using cuda::mem_clone;
 
-template <typename _ValueType, int_t _Dim, typename _Layout, int_t _OutDim, typename _OutLayout = _Layout>
-inline auto reshape(cuda::tensor<_ValueType, _Dim, _Layout> ts, pointi<_OutDim> ext, _OutLayout* = nullptr)->cuda::tensor<_ValueType, _OutDim, _OutLayout>{
+template <typename _ValueType, int_t _Rank, typename _Layout, int_t _OutDim, typename _OutLayout = _Layout>
+inline auto reshape(cuda::tensor<_ValueType, _Rank, _Layout> ts, pointi<_OutDim> ext, _OutLayout* = nullptr)->cuda::tensor<_ValueType, _OutDim, _OutLayout>{
 	///TODO: assert size equal
 	cuda::tensor<_ValueType, _OutDim, _OutLayout> re(ext, ts.shared_data());
 	return re;
