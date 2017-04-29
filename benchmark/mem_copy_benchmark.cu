@@ -22,7 +22,7 @@ void BM_each_copy_gold(benchmark::State& state) {
 			policy.block_size(),
 			policy.shared_mem_bytes(),
 			policy.stream() >>>(ts_dst.data(), ts_src.data(), ts_src.size());
-		cuda::barrier();
+		cuda::device_synchronize();
 	}
 
 	auto bytes_size = static_cast<size_t>(ts_src.size()) * sizeof(decltype(ts_src[0]));
@@ -38,7 +38,7 @@ static void BM_mem_copy(benchmark::State& state) {
 		mem_copy(ts_src, ts_dst);
 
 	#ifdef MATAZURE_CUDA
-		cuda::barrier();
+		cuda::device_synchronize();
 	#endif
 	}
 

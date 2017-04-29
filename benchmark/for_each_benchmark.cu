@@ -23,7 +23,7 @@ void BM_cu_for_each_gold(benchmark::State& state) {
 			policy.shared_mem_bytes(),
 			policy.stream() >>>(ts_src.data(), ts_src.size());
 
-		cuda::barrier();
+		cuda::device_synchronize();
 	}
 
 	auto bytes_size = static_cast<size_t>(ts_src.size()) * sizeof(_ValueType);
@@ -39,7 +39,7 @@ void BM_cu_for_each(benchmark::State& state) {
 			e = 1.0f;
 		});
 
-		cuda::barrier();
+		cuda::device_synchronize();
 	}
 
 	auto bytes_size = static_cast<size_t>(ts_src.size()) * sizeof(_ValueType);

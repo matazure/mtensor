@@ -21,7 +21,7 @@ void BM_cu_conv_global(benchmark::State& state) {
 
 	while (state.KeepRunning()) {
 		copy(cuda::puzzle::conv_global(clamp_zero(ts_src)), ts_re);
-		cuda::barrier();
+		cuda::device_synchronize();
 	}
 
 	auto bytes_size = static_cast<size_t>(ts_src.size()) * sizeof(_ValueType);
@@ -40,7 +40,7 @@ void BM_cu_conv_block(benchmark::State& state) {
 
 	while (state.KeepRunning()) {
 		cuda::puzzle::conv_block<dim<16,16>>(clamp_zero(ts_src), ts_re);
-		cuda::barrier();
+		cuda::device_synchronize();
 	}
 
 	auto bytes_size = static_cast<size_t>(ts_src.size()) * sizeof(_ValueType);
@@ -59,7 +59,7 @@ void BM_cu_conv_block_crack(benchmark::State& state) {
 
 	while (state.KeepRunning()) {
 		cuda::puzzle::conv_block_crack<dim<16,16>>(ts_src, ts_re);
-		cuda::barrier();
+		cuda::device_synchronize();
 	}
 
 	auto bytes_size = static_cast<size_t>(ts_src.size()) * sizeof(_ValueType);

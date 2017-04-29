@@ -66,7 +66,7 @@ void BM_stride(benchmark::State &state) {
 		copy(lts_re, ts_re);
 
 	#ifdef MATAZURE_CUDA
-		cuda::barrier();
+		cuda::device_synchronize();
 	#endif
 
 	}

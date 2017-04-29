@@ -267,7 +267,7 @@ inline auto make_general_lambda(pointi<_Rank> extent, _Func fun)->general_lambda
 	return general_lambda_tensor<_Rank, _Func>(extent, fun);
 }
 
-inline void barrier() {
+inline void device_synchronize() {
 	assert_runtime_success(cudaDeviceSynchronize());
 }
 

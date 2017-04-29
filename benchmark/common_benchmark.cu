@@ -27,7 +27,7 @@ void BM_cu_tensor_operation_gold(benchmark::State& state) {
 			policy.shared_mem_bytes(),
 			policy.stream() >>>(ts_re.data(), ts1.data(), ts2.data(), ts_re.size());
 
-		cuda::barrier();
+		cuda::device_synchronize();
 	}
 
 	auto bytes_size = static_cast<size_t>(ts1.size()) * sizeof(_ValueType);
@@ -76,7 +76,7 @@ void BM_cu_tensor_operation(benchmark::State &st) {
 
 	while (st.KeepRunning()) {
 		auto tsf_re = (ts1 * ts2 / ts1 + ts2).persist();
-		cuda::barrier();
+		cuda::device_synchronize();
 	}
 
 	auto bytes_size = static_cast<size_t>(ts1.size()) * sizeof(decltype(ts1[0]));
