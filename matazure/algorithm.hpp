@@ -51,15 +51,6 @@ inline void for_index(pointi<4> origin, pointi<4> extent, _Func fun) {
 	}
 }
 
-// namespace internal{
-//
-// 	template <typename _T1, typename _T2>
-// 	struct assert_extent_matched{
-//
-// 	}
-//
-// }
-
 template <typename _Tensor, typename _Fun>
 inline void for_each(_Tensor &ts, _Fun fun, enable_if_t<are_linear_access<_Tensor>::value && none_device_memory<_Tensor>::value>* = 0) {
 	for_index(0, ts.size(), [&](int_t i) {

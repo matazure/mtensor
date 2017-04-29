@@ -70,6 +70,57 @@ namespace internal{
 
 }
 
+namespace device {
+
+template <typename _Func>
+inline MATAZURE_DEVICE void for_index(int_t first, int_t last, _Func fun) {
+	for (int_t i = first; i < last; ++i) {
+		fun(i);
+	}
+}
+
+template <typename _Func>
+inline MATAZURE_DEVICE void for_index(pointi<1> origin, pointi<1> extent, _Func fun) {
+	for (int_t i = origin[0]; i < extent[0]; ++i) {
+		fun(pointi<1>{ { i } });
+	}
+}
+
+template <typename _Func>
+inline MATAZURE_DEVICE void for_index(pointi<2> origin, pointi<2> extent, _Func fun) {
+	for (int_t j = origin[1]; j < extent[1]; ++j) {
+		for (int_t i = origin[0]; i < extent[0]; ++i) {
+			fun(pointi<2>{ { i, j } });
+		}
+	}
+}
+
+template <typename _Func>
+inline MATAZURE_DEVICE void for_index(pointi<3> origin, pointi<3> extent, _Func fun) {
+	for (int_t k = origin[2]; k < extent[2]; ++k) {
+		for (int_t j = origin[1]; j < extent[1]; ++j) {
+			for (int_t i = origin[0]; i < extent[0]; ++i) {
+				fun(pointi<3>{ { i, j, k } });
+			}
+		}
+	}
+}
+
+template <typename _Func>
+inline MATAZURE_DEVICE void for_index(pointi<4> origin, pointi<4> extent, _Func fun) {
+	for (int_t l = origin[3]; l < extent[3]; ++l) {
+		for (int_t k = origin[2]; k < extent[2]; ++k) {
+			for (int_t j = origin[1]; j < extent[1]; ++j) {
+				for (int_t i = origin[0]; i < extent[0]; ++i) {
+					fun(pointi<4>{ {i, j, k, l} });
+				}
+			}
+		}
+	}
+}
+
+}
+
 template <typename Function, typename... Arguments>
 MATAZURE_GLOBAL void kenel(Function f, Arguments... args)
 {
@@ -118,34 +169,10 @@ inline void parallel_for_index(_ExecutionPolicy policy, pointi<_Rank> ext, _Fun 
 	auto stride = matazure::get_stride(ext);
 	auto max_size = index2offset((ext - 1), stride, first_major_t{}) + 1; //要包含最后一个元素
 
-	parallel_for_index(policy, 0, max_size, [=] MATAZURE_DEVICE(int_t i) {
+	parallel_for_index(policy, 0, max_size, [=] MATAZURE_DEVICE (int_t i) {
 		fun(offset2index(i, stride, first_major_t{}));
 	});
 }
-
-//template <int_t ..._Dims>
-//class block_index;
-//
-//template <int_t _S0, int_t _S1>
-//class block_index<_S0, _S1> {
-//public:
-//	MATAZURE_GENERAL block_index(pointi<2> grid_extent, pointi<2> local_idx, pointi<2> block_idx, pointi<2> global_idx) :
-//		block_extent{ _S0, _S1 },
-//		grid_extent(grid_extent),
-//		global_extent(block_extent * grid_extent),
-//		local(local_idx),
-//		block(block_idx),
-//		global(global_idx)
-//	{}
-//
-//public:
-//	const pointi<2> block_extent;
-//	const pointi<2> grid_extent;
-//	const pointi<2> global_extent;
-//	const pointi<2> local;
-//	const pointi<2> block;
-//	const pointi<2> global;
-//};
 
 template <typename _BlockDim>
 class block_index{
@@ -185,32 +212,6 @@ inline void block_for_index(pointi<_Ext::size()> grid_ext, _Fun fun) {
 
 	assert_runtime_success(cudaGetLastError());
 }
-
-//template <int_t _S0, int_t _S1, typename _Fun>
-//inline void block_for_index(pointi<2> grid_ext, _Fun fun) {
-//	kenel <<< internal::pointi_to_dim3(grid_ext), dim3(_S0, _S1, 1) >>> ([=] MATAZURE_DEVICE() {
-//		pointi<2> local = internal::uint3_to_pointi<2>(threadIdx);
-//		pointi<2> block = { static_cast<int_t>(blockIdx.x), static_cast<int_t>(blockIdx.y) };
-//		pointi<2> block_ext = { _S0, _S1 };
-//		pointi<2> global = block * block_ext + local;
-//		block_index<_S0, _S1> block_idx(grid_ext, local, block, global);
-//		fun(block_idx);
-//	});
-//
-//	assert_runtime_success(cudaGetLastError());
-//}
-
-//template <int_t _S0, int_t _S1, int_t _S2, typename _Fun>
-//inline void block_for_index(pointi<3> grid_ext, _Fun fun) {
-//	kenel <<< dim3(grid_ext[0], grid_ext[1], grid_ext[2]), dim3(_S0, _S1, _S2) >>> ([=] MATAZURE_DEVICE() {
-//		pointi<3> local = { static_cast<int_t>(threadIdx.x), static_cast<int_t>(threadIdx.y), static_cast<int_t>(threadIdx.z) };
-//		pointi<3> block = { static_cast<int_t>(blockIdx.x), static_cast<int_t>(blockIdx.y), static_cast<int_t>(blockIdx.z) };
-//		pointi<3> block_ext = { _S0, _S1, _S2 };
-//		pointi<3> global = block * block_ext + local;
-//		block_index<_S0, _S1, _S2> block_idx(grid_ext, local, block, global);
-//		fun(block_idx);
-//	});
-//}
 
 template <typename _Tensor, typename _Fun>
 inline void for_each(_Tensor ts, _Fun fun, enable_if_t<are_device_memory<_Tensor>::value && are_linear_access<_Tensor>::value>* = 0) {
