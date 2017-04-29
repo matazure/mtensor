@@ -180,18 +180,18 @@ public:
 	const static int_t rank = _BlockDim::size();
 
 	MATAZURE_GENERAL block_index(pointi<rank> grid_extent, pointi<rank> local_idx, pointi<rank> block_idx, pointi<rank> global_idx) :
-		block_extent(meta::array_to_pointi(_BlockDim{})),
-		grid_extent(grid_extent),
-		global_extent(block_extent * grid_extent),
+		block_dim(meta::array_to_pointi(_BlockDim{})),
+		grid_dim(grid_extent),
+		global_dim(block_dim * grid_extent),
 		local(local_idx),
 		block(block_idx),
 		global(global_idx)
 	{}
 
 public:
-	const pointi<rank> block_extent;
-	const pointi<rank> grid_extent;
-	const pointi<rank> global_extent;
+	const pointi<rank> block_dim;
+	const pointi<rank> grid_dim;
+	const pointi<rank> global_dim;
 	const pointi<rank> local;
 	const pointi<rank> block;
 	const pointi<rank> global;

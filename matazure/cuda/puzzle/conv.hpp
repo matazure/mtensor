@@ -7,6 +7,51 @@ namespace cuda {
 
 namespace puzzle {
 
+template <typename _Func>
+inline __device__ void corner_index(pointi<1> origin, pointi<1> extent, _Func func) {
+	func(origin);
+	func(extent-1);
+}
+
+template <typename _Func>
+inline __device__ void corner_index(pointi<2> origin, pointi<2> extent, _Func func) {
+	func(pointi<2>{origin[0], origin[1]});
+	func(pointi<2>{origin[0], extent[1]-1});
+	func(pointi<2>{extent[0]-1, origin[1]});
+	func(pointi<2>{extent[0]-1, extent[1]-1});
+}
+
+template <typename _Func>
+inline __device__ void corner_index(pointi<3> origin, pointi<3> extent, _Func func) {
+	func(pointi<3>{origin[0], origin[1], origin[2]});
+	func(pointi<3>{origin[0], origin[1], extent[2]-1});
+	func(pointi<3>{origin[0], extent[1]-1, origin[2]});
+	func(pointi<3>{origin[0], extent[1]-1, extent[2]-1});
+	func(pointi<3>{extent[0]-1, origin[1], origin[2]});
+	func(pointi<3>{extent[0]-1, origin[1], extent[2]-1});
+	func(pointi<3>{extent[0]-1, extent[1]-1, origin[2]});
+	func(pointi<3>{extent[0]-1, extent[1]-1, extent[2]-1});
+}
+
+template <typename _Func>
+inline __device__ void corner_index(pointi<4> origin, pointi<4> extent, _Func func) {
+	func(pointi<4>{origin[0], origin[1], origin[2], origin[3]});
+	func(pointi<4>{origin[0], origin[1], origin[2], extent[3]-1});
+	func(pointi<4>{origin[0], origin[1], extent[2]-1, origin[3]});
+	func(pointi<4>{origin[0], origin[1], extent[2]-1, extent[3]-1});
+	func(pointi<4>{origin[0], extent[1]-1, origin[2], origin[3]});
+	func(pointi<4>{origin[0], extent[1]-1, origin[2], extent[3]-1});
+	func(pointi<4>{origin[0], extent[1]-1, extent[2]-1, origin[3]});
+	func(pointi<4>{origin[0], extent[1]-1, extent[2]-1, extent[3]-1});
+	func(pointi<4>{extent[0]-1, origin[1], origin[2], origin[3]});
+	func(pointi<4>{extent[0]-1, origin[1], origin[2], extent[3]-1});
+	func(pointi<4>{extent[0]-1, origin[1], extent[2]-1, origin[3]});
+	func(pointi<4>{extent[0]-1, origin[1], extent[2]-1, extent[3]-1});
+	func(pointi<4>{extent[0]-1, extent[1]-1, origin[2], origin[3]});
+	func(pointi<4>{extent[0]-1, extent[1]-1, origin[2], extent[3]-1});
+	func(pointi<4>{extent[0]-1, extent[1]-1, extent[2]-1, origin[3]});
+	func(pointi<4>{extent[0]-1, extent[1]-1, extent[2]-1, extent[3]-1});
+}
 
 } //puzzle
 
@@ -60,23 +105,24 @@ inline tensor<typename _Tensor::value_type, _Tensor::rank> conv_block(_Tensor ts
 	auto grid_ext = ts.shape() / block_ext;																\
 	MATAZURE_ASSERT(equal(grid_ext * block_ext, ts.shape()));											\
 	MATAZURE_ASSERT(equal(ts.shape(), ts_re.shape()));													\
-																										\
-	auto mask_extent = mask.shape();																	\
-	auto mask_radius = mask_extent / 2;																	\
-																										\
+	auto shape_le = mask.shape() <= meta::array_to_pointi(_BlockDim{});									\
+	for(int_t i = 0; i <shape_le.size(); ++i){															\
+		MATAZURE_ASSERT(shape_le[i]);																	\
+	}																									\
 	block_for_index<_BlockDim>(grid_ext, [=] __device__ (block_index<_BlockDim> block_idx) {			\
-		auto shsts_shape = 																				\
+		auto tmp_shape = 																				\
 			meta::sub_c(meta::add_c(_BlockDim{}, decltype(mask)::meta_shape()), meta::int_t_c<1>{});	\
-		__shared__ static_tensor<value_type, decltype(shsts_shape)> shared_ts_block;					\
+		__shared__ static_tensor<value_type, decltype(tmp_shape)> shared_ts_block;						\
 																										\
-		shared_ts_block(block_idx.local) = ts(block_idx.global + pointi<2>{-1, -1});					\
-		shared_ts_block(block_idx.local + pointi<2>{2, 0}) = ts(block_idx.global + pointi<2>{1, -1});	\
-		shared_ts_block(block_idx.local + pointi<2>{0, 2}) = ts(block_idx.global + pointi<2>{-1, 1});	\
-		shared_ts_block(block_idx.local + pointi<2>{2, 2}) = ts(block_idx.global + pointi<2>{1, 1});	\
+		corner_index(pointi<_Tensor::rank>::zeros(), mask.shape(),										\
+			[&](pointi<_Tensor::rank> corner_idx){														\
+				shared_ts_block(block_idx.local + corner_idx) = ts(block_idx.global - corner_idx / 2 );	\
+			}																							\
+		);																								\
 		device::barrier();																				\
 																										\
 		auto sum = zero<value_type>::value();															\
-		device::for_index(pointi<_Tensor::rank>::zeros(), mask_extent, [&](const pointi<2> &idx) {		\
+		device::for_index(pointi<_Tensor::rank>::zeros(), mask.shape(), [&](const pointi<2> &idx) {		\
 			sum += shared_ts_block(block_idx.local + idx) * mask(idx);									\
 		});																								\
 		ts_re(block_idx.global) = sum;																	\
@@ -94,48 +140,47 @@ inline cuda::tensor<typename _Tensor::value_type, _Tensor::rank> conv_block(_Ten
 																										\
 }}}
 
-/// 卷积需要使用__constant__的mask，但不同的mask必须以静态的方式分别声明，故而定义一个宏，以便在外面使用
-#define MATAZURE_PUZZEL_CONV_BLOCK_WITH_CRACK(conv_block_crack, mask)											\
-namespace matazure{namespace cuda{namespace puzzle{																\
-																												\
-template <typename _BlockDim, typename _Tensor, typename _TensorRe>												\
-inline tensor<typename _Tensor::value_type, _Tensor::rank> conv_block_crack(_Tensor ts, _TensorRe &ts_re) {		\
-	MATAZURE_STATIC_ASSERT_DIM_MATCHED(_Tensor, decltype(mask));												\
-	MATAZURE_STATIC_ASSERT_VALUE_TYPE_MATCHED(_Tensor, decltype(mask));											\
-	typedef typename _Tensor::value_type value_type;															\
-																												\
-	constexpr auto block_ext = meta::array_to_pointi(_BlockDim{});												\
-	auto grid_ext = ts.shape() / block_ext;																		\
-	MATAZURE_ASSERT(equal(grid_ext * block_ext, ts.shape()));													\
-	MATAZURE_ASSERT(equal(ts.shape(), ts_re.shape()));															\
-																												\
-	auto mask_extent = mask.shape();																			\
-	auto mask_radius = mask_extent / 2;																			\
-																												\
-	block_for_index<_BlockDim>(grid_ext, [=] __device__ (block_index<_BlockDim> block_idx) {					\
-		__shared__ static_tensor<value_type, _BlockDim> shared_ts_block;										\
-		shared_ts_block(block_idx.local) = ts(block_idx.global);												\
-		device::barrier();																						\
-																												\
-		if (inside(block_idx.local, mask_radius, block_idx.block_extent)) {										\
-			value_type sum = 0;																					\
-																												\
-			device::for_index(pointi<_Tensor::rank>::zeros(), mask_extent, [&](const pointi<2> &idx) {			\
-				sum += shared_ts_block(block_idx.local + idx - mask_radius) * mask(idx);						\
-			});																									\
-																												\
-			ts_re(block_idx.global) = sum;																		\
-		}																										\
-	});																											\
-																												\
-	return ts_re;																								\
-}																												\
-																												\
-template <typename _BlockDim, typename _Tensor>																	\
-inline cuda::tensor<typename _Tensor::value_type, _Tensor::rank> conv_block_crack(_Tensor ts) {					\
-	cuda::tensor<typename _Tensor::value_type, _Tensor::rank> ts_re(ts.shape());								\
-	conv_block_crack<_BlockDim>(ts, ts_re);																		\
-	return ts_re;																								\
-}																												\
-																												\
+#define MATAZURE_PUZZEL_CONV_BLOCK_WITH_CRACK(conv_block_crack, mask)										\
+namespace matazure{namespace cuda{namespace puzzle{															\
+																											\
+template <typename _BlockDim, typename _Tensor, typename _TensorRe>											\
+inline tensor<typename _Tensor::value_type, _Tensor::rank> conv_block_crack(_Tensor ts, _TensorRe &ts_re) {	\
+	MATAZURE_STATIC_ASSERT_DIM_MATCHED(_Tensor, decltype(mask));											\
+	MATAZURE_STATIC_ASSERT_VALUE_TYPE_MATCHED(_Tensor, decltype(mask));										\
+	typedef typename _Tensor::value_type value_type;														\
+																											\
+	constexpr auto block_ext = meta::array_to_pointi(_BlockDim{});											\
+	auto grid_ext = ts.shape() / block_ext;																	\
+	MATAZURE_ASSERT(equal(grid_ext * block_ext, ts.shape()));												\
+	MATAZURE_ASSERT(equal(ts.shape(), ts_re.shape()));														\
+																											\
+	auto mask_extent = mask.shape();																		\
+	auto mask_radius = mask_extent / 2;																		\
+																											\
+	block_for_index<_BlockDim>(grid_ext, [=] __device__ (block_index<_BlockDim> block_idx) {				\
+		__shared__ static_tensor<value_type, _BlockDim> shared_ts_block;									\
+		shared_ts_block(block_idx.local) = ts(block_idx.global);											\
+		device::barrier();																					\
+																											\
+		if (inside(block_idx.local, mask_radius, block_idx.block_dim)) {									\
+			value_type sum = 0;																				\
+																											\
+			device::for_index(pointi<_Tensor::rank>::zeros(), mask_extent, [&](const pointi<2> &idx) {		\
+				sum += shared_ts_block(block_idx.local + idx - mask_radius) * mask(idx);					\
+			});																								\
+																											\
+			ts_re(block_idx.global) = sum;																	\
+		}																									\
+	});																										\
+																											\
+	return ts_re;																							\
+}																											\
+																											\
+template <typename _BlockDim, typename _Tensor>																\
+inline cuda::tensor<typename _Tensor::value_type, _Tensor::rank> conv_block_crack(_Tensor ts) {				\
+	cuda::tensor<typename _Tensor::value_type, _Tensor::rank> ts_re(ts.shape());							\
+	conv_block_crack<_BlockDim>(ts, ts_re);																	\
+	return ts_re;																							\
+}																											\
+																											\
 }}}	 //end MATAZURE_PUZZEL_CONV_BLOCK_WITH_CRACK
