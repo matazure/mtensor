@@ -17,31 +17,27 @@ public:
 	typedef _Type							value_type;
 	typedef value_type &					reference;
 	typedef value_type *					pointer;
-
-	typedef pointi<rank>						shape_type;
-	typedef pointi<rank>						index_type;
-
 	typedef linear_access_t					access_type;
 	typedef _Layout							layout_type;
 	typedef device_t						memory_type;
 
 	tensor() :
-		tensor(shape_type::zeros())
+		tensor(pointi<rank>::zeros())
 	{}
 
 	template <typename ..._Ext>
 	explicit tensor(_Ext... ext) :
-		tensor(shape_type{ext...})
+		tensor(pointi<rank>{ext...})
 	{}
 
-	explicit tensor(shape_type extent) :
+	explicit tensor(pointi<rank> extent) :
 		extent_(extent),
 		stride_(matazure::get_stride(extent)),
 		sp_data_(malloc_shared_memory(stride_[rank - 1])),
 		data_(sp_data_.get())
 	{ }
 
-	explicit tensor(shape_type extent, std::shared_ptr<value_type> sp_data) :
+	explicit tensor(pointi<rank> extent, std::shared_ptr<value_type> sp_data) :
 		extent_(extent),
 		stride_(matazure::get_stride(extent)),
 		sp_data_(sp_data),
@@ -60,10 +56,10 @@ public:
 
 	template <typename ..._Idx>
 	MATAZURE_GENERAL reference operator()(_Idx... idx) const {
-		return (*this)(index_type{ idx... });
+		return (*this)(pointi<rank>{ idx... });
 	}
 
-	MATAZURE_GENERAL reference operator()(const index_type &index) const {
+	MATAZURE_GENERAL reference operator()(const pointi<rank> &index) const {
 		return (*this)[index2offset(index, stride_, layout_type{})];
 	}
 
@@ -71,12 +67,12 @@ public:
 		return data_[i];
 	}
 
-	MATAZURE_GENERAL reference operator[](const index_type &idx) const{
+	MATAZURE_GENERAL reference operator[](const pointi<rank> &idx) const{
 		return (*this)(idx);
 	}
 
-	MATAZURE_GENERAL shape_type shape() const { return extent_; }
-	MATAZURE_GENERAL shape_type stride() const { return stride_; }
+	MATAZURE_GENERAL pointi<rank> shape() const { return extent_; }
+	MATAZURE_GENERAL pointi<rank> stride() const { return stride_; }
 	MATAZURE_GENERAL int_t size() const { return stride_[rank - 1]; }
 
 	MATAZURE_GENERAL pointer data() const { return data_; }
@@ -91,8 +87,8 @@ private:
 	}
 
 private:
-	const shape_type	extent_;
-	const shape_type	stride_;
+	const pointi<rank>	extent_;
+	const pointi<rank>	stride_;
 	const shared_ptr<value_type>	sp_data_;
 	const pointer data_;
 };
@@ -117,34 +113,32 @@ class device_lambda_tensor {
 public:
 	static const int_t									rank = _Rank;
 	typedef _ValueType									value_type;
-	typedef pointi<rank>									shape_type;
-	typedef pointi<rank>									index_type;
 	typedef _AccessMode									accessor_type;
 	typedef device_t									memory_type;
 
 public:
 	device_lambda_tensor() = delete;
 
-	device_lambda_tensor(const shape_type &extent, _Func fun) :
+	device_lambda_tensor(const pointi<rank> &extent, _Func fun) :
 		extent_(extent),
 		stride_(matazure::get_stride(extent)),
 		fun_(fun)
 	{ }
 
-	MATAZURE_DEVICE value_type operator()(index_type index) const {
+	MATAZURE_DEVICE value_type operator()(pointi<rank> index) const {
 		return index_imp<accessor_type>(index);
 	}
 
 	template <typename ..._Idx>
-	MATAZURE_GENERAL value_type operator()(_Idx... idx) const {
-		return (*this)(index_type{ idx... });
+	MATAZURE_DEVICE value_type operator()(_Idx... idx) const {
+		return (*this)(pointi<rank>{ idx... });
 	}
 
 	MATAZURE_DEVICE value_type operator[](int_t i) const {
 		return offset_imp<accessor_type>(i);
 	}
 
-	MATAZURE_GENERAL value_type operator[](const index_type &idx) const {
+	MATAZURE_DEVICE value_type operator[](const pointi<rank> &idx) const {
 		return (*this)(idx);
 	}
 
@@ -154,20 +148,20 @@ public:
 		return re;
 	}
 
-	MATAZURE_GENERAL shape_type shape() const { return extent_; }
-	MATAZURE_GENERAL shape_type stride() const { return stride_; }
+	MATAZURE_GENERAL pointi<rank> shape() const { return extent_; }
+	MATAZURE_GENERAL pointi<rank> stride() const { return stride_; }
 	MATAZURE_GENERAL int_t size() const { return stride_[rank - 1]; }
 
 private:
 	template <typename _Mode>
 	MATAZURE_DEVICE enable_if_t<is_same<_Mode, array_access_t>::value, value_type>
-		index_imp(index_type index) const {
+		index_imp(pointi<rank> index) const {
 		return fun_(index);
 	}
 
 	template <typename _Mode>
 	MATAZURE_DEVICE enable_if_t<is_same<_Mode, linear_access_t>::value, value_type>
-		index_imp(index_type index) const {
+		index_imp(pointi<rank> index) const {
 		return (*this)[index2offset(index, stride())];
 	}
 
@@ -184,8 +178,8 @@ private:
 	}
 
 private:
-	const shape_type extent_;
-	const shape_type stride_;
+	const pointi<rank> extent_;
+	const pointi<rank> stride_;
 	const _Func fun_;
 };
 
@@ -195,20 +189,18 @@ class general_lambda_tensor : public tensor_expression<general_lambda_tensor<_Ra
 public:
 	static const int_t										rank = _Rank;
 	typedef typename functor_traits::result_type			value_type;
-	typedef matazure::pointi<rank>							shape_type;
-	typedef pointi<rank>										index_type;
 	typedef typename matazure::internal::get_functor_accessor_type<_Rank, _Func>::type		access_type;
 	typedef device_t										memory_type;
 
 
 public:
-	general_lambda_tensor(const shape_type &extent, _Func fun) :
+	general_lambda_tensor(const pointi<rank> &extent, _Func fun) :
 		extent_(extent),
 		stride_(matazure::get_stride(extent)),
 		fun_(fun)
 	{}
 
-	MATAZURE_GENERAL value_type operator()(index_type index) const {
+	MATAZURE_GENERAL value_type operator()(pointi<rank> index) const {
 		return index_imp<access_type>(index);
 	}
 
@@ -216,7 +208,7 @@ public:
 		return offset_imp<access_type>(i);
 	}
 
-	MATAZURE_GENERAL value_type operator[](const index_type &idx) const {
+	MATAZURE_GENERAL value_type operator[](const pointi<rank> &idx) const {
 		return (*this)(idx);
 	}
 
@@ -226,18 +218,18 @@ public:
 		return re;
 	}
 
-	MATAZURE_GENERAL shape_type shape() const { return extent_; }
-	MATAZURE_GENERAL shape_type stride() const { return stride_; }
+	MATAZURE_GENERAL pointi<rank> shape() const { return extent_; }
+	MATAZURE_GENERAL pointi<rank> stride() const { return stride_; }
 	MATAZURE_GENERAL int_t size() const { return stride_[rank - 1]; }
 
 public:
 	template <typename _Mode>
-	MATAZURE_GENERAL enable_if_t<is_same<_Mode, array_access_t>::value, value_type> index_imp(index_type index) const {
+	MATAZURE_GENERAL enable_if_t<is_same<_Mode, array_access_t>::value, value_type> index_imp(pointi<rank> index) const {
 		return fun_(index);
 	}
 
 	template <typename _Mode>
-	MATAZURE_GENERAL enable_if_t<is_same<_Mode, linear_access_t>::value, value_type> index_imp(index_type index) const {
+	MATAZURE_GENERAL enable_if_t<is_same<_Mode, linear_access_t>::value, value_type> index_imp(pointi<rank> index) const {
 		return (*this)[index2offset(index, stride(), first_major_t{})];
 	}
 
@@ -252,8 +244,8 @@ public:
 	}
 
 private:
-	const shape_type extent_;
-	const shape_type stride_;
+	const pointi<rank> extent_;
+	const pointi<rank> stride_;
 	const _Func fun_;
 };
 
@@ -319,7 +311,7 @@ inline auto reshape(cuda::tensor<_ValueType, _Rank, _Layout> ts, pointi<_OutDim>
 
 template <int_t _Rank>
 inline auto make_block(pointi<_Rank> extent){
-	
+
 }
 
 }//cuda

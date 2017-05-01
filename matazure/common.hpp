@@ -151,10 +151,10 @@ template <typename _Tensor>
 struct shift_op {
 private:
 	_Tensor ts_;
-	typename _Tensor::index_type offset_;
+	pointi<_Tensor::rank> offset_;
 
 public:
-	shift_op(_Tensor ts, typename _Tensor::index_type offset):
+	shift_op(_Tensor ts, pointi<_Tensor::rank> offset):
 		ts_(ts), offset_(offset)
 	{}
 
@@ -404,7 +404,7 @@ inline auto shift(_Tensor ts, pointi<_Tensor::rank> offset)->decltype(make_lambd
 }
 
 template <typename _Tensor>
-inline auto section(_Tensor ts, typename _Tensor::index_type origin, typename _Tensor::shape_type ext)->decltype(make_lambda(ext, internal::shift_op<_Tensor>(ts, origin), typename _Tensor::memory_type{})) {
+inline auto section(_Tensor ts, pointi<_Tensor::rank> origin, pointi<_Tensor::rank> ext)->decltype(make_lambda(ext, internal::shift_op<_Tensor>(ts, origin), typename _Tensor::memory_type{})) {
 	return make_lambda(ext, internal::shift_op<_Tensor>(ts, origin), typename _Tensor::memory_type{});
 }
 
@@ -512,7 +512,7 @@ public:\
 	MATAZURE_STATIC_ASSERT_VALUE_TYPE_MATCHED(_T1, _T2); \
 	MATAZURE_GENERAL name(_T1 x1, _T2 x2) : x1_(x1), x2_(x2) {} \
 \
-	MATAZURE_GENERAL auto operator ()(const typename _T1::index_type &idx) const->decltype(this->x1_(idx) op this->x2_(idx)){ \
+	MATAZURE_GENERAL auto operator ()(const pointi<_T1::rank> &idx) const->decltype(this->x1_(idx) op this->x2_(idx)){ \
 		return x1_(idx) op x2_(idx); \
 	} \
 };
@@ -547,7 +547,7 @@ private: \
 public:\
 	name(_T x, value_type v) : x_(x), v_(v) {} \
 \
-	MATAZURE_GENERAL auto operator ()(const typename _T::index_type &idx) const->decltype(this->x_(idx) op this->v_){ \
+	MATAZURE_GENERAL auto operator ()(const pointi<_T::rank> &idx) const->decltype(this->x_(idx) op this->v_){ \
 		return x_(idx) op v_; \
 	} \
 };
@@ -581,7 +581,7 @@ private: \
 public:\
 	name(_T x, value_type v) : v_(v), x_(x) {} \
 \
-	MATAZURE_GENERAL auto operator ()(const typename _T::index_type &idx) const->decltype(this->v_ op this->x_(idx)){ \
+	MATAZURE_GENERAL auto operator ()(const pointi<_T::rank> &idx) const->decltype(this->v_ op this->x_(idx)){ \
 		return v_ op x_(idx); \
 	} \
 \
