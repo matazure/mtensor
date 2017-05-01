@@ -23,6 +23,7 @@ typedef unsigned char byte;
 
 using std::decay;
 using std::remove_const;
+using std::remove_reference;
 using std::remove_all_extents;
 using std::forward;
 
@@ -43,8 +44,11 @@ using std::get;
 template<bool _Val>
 using bool_constant = integral_constant<bool, _Val>;
 
-template<class _Ty>
+template<typename _Ty>
 using decay_t = typename decay<_Ty>::type;
+
+template<typename _Ty>
+using remove_reference_t = typename remove_reference<_Ty>::type;
 
 template<bool _Test, class _Ty = void>
 using enable_if_t = typename enable_if<_Test, _Ty>::type;
@@ -52,7 +56,7 @@ using enable_if_t = typename enable_if<_Test, _Ty>::type;
 template<bool _Test, class _Ty1, class _Ty2>
 using conditional_t = typename conditional<_Test, _Ty1, _Ty2>::type;
 
-template<class _Ty>
+template<typename _Ty>
 using remove_const_t = typename remove_const<_Ty>::type;
 
 struct blank_t {};

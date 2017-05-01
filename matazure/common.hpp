@@ -344,7 +344,7 @@ public:
 			return ts_(idx);
 		}
 		else {
-			return zero<decay_t<typename _Tensor::value_type>>::value();
+			return zero<typename _Tensor::value_type>::value();
 		}
 	}
 };

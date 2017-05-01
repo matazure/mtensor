@@ -144,7 +144,7 @@ namespace matazure{namespace cuda{namespace puzzle{															\
 template <typename _BlockDim, typename _Tensor, typename _TensorRe>											\
 inline void conv_block_crack(_Tensor ts, _TensorRe &ts_re) {												\
 	MATAZURE_STATIC_ASSERT_DIM_MATCHED(_Tensor, decltype(mask));											\
-	typedef decay_t<typename _Tensor::value_type> value_type;												\
+	typedef typename _Tensor::value_type value_type;												\
 																											\
 	constexpr auto block_ext = meta::array_to_pointi(_BlockDim{});											\
 	auto grid_ext = ts.shape() / block_ext;																	\
@@ -177,14 +177,14 @@ inline cuda::tensor<typename _Tensor::value_type, _Tensor::rank> conv_block_crac
 }																											\
 																											\
 }}}	 //end conv_block_crack
-																										
+
 #define MATAZURE_PUZZEL_CONV_BLOCK_OVERLAP(conv_block_overlap, mask)									\
 namespace matazure { namespace cuda { namespace puzzle {												\
 																										\
 template <typename _BlockDim, typename _Tensor, typename _TensorRe>										\
 inline void conv_block_overlap(_Tensor ts, _TensorRe &ts_re) {											\
 	MATAZURE_STATIC_ASSERT_DIM_MATCHED(_Tensor, decltype(mask));										\
-	typedef decay_t<typename _Tensor::value_type> value_type;											\
+	typedef typename _Tensor::value_type value_type;											\
 																										\
 	constexpr auto block_ext = meta::array_to_pointi(_BlockDim{});										\
 	auto grid_ext = ts.shape() / block_ext;																\
@@ -220,4 +220,4 @@ inline cuda::tensor<typename _Tensor::value_type, _Tensor::rank> conv_block_over
 	return ts_re;																						\
 }																										\
 																										\
-}}}	 // end conv_block_overlap																					
+}}}	 // end conv_block_overlap

@@ -220,6 +220,7 @@ public:
 
 	static const int_t						rank = _Rank;
 	typedef _Type							value_type;
+	typedef _Type &							reference;
 	typedef _Layout							layout_type;
 	typedef linear_access_t					access_type;
 	typedef host_t							memory_type;
@@ -293,17 +294,17 @@ public:
 	}
 
 	template <typename ..._Idx>
-	value_type& operator()(_Idx... idx) const {
+	reference operator()(_Idx... idx) const {
 		return (*this)(pointi<rank>{ idx... });
 	}
 
-	value_type& operator()(const pointi<rank> &index) const {
+	reference operator()(const pointi<rank> &index) const {
 		return (*this)[index2offset(index, stride_, layout_type{})];
 	}
 
-	value_type& operator[](int_t i) const { return data_[i]; }
+	reference operator[](int_t i) const { return data_[i]; }
 
-	value_type& operator[](const pointi<rank> &idx) const {
+	reference operator[](const pointi<rank> &idx) const {
 		return (*this)(idx);
 	}
 
@@ -370,9 +371,10 @@ class lambda_tensor : public tensor_expression<lambda_tensor<_Rank, _Func>> {
 	typedef function_traits<_Func>						functor_traits;
 public:
 	static const int_t										rank = _Rank;
-	typedef typename functor_traits::result_type			value_type;
+	typedef typename functor_traits::result_type			reference;
+	typedef remove_reference_t<reference>					value_type;
 	typedef typename internal::get_functor_accessor_type<_Rank, _Func>::type
-		access_type;
+															access_type;
 	typedef host_t											memory_type;
 
 public:
@@ -382,16 +384,16 @@ public:
 		fun_(fun)
 	{}
 
-	value_type operator()(pointi<rank> index) const {
+	reference operator()(pointi<rank> index) const {
 		return index_imp<access_type>(index);
 	}
 
 	template <typename ..._Idx>
-	value_type operator()(_Idx... idx) const {
+	reference operator()(_Idx... idx) const {
 		return (*this)(pointi<rank>{ idx... });
 	}
 
-	value_type operator[](int_t i) const {
+	reference operator[](int_t i) const {
 		return offset_imp<access_type>(i);
 	}
 
@@ -407,22 +409,22 @@ public:
 
 private:
 	template <typename _Mode>
-	enable_if_t<is_same<_Mode, array_access_t>::value, value_type> index_imp(pointi<rank> index) const {
+	enable_if_t<is_same<_Mode, array_access_t>::value, reference> index_imp(pointi<rank> index) const {
 		return fun_(index);
 	}
 
 	template <typename _Mode>
-	enable_if_t<is_same<_Mode, linear_access_t>::value, value_type> index_imp(pointi<rank> index) const {
+	enable_if_t<is_same<_Mode, linear_access_t>::value, reference> index_imp(pointi<rank> index) const {
 		return (*this)[index2offset(index, stride(), first_major_t{})];
 	}
 
 	template <typename _Mode>
-	enable_if_t<is_same<_Mode, array_access_t>::value, value_type> offset_imp(int_t i) const {
+	enable_if_t<is_same<_Mode, array_access_t>::value, reference> offset_imp(int_t i) const {
 		return (*this)(offset2index(i, stride(), first_major_t{}));
 	}
 
 	template <typename _Mode>
-	enable_if_t<is_same<_Mode, linear_access_t>::value, value_type> offset_imp(int_t i) const {
+	enable_if_t<is_same<_Mode, linear_access_t>::value, reference> offset_imp(int_t i) const {
 		return fun_(i);
 	}
 

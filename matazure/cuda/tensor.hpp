@@ -108,11 +108,12 @@ inline void copy_symbol(_TensorSrc src, _TensorSymbol &symbol_dst) {
 	assert_runtime_success(cudaMemcpyToSymbol(symbol_dst, src.data(), src.size() * sizeof(typename _TensorSrc::value_type)));
 }
 
-template <typename _ValueType, typename _AccessMode, int_t _Rank, typename _Func>
+template <typename _Reference, typename _AccessMode, int_t _Rank, typename _Func>
 class device_lambda_tensor {
 public:
 	static const int_t									rank = _Rank;
-	typedef _ValueType									value_type;
+	typedef _Reference									reference;
+	typedef remove_reference_t<reference>				value_type;
 	typedef _AccessMode									accessor_type;
 	typedef device_t									memory_type;
 
@@ -125,20 +126,20 @@ public:
 		fun_(fun)
 	{ }
 
-	MATAZURE_DEVICE value_type operator()(pointi<rank> index) const {
+	MATAZURE_DEVICE reference operator()(pointi<rank> index) const {
 		return index_imp<accessor_type>(index);
 	}
 
 	template <typename ..._Idx>
-	MATAZURE_DEVICE value_type operator()(_Idx... idx) const {
+	MATAZURE_DEVICE reference operator()(_Idx... idx) const {
 		return (*this)(pointi<rank>{ idx... });
 	}
 
-	MATAZURE_DEVICE value_type operator[](int_t i) const {
+	MATAZURE_DEVICE reference operator[](int_t i) const {
 		return offset_imp<accessor_type>(i);
 	}
 
-	MATAZURE_DEVICE value_type operator[](const pointi<rank> &idx) const {
+	MATAZURE_DEVICE reference operator[](const pointi<rank> &idx) const {
 		return (*this)(idx);
 	}
 
@@ -154,25 +155,25 @@ public:
 
 private:
 	template <typename _Mode>
-	MATAZURE_DEVICE enable_if_t<is_same<_Mode, array_access_t>::value, value_type>
+	MATAZURE_DEVICE enable_if_t<is_same<_Mode, array_access_t>::value, reference>
 		index_imp(pointi<rank> index) const {
 		return fun_(index);
 	}
 
 	template <typename _Mode>
-	MATAZURE_DEVICE enable_if_t<is_same<_Mode, linear_access_t>::value, value_type>
+	MATAZURE_DEVICE enable_if_t<is_same<_Mode, linear_access_t>::value, reference>
 		index_imp(pointi<rank> index) const {
 		return (*this)[index2offset(index, stride())];
 	}
 
 	template <typename _Mode>
-	MATAZURE_DEVICE enable_if_t<is_same<_Mode, array_access_t>::value, value_type>
+	MATAZURE_DEVICE enable_if_t<is_same<_Mode, array_access_t>::value, reference>
 		offset_imp(int_t i) const {
 		return (*this)(offset2index(i, stride()));
 	}
 
 	template <typename _Mode>
-	MATAZURE_DEVICE enable_if_t<is_same<_Mode, linear_access_t>::value, value_type>
+	MATAZURE_DEVICE enable_if_t<is_same<_Mode, linear_access_t>::value, reference>
 		offset_imp(int_t i) const {
 		return fun_(i);
 	}
@@ -188,7 +189,8 @@ class general_lambda_tensor : public tensor_expression<general_lambda_tensor<_Ra
 	typedef function_traits<_Func>						functor_traits;
 public:
 	static const int_t										rank = _Rank;
-	typedef typename functor_traits::result_type			value_type;
+	typedef typename functor_traits::result_type			reference;
+	typedef remove_reference_t<reference>					value_type;
 	typedef typename matazure::internal::get_functor_accessor_type<_Rank, _Func>::type		access_type;
 	typedef device_t										memory_type;
 
@@ -200,15 +202,15 @@ public:
 		fun_(fun)
 	{}
 
-	MATAZURE_GENERAL value_type operator()(pointi<rank> index) const {
+	MATAZURE_GENERAL reference operator()(pointi<rank> index) const {
 		return index_imp<access_type>(index);
 	}
 
-	MATAZURE_GENERAL value_type operator[](int_t i) const {
+	MATAZURE_GENERAL reference operator[](int_t i) const {
 		return offset_imp<access_type>(i);
 	}
 
-	MATAZURE_GENERAL value_type operator[](const pointi<rank> &idx) const {
+	MATAZURE_GENERAL reference operator[](const pointi<rank> &idx) const {
 		return (*this)(idx);
 	}
 
@@ -224,22 +226,22 @@ public:
 
 public:
 	template <typename _Mode>
-	MATAZURE_GENERAL enable_if_t<is_same<_Mode, array_access_t>::value, value_type> index_imp(pointi<rank> index) const {
+	MATAZURE_GENERAL enable_if_t<is_same<_Mode, array_access_t>::value, reference> index_imp(pointi<rank> index) const {
 		return fun_(index);
 	}
 
 	template <typename _Mode>
-	MATAZURE_GENERAL enable_if_t<is_same<_Mode, linear_access_t>::value, value_type> index_imp(pointi<rank> index) const {
+	MATAZURE_GENERAL enable_if_t<is_same<_Mode, linear_access_t>::value, reference> index_imp(pointi<rank> index) const {
 		return (*this)[index2offset(index, stride(), first_major_t{})];
 	}
 
 	template <typename _Mode>
-	MATAZURE_GENERAL enable_if_t<is_same<_Mode, array_access_t>::value, value_type> offset_imp(int_t i) const {
+	MATAZURE_GENERAL enable_if_t<is_same<_Mode, array_access_t>::value, reference> offset_imp(int_t i) const {
 		return (*this)(offset2index(i, stride(), first_major_t{}));
 	}
 
 	template <typename _Mode>
-	MATAZURE_GENERAL enable_if_t<is_same<_Mode, linear_access_t>::value, value_type> offset_imp(int_t i) const {
+	MATAZURE_GENERAL enable_if_t<is_same<_Mode, linear_access_t>::value, reference> offset_imp(int_t i) const {
 		return fun_(i);
 	}
 
