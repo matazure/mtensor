@@ -310,6 +310,18 @@ inline matazure::tensor<_Type, _Rank, _Layout> mem_clone(tensor<_Type, _Rank, _L
 	return ts_re;
 }
 
+template <typename _ValueType, int_t _Rank, typename _Layout, int_t _OutDim, typename _OutLayout = _Layout>
+inline auto reshape(cuda::tensor<_ValueType, _Rank, _Layout> ts, pointi<_OutDim> ext, _OutLayout* = nullptr)->cuda::tensor<_ValueType, _OutDim, _OutLayout>{
+	///TODO: assert size equal
+	cuda::tensor<_ValueType, _OutDim, _OutLayout> re(ext, ts.shared_data());
+	return re;
+}
+
+template <int_t _Rank>
+inline auto make_block(pointi<_Rank> extent){
+	
+}
+
 }//cuda
 
 
@@ -325,12 +337,6 @@ using cu_matrix = cu_tensor<_ValueType, 2, _Layout>;
 
 using cuda::mem_copy;
 using cuda::mem_clone;
-
-template <typename _ValueType, int_t _Rank, typename _Layout, int_t _OutDim, typename _OutLayout = _Layout>
-inline auto reshape(cuda::tensor<_ValueType, _Rank, _Layout> ts, pointi<_OutDim> ext, _OutLayout* = nullptr)->cuda::tensor<_ValueType, _OutDim, _OutLayout>{
-	///TODO: assert size equal
-	cuda::tensor<_ValueType, _OutDim, _OutLayout> re(ext, ts.shared_data());
-	return re;
-}
+using cuda::reshape;
 
 }

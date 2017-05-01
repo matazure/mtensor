@@ -213,6 +213,7 @@ public:
 	value_type			elements_[traits_t::size()];
 };
 
+static_assert(std::is_pod<static_tensor<float, dim<3,3>>>::value, "only supports pod type now");
 
 template <typename _Type, int_t _Rank, typename _Layout = first_major_t>
 class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout>> {

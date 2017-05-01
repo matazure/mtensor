@@ -96,7 +96,7 @@ inline auto conv_global(_Tensor ts)																			\
 namespace matazure { namespace cuda{ namespace puzzle{													\
 																										\
 template <typename _BlockDim, typename _Tensor, typename _TensorRe>										\
-inline tensor<typename _Tensor::value_type, _Tensor::rank> conv_block(_Tensor ts, _TensorRe &ts_re) {	\
+inline void conv_block(_Tensor ts, _TensorRe &ts_re) {													\
 	MATAZURE_STATIC_ASSERT_DIM_MATCHED(_Tensor, decltype(mask));										\
 	MATAZURE_STATIC_ASSERT_VALUE_TYPE_MATCHED(_Tensor, decltype(mask));									\
 	typedef typename _Tensor::value_type value_type;													\
@@ -127,8 +127,6 @@ inline tensor<typename _Tensor::value_type, _Tensor::rank> conv_block(_Tensor ts
 		});																								\
 		ts_re(block_idx.global) = sum;																	\
 	});																									\
-																										\
-	return ts_re;																						\
 }																										\
 																										\
 template <typename _BlockDim, typename _Tensor>															\
@@ -138,42 +136,37 @@ inline cuda::tensor<typename _Tensor::value_type, _Tensor::rank> conv_block(_Ten
 	return ts_re;																						\
 }																										\
 																										\
-}}}
+}}}  //end conv_block
 
-#define MATAZURE_PUZZEL_CONV_BLOCK_WITH_CRACK(conv_block_crack, mask)										\
+#define MATAZURE_PUZZEL_CONV_BLOCK_CRACK(conv_block_crack, mask)											\
 namespace matazure{namespace cuda{namespace puzzle{															\
 																											\
 template <typename _BlockDim, typename _Tensor, typename _TensorRe>											\
-inline tensor<typename _Tensor::value_type, _Tensor::rank> conv_block_crack(_Tensor ts, _TensorRe &ts_re) {	\
+inline void conv_block_crack(_Tensor ts, _TensorRe &ts_re) {												\
 	MATAZURE_STATIC_ASSERT_DIM_MATCHED(_Tensor, decltype(mask));											\
-	MATAZURE_STATIC_ASSERT_VALUE_TYPE_MATCHED(_Tensor, decltype(mask));										\
-	typedef typename _Tensor::value_type value_type;														\
+	typedef decay_t<typename _Tensor::value_type> value_type;												\
 																											\
 	constexpr auto block_ext = meta::array_to_pointi(_BlockDim{});											\
 	auto grid_ext = ts.shape() / block_ext;																	\
 	MATAZURE_ASSERT(equal(grid_ext * block_ext, ts.shape()));												\
 	MATAZURE_ASSERT(equal(ts.shape(), ts_re.shape()));														\
 																											\
-	auto mask_extent = mask.shape();																		\
-	auto mask_radius = mask_extent / 2;																		\
-																											\
 	block_for_index<_BlockDim>(grid_ext, [=] __device__ (block_index<_BlockDim> block_idx) {				\
 		__shared__ static_tensor<value_type, _BlockDim> shared_ts_block;									\
 		shared_ts_block(block_idx.local) = ts(block_idx.global);											\
 		device::barrier();																					\
 																											\
+		auto mask_radius = mask.shape() / 2;																\
 		if (inside(block_idx.local, mask_radius, block_idx.block_dim)) {									\
 			value_type sum = 0;																				\
 																											\
-			device::for_index(pointi<_Tensor::rank>::zeros(), mask_extent, [&](const pointi<2> &idx) {		\
+			device::for_index(pointi<_Tensor::rank>::zeros(), mask.shape(), [&](const pointi<2> &idx) {		\
 				sum += shared_ts_block(block_idx.local + idx - mask_radius) * mask(idx);					\
 			});																								\
 																											\
 			ts_re(block_idx.global) = sum;																	\
 		}																									\
 	});																										\
-																											\
-	return ts_re;																							\
 }																											\
 																											\
 template <typename _BlockDim, typename _Tensor>																\
@@ -183,4 +176,48 @@ inline cuda::tensor<typename _Tensor::value_type, _Tensor::rank> conv_block_crac
 	return ts_re;																							\
 }																											\
 																											\
-}}}	 //end MATAZURE_PUZZEL_CONV_BLOCK_WITH_CRACK
+}}}	 //end conv_block_crack
+																										
+#define MATAZURE_PUZZEL_CONV_BLOCK_OVERLAP(conv_block_overlap, mask)									\
+namespace matazure { namespace cuda { namespace puzzle {												\
+																										\
+template <typename _BlockDim, typename _Tensor, typename _TensorRe>										\
+inline void conv_block_overlap(_Tensor ts, _TensorRe &ts_re) {											\
+	MATAZURE_STATIC_ASSERT_DIM_MATCHED(_Tensor, decltype(mask));										\
+	typedef decay_t<typename _Tensor::value_type> value_type;											\
+																										\
+	constexpr auto block_ext = meta::array_to_pointi(_BlockDim{});										\
+	auto grid_ext = ts.shape() / block_ext;																\
+	MATAZURE_ASSERT(equal(grid_ext * block_ext, ts.shape()));											\
+	MATAZURE_ASSERT(equal(ts.shape(), ts_re.shape()));													\
+																										\
+	block_for_index<_BlockDim>(grid_ext, [=] __device__(block_index<_BlockDim> block_idx) {				\
+		__shared__ static_tensor<value_type, _BlockDim> shared_ts_block;								\
+		auto valid_block_shape = meta::array_to_pointi(													\
+			meta::add_c(meta::sub_c(_BlockDim{}, decltype(mask)::meta_shape()), meta::int_t_c<1>{})		\
+		);																								\
+		auto mask_radius = mask.shape() / 2;															\
+		auto valid_global_idx = valid_block_shape * block_idx.block + block_idx.local - mask_radius;	\
+		shared_ts_block(block_idx.local) = ts(valid_global_idx);										\
+		device::barrier();																				\
+																										\
+		if (inside(block_idx.local, mask_radius, block_idx.block_dim)) {								\
+			value_type sum = 0;																			\
+																										\
+			device::for_index(pointi<_Tensor::rank>::zeros(), mask.shape(), [&](const pointi<2> &idx) {	\
+				sum += shared_ts_block(block_idx.local + idx - mask_radius) * mask(idx);				\
+			});																							\
+																										\
+			ts_re(valid_global_idx) = sum;																\
+		}																								\
+	});																									\
+}																										\
+																										\
+template <typename _BlockDim, typename _Tensor>															\
+inline cuda::tensor<typename _Tensor::value_type, _Tensor::rank> conv_block_overlap(_Tensor ts) {		\
+	cuda::tensor<typename _Tensor::value_type, _Tensor::rank> ts_re(ts.shape());						\
+	conv_block_overlap<_BlockDim>(ts, ts_re);															\
+	return ts_re;																						\
+}																										\
+																										\
+}}}	 // end conv_block_overlap																					

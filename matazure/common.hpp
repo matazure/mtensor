@@ -339,12 +339,12 @@ public:
 		ts_(ts)
 	{}
 
-	MATAZURE_GENERAL auto operator()(pointi<_Tensor::rank> idx) const->decltype(zero<typename _Tensor::value_type>::value()) {
+	MATAZURE_GENERAL auto operator()(pointi<_Tensor::rank> idx) const->decltype(zero<decay_t<typename _Tensor::value_type>>::value()) {
 		if (MATAZURE_LIKELY(inside(idx, pointi<_Tensor::rank>::zeros(), ts_.shape()))) {
 			return ts_(idx);
 		}
 		else {
-			return zero<typename _Tensor::value_type>::value();
+			return zero<decay_t<typename _Tensor::value_type>>::value();
 		}
 	}
 };
