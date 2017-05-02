@@ -93,6 +93,9 @@ private:
 	const pointer data_;
 };
 
+template <typename _Type, typename _BlockDim, typename _Layout = first_major_t>
+using block_tensor = tensor<static_tensor<_Type, _BlockDim>, _BlockDim::size(), _Layout>;
+
 template <typename _ValueType, typename _Layout = first_major_t>
 using matrix = tensor<_ValueType, 2, _Layout>;
 
@@ -309,11 +312,6 @@ inline auto reshape(cuda::tensor<_ValueType, _Rank, _Layout> ts, pointi<_OutDim>
 	///TODO: assert size equal
 	cuda::tensor<_ValueType, _OutDim, _OutLayout> re(ext, ts.shared_data());
 	return re;
-}
-
-template <int_t _Rank>
-inline auto make_block(pointi<_Rank> extent){
-
 }
 
 }//cuda

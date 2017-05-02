@@ -344,6 +344,9 @@ private:
 template <typename _Type, typename _Layout = first_major_t>
 using matrix = tensor<_Type, 2, _Layout>;
 
+template <typename _Type, typename _BlockDim, typename _Layout = first_major_t>
+using block_tensor = tensor<static_tensor<_Type, _BlockDim>, _BlockDim::size(), _Layout>;
+
 //template <typename _Type, int_t _Col, int_t _Row>
 //using static_matrix = static_tensor<_Type,dim< _Col,  _Row>>;
 

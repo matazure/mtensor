@@ -349,6 +349,22 @@ public:
 	}
 };
 
+template <typename _Tensor>
+struct global_view_op{
+private:
+	_Tensor ts_;
+	typedef typename _Tensor::value_type block_type;
+public:
+	global_view_op(_Tensor ts) : ts_(ts) {}
+
+	MATAZURE_GENERAL auto operator()(pointi<_Tensor::rank> idx) const->decltype((ts_[0][0])){
+		auto block_dim = meta::array_to_pointi(block_type::meta_shape());
+		auto block_idx = idx / block_dim;
+		auto local_idx = idx % block_dim;
+		return ts_[block_idx][local_idx];
+	}
+};
+
 }
 
 #ifndef MATAZURE_CUDA
@@ -447,6 +463,12 @@ inline auto padding_zero(_Tensor ts, pointi<_Tensor::rank> padding0, pointi<_Ten
 template <typename _Tensor>
 inline auto clamp_zero(_Tensor ts)->decltype(make_lambda(ts.shape(), internal::clamp_zero_op<_Tensor>(ts), typename _Tensor::memory_type{})) {
 	return make_lambda(ts.shape(), internal::clamp_zero_op<_Tensor>(ts), typename _Tensor::memory_type{});
+}
+
+template <typename _Tensor>
+inline auto global_view(_Tensor ts)->decltype(make_lambda(ts.shape() * ts[0].shape(), internal::global_view_op<_Tensor>(ts), typename _Tensor::memory_type{})){
+	auto block_dim = meta::array_to_pointi(typename _Tensor::value_type::meta_shape());
+	return make_lambda(ts.shape() * block_dim, internal::global_view_op<_Tensor>(ts), typename _Tensor::memory_type{});
 }
 
 template <typename _Tensor>
