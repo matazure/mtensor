@@ -167,22 +167,14 @@ public:
 		return meta::array_to_pointi(meta_shape());
 	}
 
-	MATAZURE_GENERAL constexpr const_reference operator()(const pointi<rank> &idx) const {
-		return (*this)[index2offset(idx, stride(), first_major_t{})];
-	}
-
-	MATAZURE_GENERAL reference operator()(const pointi<rank> &idx) {
-		return (*this)[index2offset(idx, stride(), first_major_t{})];
-	}
-
 	template <typename ..._Idx>
 	MATAZURE_GENERAL constexpr const_reference operator()(_Idx... idx) const {
-		return (*this)(pointi<rank>{ idx... });
+		return (*this)[pointi<rank>{ idx... }];
 	}
 
 	template <typename ..._Idx>
 	MATAZURE_GENERAL reference operator()(_Idx... idx) {
-		return (*this)(pointi<rank>{ idx... });
+		return (*this)[pointi<rank>{ idx... }];
 	}
 
 	MATAZURE_GENERAL constexpr const_reference operator[](int_t i) const { return elements_[i]; }
@@ -190,11 +182,11 @@ public:
 	MATAZURE_GENERAL reference operator[](int_t i) { return elements_[i]; }
 
 	MATAZURE_GENERAL constexpr const_reference operator[](const pointi<rank> &idx) const {
-		return (*this)(idx);
+		return (*this)[index2offset(idx, stride(), first_major_t{})];
 	}
 
 	MATAZURE_GENERAL reference operator[](const pointi<rank> &idx) {
-		return (*this)(idx);
+		return (*this)[index2offset(idx, stride(), first_major_t{})];
 	}
 
 	MATAZURE_GENERAL constexpr int_t size() const { return traits_t::size(); }
@@ -295,17 +287,13 @@ public:
 
 	template <typename ..._Idx>
 	reference operator()(_Idx... idx) const {
-		return (*this)(pointi<rank>{ idx... });
-	}
-
-	reference operator()(const pointi<rank> &index) const {
-		return (*this)[index2offset(index, stride_, layout_type{})];
+		return (*this)[pointi<rank>{ idx... }];
 	}
 
 	reference operator[](int_t i) const { return data_[i]; }
 
 	reference operator[](const pointi<rank> &idx) const {
-		return (*this)(idx);
+		return (*this)[index2offset(idx, stride_, layout_type{})];
 	}
 
 	pointi<rank> shape() const { return extent_; }
@@ -387,7 +375,7 @@ public:
 		fun_(fun)
 	{}
 
-	reference operator()(pointi<rank> index) const {
+	reference operator[](pointi<rank> index) const {
 		return index_imp<access_type>(index);
 	}
 

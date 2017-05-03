@@ -56,19 +56,15 @@ public:
 
 	template <typename ..._Idx>
 	MATAZURE_GENERAL reference operator()(_Idx... idx) const {
-		return (*this)(pointi<rank>{ idx... });
+		return (*this)[pointi<rank>{ idx... }];
 	}
 
-	MATAZURE_GENERAL reference operator()(const pointi<rank> &index) const {
+	MATAZURE_GENERAL reference operator[](const pointi<rank> &index) const {
 		return (*this)[index2offset(index, stride_, layout_type{})];
 	}
 
 	MATAZURE_GENERAL reference operator[] (int_t i) const {
 		return data_[i];
-	}
-
-	MATAZURE_GENERAL reference operator[](const pointi<rank> &idx) const{
-		return (*this)(idx);
 	}
 
 	MATAZURE_GENERAL pointi<rank> shape() const { return extent_; }
@@ -129,10 +125,6 @@ public:
 		fun_(fun)
 	{ }
 
-	MATAZURE_DEVICE reference operator()(pointi<rank> index) const {
-		return index_imp<accessor_type>(index);
-	}
-
 	template <typename ..._Idx>
 	MATAZURE_DEVICE reference operator()(_Idx... idx) const {
 		return (*this)(pointi<rank>{ idx... });
@@ -143,7 +135,7 @@ public:
 	}
 
 	MATAZURE_DEVICE reference operator[](const pointi<rank> &idx) const {
-		return (*this)(idx);
+		return index_imp<accessor_type>(index);
 	}
 
 	tensor<decay_t<value_type>, rank> persist() const {
@@ -205,16 +197,17 @@ public:
 		fun_(fun)
 	{}
 
-	MATAZURE_GENERAL reference operator()(pointi<rank> index) const {
-		return index_imp<access_type>(index);
-	}
-
 	MATAZURE_GENERAL reference operator[](int_t i) const {
 		return offset_imp<access_type>(i);
 	}
 
 	MATAZURE_GENERAL reference operator[](const pointi<rank> &idx) const {
-		return (*this)(idx);
+		return index_imp<access_type>(index);
+	}
+
+	template <typename ..._Idx>
+	MATAZURE_GENERAL reference operator()(_Idx... idx) const {
+		return (*this)(pointi<rank>{ idx... });
 	}
 
 	tensor<decay_t<value_type>, rank> persist() const {
