@@ -58,7 +58,7 @@ inline __device__ void corner_index(pointi<4> origin, pointi<4> extent, _Func fu
 } //cuda
 } //matazure
 
-#define MATAZURE_PUZZEL_CONV_GLOBAL(conv_global, mask)														\
+#define MATAZURE_CUDA_PUZZEL_CONV_GLOBAL(conv_global, mask)														\
 namespace matazure{namespace cuda{ namespace puzzle {														\
 																											\
 namespace internal {																						\
@@ -92,7 +92,7 @@ inline auto conv_global(_Tensor ts)																			\
 																											\
 }}} //matazure/cuda/puzzle
 
-#define MATAZURE_PUZZEL_CONV_BLOCK(conv_block, mask)													\
+#define MATAZURE_CUDA_PUZZEL_CONV_BLOCK(conv_block, mask)													\
 namespace matazure { namespace cuda{ namespace puzzle{													\
 																										\
 template <typename _BlockDim, typename _Tensor, typename _TensorRe>										\
@@ -131,7 +131,7 @@ inline void conv_block(_Tensor ts, _TensorRe &ts_re) {													\
 																										\
 }}}  //end conv_block
 
-#define MATAZURE_PUZZEL_CONV_BLOCK_CRACK(conv_block_crack, mask)											\
+#define MATAZURE_CUDA_PUZZEL_CONV_BLOCK_CRACK(conv_block_crack, mask)											\
 namespace matazure{namespace cuda{namespace puzzle{															\
 																											\
 template <typename _BlockDim, typename _Tensor, typename _TensorRe>											\
@@ -164,7 +164,7 @@ inline void conv_block_crack(_Tensor ts, _TensorRe &ts_re) {												\
 																											\
 }}}	 //end conv_block_crack
 
-#define MATAZURE_PUZZEL_CONV_BLOCK_OVERLAP(conv_block_overlap, mask)									\
+#define MATAZURE_CUDA_PUZZEL_CONV_BLOCK_OVERLAP(conv_block_overlap, mask)									\
 namespace matazure { namespace cuda { namespace puzzle {												\
 																										\
 template <typename _BlockDim, typename _Tensor, typename _TensorRe>										\

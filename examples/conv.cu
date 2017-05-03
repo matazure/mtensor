@@ -4,10 +4,10 @@
 using namespace matazure;
 
 __constant__ static_tensor<float,dim< 3,  3>> mask;
-MATAZURE_PUZZEL_CONV_GLOBAL(conv_global, mask)
-MATAZURE_PUZZEL_CONV_BLOCK(conv_block, mask)
-MATAZURE_PUZZEL_CONV_BLOCK_CRACK(conv_block_crack, mask)
-MATAZURE_PUZZEL_CONV_BLOCK_OVERLAP(conv_block_overlap, mask)
+MATAZURE_CUDA_PUZZEL_CONV_GLOBAL(conv_global, mask)
+MATAZURE_CUDA_PUZZEL_CONV_BLOCK(conv_block, mask)
+MATAZURE_CUDA_PUZZEL_CONV_BLOCK_CRACK(conv_block_crack, mask)
+MATAZURE_CUDA_PUZZEL_CONV_BLOCK_OVERLAP(conv_block_overlap, mask)
 
 int main() {
 	try {
