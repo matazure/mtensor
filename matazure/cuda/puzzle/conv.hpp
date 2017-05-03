@@ -103,11 +103,11 @@ inline void conv_block(_Tensor ts, _TensorRe &ts_re) {													\
 																										\
 	constexpr auto block_ext = meta::array_to_pointi(_BlockDim{});										\
 	auto grid_ext = ts.shape() / block_ext;																\
-	MATAZURE_ASSERT(equal(grid_ext * block_ext, ts.shape()));											\
-	MATAZURE_ASSERT(equal(ts.shape(), ts_re.shape()));													\
+	MATAZURE_ASSERT(equal(grid_ext * block_ext, ts.shape()), "unaligned shape");						\
+	MATAZURE_ASSERT(equal(ts.shape(), ts_re.shape()), "unmatched shape");								\
 	auto shape_le = mask.shape() <= meta::array_to_pointi(_BlockDim{});									\
 	for(int_t i = 0; i <shape_le.size(); ++i){															\
-		MATAZURE_ASSERT(shape_le[i]);																	\
+		MATAZURE_ASSERT(shape_le[i], "block dim should be greater than mask shape");					\
 	}																									\
 	block_for_index<_BlockDim>(grid_ext, [=] __device__ (block_index<_BlockDim> block_idx) {			\
 		auto tmp_shape = 																				\
@@ -148,8 +148,8 @@ inline void conv_block_crack(_Tensor ts, _TensorRe &ts_re) {												\
 																											\
 	constexpr auto block_ext = meta::array_to_pointi(_BlockDim{});											\
 	auto grid_ext = ts.shape() / block_ext;																	\
-	MATAZURE_ASSERT(equal(grid_ext * block_ext, ts.shape()));												\
-	MATAZURE_ASSERT(equal(ts.shape(), ts_re.shape()));														\
+	MATAZURE_ASSERT(equal(grid_ext * block_ext, ts.shape()), "unaligned shape");							\
+	MATAZURE_ASSERT(equal(ts.shape(), ts_re.shape()), "unmatched shape");									\
 																											\
 	block_for_index<_BlockDim>(grid_ext, [=] __device__ (block_index<_BlockDim> block_idx) {				\
 		__shared__ static_tensor<value_type, _BlockDim> shared_ts_block;									\
@@ -188,8 +188,8 @@ inline void conv_block_overlap(_Tensor ts, _TensorRe &ts_re) {											\
 																										\
 	constexpr auto block_ext = meta::array_to_pointi(_BlockDim{});										\
 	auto grid_ext = ts.shape() / block_ext;																\
-	MATAZURE_ASSERT(equal(grid_ext * block_ext, ts.shape()));											\
-	MATAZURE_ASSERT(equal(ts.shape(), ts_re.shape()));													\
+	MATAZURE_ASSERT(equal(grid_ext * block_ext, ts.shape()), "unaligned shape");						\
+	MATAZURE_ASSERT(equal(ts.shape(), ts_re.shape()), "unmatched shape");								\
 																										\
 	block_for_index<_BlockDim>(grid_ext, [=] __device__(block_index<_BlockDim> block_idx) {				\
 		__shared__ static_tensor<value_type, _BlockDim> shared_ts_block;								\

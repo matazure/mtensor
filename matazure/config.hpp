@@ -86,29 +86,31 @@ struct blank_t {};
 #define MATAZURE_UNLIKELY(x) x
 #endif
 
-#if defined(MATAZURE_DISABLE_ASSERTS) || defined(NDEBUG)
+#if defined(MATAZURE_DISABLE_ASSERTS)
 
-# define MATAZURE_ASSERT(expr) ((void)0)
-# define MATAZURE_ASSERT_MSG(expr, msg) ((void)0)
-
-#elif defined(MATAZURE_ENABLE_ASSERT_HANDLER)
-#error not work
-
-namespace matazure
-{
-void assertion_failed(char const * expr, char const * function, char const * file, long line); //
-void assertion_failed_msg(char const * expr, char const * msg, char const * function, char const * file, long line); //
-}
-
-#define MATAZURE_ASSERT(expr) (MATAZURE_LIKELY(!!(expr))? ((void)0): ::matazure::assertion_failed(#expr, MATAZURE_CURRENT_FUNCTION, __FILE__, __LINE__))
-#define MATAZURE_ASSERT_MSG(expr, msg) (MATAZURE_LIKELY(!!(expr))? ((void)0): ::matazure::assertion_failed_msg(#expr, msg, MATAZURE_CURRENT_FUNCTION, __FILE__, __LINE__))
+#define MATAZURE_ASSERT(expr) ((void)0)
 
 #else
 
-# include <assert.h> // .h to support old libraries w/o <cassert> - effect is the same
+namespace matazure
+{
 
-# define MATAZURE_ASSERT(expr) assert(expr)
-# define MATAZURE_ASSERT_MSG(expr, msg) assert((expr)&&(msg))
+class assert_failed: public std::runtime_error{
+public:
+
+	assert_failed(const std::string &msg) :
+		std::runtime_error(msg)
+	{ }
+
+};
+
+inline void assertion_failed(char const * expr, char const * msg, char const * function, char const * file, long line) {
+	throw assert_failed(std::string(msg));
+}
+
+}
+
+#define MATAZURE_ASSERT(expr, msg) (MATAZURE_LIKELY(!!(expr))? ((void)0): ::matazure::assertion_failed(#expr, msg, MATAZURE_CURRENT_FUNCTION, __FILE__, __LINE__))
 
 #endif
 

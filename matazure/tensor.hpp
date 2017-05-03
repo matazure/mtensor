@@ -446,7 +446,7 @@ inline auto mem_clone(tensor<_Type, _Rank, _Layout> ts)->decltype(mem_clone(ts, 
 template <typename _ValueType, int_t _Rank, typename _Layout, int_t _OutDim, typename _OutLayout = _Layout>
 inline auto reshape(tensor<_ValueType, _Rank, _Layout> ts, pointi<_OutDim> ext, _OutLayout* = nullptr)->tensor<_ValueType, _OutDim, _OutLayout> {
 	tensor<_ValueType, _OutDim, _OutLayout> re(ext, ts.shared_data());
-	MATAZURE_ASSERT_MSG(re.size() == ts.size(), "the size of tensors are not equal");
+	MATAZURE_ASSERT(re.size() == ts.size(), "reshape need the size is the same");
 	return re;
 }
 
