@@ -446,10 +446,10 @@ inline auto slice(tensor<_T, _Rank, _Layout> ts, int_t i, enable_if_t<_DimIdx ==
 #ifdef MATAZURE_CUDA
 
 template <int_t _DimIdx, typename _T, int_t _Rank, typename _Layout>
-inline auto slice(cu_tensor<_T, _Rank, _Layout> ts, int_t i, enable_if_t<_DimIdx == _Rank-1>* = nullptr)->cu_tensor<_T, _Rank-1, _Layout>{
+inline auto slice(cuda::tensor<_T, _Rank, _Layout> ts, int_t i, enable_if_t<_DimIdx == _Rank-1>* = nullptr)->cuda::tensor<_T, _Rank-1, _Layout>{
 	auto slice_ext = internal::slice_point<_DimIdx>(ts.shape());
 	auto slice_size = prod(slice_ext);
-	cu_tensor<_T, _Rank-1, _Layout> ts_re(slice_ext, shared_ptr<_T>(ts.shared_data().get() + i * slice_size, [ts](_T *){ }));
+	cuda::tensor<_T, _Rank-1, _Layout> ts_re(slice_ext, shared_ptr<_T>(ts.shared_data().get() + i * slice_size, [ts](_T *){ }));
 	return ts_re;
 }
 

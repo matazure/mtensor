@@ -129,13 +129,6 @@ inline void conv_block(_Tensor ts, _TensorRe &ts_re) {													\
 	});																									\
 }																										\
 																										\
-template <typename _BlockDim, typename _Tensor>															\
-inline cuda::tensor<typename _Tensor::value_type, _Tensor::rank> conv_block(_Tensor ts) {				\
-	cuda::tensor<typename _Tensor::value_type, _Tensor::rank> ts_re(ts.shape());						\
-	conv_block<_BlockDim>(ts, ts_re);																	\
-	return ts_re;																						\
-}																										\
-																										\
 }}}  //end conv_block
 
 #define MATAZURE_PUZZEL_CONV_BLOCK_CRACK(conv_block_crack, mask)											\
@@ -167,13 +160,6 @@ inline void conv_block_crack(_Tensor ts, _TensorRe &ts_re) {												\
 			ts_re(block_idx.global) = sum;																	\
 		}																									\
 	});																										\
-}																											\
-																											\
-template <typename _BlockDim, typename _Tensor>																\
-inline cuda::tensor<typename _Tensor::value_type, _Tensor::rank> conv_block_crack(_Tensor ts) {				\
-	cuda::tensor<typename _Tensor::value_type, _Tensor::rank> ts_re(ts.shape());							\
-	conv_block_crack<_BlockDim>(ts, ts_re);																	\
-	return ts_re;																							\
 }																											\
 																											\
 }}}	 //end conv_block_crack
@@ -211,13 +197,6 @@ inline void conv_block_overlap(_Tensor ts, _TensorRe &ts_re) {											\
 			ts_re(valid_global_idx) = sum;																\
 		}																								\
 	});																									\
-}																										\
-																										\
-template <typename _BlockDim, typename _Tensor>															\
-inline cuda::tensor<typename _Tensor::value_type, _Tensor::rank> conv_block_overlap(_Tensor ts) {		\
-	cuda::tensor<typename _Tensor::value_type, _Tensor::rank> ts_re(ts.shape());						\
-	conv_block_overlap<_BlockDim>(ts, ts_re);															\
-	return ts_re;																						\
 }																										\
 																										\
 }}}	 // end conv_block_overlap

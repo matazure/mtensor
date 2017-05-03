@@ -19,7 +19,7 @@ template <typename _ValueType>
 void BM_cu_tensor_construct_and_destruct(benchmark::State& state) {
 	int_t size = 0;
 	while (state.KeepRunning()) {
-		cu_tensor<_ValueType,1> ts(state.range(0));
+		cuda::tensor<_ValueType,1> ts(state.range(0));
 		size = ts.size();
 	}
 

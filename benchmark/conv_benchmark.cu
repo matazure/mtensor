@@ -15,8 +15,8 @@ template <typename _ValueType>
 void BM_cu_conv_global(benchmark::State& state) {
 	pointi<2> ext;
 	fill(ext, state.range(0));
-	cu_tensor<_ValueType, 2> ts_src(ext);
-	cu_tensor<_ValueType, 2> ts_re(ts_src.shape());
+	cuda::tensor<_ValueType, 2> ts_src(ext);
+	cuda::tensor<_ValueType, 2> ts_re(ts_src.shape());
 	fill(host_mask, 1.0f / host_mask.size());
 	cuda::copy_symbol(host_mask, mask);
 
@@ -34,8 +34,8 @@ template <typename _ValueType>
 void BM_cu_conv_block(benchmark::State& state) {
 	pointi<2> ext;
 	fill(ext, state.range(0));
-	cu_tensor<_ValueType, 2> ts_src(ext);
-	cu_tensor<_ValueType, 2> ts_re(ts_src.shape());
+	cuda::tensor<_ValueType, 2> ts_src(ext);
+	cuda::tensor<_ValueType, 2> ts_re(ts_src.shape());
 	fill(host_mask, 1.0f / host_mask.size());
 	cuda::copy_symbol(host_mask, mask);
 
@@ -53,8 +53,8 @@ template <typename _ValueType>
 void BM_cu_conv_block_crack(benchmark::State& state) {
 	pointi<2> ext;
 	fill(ext, state.range(0));
-	cu_tensor<_ValueType, 2> ts_src(ext);
-	cu_tensor<_ValueType, 2> ts_re(ts_src.shape());
+	cuda::tensor<_ValueType, 2> ts_src(ext);
+	cuda::tensor<_ValueType, 2> ts_re(ts_src.shape());
 	fill(host_mask, 1.0f / host_mask.size());
 	cuda::copy_symbol(host_mask, mask);
 
@@ -95,8 +95,8 @@ template <typename _ValueType>
 void BM_cu_conv_block_overlap(benchmark::State& state) {
 	pointi<2> ext;
 	fill(ext, state.range(0));
-	cu_tensor<_ValueType, 2> ts_src(ext);
-	cu_tensor<_ValueType, 2> ts_re(ts_src.shape());
+	cuda::tensor<_ValueType, 2> ts_src(ext);
+	cuda::tensor<_ValueType, 2> ts_re(ts_src.shape());
 	fill(host_mask, 1.0f / host_mask.size());
 	cuda::copy_symbol(host_mask, mask);
 
@@ -114,8 +114,8 @@ template <typename _ValueType>
 void BM_cu_conv_block_overlap_with_block_tensor(benchmark::State& state) {
 	pointi<2> ext;
 	fill(ext, state.range(0));
-	cu_tensor<static_tensor<_ValueType, dim<16,16>>, 2> ts_src(ext / 16);
-	cu_tensor<static_tensor<_ValueType, dim<16,16>>, 2> ts_dst(ext / 16);
+	cuda::tensor<static_tensor<_ValueType, dim<16,16>>, 2> ts_src(ext / 16);
+	cuda::tensor<static_tensor<_ValueType, dim<16,16>>, 2> ts_dst(ext / 16);
 
 	auto ts_src_view = make_lambda(ext, [=] __matazure__ (pointi<2> idx)->float &{
 		auto block_idx = idx / pointi<2>{16, 16};

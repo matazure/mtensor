@@ -12,7 +12,7 @@ __global__ void for_each_gold_kenel(_ValueType *p_dst, int_t count){
 
 template <typename _ValueType>
 void BM_cu_for_each_gold(benchmark::State& state) {
-	cu_tensor<_ValueType, 1> ts_src(state.range(0));
+	cuda::tensor<_ValueType, 1> ts_src(state.range(0));
 
 	while (state.KeepRunning()) {
 		cuda::parallel_execution_policy policy;
@@ -32,7 +32,7 @@ void BM_cu_for_each_gold(benchmark::State& state) {
 
 template <typename _ValueType>
 void BM_cu_for_each(benchmark::State& state) {
-	cu_tensor<_ValueType, 1> ts_src(state.range(0));
+	cuda::tensor<_ValueType, 1> ts_src(state.range(0));
 
 	while (state.KeepRunning()) {
 		for_each(ts_src, [] __matazure__(_ValueType &e) {

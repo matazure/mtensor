@@ -48,13 +48,13 @@ void BM_zip(benchmark::State &state) {
 //
 //template <typename _ValueType>
 //void BM_cu_zip_gold(benchmark::State& state) {
-//	cu_tensor<_ValueType, 1> ts1(state.range(0));
-//	cu_tensor<_ValueType, 1> ts2(state.range(0));
+//	cuda::tensor<_ValueType, 1> ts1(state.range(0));
+//	cuda::tensor<_ValueType, 1> ts2(state.range(0));
 //	fill(ts1, _ValueType(1));
 //	fill(ts2, _ValueType(1));
 //
 //	while (state.KeepRunning()) {
-//		cu_tensor<float, 1> ts_re(ts1.shape());
+//		cuda::tensor<float, 1> ts_re(ts1.shape());
 //		cuda::execution_policy policy;
 //		cuda::assert_runtime_success(cuda::configure_grid(policy, tensor_operation_gold_kenel<_ValueType>));
 //		tensor_operation_gold_kenel<<< policy.grid_size(),
@@ -69,8 +69,8 @@ void BM_zip(benchmark::State &state) {
 //
 //template <typename _ValueType>
 //void BM_zip_operation(benchmark::State &state) {
-//	cu_tensor<_ValueType, 1> ts1(state.range(0));
-//	cu_tensor<_ValueType, 1> ts2(state.range(0));
+//	cuda::tensor<_ValueType, 1> ts1(state.range(0));
+//	cuda::tensor<_ValueType, 1> ts2(state.range(0));
 //	fill(ts1, _ValueType(1));
 //	fill(ts2, _ValueType(1));
 //

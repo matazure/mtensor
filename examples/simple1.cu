@@ -38,13 +38,13 @@ int main() {
 #ifdef MATAZURE_CUDA
 
 	//构造一个tsf2一样大小的cuda::tensor
-	cu_tensor<float, 2> cts(tsf2.shape());
-	printf("success construct %dx%d cu_tensor.\n", cts.shape()[0], cts.shape()[1]);
-	//cts[100] = 3; //runtime error! cu_tensor只有在device函数里可以访问数据
+	cuda::tensor<float, 2> cts(tsf2.shape());
+	printf("success construct %dx%d cuda::tensor.\n", cts.shape()[0], cts.shape()[1]);
+	//cts[100] = 3; //runtime error! cuda::tensor只有在device函数里可以访问数据
 	//将主机端的tsf2值拷贝到cts
 	mem_copy(tsf2, cts);
 
-	cu_tensor<float, 2> cts2(cts.shape());
+	cuda::tensor<float, 2> cts2(cts.shape());
 	//设备到设备的值拷贝
 	mem_copy(cts, cts2);
 

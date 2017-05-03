@@ -13,13 +13,13 @@ __global__ void tensor_operation_gold_kenel(_ValueType *p_dst, _ValueType *p1, _
 
 template <typename _ValueType>
 void BM_cu_tensor_operation_gold(benchmark::State& state) {
-	cu_tensor<_ValueType, 1> ts1(state.range(0));
-	cu_tensor<_ValueType, 1> ts2(state.range(0));
+	cuda::tensor<_ValueType, 1> ts1(state.range(0));
+	cuda::tensor<_ValueType, 1> ts2(state.range(0));
 	fill(ts1, _ValueType(1));
 	fill(ts2, _ValueType(1));
 
 	while (state.KeepRunning()) {
-		cu_tensor<_ValueType, 1> ts_re(ts1.shape());
+		cuda::tensor<_ValueType, 1> ts_re(ts1.shape());
 		cuda::execution_policy policy;
 		cuda::configure_grid(policy, tensor_operation_gold_kenel<_ValueType>);
 		tensor_operation_gold_kenel<<< policy.grid_size(),
@@ -69,8 +69,8 @@ void BM_host_tensor_operation(benchmark::State &st) {
 
 template <typename _ValueType>
 void BM_cu_tensor_operation(benchmark::State &st) {
-	cu_tensor<_ValueType, 1> ts1(st.range(0));
-	cu_tensor<_ValueType, 1> ts2(st.range(0));
+	cuda::tensor<_ValueType, 1> ts1(st.range(0));
+	cuda::tensor<_ValueType, 1> ts2(st.range(0));
 	fill(ts1, _ValueType(1));
 	fill(ts2, _ValueType(1));
 

@@ -50,16 +50,16 @@ auto BM_host2host_mem_copy = BM_mem_copy<tensor<byte, 1>, tensor<byte, 1>>;
 BENCHMARK(BM_host2host_mem_copy)->Range(1 << 10, 1 << 28)->UseRealTime();
 
 #ifdef MATAZURE_CUDA
-auto BM_device2host_mem_copy = BM_mem_copy<cu_tensor<byte, 1>, tensor<byte, 1>>;
+auto BM_device2host_mem_copy = BM_mem_copy<cuda::tensor<byte, 1>, tensor<byte, 1>>;
 BENCHMARK(BM_device2host_mem_copy)->Range(1 << 10, 1 << 28)->UseRealTime();
-auto BM_host2device_mem_copy = BM_mem_copy<tensor<byte, 1>, cu_tensor<byte, 1>>;
+auto BM_host2device_mem_copy = BM_mem_copy<tensor<byte, 1>, cuda::tensor<byte, 1>>;
 BENCHMARK(BM_host2device_mem_copy)->Range(1 << 10, 1 << 28)->UseRealTime();
-auto BM_device2device_mem_copy = BM_mem_copy<cu_tensor<byte, 1>, cu_tensor<byte, 1>>;
+auto BM_device2device_mem_copy = BM_mem_copy<cuda::tensor<byte, 1>, cuda::tensor<byte, 1>>;
 BENCHMARK(BM_device2device_mem_copy)->Range(1 << 10, 1 << 28)->UseRealTime();
 #endif
 
-auto BM_each_copy_gold_byte = BM_each_copy_gold<cu_tensor<byte, 1>>;
+auto BM_each_copy_gold_byte = BM_each_copy_gold<cuda::tensor<byte, 1>>;
 BENCHMARK(BM_each_copy_gold_byte)->Range(1 << 10, 1 << 28)->UseRealTime();
 
-auto BM_each_copy_gold_float = BM_each_copy_gold<cu_tensor<float, 1>>;
+auto BM_each_copy_gold_float = BM_each_copy_gold<cuda::tensor<float, 1>>;
 BENCHMARK(BM_each_copy_gold_float)->Range(1 << 10, 1 << 28)->UseRealTime();

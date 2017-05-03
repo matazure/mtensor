@@ -84,7 +84,7 @@ int main() {
 		}
 	}
 
-	cu_tensor<int, 2> tsfdsag;
+	cuda::tensor<int, 2> tsfdsag;
 
 #endif
 

@@ -30,7 +30,7 @@ int main() {
 	printf("reduce ts2 result: %d\n", re);
 
 #ifdef MATAZURE_CUDA
-	cu_tensor<int, 2> cts(10, 10);
+	cuda::tensor<int, 2> cts(10, 10);
 	fill(cts, 1);
 
 	//每个元素置为10, 设备端lambda需要加上__device__
@@ -38,7 +38,7 @@ int main() {
 		e = 10;
 	});
 
-	cu_tensor<int, 2> cts2(cts.shape());
+	cuda::tensor<int, 2> cts2(cts.shape());
 	copy(cts, cts2);
 
 	tensor<int, 2> ts_tmp(cts2.shape());

@@ -44,9 +44,9 @@ int main() {
 
 #ifdef MATAZURE_CUDA
 
-	cu_tensor<float, 2> cts1(10, 10);
+	cuda::tensor<float, 2> cts1(10, 10);
 	fill(cts1, 1.0f);
-	cu_tensor<float, 2> cts2(10, 10);
+	cuda::tensor<float, 2> cts2(10, 10);
 	fill(cts2, 2.0f);
 	auto lcts_1add2 = cts1 + cts2;
 
