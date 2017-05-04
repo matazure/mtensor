@@ -131,7 +131,7 @@ inline void conv_block(_Tensor ts, _TensorRe &ts_re) {													\
 																										\
 }}}  //end conv_block
 
-#define MATAZURE_CUDA_PUZZEL_CONV_BLOCK_CRACK(conv_block_crack, mask)											\
+#define MATAZURE_CUDA_PUZZEL_CONV_BLOCK_CRACK(conv_block_crack, mask)										\
 namespace matazure{namespace cuda{namespace puzzle{															\
 																											\
 template <typename _BlockDim, typename _Tensor, typename _TensorRe>											\
@@ -164,7 +164,7 @@ inline void conv_block_crack(_Tensor ts, _TensorRe &ts_re) {												\
 																											\
 }}}	 //end conv_block_crack
 
-#define MATAZURE_CUDA_PUZZEL_CONV_BLOCK_OVERLAP(conv_block_overlap, mask)									\
+#define MATAZURE_CUDA_PUZZEL_CONV_BLOCK_OVERLAP(conv_block_overlap, mask)								\
 namespace matazure { namespace cuda { namespace puzzle {												\
 																										\
 template <typename _BlockDim, typename _Tensor, typename _TensorRe>										\
@@ -172,18 +172,20 @@ inline void conv_block_overlap(_Tensor ts, _TensorRe &ts_re) {											\
 	MATAZURE_STATIC_ASSERT_DIM_MATCHED(_Tensor, decltype(mask));										\
 	typedef typename _Tensor::value_type value_type;													\
 																										\
-	constexpr auto block_ext = meta::array_to_pointi(_BlockDim{});										\
-	auto grid_ext = ts.shape() / block_ext;																\
-	MATAZURE_ASSERT(equal(grid_ext * block_ext, ts.shape()), "unaligned shape");						\
+	auto valid_block_dim = meta::array_to_pointi(														\
+		meta::add_c(meta::sub_c(_BlockDim{}, decltype(mask)::meta_shape_type{}), meta::int_t_c<1>{})	\
+	);																									\
+	auto grid_ext = ts.shape() / valid_block_dim;														\
+	MATAZURE_ASSERT(equal(grid_ext * valid_block_dim, ts.shape()), "unaligned shape");					\
 	MATAZURE_ASSERT(equal(ts.shape(), ts_re.shape()), "unmatched shape");								\
 																										\
 	block_for_index<_BlockDim>(grid_ext, [=] __device__(block_index<_BlockDim> block_idx) {				\
 		__shared__ static_tensor<value_type, _BlockDim> shared_ts_block;								\
-		auto valid_block_shape = meta::array_to_pointi(													\
+		auto valid_block_dim = meta::array_to_pointi(													\
 			meta::add_c(meta::sub_c(_BlockDim{}, decltype(mask)::meta_shape()), meta::int_t_c<1>{})		\
 		);																								\
 		auto mask_radius = mask.shape() / 2;															\
-		auto valid_global_idx = valid_block_shape * block_idx.block + block_idx.local - mask_radius;	\
+		auto valid_global_idx = valid_block_dim * block_idx.block + block_idx.local - mask_radius;	\
 		shared_ts_block(block_idx.local) = ts(valid_global_idx);										\
 		device::barrier();																				\
 																										\
