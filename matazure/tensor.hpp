@@ -381,7 +381,7 @@ public:
 
 	template <typename ..._Idx>
 	reference operator()(_Idx... idx) const {
-		return (*this)(pointi<rank>{ idx... });
+		return (*this)[pointi<rank>{ idx... }];
 	}
 
 	reference operator[](int_t i) const {

@@ -127,7 +127,7 @@ public:
 
 	template <typename ..._Idx>
 	MATAZURE_DEVICE reference operator()(_Idx... idx) const {
-		return (*this)(pointi<rank>{ idx... });
+		return (*this)[pointi<rank>{ idx... }];
 	}
 
 	MATAZURE_DEVICE reference operator[](int_t i) const {
@@ -135,7 +135,7 @@ public:
 	}
 
 	MATAZURE_DEVICE reference operator[](const pointi<rank> &idx) const {
-		return index_imp<accessor_type>(index);
+		return index_imp<accessor_type>(idx);
 	}
 
 	tensor<decay_t<value_type>, rank> persist() const {
@@ -202,12 +202,12 @@ public:
 	}
 
 	MATAZURE_GENERAL reference operator[](const pointi<rank> &idx) const {
-		return index_imp<access_type>(index);
+		return index_imp<access_type>(idx);
 	}
 
 	template <typename ..._Idx>
 	MATAZURE_GENERAL reference operator()(_Idx... idx) const {
-		return (*this)(pointi<rank>{ idx... });
+		return (*this)[pointi<rank>{ idx... }];
 	}
 
 	tensor<decay_t<value_type>, rank> persist() const {

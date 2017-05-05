@@ -162,7 +162,7 @@ inline typename _TS::value_type min(const _TS &ts) {
 template <typename _ValueType, int_t _Rank>
 inline MATAZURE_GENERAL bool inside(point<_ValueType, _Rank> idx, point<_ValueType, _Rank> origin, point<_ValueType, _Rank> extent) {
 	for (int_t i = 0; i < _Rank; ++i) {
-		if (MATAZURE_LIKELY(idx[i] < origin[i] || idx[i] + origin[i]>= extent[i] ))
+		if (MATAZURE_LIKELY(idx[i] < origin[i] || idx[i] >= extent[i] ))
 			return false;
 	}
 
@@ -172,7 +172,7 @@ inline MATAZURE_GENERAL bool inside(point<_ValueType, _Rank> idx, point<_ValueTy
 template <typename _ValueType, int_t _Rank>
 inline MATAZURE_GENERAL bool outside(point<_ValueType, _Rank> idx, point<_ValueType, _Rank> origin, point<_ValueType, _Rank> extent) {
 	for (int_t i = 0; i < _Rank; ++i) {
-		if (MATAZURE_LIKELY(idx[i] < origin[i] || idx[i] >= extent[i] - origin[i]))
+		if (MATAZURE_LIKELY(idx[i] < origin[i] || idx[i] >= extent[i] ))
 			return true;
 	}
 
