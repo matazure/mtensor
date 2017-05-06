@@ -224,44 +224,44 @@ inline void conv_block_overlap(_Tensor ts, _TensorRe &ts_re) {												\
 }}}	 // end conv_block_overlap
 
 
-#define MATAZURE_CUDA_PUZZEL_CONV_BLOCK_ALIGNED(conv_block_aligned, mask)								\
-namespace matazure { namespace cuda{ namespace puzzle{													\
-																										\
-template <typename _BlockDim, typename _Tensor, typename _TensorRe>										\
-inline void conv_block_aligned(_Tensor ts, _TensorRe &ts_re) {											\
-	MATAZURE_STATIC_ASSERT_DIM_MATCHED(_Tensor, decltype(mask));										\
-	MATAZURE_STATIC_ASSERT_VALUE_TYPE_MATCHED(_Tensor, decltype(mask));									\
-	typedef typename _Tensor::value_type value_type;													\
-																										\
-	constexpr auto block_ext = meta::array_to_pointi(_BlockDim{});										\
-	auto grid_ext = ts.shape() / block_ext;																\
-	MATAZURE_ASSERT(equal(grid_ext * block_ext, ts.shape()), "unaligned shape");						\
-	MATAZURE_ASSERT(equal(ts.shape(), ts_re.shape()), "unmatched shape");								\
-	auto shape_le = mask.shape() <= meta::array_to_pointi(_BlockDim{});									\
-	for(int_t i = 0; i <shape_le.size(); ++i){															\
-		MATAZURE_ASSERT(shape_le[i], "block dim should be greater than mask shape");					\
-	}																									\
-																										\
-	block_for_index<_BlockDim>(grid_ext, [=] __device__ (block_index<_BlockDim> block_idx) {			\
-		auto tmp_shape = 																				\
-			meta::sub_c(meta::add_c(_BlockDim{}, decltype(mask)::meta_shape()), meta::int_t_c<1>{});	\
-		__shared__ static_tensor<value_type, decltype(tmp_shape)> sh_ts_block;							\
-																										\
-		corner_index(pointi<_Tensor::rank>::zeros(), mask.shape(),										\
-			[&](pointi<_Tensor::rank> corner_idx){														\
-				sh_ts_block(block_idx.local + corner_idx) = ts(block_idx.global - corner_idx / 2 );		\
-			}																							\
-		);																								\
-		device::barrier();																				\
-																										\
-		auto sum = zero<value_type>::value();															\
-		device::for_index(pointi<_Tensor::rank>::zeros(), mask.shape(), [&](const pointi<2> &idx) {		\
-			sum += sh_ts_block(block_idx.local + idx) * mask(idx);										\
-		});																								\
-		ts_re(block_idx.global) = sum;																	\
-	});																									\
-}																										\
-																										\
+#define MATAZURE_CUDA_PUZZEL_CONV_BLOCK_ALIGNED(conv_block_aligned, mask)									\
+namespace matazure { namespace cuda{ namespace puzzle{														\
+																											\
+template <typename _BlockDim, typename _Tensor, typename _TensorRe>											\
+inline void conv_block_aligned(_Tensor ts, _TensorRe &ts_re) {												\
+	MATAZURE_STATIC_ASSERT_DIM_MATCHED(_Tensor, decltype(mask));											\
+	MATAZURE_STATIC_ASSERT_VALUE_TYPE_MATCHED(_Tensor, decltype(mask));										\
+	typedef typename _Tensor::value_type value_type;														\
+																											\
+	constexpr auto block_ext = meta::array_to_pointi(_BlockDim{});											\
+	auto grid_ext = ts.shape() / block_ext;																	\
+	MATAZURE_ASSERT(equal(grid_ext * block_ext, ts.shape()), "unaligned shape");							\
+	MATAZURE_ASSERT(equal(ts.shape(), ts_re.shape()), "unmatched shape");									\
+	auto shape_le = mask.shape() <= meta::array_to_pointi(_BlockDim{});										\
+	for(int_t i = 0; i <shape_le.size(); ++i){																\
+		MATAZURE_ASSERT(shape_le[i], "block dim should be greater than mask shape");						\
+	}																										\
+																											\
+	block_for_index<_BlockDim>(grid_ext, [=] __device__ (block_index<_BlockDim> block_idx) {				\
+		auto tmp_shape = 																					\
+			meta::sub_c(meta::add_c(_BlockDim{}, decltype(mask)::meta_shape()), meta::int_t_c<1>{});		\
+		__shared__ static_tensor<value_type, decltype(tmp_shape)> sh_ts_block;								\
+																											\
+		corner_index(pointi<_Tensor::rank>::zeros(), mask.shape(),											\
+			[&](pointi<_Tensor::rank> corner_idx){															\
+				sh_ts_block(block_idx.local + corner_idx) = ts(block_idx.global - corner_idx / 2 );			\
+			}																								\
+		);																									\
+		device::barrier();																					\
+																											\
+		auto sum = zero<value_type>::value();																\
+		device::for_index(pointi<_Tensor::rank>::zeros(), mask.shape(), [&](const pointi<2> &idx) {			\
+			sum += sh_ts_block(block_idx.local + idx) * mask(idx);											\
+		});																									\
+		ts_re(block_idx.global) = sum;																		\
+	});																										\
+}																											\
+																											\
 }}}  //end conv_block
 
 #define MATAZURE_CUDA_PUZZEL_CONV_BLOCK_CRACK_ALIGNED(conv_block_crack_aligned, mask)						\
@@ -301,45 +301,45 @@ inline void conv_block_crack_aligned(_Tensor ts, _TensorRe &ts_re) {										\
 																											\
 }}}	 //end conv_block_crack
 
-#define MATAZURE_CUDA_PUZZEL_CONV_BLOCK_OVERLAP_ALIGNED(conv_block_overlap_aligned, mask)				\
-namespace matazure { namespace cuda { namespace puzzle {												\
-																										\
-template <typename _BlockDim, typename _Tensor, typename _TensorRe>										\
-inline void conv_block_overlap_aligned(_Tensor ts, _TensorRe &ts_re) {									\
-	MATAZURE_STATIC_ASSERT_DIM_MATCHED(_Tensor, decltype(mask));										\
-	typedef typename _Tensor::value_type value_type;													\
-																										\
-	auto valid_block_dim = meta::array_to_pointi(														\
-		meta::add_c(meta::sub_c(_BlockDim{}, decltype(mask)::meta_shape_type{}), meta::int_t_c<1>{})	\
-	);																									\
-	auto grid_ext = ts.shape() / valid_block_dim;														\
-	MATAZURE_ASSERT(equal(grid_ext * valid_block_dim, ts.shape()), "unaligned shape");					\
-	MATAZURE_ASSERT(equal(ts.shape(), ts_re.shape()), "unmatched shape");								\
-	auto shape_le = mask.shape() <= meta::array_to_pointi(_BlockDim{});									\
-	for(int_t i = 0; i <shape_le.size(); ++i){															\
-		MATAZURE_ASSERT(shape_le[i], "block dim could not be less than mask shape");					\
-	}																									\
-																										\
-	block_for_index<_BlockDim>(grid_ext, [=] __device__(block_index<_BlockDim> block_idx) {				\
-		__shared__ static_tensor<value_type, _BlockDim> sh_ts_block;									\
-		auto valid_block_dim = meta::array_to_pointi(													\
-			meta::add_c(meta::sub_c(_BlockDim{}, decltype(mask)::meta_shape()), meta::int_t_c<1>{})		\
-		);																								\
-		auto mask_radius = mask.shape() / 2;															\
-		auto valid_global_idx = valid_block_dim * block_idx.block + block_idx.local - mask_radius;		\
-		sh_ts_block(block_idx.local) = ts(valid_global_idx);											\
-		device::barrier();																				\
-																										\
-		if (inside(block_idx.local, mask_radius, block_idx.block_dim - mask_radius)) {					\
-			value_type sum = 0;																			\
-																										\
-			device::for_index(pointi<_Tensor::rank>::zeros(), mask.shape(), [&](const pointi<2> &idx) {	\
-				sum += sh_ts_block(block_idx.local + idx - mask_radius) * mask(idx);					\
-			});																							\
-																										\
-			ts_re(valid_global_idx) = sum;																\
-		}																								\
-	});																									\
-}																										\
-																										\
+#define MATAZURE_CUDA_PUZZEL_CONV_BLOCK_OVERLAP_ALIGNED(conv_block_overlap_aligned, mask)					\
+namespace matazure { namespace cuda { namespace puzzle {													\
+																											\
+template <typename _BlockDim, typename _Tensor, typename _TensorRe>											\
+inline void conv_block_overlap_aligned(_Tensor ts, _TensorRe &ts_re) {										\
+	MATAZURE_STATIC_ASSERT_DIM_MATCHED(_Tensor, decltype(mask));											\
+	typedef typename _Tensor::value_type value_type;														\
+																											\
+	auto valid_block_dim = meta::array_to_pointi(															\
+		meta::add_c(meta::sub_c(_BlockDim{}, decltype(mask)::meta_shape_type{}), meta::int_t_c<1>{})		\
+	);																										\
+	auto grid_ext = ts.shape() / valid_block_dim;															\
+	MATAZURE_ASSERT(equal(grid_ext * valid_block_dim, ts.shape()), "unaligned shape");						\
+	MATAZURE_ASSERT(equal(ts.shape(), ts_re.shape()), "unmatched shape");									\
+	auto shape_le = mask.shape() <= meta::array_to_pointi(_BlockDim{});										\
+	for(int_t i = 0; i <shape_le.size(); ++i){																\
+		MATAZURE_ASSERT(shape_le[i], "block dim could not be less than mask shape");						\
+	}																										\
+																											\
+	block_for_index<_BlockDim>(grid_ext, [=] __device__(block_index<_BlockDim> block_idx) {					\
+		__shared__ static_tensor<value_type, _BlockDim> sh_ts_block;										\
+		auto valid_block_dim = meta::array_to_pointi(														\
+			meta::add_c(meta::sub_c(_BlockDim{}, decltype(mask)::meta_shape()), meta::int_t_c<1>{})			\
+		);																									\
+		auto mask_radius = mask.shape() / 2;																\
+		auto valid_global_idx = valid_block_dim * block_idx.block + block_idx.local - mask_radius;			\
+		sh_ts_block(block_idx.local) = ts(valid_global_idx);												\
+		device::barrier();																					\
+																											\
+		if (inside(block_idx.local, mask_radius, block_idx.block_dim - mask_radius)) {						\
+			value_type sum = 0;																				\
+																											\
+			device::for_index(pointi<_Tensor::rank>::zeros(), mask.shape(), [&](const pointi<2> &idx) {		\
+				sum += sh_ts_block(block_idx.local + idx - mask_radius) * mask(idx);						\
+			});																								\
+																											\
+			ts_re(valid_global_idx) = sum;																	\
+		}																									\
+	});																										\
+}																											\
+																											\
 }}}	 // end conv_block_overlap

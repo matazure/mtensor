@@ -1,5 +1,4 @@
 ﻿#include <matazure/tensor>
-#include <matazure/cuda/puzzle/conv.hpp>
 
 using namespace matazure;
 
