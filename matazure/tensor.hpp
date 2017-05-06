@@ -203,6 +203,9 @@ public:
 	value_type			elements_[traits_t::size()];
 };
 
+template <typename _Type, typename _Ext, typename _Tmp = enable_if_t<_Ext::size() == 2>>
+using static_matrix = static_tensor<_Type, _Ext>;
+
 static_assert(std::is_pod<static_tensor<float, dim<3,3>>>::value, "only supports pod type now");
 
 template <typename _Type, int_t _Rank, typename _Layout = first_major_t>
@@ -329,14 +332,14 @@ private:
 	value_type * 	data_;
 };
 
-template <typename _Type, typename _Layout = first_major_t>
-using matrix = tensor<_Type, 2, _Layout>;
+
+template <typename _ValueType, typename _Layout = first_major_t>
+using matrix = tensor<_ValueType, 2, _Layout>;
+template <typename _ValueType, typename _Layout = first_major_t>
+using vector = tensor<_ValueType, 1, _Layout>;
 
 template <typename _Type, typename _BlockDim, typename _Layout = first_major_t>
 using block_tensor = tensor<static_tensor<_Type, _BlockDim>, _BlockDim::size(), _Layout>;
-
-//template <typename _Type, int_t _Col, int_t _Row>
-//using static_matrix = static_tensor<_Type,dim< _Col,  _Row>>;
 
 namespace internal {
 

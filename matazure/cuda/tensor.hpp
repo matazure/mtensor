@@ -94,6 +94,8 @@ using block_tensor = tensor<static_tensor<_Type, _BlockDim>, _BlockDim::size(), 
 
 template <typename _ValueType, typename _Layout = first_major_t>
 using matrix = tensor<_ValueType, 2, _Layout>;
+template <typename _ValueType, typename _Layout = first_major_t>
+using vector = tensor<_ValueType, 1, _Layout>;
 
 template <typename _TensorSrc, typename _TensorDst>
 inline void mem_copy(_TensorSrc ts_src, _TensorDst cts_dst, enable_if_t<!are_host_memory<_TensorSrc, _TensorDst>::value && is_same<typename _TensorSrc::layout_type, typename _TensorDst::layout_type>::value>* = nullptr) {
