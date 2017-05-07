@@ -52,6 +52,8 @@ public:
 		data_(ts.data())
 	{ }
 
+	tensor(std::initializer_list<int_t> v) = delete;
+	
 	shared_ptr<value_type> shared_data() const { return sp_data_; }
 
 	template <typename ..._Idx>

@@ -69,7 +69,9 @@ struct blank_t {};
 #define MATAZURE_STATIC_ASSERT_VALUE_TYPE_MATCHED(T1, T2) static_assert(std::is_same<typename T1::value_type, typename T2::value_type>::value, \
 "the value type is not matched")
 
-#define MATAZURE_STATIC_ASSERT_IS_MATRIX(_Matrix) static_assert(std::is_same<matazure::tensor_expression<_Matrix> , _Matrix>::value && _Matrix::rank == 2)
+#define MATAZURE_STATIC_ASSERT_MEMORY_TYPE_MATCHED(T1, T2) static_assert(std::is_same<typename T1::memory_type, typename T2::memory_type>::value, "the memory type is not matched")
+
+#define MATAZURE_STATIC_ASSERT_MATRIX_RANK(T) static_assert(T::rank == 2, "the matrix rank should be 2")
 
 #define MATAZURE_CURRENT_FUNCTION "(unknown)"
 

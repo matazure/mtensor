@@ -6,6 +6,8 @@ namespace matazure {
 
 struct first_major_t {};
 struct last_major_t {};
+typedef first_major_t col_major_t;
+typedef last_major_t row_major_t;
 
 struct linear_access_t {};
 struct array_access_t {};
