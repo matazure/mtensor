@@ -6,5 +6,6 @@
 #include <matazure/meta.hpp>
 
 #include <matazure/numeric/prod.hpp>
+#include <matazure/cuda/numeric/prod.hpp>
 
 #include <matazure/cuda/puzzle/conv.hpp>

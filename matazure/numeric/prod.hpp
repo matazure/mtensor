@@ -3,7 +3,7 @@
 #include <matazure/common.hpp>
 
 namespace matazure {
-namespace puzzle {
+namespace numeric{
 
 namespace internal{
 

@@ -8,7 +8,7 @@ int main(){
 	cuda::matrix<float> cmat_rhs(100, 10);
 	fill(cmat_rhs, 2.0f);
 
-	auto cmat_re = puzzle::prod_general(cmat_lhs, cmat_rhs).persist();
+	auto cmat_re = numeric::prod_general(cmat_lhs, cmat_rhs).persist();
 	cuda::device_synchronize();
 
 	auto mat_re = mem_clone(cmat_re, host_t{});
