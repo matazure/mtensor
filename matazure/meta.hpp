@@ -11,21 +11,20 @@ using int_t_c = std::integral_constant<int_t, _V>;
 
 template <int_t ..._Values>
 struct array{
-	MATAZURE_GENERAL constexpr array():
-		elements_{_Values ...}
-	{}
 
 	MATAZURE_GENERAL static constexpr int_t size() {
 		return sizeof...(_Values);
 	}
 
-	int_t elements_[sizeof...(_Values)];
+	MATAZURE_GENERAL static constexpr std::array<int_t, sizeof...(_Values)> value() {
+		return { _Values ... };
+	}
 };
 
 template <int_t _Idx, int_t ..._Values>
 inline MATAZURE_GENERAL constexpr int_t at_c(array<_Values...> a) {
 	static_assert(_Idx < sizeof...(_Values), "_Idx should be less than meta array size");
-	return a.elements_[_Idx];
+	return array<_Values...>::value()[_Idx];
 }
 
 #define MATAZURE_META_BINARY_FUNC(name, op)																						\
