@@ -180,7 +180,7 @@ public:
 	const static int_t rank = _BlockDim::size();
 
 	MATAZURE_GENERAL block_index(pointi<rank> grid_extent, pointi<rank> local_idx, pointi<rank> block_idx, pointi<rank> global_idx) :
-		block_dim(meta::array_to_pointi(_BlockDim{})),
+		block_dim(_BlockDim::value()),
 		grid_dim(grid_extent),
 		global_dim(block_dim * grid_extent),
 		local(local_idx),
@@ -200,7 +200,7 @@ public:
 template <typename _Ext, typename _Fun>
 inline void block_for_index(pointi<_Ext::size()> grid_ext, _Fun fun) {
 	auto grid_dim = internal::pointi_to_dim3(grid_ext);
-	auto block_dim = internal::pointi_to_dim3(meta::array_to_pointi(_Ext{}));
+	auto block_dim = internal::pointi_to_dim3(_Ext::value());
 	kenel <<<grid_dim, block_dim>>> ([=] MATAZURE_DEVICE() {
 		auto local = internal::uint3_to_pointi<_Ext::size()>(threadIdx);
 		auto block = internal::uint3_to_pointi<_Ext::size()>(blockIdx);

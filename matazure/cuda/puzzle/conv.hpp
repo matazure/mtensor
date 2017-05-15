@@ -102,10 +102,10 @@ inline void conv_block(_Tensor ts, _TensorRe &ts_re) {														\
 	MATAZURE_STATIC_ASSERT_VALUE_TYPE_MATCHED(_Tensor, decltype(mask));										\
 	typedef typename _Tensor::value_type value_type;														\
 																											\
-	constexpr auto block_ext = meta::array_to_pointi(_BlockDim{});											\
+	constexpr auto block_ext = _BlockDim::value();											\
 	auto grid_ext = (ts.shape() + block_ext - 1) / block_ext;												\
 	MATAZURE_ASSERT(equal(ts.shape(), ts_re.shape()), "unmatched shape");									\
-	auto shape_le = mask.shape() <= meta::array_to_pointi(_BlockDim{});										\
+	auto shape_le = mask.shape() <= _BlockDim::value();										\
 	for(int_t i = 0; i <shape_le.size(); ++i){																\
 		MATAZURE_ASSERT(shape_le[i], "block dim could not be less than mask shape");						\
 	}																										\
@@ -144,10 +144,10 @@ inline void conv_block_crack(_Tensor ts, _TensorRe &ts_re) {												\
 	MATAZURE_STATIC_ASSERT_DIM_MATCHED(_Tensor, decltype(mask));											\
 	typedef typename _Tensor::value_type value_type;														\
 																											\
-	constexpr auto block_ext = meta::array_to_pointi(_BlockDim{});											\
+	constexpr auto block_ext = _BlockDim::value();											\
 	auto grid_ext = (ts.shape() + block_ext - 1) / block_ext;												\
 	MATAZURE_ASSERT(equal(ts.shape(), ts_re.shape()), "unmatched shape");									\
-	auto shape_le = mask.shape() <= meta::array_to_pointi(_BlockDim{});										\
+	auto shape_le = mask.shape() <= _BlockDim::value();										\
 	for(int_t i = 0; i <shape_le.size(); ++i){																\
 		MATAZURE_ASSERT(shape_le[i], "block dim could not be less than mask shape");						\
 	}																										\
@@ -190,7 +190,7 @@ inline void conv_block_overlap(_Tensor ts, _TensorRe &ts_re) {												\
 	);																										\
 	auto grid_ext = (ts.shape() + valid_block_dim - 1) / valid_block_dim;									\
 	MATAZURE_ASSERT(equal(ts.shape(), ts_re.shape()), "unmatched shape");									\
-	auto shape_le = mask.shape() <= meta::array_to_pointi(_BlockDim{});										\
+	auto shape_le = mask.shape() <= _BlockDim::value();										\
 	for(int_t i = 0; i <shape_le.size(); ++i){																\
 		MATAZURE_ASSERT(shape_le[i], "block dim could not be less than mask shape");						\
 	}																										\
@@ -233,11 +233,11 @@ inline void conv_block_aligned(_Tensor ts, _TensorRe &ts_re) {												\
 	MATAZURE_STATIC_ASSERT_VALUE_TYPE_MATCHED(_Tensor, decltype(mask));										\
 	typedef typename _Tensor::value_type value_type;														\
 																											\
-	constexpr auto block_ext = meta::array_to_pointi(_BlockDim{});											\
+	constexpr auto block_ext = _BlockDim::value();											\
 	auto grid_ext = ts.shape() / block_ext;																	\
 	MATAZURE_ASSERT(equal(grid_ext * block_ext, ts.shape()), "unaligned shape");							\
 	MATAZURE_ASSERT(equal(ts.shape(), ts_re.shape()), "unmatched shape");									\
-	auto shape_le = mask.shape() <= meta::array_to_pointi(_BlockDim{});										\
+	auto shape_le = mask.shape() <= _BlockDim::value();										\
 	for(int_t i = 0; i <shape_le.size(); ++i){																\
 		MATAZURE_ASSERT(shape_le[i], "block dim should be greater than mask shape");						\
 	}																										\
@@ -272,11 +272,11 @@ inline void conv_block_crack_aligned(_Tensor ts, _TensorRe &ts_re) {										\
 	MATAZURE_STATIC_ASSERT_DIM_MATCHED(_Tensor, decltype(mask));											\
 	typedef typename _Tensor::value_type value_type;														\
 																											\
-	constexpr auto block_ext = meta::array_to_pointi(_BlockDim{});											\
+	constexpr auto block_ext = _BlockDim::value();											\
 	auto grid_ext = ts.shape() / block_ext;																	\
 	MATAZURE_ASSERT(equal(grid_ext * block_ext, ts.shape()), "unaligned shape");							\
 	MATAZURE_ASSERT(equal(ts.shape(), ts_re.shape()), "unmatched shape");									\
-	auto shape_le = mask.shape() <= meta::array_to_pointi(_BlockDim{});										\
+	auto shape_le = mask.shape() <= _BlockDim::value();										\
 	for(int_t i = 0; i <shape_le.size(); ++i){																\
 		MATAZURE_ASSERT(shape_le[i], "block dim could not be less than mask shape");						\
 	}																										\
@@ -315,7 +315,7 @@ inline void conv_block_overlap_aligned(_Tensor ts, _TensorRe &ts_re) {										
 	auto grid_ext = ts.shape() / valid_block_dim;															\
 	MATAZURE_ASSERT(equal(grid_ext * valid_block_dim, ts.shape()), "unaligned shape");						\
 	MATAZURE_ASSERT(equal(ts.shape(), ts_re.shape()), "unmatched shape");									\
-	auto shape_le = mask.shape() <= meta::array_to_pointi(_BlockDim{});										\
+	auto shape_le = mask.shape() <= _BlockDim::value();										\
 	for(int_t i = 0; i <shape_le.size(); ++i){																\
 		MATAZURE_ASSERT(shape_le[i], "block dim could not be less than mask shape");						\
 	}																										\

@@ -12,15 +12,6 @@ namespace matazure {
 template <int_t... _Values>
 using dim = meta::array<_Values ...>;
 
-namespace meta{
-
-template <int_t... _Values>
-inline MATAZURE_GENERAL constexpr pointi<sizeof...(_Values)> array_to_pointi(dim<_Values...>){
-	return {_Values ...};
-}
-
-}
-
 template <int_t _Rank>
 inline MATAZURE_GENERAL typename pointi<_Rank>::value_type index2offset(const pointi<_Rank> &id, const pointi<_Rank> &stride, first_major_t) {
 	typename pointi<_Rank>::value_type offset = id[0];
@@ -164,7 +155,7 @@ public:
 	}
 
 	MATAZURE_GENERAL constexpr pointi<rank> shape() const {
-		return meta::array_to_pointi(meta_shape());
+		return meta_shape_type::value();
 	}
 
 	template <typename ..._Idx>

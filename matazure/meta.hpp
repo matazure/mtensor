@@ -1,10 +1,17 @@
 ﻿#pragma once
 
 #include <matazure/config.hpp>
-#include <array>
+#include <matazure/point.hpp>
 
 namespace matazure {
 namespace meta {
+
+namespace walkground{
+	template <int_t... _Values>
+	constexpr pointi<sizeof...(_Values)> get_pointi() {
+		return { _Values ... };
+	}
+}
 
 template <int_t _V>
 using int_t_c = std::integral_constant<int_t, _V>;
@@ -16,8 +23,8 @@ struct array{
 		return sizeof...(_Values);
 	}
 
-	MATAZURE_GENERAL static constexpr std::array<int_t, sizeof...(_Values)> value() {
-		return { _Values ... };
+	MATAZURE_GENERAL static constexpr point<int_t, sizeof...(_Values)> value() {
+		return walkground::get_pointi<_Values ...>();
 	}
 };
 
@@ -51,6 +58,11 @@ MATAZURE_META_BINARY_FUNC(sub, -)
 MATAZURE_META_BINARY_FUNC(mul, *)
 MATAZURE_META_BINARY_FUNC(div, /)
 MATAZURE_META_BINARY_FUNC(mod, %)
+
+template <int_t... _Values>
+inline MATAZURE_GENERAL constexpr pointi<sizeof...(_Values)> array_to_pointi(array<_Values...>){
+	return {_Values ...};
+}
 
 }
 }

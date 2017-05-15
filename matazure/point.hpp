@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <matazure/type_traits.hpp>
+#include <matazure/config.hpp>
 
 namespace matazure {
 

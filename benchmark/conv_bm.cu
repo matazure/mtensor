@@ -84,7 +84,7 @@ template <typename _ValueType, typename _BlockDim>
 void bm_cu_conv_block_crack_with_block_tensor(benchmark::State& state) {
 	pointi<2> ext;
 	fill(ext, state.range(0));
-	auto block_dim = meta::array_to_pointi(_BlockDim{});
+	auto block_dim = _BlockDim::value();
 	cuda::block_tensor<_ValueType, _BlockDim> ts_src(ext / block_dim);
 	cuda::block_tensor<_ValueType, _BlockDim> ts_dst(ext / block_dim);
 
@@ -130,7 +130,7 @@ template <typename _ValueType, typename _BlockDim>
 void bm_cu_conv_block_overlap_with_block_tensor(benchmark::State& state) {
 	pointi<2> ext;
 	fill(ext, state.range(0));
-	auto block_dim = meta::array_to_pointi(_BlockDim{});
+	auto block_dim = _BlockDim::value();
 	cuda::block_tensor<_ValueType, _BlockDim> ts_src(ext / block_dim);
 	cuda::block_tensor<_ValueType, _BlockDim> ts_dst(ext / block_dim);
 
@@ -196,7 +196,7 @@ template <typename _ValueType, typename _BlockDim>
 void bm_cu_conv_block_crack_aligned_with_block_tensor(benchmark::State& state) {
 	pointi<2> ext;
 	fill(ext, state.range(0));
-	auto block_dim = meta::array_to_pointi(_BlockDim{});
+	auto block_dim = _BlockDim::value();
 	cuda::block_tensor<_ValueType, _BlockDim> ts_src(ext / block_dim);
 	cuda::block_tensor<_ValueType, _BlockDim> ts_dst(ext / block_dim);
 
