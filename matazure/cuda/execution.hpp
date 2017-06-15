@@ -110,8 +110,8 @@ inline void configure_grid(execution_policy &exe_policy, __KernelFunc k)
 class parallel_execution_policy : public execution_policy {
 public:
 
-	int_t parallel_size() const		{ return parallel_size_; }
-	void parallel_size(int_t size)	{ parallel_size_ = size; }
+	int_t total_size() const		{ return parallel_size_; }
+	void total_size(int_t size)	{ parallel_size_ = size; }
 
 protected:
 	int_t parallel_size_;
@@ -146,7 +146,7 @@ inline void configure_grid(parallel_execution_policy &exe_policy, __KernelFunc k
 
 
 	auto pre_block_size = exe_policy.block_size();
-	auto tmp_block_size = __occDivideRoundUp(exe_policy.parallel_size(), exe_policy.grid_size());
+	auto tmp_block_size = __occDivideRoundUp(exe_policy.total_size(), exe_policy.grid_size());
 	tmp_block_size = __occRoundUp(tmp_block_size, 128);
 	exe_policy.block_size(std::min(tmp_block_size, pre_block_size));
 

@@ -225,7 +225,7 @@ public:
 
 	explicit tensor(pointi<rank> extent) :
 		extent_(extent),
-		stride_(get_stride(extent)),
+		stride_(accumulate_stride(extent)),
 		sp_data_(malloc_shared_memory(stride_[rank - 1])),
 		data_(sp_data_.get())
 	{ }
@@ -238,14 +238,14 @@ public:
 
 	explicit tensor(pointi<rank> extent, pinned_t pinned_v) :
 		extent_(extent),
-		stride_(get_stride(extent)),
+		stride_(accumulate_stride(extent)),
 		sp_data_(malloc_shared_memory(stride_[rank - 1], pinned_v)),
 		data_(sp_data_.get())
 	{ }
 
 	explicit tensor(pointi<rank> extent, unpinned_t) :
 		extent_(extent),
-		stride_(get_stride(extent)),
+		stride_(accumulate_stride(extent)),
 		sp_data_(malloc_shared_memory(stride_[rank - 1])),
 		data_(sp_data_.get())
 	{ }
@@ -254,7 +254,7 @@ public:
 
 	explicit tensor(pointi<rank> extent, std::shared_ptr<value_type> sp_data) :
 		extent_(extent),
-		stride_(get_stride(extent)),
+		stride_(accumulate_stride(extent)),
 		sp_data_(sp_data),
 		data_(sp_data_.get())
 	{ }
@@ -365,7 +365,7 @@ public:
 public:
 	lambda_tensor(const pointi<rank> &extent, _Func fun) :
 		extent_(extent),
-		stride_(matazure::get_stride(extent)),
+		stride_(matazure::accumulate_stride(extent)),
 		fun_(fun)
 	{}
 

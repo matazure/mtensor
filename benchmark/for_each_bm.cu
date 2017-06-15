@@ -16,7 +16,7 @@ void BM_cu_for_each_gold(benchmark::State& state) {
 
 	while (state.KeepRunning()) {
 		cuda::parallel_execution_policy policy;
-		policy.parallel_size(ts_src.size());
+		policy.total_size(ts_src.size());
 		cuda::configure_grid(policy, for_each_gold_kenel<_ValueType>);
 		for_each_gold_kenel<<< policy.grid_size(),
 			policy.block_size(),

@@ -184,13 +184,33 @@ struct zero<point<_T, _Rank>>{
 };
 
 template <int_t _Rank>
-inline MATAZURE_GENERAL pointi<_Rank> get_stride(pointi<_Rank> ex) {
+inline MATAZURE_GENERAL pointi<_Rank> accumulate_stride(pointi<_Rank> ex) {
 	pointi<_Rank>  stride;
 	stride[0] = ex[0];
 	for (int_t i = 1; i < _Rank; ++i) {
 		stride[i] = ex[i] * stride[i - 1];
 	}
 	return stride;
+}
+
+template <typename _ValueType, int_t _Rank>
+inline MATAZURE_GENERAL bool inside(point<_ValueType, _Rank> idx, point<_ValueType, _Rank> origin, point<_ValueType, _Rank> extent) {
+	for (int_t i = 0; i < _Rank; ++i) {
+		if (MATAZURE_LIKELY(idx[i] < origin[i] || idx[i] >= extent[i] ))
+			return false;
+	}
+
+	return true;
+}
+
+template <typename _ValueType, int_t _Rank>
+inline MATAZURE_GENERAL bool outside(point<_ValueType, _Rank> idx, point<_ValueType, _Rank> origin, point<_ValueType, _Rank> extent) {
+	for (int_t i = 0; i < _Rank; ++i) {
+		if (MATAZURE_LIKELY(idx[i] < origin[i] || idx[i] >= extent[i] ))
+			return true;
+	}
+
+	return false;
 }
 
 template <typename _Tuple, int_t rank = tuple_size<_Tuple>::value>
