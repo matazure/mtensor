@@ -1,15 +1,21 @@
 cmake_minimum_required(VERSION 3.0)
 
-project(MatazureTensor CXX C)
+project(MatazureTensor CXX)
 
-option(WITH_CUDA "Enable CUDA" ON)
-option(WITH_BENCHMARK "Enable Benchmark" ON) #unneccesary
+option(WITH_CUDA "With CUDA" ON)
+option(WITH_BENCHMARK "With Benchmark" ON)
+option(WITH_OPENMP "With OpenMP" ON)
 
 include_directories(.)
 set_property( GLOBAL PROPERTY USE_FOLDERS ON)
 
 if (WIN32)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+endif()
+
+if (WITH_OPENMP)
+	find_package(OpenMP)
+	set(CMAKE_CXX_FLAGS "${OpenMP_CXX_FLAGS}")
 endif()
 
 if (WITH_CUDA)

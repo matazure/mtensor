@@ -144,7 +144,6 @@ inline void configure_grid(parallel_execution_policy &exe_policy, __KernelFunc k
 	assert_occupancy_success(cudaOccMaxActiveBlocksPerMultiprocessor(&result, &occProp, &occAttrib, &occState, exe_policy.block_size(), exe_policy.shared_mem_bytes()));
 	exe_policy.grid_size(result.activeBlocksPerMultiprocessor * numSMs);
 
-
 	auto pre_block_size = exe_policy.block_size();
 	auto tmp_block_size = __occDivideRoundUp(exe_policy.total_size(), exe_policy.grid_size());
 	tmp_block_size = __occRoundUp(tmp_block_size, 128);

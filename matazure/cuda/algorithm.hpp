@@ -238,7 +238,7 @@ template <typename _ExecutionPolicy, typename _Tensor>
 inline void fill(_ExecutionPolicy policy, _Tensor ts, typename _Tensor::value_type v, enable_if_t<are_device_memory<_Tensor>::value>* = 0) {
 	for_each(policy, ts, [v] MATAZURE_DEVICE(typename _Tensor::value_type &element) {
 		element = v;
-	});
+	}, nullptr);
 }
 
 template <typename _Tensor>

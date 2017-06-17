@@ -1,14 +1,50 @@
 ﻿#pragma once
 
 #include <matazure/point.hpp>
+#include <matazure/execution.hpp>
 
 namespace matazure {
 
 template <typename _Func>
-inline MATAZURE_GENERAL void for_index(int_t first, int_t last, _Func fun) {
+inline MATAZURE_GENERAL void for_index(sequence_policy policy, int_t first, int_t last, _Func fun) {
 	for (int_t i = first; i < last; ++i) {
 		fun(i);
 	}
+}
+
+template <typename _Func>
+inline MATAZURE_GENERAL void for_index(sequence_vectorized_policy policy, int_t first, int_t last, _Func fun) {
+	#pragma simd //#pragma ivdep
+	for (int_t i = first; i < last; ++i) {
+		fun(i);
+	}
+}
+
+#ifdef _OPENMP
+
+template <typename _Func>
+inline MATAZURE_GENERAL void for_index(omp_policy policy, int_t first, int_t last, _Func fun){
+	#pragma omp parallel for
+	for (int_t i = first; i < last; ++i) {
+		fun(i);
+	}
+}
+
+template <typename _Func>
+inline MATAZURE_GENERAL void for_index(omp_vectorized_policy policy, int_t first, int_t last, _Func fun){
+	#pragma simd
+	#pragma omp parallel for
+	for (int_t i = first; i < last; ++i) {
+		fun(i);
+	}
+}
+
+#endif
+
+template <typename _Func>
+inline MATAZURE_GENERAL void for_index(int_t first, int_t last, _Func fun) {
+	sequence_policy seq{};
+	for_index(seq, first, last, fun);
 }
 
 template <typename _Func>
