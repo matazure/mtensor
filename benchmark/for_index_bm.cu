@@ -16,6 +16,7 @@ void BM_for_index(benchmark::State& state) {
 
 	state.SetItemsProcessed(ts1.size());
 }
+
 BENCHMARK_TEMPLATE1(BM_for_index, sequence_policy)->Range(1<<10, 1 << 28)->UseRealTime();
 BENCHMARK_TEMPLATE1(BM_for_index, sequence_vectorized_policy)->Range(1<<10, 1 << 28)->UseRealTime();
 BENCHMARK_TEMPLATE1(BM_for_index, omp_policy)->Range(1<<10, 1 << 28)->UseRealTime();
@@ -35,6 +36,7 @@ void BM_for_index_array(benchmark::State& state) {
 
 	state.SetItemsProcessed(ts1.size());
 }
+
 BENCHMARK_TEMPLATE2(BM_for_index_array, sequence_policy, 1)->Range(1<<10, 1 << 28)->UseRealTime();
 BENCHMARK_TEMPLATE2(BM_for_index_array, sequence_policy, 2)->Range(1<<5, 1 << 14)->UseRealTime();
 BENCHMARK_TEMPLATE2(BM_for_index_array, sequence_policy, 3)->Range(1<<3, 1 << 8)->UseRealTime();
