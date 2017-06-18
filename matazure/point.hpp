@@ -176,6 +176,14 @@ template <int_t _Rank> using points = point<short, _Rank>;
 template <int_t _Rank> using pointi = point<int_t, _Rank>;
 template <int_t _Rank> using pointf = point<float, _Rank>;
 
+template <typename _Ty, int_t _Rank>
+inline MATAZURE_GENERAL bool equal(point<_Ty, _Rank> lhs, point<_Ty, _Rank> rhs) {
+	for (int_t i = 0; i < lhs.size(); ++i) {
+		if ((lhs[i] != rhs[i])) return false;
+	}
+	return true;
+}
+
 template <typename _T, int_t _Rank>
 struct zero<point<_T, _Rank>>{
 	static constexpr point<_T, _Rank> value(){

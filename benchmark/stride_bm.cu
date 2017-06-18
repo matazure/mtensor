@@ -48,7 +48,7 @@ void BM_host_stride_dim2_gold(benchmark::State &state) {
 		}
 	}
 
-	auto bytes_size = static_cast<size_t>(prod(ts_re_ext)) * sizeof(_ValueType);
+	auto bytes_size = static_cast<size_t>(ts_re.size()) * sizeof(_ValueType);
 	state.SetBytesProcessed(state.iterations() * bytes_size);
 }
 
@@ -71,7 +71,7 @@ void BM_stride(benchmark::State &state) {
 
 	}
 
-	auto bytes_size = static_cast<size_t>(prod(ts_re_ext)) * sizeof(decltype(ts[0]));
+	auto bytes_size = static_cast<size_t>(ts_re.size()) * sizeof(decltype(ts[0]));
 	state.SetBytesProcessed(state.iterations() * bytes_size);
 }
 

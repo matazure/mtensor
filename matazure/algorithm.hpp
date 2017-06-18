@@ -277,66 +277,76 @@ inline MATAZURE_GENERAL void for_index(pointi<_Rank> origin, pointi<_Rank> exten
 	for_index(policy, origin, extent, fun);
 }
 
-template <typename _Tensor, typename _Fun>
-inline MATAZURE_GENERAL void for_each(_Tensor &ts, _Fun fun, enable_if_t<are_linear_access<_Tensor>::value && none_device_memory<_Tensor>::value>* = 0) {
-	for_index(0, ts.size(), [&](int_t i) {
+template <typename _ExectutionPolicy, typename _Tensor, typename _Fun>
+inline MATAZURE_GENERAL void for_each(_ExectutionPolicy policy, _Tensor &ts, _Fun fun, enable_if_t<are_linear_access<_Tensor>::value && none_device_memory<_Tensor>::value>* = 0) {
+	for_index(policy, 0, ts.size(), [&](int_t i) {
 		fun(ts[i]);
 	});
 }
 
-template <typename _Tensor, typename _Fun>
-inline MATAZURE_GENERAL void for_each(_Tensor &ts, _Fun fun, enable_if_t<!are_linear_access<_Tensor>::value && none_device_memory<_Tensor>::value>* = 0) {
-	for_index(pointi<_Tensor::rank>::zeor(), ts.shape(), [&](pointi<_Tensor::rank> idx) {
+template <typename _ExectutionPolicy, typename _Tensor, typename _Fun>
+inline MATAZURE_GENERAL void for_each(_ExectutionPolicy policy, _Tensor &ts, _Fun fun, enable_if_t<!are_linear_access<_Tensor>::value && none_device_memory<_Tensor>::value>* = 0) {
+	for_index(policy, pointi<_Tensor::rank>::zeor(), ts.shape(), [&](pointi<_Tensor::rank> idx) {
 		fun(ts(idx));
-	});
+	}, nullptr);
+}
+
+template <typename _Tensor, typename _Fun>
+inline MATAZURE_GENERAL void for_each(_Tensor &ts, _Fun fun, enable_if_t<none_device_memory<_Tensor>::value>* = 0) {
+	sequence_policy policy{};
+	for_each(policy, ts, fun, nullptr);
+}
+
+template <typename _ExectutionPolicy, typename _Tensor>
+inline MATAZURE_GENERAL void fill(_ExectutionPolicy policy, _Tensor &ts, typename _Tensor::value_type v, enable_if_t<none_device_memory<_Tensor>::value>* = 0) {
+	for_each(policy, ts, [v](typename _Tensor::value_type &x) { x = v;}, nullptr);
 }
 
 template <typename _Tensor>
 inline MATAZURE_GENERAL void fill(_Tensor &ts, typename _Tensor::value_type v, enable_if_t<none_device_memory<_Tensor>::value>* = 0) {
-	for_each(ts, [v](typename _Tensor::value_type &x) { x = v;});
+	sequence_policy policy{};
+	fill(policy, ts, v, nullptr);
 }
 
-template <typename _T1, typename _T2>
-inline MATAZURE_GENERAL void copy(const _T1 &lhs, _T2 &rhs, enable_if_t<are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
-	for_index(0, lhs.size(), [&](int_t i) {
+template <typename _ExectutionPolicy, typename _T1, typename _T2>
+inline MATAZURE_GENERAL void copy(_ExectutionPolicy policy, const _T1 &lhs, _T2 &rhs, enable_if_t<are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
+	for_index(policy, 0, lhs.size(), [&](int_t i) {
 		rhs[i] = lhs[i];
 	});
 }
 
-template <typename _T1, typename _T2>
-inline MATAZURE_GENERAL void copy(const _T1 &lhs, _T2 &rhs, enable_if_t<!are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
-	for_index(pointi<_T1::rank>::zeros(), lhs.shape(), [&](pointi<_T1::rank> idx) {
+template <typename _ExectutionPolicy, typename _T1, typename _T2>
+inline MATAZURE_GENERAL void copy(_ExectutionPolicy policy, const _T1 &lhs, _T2 &rhs, enable_if_t<!are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
+	for_index(policy, pointi<_T1::rank>::zeros(), lhs.shape(), [&](pointi<_T1::rank> idx) {
 		rhs(idx) = lhs(idx);
 	});
 }
 
-template <typename _T1, typename _T2, typename _TransFun>
-inline MATAZURE_GENERAL void transform(const _T1 &lhs, _T2 &rhs, _TransFun fun, enable_if_t<are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
-	for_index(0, lhs.size(), [&](int_t i) {
+template <typename _T1, typename _T2>
+inline MATAZURE_GENERAL void copy(const _T1 &lhs, _T2 &rhs, enable_if_t<none_device_memory<_T1, _T2>::value>* = 0) {
+	sequence_policy policy;
+	copy(policy, lhs, rhs, nullptr);
+}
+
+template <typename _ExectutionPolicy, typename _T1, typename _T2, typename _TransFun>
+inline MATAZURE_GENERAL void transform(_ExectutionPolicy policy, const _T1 &lhs, _T2 &rhs, _TransFun fun, enable_if_t<are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
+	for_index(policy, 0, lhs.size(), [&](int_t i) {
 		fun(lhs[i], rhs[i]);
+	});
+}
+
+template <typename _ExectutionPolicy, typename _T1, typename _T2, typename _TransFun>
+inline MATAZURE_GENERAL void transform(_ExectutionPolicy policy, const _T1 &lhs, _T2 &rhs, _TransFun fun, enable_if_t<!are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
+	for_index(policy, pointi<_T1::rank>::zeros(), lhs.shape(), [&](pointi<_T1::rank> idx) {
+		fun(lhs(idx), rhs(idx));
 	});
 }
 
 template <typename _T1, typename _T2, typename _TransFun>
 inline MATAZURE_GENERAL void transform(const _T1 &lhs, _T2 &rhs, _TransFun fun, enable_if_t<!are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
-	for_index(pointi<_T1::rank>::zeros(), lhs.shape(), [&](pointi<_T1::rank> idx) {
-		fun(lhs(idx), rhs(idx));
-	});
+	sequence_policy policy;
+	for_index(policy, lhs, rhs, fun, nullptr);
 }
-
-template <typename _T1, typename _T2>
-inline MATAZURE_GENERAL bool equal(_T1 lhs, _T2 rhs, enable_if_t<none_device_memory<_T1, _T2>::value>* = 0) {
-	for (int_t i = 0; i < lhs.size(); ++i) {
-		if (MATAZURE_UNLIKELY(lhs[i] != rhs[i])) return false;
-	}
-
-	return true;
-}
-//
-// template <typename _T1, typename _T2, typename _TransFun>
-// inline MATAZURE_GENERAL void equal(_T1 lhs, _T2 rhs, _TransFun fun, enable_if_t<!are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
-	//not implement
-// }
 
 template <typename _Tensor, typename _VT, typename _BinaryOp>
 inline MATAZURE_GENERAL _VT reduce(const _Tensor &ts, _VT init, _BinaryOp binaryop, enable_if_t<none_device_memory<_Tensor>::value>* = 0) {
@@ -348,41 +358,41 @@ inline MATAZURE_GENERAL _VT reduce(const _Tensor &ts, _VT init, _BinaryOp binary
 	return re;
 }
 
-template <typename _TS>
-inline MATAZURE_GENERAL auto sum(const _TS &ts)->typename _TS::value_type {
-	typedef typename _TS::value_type value_type;
-	return reduce(ts, zero<value_type>::value(), [&](value_type lhs, value_type rhs) {
-		return lhs + rhs;
-	});
-}
-
-template <typename _TS>
-inline MATAZURE_GENERAL typename _TS::value_type prod(const _TS &ts) {
-	typedef typename _TS::value_type value_type;
-	return reduce(ts, value_type(1), [&](value_type lhs, value_type rhs) {
-		return lhs * rhs;
-	});
-}
-
-template <typename _TS>
-inline MATAZURE_GENERAL auto mean(const _TS &ts)->typename _TS::value_type {
-	return sum(ts) / ts.size();
-}
-
-template <typename _TS>
-inline MATAZURE_GENERAL typename _TS::value_type max(const _TS &ts) {
-	typedef typename _TS::value_type value_type;
-	return reduce(ts, ts[0], [&](value_type lhs, value_type rhs) {
-		return rhs > lhs ? rhs : lhs;
-	});
-}
-
-template <typename _TS>
-inline MATAZURE_GENERAL typename _TS::value_type min(const _TS &ts) {
-	typedef typename _TS::value_type value_type;
-	return reduce(ts, numeric_limits<value_type>::max(), [&](value_type lhs, value_type rhs) {
-		return lhs <= rhs ? lhs : rhs;
-	});
-}
+// template <typename _TS>
+// inline MATAZURE_GENERAL auto sum(const _TS &ts)->typename _TS::value_type {
+// 	typedef typename _TS::value_type value_type;
+// 	return reduce(ts, zero<value_type>::value(), [&](value_type lhs, value_type rhs) {
+// 		return lhs + rhs;
+// 	});
+// }
+//
+// template <typename _TS>
+// inline MATAZURE_GENERAL typename _TS::value_type prod(const _TS &ts) {
+// 	typedef typename _TS::value_type value_type;
+// 	return reduce(ts, value_type(1), [&](value_type lhs, value_type rhs) {
+// 		return lhs * rhs;
+// 	});
+// }
+//
+// template <typename _TS>
+// inline MATAZURE_GENERAL auto mean(const _TS &ts)->typename _TS::value_type {
+// 	return sum(ts) / ts.size();
+// }
+//
+// template <typename _TS>
+// inline MATAZURE_GENERAL typename _TS::value_type max(const _TS &ts) {
+// 	typedef typename _TS::value_type value_type;
+// 	return reduce(ts, ts[0], [&](value_type lhs, value_type rhs) {
+// 		return rhs > lhs ? rhs : lhs;
+// 	});
+// }
+//
+// template <typename _TS>
+// inline MATAZURE_GENERAL typename _TS::value_type min(const _TS &ts) {
+// 	typedef typename _TS::value_type value_type;
+// 	return reduce(ts, numeric_limits<value_type>::max(), [&](value_type lhs, value_type rhs) {
+// 		return lhs <= rhs ? lhs : rhs;
+// 	});
+// }
 
 }
