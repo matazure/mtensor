@@ -1,5 +1,6 @@
 #include <benchmark/benchmark.h>
 #include <matazure/tensor>
+#include <cmath>
 
 using namespace matazure;
 
@@ -9,7 +10,7 @@ void BM_for_index(benchmark::State& state) {
 	tensor<float, 1> ts2(ts1.shape());
 	while (state.KeepRunning()) {
 		for_index(_ExecutionPolicy{}, 0, ts1.size(), [=](int_t i) {
-			ts2[i] = ts1[i] / ts2[i] + ts2[i] * ts1[i];
+			ts2[i] = std::sin(ts1[i]) / ts2[i] + std::sqrt(ts2[i]) * ts1[i];
 		});
 	}
 
@@ -20,62 +21,35 @@ BENCHMARK_TEMPLATE1(BM_for_index, sequence_vectorized_policy)->Range(1<<10, 1 <<
 BENCHMARK_TEMPLATE1(BM_for_index, omp_policy)->Range(1<<10, 1 << 28)->UseRealTime();
 BENCHMARK_TEMPLATE1(BM_for_index, omp_vectorized_policy)->Range(1<<10, 1 << 28)->UseRealTime();
 
+template <typename _ExecutionPolicy, int_t _Rank>
+void BM_for_index_array(benchmark::State& state) {
+	pointi<_Rank> shape{};
+	fill(shape, state.range(0));
+	tensor<float, _Rank> ts1(shape);
+	tensor<float, _Rank> ts2(ts1.shape());
+	while (state.KeepRunning()) {
+		for_index(_ExecutionPolicy{}, pointi<_Rank>{0}, ts1.shape(), [=](pointi<_Rank> idx) {
+			ts2[idx] = std::sin(ts1[idx]) / ts2[idx] + std::sqrt(ts2[idx]) * ts1[idx];
+		});
+	}
+
+	state.SetItemsProcessed(ts1.size());
+}
+BENCHMARK_TEMPLATE2(BM_for_index_array, sequence_policy, 1)->Range(1<<10, 1 << 28)->UseRealTime();
+BENCHMARK_TEMPLATE2(BM_for_index_array, sequence_policy, 2)->Range(1<<5, 1 << 14)->UseRealTime();
+BENCHMARK_TEMPLATE2(BM_for_index_array, sequence_policy, 3)->Range(1<<3, 1 << 8)->UseRealTime();
+BENCHMARK_TEMPLATE2(BM_for_index_array, sequence_policy, 4)->Range(1<<2, 1 << 7)->UseRealTime();
+BENCHMARK_TEMPLATE2(BM_for_index_array, sequence_vectorized_policy, 1)->Range(1<<10, 1 << 28)->UseRealTime();
+BENCHMARK_TEMPLATE2(BM_for_index_array, sequence_vectorized_policy, 2)->Range(1<<5, 1 << 14)->UseRealTime();
+BENCHMARK_TEMPLATE2(BM_for_index_array, sequence_vectorized_policy, 3)->Range(1<<3, 1 << 8)->UseRealTime();
+BENCHMARK_TEMPLATE2(BM_for_index_array, sequence_vectorized_policy, 4)->Range(1<<2, 1 << 7)->UseRealTime();
+BENCHMARK_TEMPLATE2(BM_for_index_array, omp_policy, 1)->Range(1<<10, 1 << 28)->UseRealTime();
+BENCHMARK_TEMPLATE2(BM_for_index_array, omp_policy, 2)->Range(1<<5, 1 << 14)->UseRealTime();
+BENCHMARK_TEMPLATE2(BM_for_index_array, omp_policy, 3)->Range(1<<3, 1 << 8)->UseRealTime();
+BENCHMARK_TEMPLATE2(BM_for_index_array, omp_policy, 4)->Range(1<<2, 1 << 7)->UseRealTime();
+BENCHMARK_TEMPLATE2(BM_for_index_array, omp_vectorized_policy, 1)->Range(1<<10, 1 << 28)->UseRealTime();
+BENCHMARK_TEMPLATE2(BM_for_index_array, omp_vectorized_policy, 2)->Range(1<<5, 1 << 14)->UseRealTime();
+BENCHMARK_TEMPLATE2(BM_for_index_array, omp_vectorized_policy, 3)->Range(1<<3, 1 << 8)->UseRealTime();
+BENCHMARK_TEMPLATE2(BM_for_index_array, omp_vectorized_policy, 4)->Range(1<<2, 1 << 7)->UseRealTime();
 
 
-
-//template <typename _ValueType>
-//__global__ void for_each_gold_kenel(_ValueType *p_dst, int_t count){
-//	for (int_t i = threadIdx.x + blockIdx.x * blockDim.x; i < count; i += blockDim.x * gridDim.x) {
-//		p_dst[i] = static_cast<_ValueType>(1);
-//	}
-//}
-//
-//template <typename _ValueType>
-//void BM_cu_for_each_gold(benchmark::State& state) {
-//	cuda::tensor<_ValueType, 1> ts_src(state.range(0));
-//
-//	while (state.KeepRunning()) {
-//		cuda::parallel_execution_policy policy;
-//		policy.total_size(ts_src.size());
-//		cuda::configure_grid(policy, for_each_gold_kenel<_ValueType>);
-//		for_each_gold_kenel<<< policy.grid_size(),
-//			policy.block_size(),
-//			policy.shared_mem_bytes(),
-//			policy.stream() >>>(ts_src.data(), ts_src.size());
-//
-//		cuda::device_synchronize();
-//	}
-//
-//	auto bytes_size = static_cast<size_t>(ts_src.size()) * sizeof(_ValueType);
-//	state.SetBytesProcessed(state.iterations() * bytes_size);
-//}
-//
-//template <typename _ValueType>
-//void BM_cu_for_each(benchmark::State& state) {
-//	cuda::tensor<_ValueType, 1> ts_src(state.range(0));
-//
-//	while (state.KeepRunning()) {
-//		for_each(ts_src, [] __matazure__ (_ValueType &e) {
-//			e = 1.0f;
-//		});
-//
-//		cuda::device_synchronize();
-//	}
-//
-//	auto bytes_size = static_cast<size_t>(ts_src.size()) * sizeof(_ValueType);
-//	state.SetBytesProcessed(state.iterations() * bytes_size);
-//}
-//
-//BENCHMARK_TEMPLATE1(BM_cu_for_each_gold, byte)->Range(1<<10, 1 << 28)->UseRealTime();
-//BENCHMARK_TEMPLATE1(BM_cu_for_each_gold, int16_t)->Range(1<<10, 1 << 28)->UseRealTime();
-//BENCHMARK_TEMPLATE1(BM_cu_for_each_gold, int32_t)->Range(1<<10, 1 << 28)->UseRealTime();
-//BENCHMARK_TEMPLATE1(BM_cu_for_each_gold, int64_t)->Range(1<<10, 1 << 28)->UseRealTime();
-//BENCHMARK_TEMPLATE1(BM_cu_for_each_gold, float)->Range(1<<10, 1 << 28)->UseRealTime();
-//BENCHMARK_TEMPLATE1(BM_cu_for_each_gold, double)->Range(1<<10, 1 << 28)->UseRealTime();
-//
-//BENCHMARK_TEMPLATE1(BM_cu_for_each, byte)->Range(1<<10, 1 << 28)->UseRealTime();
-//BENCHMARK_TEMPLATE1(BM_cu_for_each, int16_t)->Range(1<<10, 1 << 28)->UseRealTime();
-//BENCHMARK_TEMPLATE1(BM_cu_for_each, int32_t)->Range(1<<10, 1 << 28)->UseRealTime();
-//BENCHMARK_TEMPLATE1(BM_cu_for_each, int64_t)->Range(1<<10, 1 << 28)->UseRealTime();
-//BENCHMARK_TEMPLATE1(BM_cu_for_each, float)->Range(1<<10, 1 << 28)->UseRealTime();
-//BENCHMARK_TEMPLATE1(BM_cu_for_each, double)->Range(1<<10, 1 << 28)->UseRealTime();
