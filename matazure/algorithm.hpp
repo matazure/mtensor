@@ -286,7 +286,7 @@ inline MATAZURE_GENERAL void for_each(_ExectutionPolicy policy, _Tensor &ts, _Fu
 
 template <typename _ExectutionPolicy, typename _Tensor, typename _Fun>
 inline MATAZURE_GENERAL void for_each(_ExectutionPolicy policy, _Tensor &ts, _Fun fun, enable_if_t<!are_linear_access<_Tensor>::value && none_device_memory<_Tensor>::value>* = 0) {
-	for_index(policy, pointi<_Tensor::rank>::zeor(), ts.shape(), [&](pointi<_Tensor::rank> idx) {
+	for_index(policy, pointi<_Tensor::rank>::zeros(), ts.shape(), [&](pointi<_Tensor::rank> idx) {
 		fun(ts(idx));
 	}, nullptr);
 }
