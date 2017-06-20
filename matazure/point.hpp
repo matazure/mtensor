@@ -24,6 +24,12 @@ public:
 		return { 0 };
 	}
 
+	MATAZURE_GENERAL static point all(value_type v) {
+		point re{};
+		fill(re, v);
+		return re;
+	}
+
 public:
 	value_type elements_[rank];
 };
