@@ -39,7 +39,6 @@ float main(){
 	cuda::device_synchronize();
 	return 0;
 }
-
 ```
 可以看出，使用Tensor库，异构程序的开发效率可以获得极大的提升。下面的程序用于rgb图像归一化并分离三个通道的数据
 ``` cpp
