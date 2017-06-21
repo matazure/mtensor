@@ -54,7 +54,7 @@ foreach(File ${Files})
 	get_filename_component(FileName ${File} NAME_WE)
 	add_executable(${FileName} ${File})
 	set_target_properties(${FileName} PROPERTIES LINKER_LANGUAGE CXX)
-	target_compile_features(${FileName} PRIVATE cxx_lambdas cxx_variadic_macros cxx_nullptr cxx_variadic_templates)
+	target_compile_features(${FileName} PRIVATE cxx_constexpr cxx_deleted_functions cxx_lambdas cxx_rvalue_references cxx_variadic_templates)
 endforeach()
 
 if (WITH_BENCHMARK)
