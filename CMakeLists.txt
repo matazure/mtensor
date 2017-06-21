@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.1)
 
 project(MatazureTensor CXX)
 
@@ -20,7 +20,7 @@ endif()
 
 if (UNIX)
 	add_definitions("-x c++")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+	# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11") #conflict with  CUDA_NVCC_FLAGS, so use target_compile_features
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}-s -O3 -Wall")
 endif()
 
@@ -31,9 +31,9 @@ if (WITH_CUDA)
 
 	find_package(CUDA 8.0 REQUIRED)
 	set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} --expt-extended-lambda -Wno-deprecated-gpu-targets")
-	# if (UNIX)
-	# 	set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} --std=c++11")
-	# endif()
+	if (UNIX)
+		set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} --std=c++11")
+	endif()
 	if (MSVC)
 		set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -Xcompiler \"/wd4819 /wd4503\" ")
 	endif()
@@ -47,12 +47,14 @@ if (WITH_CUDA)
 	endforeach()
 endif()
 
+#add example targets
 file(GLOB Files ${CMAKE_CURRENT_SOURCE_DIR}/examples/*.cpp)
 foreach(File ${Files})
 	set_source_files_properties(${File} PROPERTIES LANGUAGE CXX)
 	get_filename_component(FileName ${File} NAME_WE)
 	add_executable(${FileName} ${File})
 	set_target_properties(${FileName} PROPERTIES LINKER_LANGUAGE CXX)
+	target_compile_features(${FileName} PRIVATE cxx_lambdas cxx_variadic_macros cxx_nullptr cxx_variadic_templates)
 endforeach()
 
 if (WITH_BENCHMARK)
