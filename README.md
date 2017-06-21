@@ -1,4 +1,4 @@
-# [Tensor](https://github.com/Matazure/tensor)
+# [Tensor](https://github.com/Matazure/tensor)[![Build Status](https://travis-ci.org/zhangzhimin/tensor.svg?branch=master)](https://travis-ci.org/zhangzhimin/tensor)
 Tensor是一个基于C++, CUDA的异构计算库，其上层接口极大地提高了高性能异构程序的开发效率。Tensor采用C++ AMP，Thrust的异构接口设计；具备类似Matlab的基本矩阵操作；将Eigen的延迟计算推广到GPU端；使用元编程技术追求扩展性和性能的极致。Tensor将致力于为众多异构应用提供底层支持。
 
 ## 特点
