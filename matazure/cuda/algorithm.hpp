@@ -142,13 +142,6 @@ inline void launch(_ExecutionPolicy exe_policy, _Fun f, _Args... args)
 	assert_runtime_success(cudaGetLastError());
 }
 
-template <typename _Fun>
-inline void for_index(int_t first, int_t last, _Fun fun) {
-	parallel_execution_policy policy;
-	policy.total_size(last - first);
-	cuda::for_index(policy, first, last, fun);
-}
-
 template <typename _ExecutionPolicy, typename _Fun>
 inline void for_index(_ExecutionPolicy policy, int_t first, int_t last, _Fun fun) {
 	launch(policy, [=] MATAZURE_DEVICE() {
@@ -158,10 +151,11 @@ inline void for_index(_ExecutionPolicy policy, int_t first, int_t last, _Fun fun
 	});
 }
 
-template <int_t _Rank, typename _Fun>
-inline void for_index(pointi<_Rank> ext, _Fun fun) {
-	execution_policy p;
-	cuda::for_index(p, ext, fun);
+template <typename _Fun>
+inline void for_index(int_t first, int_t last, _Fun fun) {
+	parallel_execution_policy policy;
+	policy.total_size(last - first);
+	cuda::for_index(policy, first, last, fun);
 }
 
 template <typename _ExecutionPolicy, int_t _Rank, typename _Fun>
@@ -172,6 +166,12 @@ inline void for_index(_ExecutionPolicy policy, pointi<_Rank> ext, _Fun fun) {
 	cuda::for_index(policy, 0, max_size, [=] MATAZURE_DEVICE (int_t i) {
 		fun(offset2index(i, stride, first_major_t{}));
 	});
+}
+
+template <int_t _Rank, typename _Fun>
+inline void for_index(pointi<_Rank> ext, _Fun fun) {
+	execution_policy p;
+	cuda::for_index(p, ext, fun);
 }
 
 template <typename _BlockDim>

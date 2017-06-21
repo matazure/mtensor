@@ -4,9 +4,9 @@
 #include <matazure/execution.hpp>
 
 #ifdef _MSC_VER
-#define MATAZURE_AUTO_VECTORISED #pragma loop(ivdep)
+#define MATAZURE_AUTO_VECTORISED loop(ivdep)
 #else
-#define MATAZURE_AUTO_VECTORISED MATAZURE_AUTO_VECTORISED
+#define MATAZURE_AUTO_VECTORISED simd
 #endif
 
 namespace matazure {
@@ -20,7 +20,7 @@ inline MATAZURE_GENERAL void for_index(sequence_policy policy, int_t first, int_
 
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(sequence_vectorized_policy policy, int_t first, int_t last, _Func fun) {
-	MATAZURE_AUTO_VECTORISED
+	#pragma MATAZURE_AUTO_VECTORISED
 	for (int_t i = first; i < last; ++i) {
 		fun(i);
 	}
@@ -41,7 +41,7 @@ inline MATAZURE_GENERAL void for_index(omp_vectorized_policy policy, int_t first
 #if _OPENMP >= 201307
 	#pragma omp parallel for simd
 #else
-	MATAZURE_AUTO_VECTORISED
+	#pragma MATAZURE_AUTO_VECTORISED
 	#pragma omp parallel for
 #endif
 	for (int_t i = first; i < last; ++i) {
@@ -99,7 +99,7 @@ inline MATAZURE_GENERAL void for_index(sequence_policy, pointi<4> origin, pointi
 
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(sequence_vectorized_policy, pointi<1> origin, pointi<1> extent, _Func fun) {
-	MATAZURE_AUTO_VECTORISED
+	#pragma MATAZURE_AUTO_VECTORISED
 	for (int_t i = origin[0]; i < extent[0]; ++i) {
 		fun(pointi<1>{ { i } });
 	}
@@ -108,7 +108,7 @@ inline MATAZURE_GENERAL void for_index(sequence_vectorized_policy, pointi<1> ori
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(sequence_vectorized_policy, pointi<2> origin, pointi<2> extent, _Func fun) {
 	for (int_t j = origin[1]; j < extent[1]; ++j) {
-		MATAZURE_AUTO_VECTORISED
+		#pragma MATAZURE_AUTO_VECTORISED
 		for (int_t i = origin[0]; i < extent[0]; ++i) {
 			fun(pointi<2>{ { i, j } });
 		}
@@ -119,7 +119,7 @@ template <typename _Func>
 inline MATAZURE_GENERAL void for_index(sequence_vectorized_policy, pointi<3> origin, pointi<3> extent, _Func fun) {
 	for (int_t k = origin[2]; k < extent[2]; ++k) {
 		for (int_t j = origin[1]; j < extent[1]; ++j) {
-			MATAZURE_AUTO_VECTORISED
+			#pragma MATAZURE_AUTO_VECTORISED
 			for (int_t i = origin[0]; i < extent[0]; ++i) {
 				fun(pointi<3>{ { i, j, k } });
 			}
@@ -132,7 +132,7 @@ inline MATAZURE_GENERAL void for_index(sequence_vectorized_policy, pointi<4> ori
 	for (int_t l = origin[3]; l < extent[3]; ++l) {
 		for (int_t k = origin[2]; k < extent[2]; ++k) {
 			for (int_t j = origin[1]; j < extent[1]; ++j) {
-				MATAZURE_AUTO_VECTORISED
+				#pragma MATAZURE_AUTO_VECTORISED
 				for (int_t i = origin[0]; i < extent[0]; ++i) {
 					fun(pointi<4>{ {i, j, k, l} });
 				}
@@ -204,7 +204,7 @@ inline MATAZURE_GENERAL void for_index(omp_vectorized_policy, pointi<1> origin, 
 #if _OPENMP >= 201307
 	#pragma omp parallel for simd
 #else
-	MATAZURE_AUTO_VECTORISED
+	#pragma MATAZURE_AUTO_VECTORISED
 	#pragma omp parallel for
 #endif
 	for (int_t i = origin[0]; i < extent[0]; ++i) {
@@ -220,11 +220,7 @@ inline MATAZURE_GENERAL void for_index(omp_vectorized_policy, pointi<2> origin, 
 	#pragma omp parallel for
 #endif
 	for (int_t j = origin[1]; j < extent[1]; ++j) {
-	#if _OPENMP >= 201307
-		#pragma omp  simd
-	#else
-		MATAZURE_AUTO_VECTORISED
-	#endif
+		#pragma MATAZURE_AUTO_VECTORISED
 		for (int_t i = origin[0]; i < extent[0]; ++i) {
 			fun(pointi<2>{ { i, j } });
 		}
@@ -234,17 +230,13 @@ inline MATAZURE_GENERAL void for_index(omp_vectorized_policy, pointi<2> origin, 
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(omp_vectorized_policy, pointi<3> origin, pointi<3> extent, _Func fun) {
 #if  _OPENMP >= 200805
-	#pragma omp parallel for schedule(dynamic,1) collapse(2)
+	#pragma omp parallel for schedule(dynamic,1) collapse(3)
 #else
 	#pragma omp parallel for
 #endif
 	for (int_t k = origin[2]; k < extent[2]; ++k) {
 		for (int_t j = origin[1]; j < extent[1]; ++j) {
-		#if _OPENMP >= 201307
-			#pragma omp  simd
-		#else
-			MATAZURE_AUTO_VECTORISED
-		#endif
+			#pragma MATAZURE_AUTO_VECTORISED
 			for (int_t i = origin[0]; i < extent[0]; ++i) {
 				fun(pointi<3>{ { i, j, k } });
 			}
@@ -255,18 +247,14 @@ inline MATAZURE_GENERAL void for_index(omp_vectorized_policy, pointi<3> origin, 
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(omp_vectorized_policy, pointi<4> origin, pointi<4> extent, _Func fun) {
 #if  _OPENMP >= 200805
-	#pragma omp parallel for schedule(dynamic,1) collapse(2)
+	#pragma omp parallel for schedule(dynamic,1) collapse(4)
 #else
 	#pragma omp parallel for
 #endif
 	for (int_t l = origin[3]; l < extent[3]; ++l) {
 		for (int_t k = origin[2]; k < extent[2]; ++k) {
 			for (int_t j = origin[1]; j < extent[1]; ++j) {
-			#if _OPENMP >= 201307
-				#pragma omp  simd
-			#else
-				MATAZURE_AUTO_VECTORISED
-			#endif
+				#pragma MATAZURE_AUTO_VECTORISED
 				for (int_t i = origin[0]; i < extent[0]; ++i) {
 					fun(pointi<4>{ {i, j, k, l} });
 				}
