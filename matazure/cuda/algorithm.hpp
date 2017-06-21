@@ -223,7 +223,7 @@ inline void for_each(_ExecutionPolicy policy, _Tensor ts, _Fun fun, enable_if_t<
 template <typename _ExecutionPolicy, typename _Tensor, typename _Fun>
 inline void for_each(_ExecutionPolicy policy, _Tensor ts, _Fun fun, enable_if_t<are_device_memory<_Tensor>::value && !are_linear_access<_Tensor>::value>* = 0) {
 	cuda::for_index(policy, ts.shape(), [=] MATAZURE_DEVICE(pointi<_Tensor::rank> idx) {
-		fun(ts(idx));
+		fun(ts[idx]);
 	});
 }
 
@@ -258,7 +258,7 @@ void copy(_ExecutionPolicy policy, _T1 lhs, _T2 rhs, enable_if_t<are_linear_acce
 template <typename _ExecutionPolicy, typename _T1, typename _T2>
 void copy(_ExecutionPolicy policy, _T1 lhs, _T2 rhs, enable_if_t<!are_linear_access<_T1, _T2>::value && are_device_memory<_T1, _T2>::value>* = 0) {
 	cuda::for_index(policy, lhs.shape(), [=] MATAZURE_DEVICE(pointi<_T1::rank> idx) {
-		rhs(idx) = lhs(idx);
+		rhs[idx] = lhs[idx];
 	});
 }
 

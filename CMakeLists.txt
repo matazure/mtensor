@@ -6,6 +6,8 @@ option(WITH_CUDA "With CUDA" ON)
 option(WITH_BENCHMARK "With Benchmark" ON)
 option(WITH_OPENMP "With OpenMP" ON)
 
+message("current compiler is ${CMAKE_CXX_COMPILER}")
+
 include_directories(.)
 set_property( GLOBAL PROPERTY USE_FOLDERS ON)
 

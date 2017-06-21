@@ -158,6 +158,18 @@ public:
 		return meta_shape_type::value();
 	}
 
+	template <typename _Idx>
+	reference operator()(_Idx idx) const {
+		static_assert(std::is_same<_Idx, int_t>::value && rank == 1, "only operator [] support access data by pointi");
+		return (*this)[pointi<1>{idx}];
+	}
+
+	template <typename _Idx>
+	const_reference operator()(_Idx idx) {
+		static_assert(std::is_same<_Idx, int_t>::value && rank == 1, "only operator [] support access data by pointi");
+		return (*this)[pointi<1>{idx}];
+	}
+
 	template <typename ..._Idx>
 	MATAZURE_GENERAL constexpr const_reference operator()(_Idx... idx) const {
 		return (*this)[pointi<rank>{ idx... }];
@@ -279,6 +291,12 @@ public:
 		return *this;
 	}
 
+	template <typename _Idx>
+	reference operator()(_Idx idx) const {
+		static_assert(std::is_same<_Idx, int_t>::value && rank == 1, "only operator [] support access data by pointi");
+		return (*this)[pointi<1>{idx}];
+	}
+
 	template <typename ..._Idx>
 	reference operator()(_Idx... idx) const {
 		return (*this)[pointi<rank>{ idx... }];
@@ -369,8 +387,14 @@ public:
 		fun_(fun)
 	{}
 
-	reference operator[](pointi<rank> index) const {
-		return index_imp<access_type>(index);
+	reference operator[](pointi<rank> idx) const {
+		return index_imp<access_type>(idx);
+	}
+
+	template <typename _Idx>
+	reference operator()(_Idx idx) const {
+		static_assert(std::is_same<_Idx, int_t>::value && rank == 1, "only operator [] support access data by pointi");
+		return (*this)[pointi<1>{idx}];
 	}
 
 	template <typename ..._Idx>
@@ -394,13 +418,13 @@ public:
 
 private:
 	template <typename _Mode>
-	enable_if_t<is_same<_Mode, array_access_t>::value, reference> index_imp(pointi<rank> index) const {
-		return fun_(index);
+	enable_if_t<is_same<_Mode, array_access_t>::value, reference> index_imp(pointi<rank> idx) const {
+		return fun_(idx);
 	}
 
 	template <typename _Mode>
-	enable_if_t<is_same<_Mode, linear_access_t>::value, reference> index_imp(pointi<rank> index) const {
-		return (*this)[index2offset(index, stride(), first_major_t{})];
+	enable_if_t<is_same<_Mode, linear_access_t>::value, reference> index_imp(pointi<rank> idx) const {
+		return (*this)[index2offset(idx, stride(), first_major_t{})];
 	}
 
 	template <typename _Mode>

@@ -98,8 +98,8 @@ private:
 public:
 	array_map_op(_Tensor ts, _Func fun) : ts_(ts), fun_(fun) {}
 
-	MATAZURE_GENERAL auto operator()(pointi<_Tensor::rank> idx) const->decltype(this->fun_(this->ts_(idx))) {
-		return fun_(ts_(idx));
+	MATAZURE_GENERAL auto operator()(pointi<_Tensor::rank> idx) const->decltype(this->fun_(this->ts_[idx])) {
+		return fun_(ts_[idx]);
 	}
 };
 
@@ -126,8 +126,8 @@ private:
 public:
 	device_array_map_op(_Tensor ts, _Func fun) : ts_(ts), fun_(fun) {}
 
-	MATAZURE_DEVICE auto operator()(pointi<_Tensor::rank> idx) const->decltype(this->fun_(this->ts_(idx))) {
-		return fun_(ts_(idx));
+	MATAZURE_DEVICE auto operator()(pointi<_Tensor::rank> idx) const->decltype(this->fun_(this->ts_[idx])) {
+		return fun_(ts_[idx]);
 	}
 };
 
@@ -158,8 +158,8 @@ public:
 		ts_(ts), offset_(offset)
 	{}
 
-	MATAZURE_GENERAL auto operator()(pointi<_Tensor::rank> idx) const->decltype((ts_(idx + offset_))) {
-		return ts_(idx + offset_);
+	MATAZURE_GENERAL auto operator()(pointi<_Tensor::rank> idx) const->decltype((ts_[idx + offset_])) {
+		return ts_[idx + offset_];
 	}
 };
 
@@ -173,8 +173,8 @@ public:
 		ts_(ts), stride_(stride)
 	{}
 
-	MATAZURE_GENERAL auto operator()(pointi<_Tensor::rank> idx) const->decltype((ts_(idx * stride_))){
-		return ts_(idx * stride_);
+	MATAZURE_GENERAL auto operator()(pointi<_Tensor::rank> idx) const->decltype((ts_[idx * stride_])){
+		return ts_[idx * stride_];
 	}
 };
 
@@ -190,8 +190,8 @@ public:
 	}
 
 	MATAZURE_GENERAL typename _Tensor::value_type operator()(const pointi<_Tensor::rank> &idx) const{
-		auto idx_f = point_cast<float>(idx) * resize_scale_;
-		return ts_(point_cast<int_t>(idx_f));
+		auto idx_f = point_cast<float>[idx] * resize_scale_;
+		return ts_[point_cast<int_t>(idx_f)];
 	}
 };
 
@@ -300,8 +300,8 @@ public:
 		ts_(ts), slice_i_(slice_i)
 	{}
 
-	MATAZURE_GENERAL auto operator()(pointi<_Tensor::rank-1> idx) const->decltype((ts_(cat_point<_SliceDimIdx>(idx, slice_i_)))){
-		return ts_(cat_point<_SliceDimIdx>(idx, slice_i_));
+	MATAZURE_GENERAL auto operator()(pointi<_Tensor::rank-1> idx) const->decltype((ts_[cat_point<_SliceDimIdx>(idx, slice_i_)])){
+		return ts_[cat_point<_SliceDimIdx>(idx, slice_i_)];
 	}
 };
 
@@ -321,7 +321,7 @@ public:
 
 	MATAZURE_GENERAL auto operator()(pointi<_Tensor::rank> idx) const->decltype(zero<typename _Tensor::value_type>::value()) {
 		if (MATAZURE_LIKELY(inside(idx, padding0_, ts_.shape()))) {
-			return ts_(idx - padding0_);
+			return ts_[idx - padding0_];
 		}
 		else {
 			return zero<typename _Tensor::value_type>::value();
@@ -341,7 +341,7 @@ public:
 
 	MATAZURE_GENERAL auto operator()(pointi<_Tensor::rank> idx) const->decltype(zero<decay_t<typename _Tensor::value_type>>::value()) {
 		if (MATAZURE_LIKELY(inside(idx, pointi<_Tensor::rank>::zeros(), ts_.shape()))) {
-			return ts_(idx);
+			return ts_[idx];
 		}
 		else {
 			return zero<typename _Tensor::value_type>::value();
@@ -534,8 +534,8 @@ public:\
 	MATAZURE_STATIC_ASSERT_VALUE_TYPE_MATCHED(_T1, _T2); \
 	MATAZURE_GENERAL name(_T1 x1, _T2 x2) : x1_(x1), x2_(x2) {} \
 \
-	MATAZURE_GENERAL auto operator ()(const pointi<_T1::rank> &idx) const->decltype(this->x1_(idx) op this->x2_(idx)){ \
-		return x1_(idx) op x2_(idx); \
+	MATAZURE_GENERAL auto operator ()(const pointi<_T1::rank> &idx) const->decltype(this->x1_[idx] op this->x2_[idx]){ \
+		return x1_[idx] op x2_[idx]; \
 	} \
 };
 
@@ -569,8 +569,8 @@ private: \
 public:\
 	name(_T x, value_type v) : x_(x), v_(v) {} \
 \
-	MATAZURE_GENERAL auto operator ()(const pointi<_T::rank> &idx) const->decltype(this->x_(idx) op this->v_){ \
-		return x_(idx) op v_; \
+	MATAZURE_GENERAL auto operator ()(const pointi<_T::rank> &idx) const->decltype(this->x_[idx] op this->v_){ \
+		return x_[idx] op v_; \
 	} \
 };
 
@@ -603,8 +603,8 @@ private: \
 public:\
 	name(_T x, value_type v) : v_(v), x_(x) {} \
 \
-	MATAZURE_GENERAL auto operator ()(const pointi<_T::rank> &idx) const->decltype(this->v_ op this->x_(idx)){ \
-		return v_ op x_(idx); \
+	MATAZURE_GENERAL auto operator ()(const pointi<_T::rank> &idx) const->decltype(this->v_ op this->x_[idx]){ \
+		return v_ op x_[idx]; \
 	} \
 \
 };

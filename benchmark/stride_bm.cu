@@ -18,7 +18,7 @@ using namespace matazure;
 //		for (int_t j = 0; j < ts_re_ext[1]; ++j) {
 //			for (int_t i = 0; i < ts_re_ext[0]; ++i) {
 //				pointi<2> idx = { i,j };
-//				ts_re(idx) = ts(idx * stride + phase);
+//				ts_re[idx] = ts(idx * stride + phase);
 //			}
 //		}
 //	}

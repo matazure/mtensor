@@ -76,7 +76,7 @@ public:																										\
 		auto mask_radius = mask.shape() / 2;																\
 		auto sum = zero<typename _Tensor::value_type>::value();												\
 		device::for_index(pointi<_Tensor::rank>::zeros(), mask.shape(), [&] (const pointi<2> &mask_idx) {	\
-			sum += ts_(idx + mask_idx - mask_radius) * mask(mask_idx);										\
+			sum += ts_[idx + mask_idx - mask_radius] * mask[mask_idx];										\
 		});																									\
 		return sum;																							\
 	}																										\
@@ -119,7 +119,7 @@ inline void conv_block(_Tensor ts, _TensorRe &ts_re) {														\
 		if (is_valid) {																						\
 			corner_index(pointi<_Tensor::rank>::zeros(), mask.shape(),										\
 				[&](pointi<_Tensor::rank> corner_idx) {														\
-				sh_ts_block(block_idx.local + corner_idx) = ts(block_idx.global - corner_idx / 2);			\
+				sh_ts_block[block_idx.local + corner_idx] = ts[block_idx.global - corner_idx / 2];			\
 			}																								\
 			);																								\
 		}																									\
@@ -128,9 +128,9 @@ inline void conv_block(_Tensor ts, _TensorRe &ts_re) {														\
 		if (!is_valid) return;																				\
 		auto sum = zero<value_type>::value();																\
 		device::for_index(pointi<_Tensor::rank>::zeros(), mask.shape(), [&](const pointi<2> &idx) {			\
-			sum += sh_ts_block(block_idx.local + idx) * mask(idx);											\
+			sum += sh_ts_block[block_idx.local + idx] * mask[idx];											\
 		});																									\
-		ts_re(block_idx.global) = sum;																		\
+		ts_re[block_idx.global] = sum;																		\
 	});																										\
 }																											\
 																											\
@@ -157,7 +157,7 @@ inline void conv_block_crack(_Tensor ts, _TensorRe &ts_re) {												\
 																											\
 		auto is_valid = inside(block_idx.global, pointi<_Tensor::rank>::zeros(), ts.shape());				\
 		if (is_valid) {																						\
-			sh_ts_block(block_idx.local) = ts(block_idx.global);											\
+			sh_ts_block[block_idx.local] = ts[block_idx.global];											\
 		}																									\
 		device::barrier();																					\
 																											\
@@ -167,10 +167,10 @@ inline void conv_block_crack(_Tensor ts, _TensorRe &ts_re) {												\
 			value_type sum = 0;																				\
 																											\
 			device::for_index(pointi<_Tensor::rank>::zeros(), mask.shape(), [&](const pointi<2> &idx) {		\
-				sum += sh_ts_block(block_idx.local + idx - mask_radius) * mask(idx);						\
+				sum += sh_ts_block[block_idx.local + idx - mask_radius] * mask[idx];						\
 			});																								\
 																											\
-			ts_re(block_idx.global) = sum;																	\
+			ts_re[block_idx.global] = sum;																	\
 		}																									\
 	});																										\
 }																											\
@@ -204,7 +204,7 @@ inline void conv_block_overlap(_Tensor ts, _TensorRe &ts_re) {												\
 		auto valid_global_idx = valid_block_dim * block_idx.block + block_idx.local - mask_radius;			\
 																											\
 		if (inside(valid_global_idx, -mask_radius, ts.shape() + mask_radius)) {								\
-			sh_ts_block(block_idx.local) = ts(valid_global_idx);											\
+			sh_ts_block[block_idx.local] = ts[valid_global_idx];											\
 		}																									\
 		device::barrier();																					\
 																											\
@@ -213,10 +213,10 @@ inline void conv_block_overlap(_Tensor ts, _TensorRe &ts_re) {												\
 			value_type sum = 0;																				\
 																											\
 			device::for_index(pointi<_Tensor::rank>::zeros(), mask.shape(), [&](const pointi<2> &idx) {		\
-				sum += sh_ts_block(block_idx.local + idx - mask_radius) * mask(idx);						\
+				sum += sh_ts_block[block_idx.local + idx - mask_radius] * mask[idx];						\
 			});																								\
 																											\
-			ts_re(valid_global_idx) = sum;																	\
+			ts_re[valid_global_idx] = sum;																	\
 		}																									\
 	});																										\
 }																											\
@@ -249,16 +249,16 @@ inline void conv_block_aligned(_Tensor ts, _TensorRe &ts_re) {												\
 																											\
 		corner_index(pointi<_Tensor::rank>::zeros(), mask.shape(),											\
 			[&](pointi<_Tensor::rank> corner_idx){															\
-				sh_ts_block(block_idx.local + corner_idx) = ts(block_idx.global - corner_idx / 2 );			\
+				sh_ts_block[block_idx.local + corner_idx] = ts[block_idx.global - corner_idx / 2];			\
 			}																								\
 		);																									\
 		device::barrier();																					\
 																											\
 		auto sum = zero<value_type>::value();																\
 		device::for_index(pointi<_Tensor::rank>::zeros(), mask.shape(), [&](const pointi<2> &idx) {			\
-			sum += sh_ts_block(block_idx.local + idx) * mask(idx);											\
+			sum += sh_ts_block[block_idx.local + idx] * mask[idx];											\
 		});																									\
-		ts_re(block_idx.global) = sum;																		\
+		ts_re[block_idx.global] = sum;																		\
 	});																										\
 }																											\
 																											\
@@ -283,7 +283,7 @@ inline void conv_block_crack_aligned(_Tensor ts, _TensorRe &ts_re) {										\
 																											\
 	block_for_index<_BlockDim>(grid_ext, [=] __device__ (block_index<_BlockDim> block_idx) {				\
 		__shared__ static_tensor<value_type, _BlockDim> sh_ts_block;										\
-		sh_ts_block(block_idx.local) = ts(block_idx.global);												\
+		sh_ts_block[block_idx.local] = ts[block_idx.global];												\
 		device::barrier();																					\
 																											\
 		auto mask_radius = mask.shape() / 2;																\
@@ -291,10 +291,10 @@ inline void conv_block_crack_aligned(_Tensor ts, _TensorRe &ts_re) {										\
 			value_type sum = 0;																				\
 																											\
 			device::for_index(pointi<_Tensor::rank>::zeros(), mask.shape(), [&](const pointi<2> &idx) {		\
-				sum += sh_ts_block(block_idx.local + idx - mask_radius) * mask(idx);						\
+				sum += sh_ts_block[block_idx.local + idx - mask_radius] * mask[idx];						\
 			});																								\
 																											\
-			ts_re(block_idx.global) = sum;																	\
+			ts_re[block_idx.global] = sum;																	\
 		}																									\
 	});																										\
 }																											\
@@ -327,17 +327,17 @@ inline void conv_block_overlap_aligned(_Tensor ts, _TensorRe &ts_re) {										
 		);																									\
 		auto mask_radius = mask.shape() / 2;																\
 		auto valid_global_idx = valid_block_dim * block_idx.block + block_idx.local - mask_radius;			\
-		sh_ts_block(block_idx.local) = ts(valid_global_idx);												\
+		sh_ts_block[block_idx.local] = ts[valid_global_idx];												\
 		device::barrier();																					\
 																											\
 		if (inside(block_idx.local, mask_radius, block_idx.block_dim - mask_radius)) {						\
 			value_type sum = 0;																				\
 																											\
 			device::for_index(pointi<_Tensor::rank>::zeros(), mask.shape(), [&](const pointi<2> &idx) {		\
-				sum += sh_ts_block(block_idx.local + idx - mask_radius) * mask(idx);						\
+				sum += sh_ts_block[block_idx.local + idx - mask_radius] * mask[idx];						\
 			});																								\
 																											\
-			ts_re(valid_global_idx) = sum;																	\
+			ts_re[valid_global_idx] = sum;																	\
 		}																									\
 	});																										\
 }																											\

@@ -41,7 +41,6 @@ inline MATAZURE_GENERAL void for_index(omp_vectorized_policy policy, int_t first
 #if _OPENMP >= 201307
 	#pragma omp parallel for simd
 #else
-	#pragma MATAZURE_AUTO_VECTORISED
 	#pragma omp parallel for
 #endif
 	for (int_t i = first; i < last; ++i) {
@@ -204,7 +203,6 @@ inline MATAZURE_GENERAL void for_index(omp_vectorized_policy, pointi<1> origin, 
 #if _OPENMP >= 201307
 	#pragma omp parallel for simd
 #else
-	#pragma MATAZURE_AUTO_VECTORISED
 	#pragma omp parallel for
 #endif
 	for (int_t i = origin[0]; i < extent[0]; ++i) {
@@ -281,7 +279,7 @@ inline MATAZURE_GENERAL void for_each(_ExectutionPolicy policy, _Tensor &ts, _Fu
 template <typename _ExectutionPolicy, typename _Tensor, typename _Fun>
 inline MATAZURE_GENERAL void for_each(_ExectutionPolicy policy, _Tensor &ts, _Fun fun, enable_if_t<!are_linear_access<_Tensor>::value && none_device_memory<_Tensor>::value>* = 0) {
 	for_index(policy, pointi<_Tensor::rank>::zeros(), ts.shape(), [&](pointi<_Tensor::rank> idx) {
-		fun(ts(idx));
+		fun(ts[idx]);
 	}, (void *)(0));
 }
 
@@ -312,7 +310,7 @@ inline MATAZURE_GENERAL void copy(_ExectutionPolicy policy, const _T1 &lhs, _T2 
 template <typename _ExectutionPolicy, typename _T1, typename _T2>
 inline MATAZURE_GENERAL void copy(_ExectutionPolicy policy, const _T1 &lhs, _T2 &rhs, enable_if_t<!are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
 	for_index(policy, pointi<_T1::rank>::zeros(), lhs.shape(), [&](pointi<_T1::rank> idx) {
-		rhs(idx) = lhs(idx);
+		rhs[idx] = lhs[idx];
 	});
 }
 
@@ -332,7 +330,7 @@ inline MATAZURE_GENERAL void transform(_ExectutionPolicy policy, const _T1 &lhs,
 template <typename _ExectutionPolicy, typename _T1, typename _T2, typename _TransFun>
 inline MATAZURE_GENERAL void transform(_ExectutionPolicy policy, const _T1 &lhs, _T2 &rhs, _TransFun fun, enable_if_t<!are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
 	for_index(policy, pointi<_T1::rank>::zeros(), lhs.shape(), [&](pointi<_T1::rank> idx) {
-		fun(lhs(idx), rhs(idx));
+		fun(lhs[idx], rhs[idx]);
 	});
 }
 

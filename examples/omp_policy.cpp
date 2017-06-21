@@ -3,6 +3,8 @@
 using namespace matazure;
 
 int main(){
+	tensor<float, 2> ts(100, 100);
+
 	//默认按串行执行， index是按顺序的
 	for_index(0, 10, [](int_t i) {
 		printf("%d ", i);

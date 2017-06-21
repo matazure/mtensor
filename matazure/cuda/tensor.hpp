@@ -53,8 +53,14 @@ public:
 	{ }
 
 	tensor(std::initializer_list<int_t> v) = delete;
-	
+
 	shared_ptr<value_type> shared_data() const { return sp_data_; }
+
+	 template <typename _Idx>
+	 MATAZURE_GENERAL reference operator()(_Idx idx) const {
+	 	static_assert(std::is_same<_Idx, int_t>::value && rank == 1, "only operator [] support access data by pointi");
+	 	return (*this)[pointi<1>{idx}];
+	 }
 
 	template <typename ..._Idx>
 	MATAZURE_GENERAL reference operator()(_Idx... idx) const {
@@ -128,6 +134,12 @@ public:
 		stride_(matazure::accumulate_stride(extent)),
 		fun_(fun)
 	{ }
+
+	 template <typename _Idx>
+	 MATAZURE_GENERAL reference operator()(_Idx idx) const {
+	 	static_assert(std::is_same<_Idx, int_t>::value && rank == 1, "only operator [] support access data by pointi");
+	 	return (*this)[pointi<1>{idx}];
+	 }
 
 	template <typename ..._Idx>
 	MATAZURE_DEVICE reference operator()(_Idx... idx) const {
