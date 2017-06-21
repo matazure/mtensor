@@ -1,1 +1,14 @@
 language: c++
+dist: trusty
+sudo: required
+# addons:
+#     apt:
+#       sources:
+#       - ubuntu-toolchain-r-test
+#       - kalakris-cmake
+#       packages:
+#       - cmake
+#       - gcc-4.8
+#       - g++-4.8
+script:
+  - mkdir build && cd build && cmake .. -DWITH_CUDA=OFF -DWITH_BENCHMARK=OFF && make
