@@ -1,6 +1,7 @@
 ﻿#include <matazure/tensor>
 using namespace matazure;
 
+//若支持CUDA则使用
 #ifdef MATAZURE_CUDA
 #define WITH_CUDA
 #endif
