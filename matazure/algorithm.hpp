@@ -282,24 +282,24 @@ template <typename _ExectutionPolicy, typename _Tensor, typename _Fun>
 inline MATAZURE_GENERAL void for_each(_ExectutionPolicy policy, _Tensor &ts, _Fun fun, enable_if_t<!are_linear_access<_Tensor>::value && none_device_memory<_Tensor>::value>* = 0) {
 	for_index(policy, pointi<_Tensor::rank>::zeros(), ts.shape(), [&](pointi<_Tensor::rank> idx) {
 		fun(ts(idx));
-	}, nullptr);
+	}, (void *)(0));
 }
 
 template <typename _Tensor, typename _Fun>
 inline MATAZURE_GENERAL void for_each(_Tensor &ts, _Fun fun, enable_if_t<none_device_memory<_Tensor>::value>* = 0) {
 	sequence_policy policy{};
-	for_each(policy, ts, fun, nullptr);
+	for_each(policy, ts, fun, (void *)(0));
 }
 
 template <typename _ExectutionPolicy, typename _Tensor>
 inline MATAZURE_GENERAL void fill(_ExectutionPolicy policy, _Tensor &ts, typename _Tensor::value_type v, enable_if_t<none_device_memory<_Tensor>::value>* = 0) {
-	for_each(policy, ts, [v](typename _Tensor::value_type &x) { x = v;}, nullptr);
+	for_each(policy, ts, [v](typename _Tensor::value_type &x) { x = v;}, (void *)(0));
 }
 
 template <typename _Tensor>
 inline MATAZURE_GENERAL void fill(_Tensor &ts, typename _Tensor::value_type v, enable_if_t<none_device_memory<_Tensor>::value>* = 0) {
 	sequence_policy policy{};
-	fill(policy, ts, v, nullptr);
+	fill(policy, ts, v, (void *)(0));
 }
 
 template <typename _ExectutionPolicy, typename _T1, typename _T2>
@@ -319,7 +319,7 @@ inline MATAZURE_GENERAL void copy(_ExectutionPolicy policy, const _T1 &lhs, _T2 
 template <typename _T1, typename _T2>
 inline MATAZURE_GENERAL void copy(const _T1 &lhs, _T2 &rhs, enable_if_t<none_device_memory<_T1, _T2>::value>* = 0) {
 	sequence_policy policy;
-	copy(policy, lhs, rhs, nullptr);
+	copy(policy, lhs, rhs, (void *)(0));
 }
 
 template <typename _ExectutionPolicy, typename _T1, typename _T2, typename _TransFun>
@@ -339,7 +339,7 @@ inline MATAZURE_GENERAL void transform(_ExectutionPolicy policy, const _T1 &lhs,
 template <typename _T1, typename _T2, typename _TransFun>
 inline MATAZURE_GENERAL void transform(const _T1 &lhs, _T2 &rhs, _TransFun fun, enable_if_t<!are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
 	sequence_policy policy;
-	for_index(policy, lhs, rhs, fun, nullptr);
+	for_index(policy, lhs, rhs, fun, (void *)(0));
 }
 
 template <typename _Tensor, typename _VT, typename _BinaryOp>
