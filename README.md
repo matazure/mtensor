@@ -70,6 +70,7 @@ int main(int argc, char *argv[]) {
     //前面并未进行实质的计算，这一步将上面的运算合并处理并把结果写入到memory中
     auto gts_rgb_normalized = glts_rgb_normalized.persist();
 #ifdef WITH_CUDA
+    cuda::device_synchronize();
     auto ts_rgb_normalized = mem_clone(gts_rgb_normalized, host_t{});
 #else
     auto &ts_rgb_normalized = gts_rgb_normalized;
