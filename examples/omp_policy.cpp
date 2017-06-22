@@ -16,10 +16,6 @@ int main(){
 	for_index(omp_policy{}, 0, 10, [](int_t i) {
 		printf("%d ", i);
 	});
-		static_assert(is_tensor<tensor<int, 2>>::value, "");
-
-
-	static_assert(are_host_memory<tensor<int, 2>>::value, "");
 
 	printf("\n");
 	return 0;

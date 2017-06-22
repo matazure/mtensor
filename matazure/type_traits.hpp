@@ -60,114 +60,39 @@ template <typename _Tensor>
 class tensor_expression;
 
 //are tag
-//#define MATAZURE_ARE_TAG(name, tag_name, tag)								\
-//template <typename ..._Tensor>												\
-//struct name;																\
-//template <>																	\
-//																			\
-//struct name<> : bool_constant<true> {};										\
-//																			\
-//template <typename _Tensor, typename ..._OtherTensors>						\
-//struct name<tensor_expression<_Tensor>, _OtherTensors...> : bool_constant<	\
-//	is_same<typename _Tensor::tag_name, tag>::value							\
-//	&& name<_OtherTensors...>::value> {};									
+#define MATAZURE_DEFINE_ARE_TAG(name, tag_name, tag)						\
+template <typename ..._Tensor>												\
+struct name;																\
+template <>																	\
+																			\
+struct name<> : bool_constant<true> {};										\
+																			\
+template <typename _Tensor, typename ..._OtherTensors>						\
+struct name<_Tensor, _OtherTensors...> : bool_constant<						\
+	is_same<typename _Tensor::tag_name, tag>::value							\
+	&& name<_OtherTensors...>::value> {};									
 
-//MATAZURE_ARE_TAG(are_host_memory, memory_type, host_t)
-//MATAZURE_ARE_TAG(are_device_memory, memory_type, device_t)
+MATAZURE_DEFINE_ARE_TAG(are_host_memory, memory_type, host_t)
+MATAZURE_DEFINE_ARE_TAG(are_device_memory, memory_type, device_t)
+MATAZURE_DEFINE_ARE_TAG(are_linear_access, access_type, linear_access_t)
+MATAZURE_DEFINE_ARE_TAG(are_array_access, access_type, array_access_t)
 
-//are host memory
-template <typename ..._Tensor>
-struct are_host_memory;
-template <>
+//none tag
+#define MATAZURE_DEFINE_NONE_TAG(name, tag_name, tag)		\
+template <typename ..._Tensor>								\
+struct name;												\
+template <>													\
+															\
+struct name<> : bool_constant<true> {};						\
+															\
+template <typename _Tensor, typename ..._OtherTensors>		\
+struct name<_Tensor, _OtherTensors...> : bool_constant<		\
+	!is_same<typename _Tensor::tag_name, tag>::value		\
+	&& name<_OtherTensors...>::value> {};
 
-struct are_host_memory<> : bool_constant<true> {};
+MATAZURE_DEFINE_NONE_TAG(none_host_memory, memory_type, host_t)
+MATAZURE_DEFINE_NONE_TAG(none_device_memory, memory_type, device_t)
+MATAZURE_DEFINE_NONE_TAG(none_linear_access, access_type, linear_access_t)
+MATAZURE_DEFINE_NONE_TAG(none_array_access, access_type, array_access_t)
 
-template <typename _Tensor, typename ..._OtherTensors>
-struct are_host_memory<_Tensor, _OtherTensors...> : bool_constant<
-	is_same<typename _Tensor::memory_type, host_t>::value
-	&& are_host_memory<_OtherTensors...>::value> {};
-
-//are device memory
-template <typename ..._Tensor>
-struct are_device_memory;
-
-template <>
-struct are_device_memory<> : bool_constant<true> {};
-
-template <typename _Tensor, typename ..._OtherTensors>
-struct are_device_memory<_Tensor, _OtherTensors...> : bool_constant<
-	is_same<typename _Tensor::memory_type, device_t>::value
-	&& are_device_memory<_OtherTensors...>::value> {};
-
-//are linear access
-template <typename ..._Tensor>
-struct are_linear_access;
-
-template <>
-struct are_linear_access<> : bool_constant<true> {};
-
-template <typename _Tensor, typename ..._OtherTensors>
-struct are_linear_access<_Tensor, _OtherTensors...> : bool_constant<
-	is_same<typename _Tensor::access_type, linear_access_t>::value
-	&& are_linear_access<_OtherTensors...>::value> {};
-
-//are array access
-template <typename ..._Tensor>
-struct are_array_access;
-
-template <>
-struct are_array_access<> : bool_constant<true> {};
-
-template <typename _Tensor, typename ..._OtherTensors>
-struct are_array_access<_Tensor, _OtherTensors...> : bool_constant<
-	is_same<typename _Tensor::access_type, array_access_t>::value
-	&& are_array_access<_OtherTensors...>::value> {};
-
-//none host memory
-template <typename ..._Tensor>
-struct none_host_memory;
-template <>
-
-struct none_host_memory<> : bool_constant<true> {};
-
-template <typename _Tensor, typename ..._OtherTensors>
-struct none_host_memory<_Tensor, _OtherTensors...> : bool_constant<
-	!is_same<typename _Tensor::memory_type, host_t>::value
-	&& none_host_memory<_OtherTensors...>::value> {};
-
-//none device memory
-template <typename ..._Tensor>
-struct none_device_memory;
-
-template <>
-struct none_device_memory<> : bool_constant<true> {};
-
-template <typename _Tensor, typename ..._OtherTensors>
-struct none_device_memory<_Tensor, _OtherTensors...> : bool_constant<
-	!is_same<typename _Tensor::memory_type, device_t>::value
-	&& none_device_memory<_OtherTensors...>::value> {};
-
-//none linear access
-template <typename ..._Tensor>
-struct none_linear_access;
-
-template <>
-struct none_linear_access<> : bool_constant<true> {};
-
-template <typename _Tensor, typename ..._OtherTensors>
-struct none_linear_access<_Tensor, _OtherTensors...> : bool_constant<
-	!is_same<typename _Tensor::access_type, linear_access_t>::value
-	&& none_linear_access<_OtherTensors...>::value> {};
-
-//none array access
-template <typename ..._Tensor>
-struct none_array_access;
-
-template <>
-struct none_array_access<> : bool_constant<true> {};
-
-template <typename _Tensor, typename ..._OtherTensors>
-struct none_array_access<_Tensor, _OtherTensors...> : bool_constant<
-	!is_same<typename _Tensor::access_type, array_access_t>::value
-	&& none_array_access<_OtherTensors...>::value> {};
 }
