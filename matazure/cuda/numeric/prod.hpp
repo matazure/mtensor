@@ -89,7 +89,7 @@ inline void prod_block(_MatrixLhs cmat_lhs, _MatrixRhs cmat_rhs, _MatrixRe &cmat
 			else {
 				local_lhs(row, col) = zero<value_type>::value();
 			}
-			if (global_col < n, row + i < m) {
+			if (global_col < n && row + i < m) {
 				local_rhs(row, col) = cmat_rhs(row + i, global_col);
 			}
 			else {

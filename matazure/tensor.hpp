@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <matazure/meta.hpp>
+#include <matazure/type_traits.hpp>
 #include <matazure/algorithm.hpp>
 
 #ifdef MATAZURE_CUDA
@@ -206,10 +207,13 @@ public:
 	value_type			elements_[traits_t::size()];
 };
 
+static_assert(std::is_pod<static_tensor<float, dim<3,3>>>::value, "static tensor should be pod type");
+
 template <typename _Type, typename _Ext, typename _Tmp = enable_if_t<_Ext::size() == 2>>
 using static_matrix = static_tensor<_Type, _Ext>;
 
-static_assert(std::is_pod<static_tensor<float, dim<3,3>>>::value, "only supports pod type now");
+template <typename _ValueType, typename _Ext>
+struct is_tensor<static_tensor<_ValueType, _Ext>> : bool_constant<true> {};
 
 template <typename _Type, int_t _Rank, typename _Layout = first_major_t>
 class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout>> {
@@ -406,10 +410,16 @@ public:
 		return offset_imp<access_type>(i);
 	}
 
-	MATAZURE_GENERAL tensor<decay_t<value_type>, rank> persist() const {
+	template <typename _ExecutionPolicy>
+	MATAZURE_GENERAL tensor<decay_t<value_type>, rank> persist(_ExecutionPolicy policy) const {
 		tensor<decay_t<value_type>, rank> re(this->shape());
-		copy(*this, re);
+		copy(policy, *this, re);
 		return re;
+	}
+
+	MATAZURE_GENERAL tensor<decay_t<value_type>, rank> persist() const {
+		sequence_policy policy{};
+		return persist(policy);
 	}
 
 	pointi<rank> shape() const { return extent_; }

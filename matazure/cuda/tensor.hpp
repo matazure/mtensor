@@ -118,7 +118,7 @@ inline void copy_symbol(_TensorSrc src, _TensorSymbol &symbol_dst) {
 }
 
 template <typename _Reference, typename _AccessMode, int_t _Rank, typename _Func>
-class device_lambda_tensor {
+class device_lambda_tensor : public tensor_expression<device_lambda_tensor<_Reference, _AccessMode, _Rank, _Func>> {
 public:
 	static const int_t									rank = _Rank;
 	typedef _Reference									reference;
@@ -154,10 +154,16 @@ public:
 		return index_imp<accessor_type>(idx);
 	}
 
-	tensor<decay_t<value_type>, rank> persist() const {
+	template <typename _ExecutionPolicy>
+	tensor<decay_t<value_type>, rank> persist(_ExecutionPolicy policy) const {
 		tensor<decay_t<value_type>, rank> re(this->shape());
-		copy(*this, re);
+		copy(policy, *this, re);
 		return re;
+	}
+
+	tensor<decay_t<value_type>, rank> persist() const {
+		parallel_execution_policy policy{};
+		return persist(policy);
 	}
 
 	MATAZURE_GENERAL pointi<rank> shape() const { return extent_; }
@@ -226,10 +232,16 @@ public:
 		return (*this)[pointi<rank>{ idx... }];
 	}
 
-	tensor<decay_t<value_type>, rank> persist() const {
+	template <typename _ExecutionPolicy>
+	tensor<decay_t<value_type>, rank> persist(_ExecutionPolicy policy) const {
 		tensor<decay_t<value_type>, rank> re(this->shape());
-		copy(*this, re);
+		cuda::copy(policy, *this, re);
 		return re;
+	}
+
+	tensor<decay_t<value_type>, rank> persist() const {
+		parallel_execution_policy policy{};
+		return persist(policy);
 	}
 
 	MATAZURE_GENERAL pointi<rank> shape() const { return extent_; }

@@ -16,19 +16,15 @@ struct host_t {};
 struct device_t {};
 struct local_t {};
 
-struct pinned_t{};
-struct unpinned_t{};
-
-struct static_t{};
-struct dynamic_t{};
-struct saturate_t{};
+struct pinned_t {};
+struct unpinned_t {};
 
 template <typename _T>
 struct zero;
 
 template <typename _T>
-struct zero{
-	MATAZURE_GENERAL static constexpr _T value(){
+struct zero {
+	MATAZURE_GENERAL static constexpr _T value() {
 		return 0;
 	};
 };
@@ -56,6 +52,28 @@ struct function_traits<_ReturnType(_ClassType::*)(_Args...) const> {
 		typedef typename std::tuple_element<_index, std::tuple<_Args...>>::type type;
 	};
 };
+
+template <typename _Type>
+struct is_tensor : bool_constant<std::is_base_of<tensor_expression<_Type>, _Type>::value> {};
+
+template <typename _Tensor>
+class tensor_expression;
+
+//are tag
+//#define MATAZURE_ARE_TAG(name, tag_name, tag)								\
+//template <typename ..._Tensor>												\
+//struct name;																\
+//template <>																	\
+//																			\
+//struct name<> : bool_constant<true> {};										\
+//																			\
+//template <typename _Tensor, typename ..._OtherTensors>						\
+//struct name<tensor_expression<_Tensor>, _OtherTensors...> : bool_constant<	\
+//	is_same<typename _Tensor::tag_name, tag>::value							\
+//	&& name<_OtherTensors...>::value> {};									
+
+//MATAZURE_ARE_TAG(are_host_memory, memory_type, host_t)
+//MATAZURE_ARE_TAG(are_device_memory, memory_type, device_t)
 
 //are host memory
 template <typename ..._Tensor>
@@ -152,5 +170,4 @@ template <typename _Tensor, typename ..._OtherTensors>
 struct none_array_access<_Tensor, _OtherTensors...> : bool_constant<
 	!is_same<typename _Tensor::access_type, array_access_t>::value
 	&& none_array_access<_OtherTensors...>::value> {};
-
 }

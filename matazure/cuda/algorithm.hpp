@@ -263,7 +263,7 @@ void copy(_ExecutionPolicy policy, _T1 lhs, _T2 rhs, enable_if_t<!are_linear_acc
 }
 
 template <typename _T1, typename _T2>
-void copy(_T1 lhs, _T2 rhs, enable_if_t<are_device_memory<_T1, _T2>::value>* = 0) {
+void copy(_T1 lhs, _T2 rhs, enable_if_t<is_tensor<_T1>::value>* = 0, enable_if_t<are_device_memory<_T1, _T2>::value>* = 0) {
 	parallel_execution_policy policy;
 	policy.total_size(lhs.size());
 	copy(policy, lhs, rhs, (void *)(0));

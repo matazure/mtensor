@@ -79,6 +79,7 @@ if (WITH_CUDA)
 	endforeach()
 endif()
 
+#add benchmark
 if (WITH_BENCHMARK)
 	add_subdirectory(benchmark)
 endif()

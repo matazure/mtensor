@@ -315,7 +315,7 @@ inline MATAZURE_GENERAL void copy(_ExectutionPolicy policy, const _T1 &lhs, _T2 
 }
 
 template <typename _T1, typename _T2>
-inline MATAZURE_GENERAL void copy(const _T1 &lhs, _T2 &rhs, enable_if_t<none_device_memory<_T1, _T2>::value>* = 0) {
+inline MATAZURE_GENERAL void copy(const _T1 &lhs, _T2 &rhs, enable_if_t<is_tensor<_T1>::value>* = 0, enable_if_t<none_device_memory<_T1, _T2>::value>* = 0) {
 	sequence_policy policy;
 	copy(policy, lhs, rhs, (void *)(0));
 }
