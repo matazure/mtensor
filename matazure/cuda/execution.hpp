@@ -110,11 +110,11 @@ inline void configure_grid(execution_policy &exe_policy, __KernelFunc k)
 class parallel_execution_policy : public execution_policy {
 public:
 
-	int_t total_size() const		{ return parallel_size_; }
-	void total_size(int_t size)	{ parallel_size_ = size; }
+	int_t total_size() const		{ return total_size_; }
+	void total_size(int_t size)	{ total_size_ = size; }
 
 protected:
-	int_t parallel_size_;
+	int_t total_size_;
 };
 
 template <typename __KernelFunc>
