@@ -56,6 +56,9 @@ struct function_traits<_ReturnType(_ClassType::*)(_Args...) const> {
 template <typename _Type>
 struct is_tensor : bool_constant<std::is_base_of<tensor_expression<_Type>, _Type>::value> {};
 
+template <typename _Type>
+struct is_linear_array : bool_constant<is_tensor<_Type>::value> {};
+
 template <typename _Tensor>
 class tensor_expression;
 
@@ -70,7 +73,7 @@ struct name<> : bool_constant<true> {};										\
 template <typename _Tensor, typename ..._OtherTensors>						\
 struct name<_Tensor, _OtherTensors...> : bool_constant<						\
 	is_same<typename _Tensor::tag_name, tag>::value							\
-	&& name<_OtherTensors...>::value> {};									
+	&& name<_OtherTensors...>::value> {};
 
 MATAZURE_DEFINE_ARE_TAG(are_host_memory, memory_type, host_t)
 MATAZURE_DEFINE_ARE_TAG(are_device_memory, memory_type, device_t)

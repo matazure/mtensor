@@ -26,7 +26,9 @@ public:
 
 	MATAZURE_GENERAL static point all(value_type v) {
 		point re{};
-		fill(re, v);
+		for (int_t i = 0;i < re.size(); ++i) {
+			re[i] = v;
+		}
 		return re;
 	}
 

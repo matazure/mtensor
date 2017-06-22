@@ -228,24 +228,24 @@ inline void for_each(_ExecutionPolicy policy, _Tensor ts, _Fun fun, enable_if_t<
 }
 
 template <typename _Tensor, typename _Fun>
-inline void for_each(_Tensor ts, _Fun fun, enable_if_t<are_device_memory<_Tensor>::value>* = 0) {
+inline void for_each(_Tensor ts, _Fun fun, enable_if_t<are_device_memory<enable_if_t<is_tensor<_Tensor>::value, _Tensor>>::value>* = 0) {
 	parallel_execution_policy policy;
 	policy.total_size(ts.size());
-	for_each(policy, ts, fun, (void *)(0));
+	for_each(policy, ts, fun);
 }
 
 template <typename _ExecutionPolicy, typename _Tensor>
-inline void fill(_ExecutionPolicy policy, _Tensor ts, typename _Tensor::value_type v, enable_if_t<are_device_memory<_Tensor>::value>* = 0) {
+inline void fill(_ExecutionPolicy policy, _Tensor ts, typename _Tensor::value_type v, enable_if_t<are_device_memory<enable_if_t<is_tensor<_Tensor>::value, _Tensor>>::value>* = 0) {
 	for_each(policy, ts, [v] MATAZURE_DEVICE(typename _Tensor::value_type &element) {
 		element = v;
-	}, (void *)(0));
+	});
 }
 
 template <typename _Tensor>
-inline void fill(_Tensor ts, typename _Tensor::value_type v, enable_if_t<are_device_memory<_Tensor>::value>* = 0) {
+inline void fill(_Tensor ts, typename _Tensor::value_type v, enable_if_t<are_device_memory<enable_if_t<is_tensor<_Tensor>::value, _Tensor>>::value>* = 0) {
 	parallel_execution_policy policy;
 	policy.total_size(ts.size());
-	fill(policy, ts, v, (void *)(0));
+	fill(policy, ts, v);
 }
 
 template <typename _ExecutionPolicy, typename _T1, typename _T2>
@@ -263,10 +263,10 @@ void copy(_ExecutionPolicy policy, _T1 lhs, _T2 rhs, enable_if_t<!are_linear_acc
 }
 
 template <typename _T1, typename _T2>
-void copy(_T1 lhs, _T2 rhs, enable_if_t<is_tensor<_T1>::value>* = 0, enable_if_t<are_device_memory<_T1, _T2>::value>* = 0) {
+void copy(_T1 lhs, _T2 rhs, enable_if_t<are_device_memory<enable_if_t<is_tensor<_T1>::value, _T1>, _T2>::value>* = 0) {
 	parallel_execution_policy policy;
 	policy.total_size(lhs.size());
-	copy(policy, lhs, rhs, (void *)(0));
+	copy(policy, lhs, rhs);
 }
 
 }

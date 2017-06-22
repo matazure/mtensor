@@ -9,7 +9,7 @@ namespace matazure {
 namespace cuda {
 
 template <typename _Type, int_t _Rank, typename _Layout = first_major_t>
-class tensor : public tensor_expression<tensor<_Type, _Rank, first_major_t>> {
+class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout>> {
 public:
 	static_assert(std::is_pod<_Type>::value, "only supports pod type now");
 
