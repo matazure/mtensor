@@ -10,15 +10,15 @@ using namespace matazure;
 //	tensor<_ValueType, 2> ts(state.range(1), state.range(1));
 //	int_t stride = state.range(0);
 //	int_t phase = stride / 2;
-//	auto ts_re_ext = ts.extent() / stride;
+//	auto ts_re_ext = ts.shape() / stride;
 //
 //	while (state.KeepRunning()) {
 //		tensor<_ValueType, 2> ts_re(ts_re_ext);
-//		auto ts_ext = ts.extent();
+//		auto ts_ext = ts.shape();
 //		for (int_t j = 0; j < ts_re_ext[1]; ++j) {
 //			for (int_t i = 0; i < ts_re_ext[0]; ++i) {
 //				pointi<2> idx = { i,j };
-//				ts_re(idx) = ts(idx * stride + phase);
+//				ts_re[idx] = ts(idx * stride + phase);
 //			}
 //		}
 //	}
@@ -32,49 +32,46 @@ void BM_host_stride_dim2_gold(benchmark::State &state) {
 	tensor<_ValueType, 2> ts(state.range(1), state.range(1));
 	int_t stride = state.range(0);
 	int_t phase = stride / 2;
-	auto ts_re_ext = ts.extent() / stride;
+	auto ts_re_ext = ts.shape() / stride;
+	tensor<_ValueType, 2> ts_re(ts_re_ext);
 
 	while (state.KeepRunning()) {
-		tensor<_ValueType, 2> ts_re(ts_re_ext);
-		auto ts_ext = ts.extent();
-
 		int_t pos_i = 0;
 		int_t pos_j = 0;
 		for (int_t j = 0; j < ts_re_ext[1]; ++j) {
 			pos_i = 0;
 			for (int_t i = 0; i < ts_re_ext[0]; ++i) {
-				ts_re(i, j) = ts(pos_i + phase, pos_j + phase);
+				ts_re(i, j) = ts(pos_i, pos_j);
 				pos_i += stride;
 			}
 			pos_j += stride;
 		}
 	}
 
-	auto bytes_size = static_cast<size_t>(prod(ts_re_ext)) * sizeof(_ValueType);
+	auto bytes_size = static_cast<size_t>(ts_re.size()) * sizeof(_ValueType);
 	state.SetBytesProcessed(state.iterations() * bytes_size);
 }
 
 template <typename _Tensor>
 void BM_stride(benchmark::State &state) {
-	auto ext = pointi<_Tensor::dim>::zeros();
-	for (int_t i = 0; i < ext.size(); ++i) {
-		ext[i] = state.range(1);
-	}
-
+	auto ext = pointi<_Tensor::rank>::zeros();
+	fill(ext, state.range(1));
 	_Tensor ts(ext);
 	int_t ts_stride = state.range(0);
-	int_t ts_phase = ts_stride / 2;
-	auto ts_re_ext = ts.extent() / ts_stride;
+	auto ts_re_ext = ts.shape() / ts_stride;
+	_Tensor ts_re(ts_re_ext);
+	
 	while (state.KeepRunning()) {
-		auto ts_re = stride(ts, ts_stride, ts_phase).persist();
+		auto lts_re = stride(ts, ts_stride);
+		copy(lts_re, ts_re);
 
 	#ifdef MATAZURE_CUDA
-		cuda::barrier();
+		cuda::device_synchronize();
 	#endif
 
 	}
 
-	auto bytes_size = static_cast<size_t>(prod(ts_re_ext)) * sizeof(decltype(ts[0]));
+	auto bytes_size = static_cast<size_t>(ts_re.size()) * sizeof(decltype(ts[0]));
 	state.SetBytesProcessed(state.iterations() * bytes_size);
 }
 
@@ -87,16 +84,16 @@ void BM_stride(benchmark::State &state) {
 
 //template <typename _ValueType>
 //void BM_cu_stride_gold(benchmark::State& state) {
-//	cu_tensor<_ValueType, 1> ts(state.range(0));
+//	cuda::tensor<_ValueType, 1> ts(state.range(0));
 //
 //	while (state.KeepRunning()) {
-//		cu_tensor<float, 1> ts_re(ts1.extent());
-//		cuda::ExecutionPolicy policy;
-//		cuda::throw_on_error(cuda::condigure_grid(policy, tensor_operation_gold_kenel<_ValueType>));
-//		tensor_operation_gold_kenel<<< policy.getGridSize(),
-//			policy.getBlockSize(),
-//			policy.getSharedMemBytes(),
-//			policy.getStream() >>>(ts_re.data(), ts1.data(), ts2.data(), ts_re.size());
+//		cuda::tensor<float, 1> ts_re(ts1.shape());
+//		cuda::execution_policy policy;
+//		cuda::assert_runtime_success(cuda::configure_grid(policy, tensor_operation_gold_kenel<_ValueType>));
+//		tensor_operation_gold_kenel<<< policy.grid_size(),
+//			policy.block_size(),
+//			policy.shared_mem_bytes(),
+//			policy.stream() >>>(ts_re.data(), ts1.data(), ts2.data(), ts_re.size());
 //	}
 //
 //	auto bytes_size = static_cast<size_t>(ts1.size()) * sizeof(_ValueType);
@@ -105,8 +102,8 @@ void BM_stride(benchmark::State &state) {
 //
 //template <typename _ValueType>
 //void BM_stride_operation(benchmark::State &state) {
-//	cu_tensor<_ValueType, 1> ts1(state.range(0));
-//	cu_tensor<_ValueType, 1> ts2(state.range(0));
+//	cuda::tensor<_ValueType, 1> ts1(state.range(0));
+//	cuda::tensor<_ValueType, 1> ts2(state.range(0));
 //	fill(ts1, _ValueType(1));
 //	fill(ts2, _ValueType(1));
 //
@@ -135,10 +132,10 @@ BENCHMARK_TEMPLATE(BM_host_stride_dim2_gold, byte)->UseRealTime()->Apply(custom_
 auto BM_stride_tensor_byte_dim2 = BM_stride<tensor<byte, 2>>;
 BENCHMARK(BM_stride_tensor_byte_dim2)->UseRealTime()->Apply(custom_arguments);
 
-auto BM_stride_cu_tensor_byte_dim2 = BM_stride<cu_tensor<byte, 2>>;
+auto BM_stride_cu_tensor_byte_dim2 = BM_stride<cuda::tensor<byte, 2>>;
 BENCHMARK(BM_stride_cu_tensor_byte_dim2)->UseRealTime()->Apply(custom_arguments);
 
-//auto BM_stride_cu_tensor_byte_dim1 = BM_stride<cu_tensor<byte, 1>>;
+//auto BM_stride_cu_tensor_byte_dim1 = BM_stride<cuda::tensor<byte, 1>>;
 //BENCHMARK(BM_stride_cu_tensor_byte_dim1)->UseRealTime()->Apply(custom_arguments);
 
 

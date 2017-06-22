@@ -7,9 +7,9 @@ using namespace matazure;
 template <typename _ValueType>
 void BM_host_zip_gold(benchmark::State &state) {
 	tensor<_ValueType, 1> ts0(state.range(0));
-	tensor<_ValueType, 1> ts1(ts0.extent());
-	tensor<_ValueType, 1> ts_re0(ts0.extent());
-	tensor<_ValueType, 1> ts_re1(ts0.extent());
+	tensor<_ValueType, 1> ts1(ts0.shape());
+	tensor<_ValueType, 1> ts_re0(ts0.shape());
+	tensor<_ValueType, 1> ts_re1(ts0.shape());
 
 	while (state.KeepRunning()) {
 		for (int_t i = 0; i < ts0.size(); ++i) {
@@ -25,9 +25,9 @@ void BM_host_zip_gold(benchmark::State &state) {
 template <typename _Tensor>
 void BM_zip(benchmark::State &state) {
 	_Tensor ts0(state.range(0));
-	_Tensor ts1(ts0.extent());
-	_Tensor ts_re0(ts0.extent());
-	_Tensor ts_re1(ts0.extent());
+	_Tensor ts1(ts0.shape());
+	_Tensor ts_re0(ts0.shape());
+	_Tensor ts_re1(ts0.shape());
 
 	while (state.KeepRunning()) {
 		auto ts_zip = zip(ts0, ts1);
@@ -48,19 +48,19 @@ void BM_zip(benchmark::State &state) {
 //
 //template <typename _ValueType>
 //void BM_cu_zip_gold(benchmark::State& state) {
-//	cu_tensor<_ValueType, 1> ts1(state.range(0));
-//	cu_tensor<_ValueType, 1> ts2(state.range(0));
+//	cuda::tensor<_ValueType, 1> ts1(state.range(0));
+//	cuda::tensor<_ValueType, 1> ts2(state.range(0));
 //	fill(ts1, _ValueType(1));
 //	fill(ts2, _ValueType(1));
 //
 //	while (state.KeepRunning()) {
-//		cu_tensor<float, 1> ts_re(ts1.extent());
-//		cuda::ExecutionPolicy policy;
-//		cuda::throw_on_error(cuda::condigure_grid(policy, tensor_operation_gold_kenel<_ValueType>));
-//		tensor_operation_gold_kenel<<< policy.getGridSize(),
-//			policy.getBlockSize(),
-//			policy.getSharedMemBytes(),
-//			policy.getStream() >>>(ts_re.data(), ts1.data(), ts2.data(), ts_re.size());
+//		cuda::tensor<float, 1> ts_re(ts1.shape());
+//		cuda::execution_policy policy;
+//		cuda::assert_runtime_success(cuda::configure_grid(policy, tensor_operation_gold_kenel<_ValueType>));
+//		tensor_operation_gold_kenel<<< policy.grid_size(),
+//			policy.block_size(),
+//			policy.shared_mem_bytes(),
+//			policy.stream() >>>(ts_re.data(), ts1.data(), ts2.data(), ts_re.size());
 //	}
 //
 //	auto bytes_size = static_cast<size_t>(ts1.size()) * sizeof(_ValueType);
@@ -69,8 +69,8 @@ void BM_zip(benchmark::State &state) {
 //
 //template <typename _ValueType>
 //void BM_zip_operation(benchmark::State &state) {
-//	cu_tensor<_ValueType, 1> ts1(state.range(0));
-//	cu_tensor<_ValueType, 1> ts2(state.range(0));
+//	cuda::tensor<_ValueType, 1> ts1(state.range(0));
+//	cuda::tensor<_ValueType, 1> ts2(state.range(0));
 //	fill(ts1, _ValueType(1));
 //	fill(ts2, _ValueType(1));
 //

@@ -34,9 +34,9 @@
 *.pdb
 *.opendb
 .vs
+CMakeSettings.json
 
 vs
 build*
 bin
 data
-vendors

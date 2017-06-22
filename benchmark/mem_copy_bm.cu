@@ -13,16 +13,16 @@ __global__ void each_copy_gold_kenel(_ValueType *p_dst, _ValueType *p_src, int_t
 template <typename _Tensor>
 void BM_each_copy_gold(benchmark::State& state) {
 	_Tensor ts_src(state.range(0));
-	_Tensor ts_dst(ts_src.extent());
+	_Tensor ts_dst(ts_src.shape());
 
 	while (state.KeepRunning()) {
-		cuda::ExecutionPolicy policy;
-		cuda::throw_on_error(cuda::condigure_grid(policy, each_copy_gold_kenel<typename _Tensor::value_type>));
-		each_copy_gold_kenel<<< policy.getGridSize(),
-			policy.getBlockSize(),
-			policy.getSharedMemBytes(),
-			policy.getStream() >>>(ts_dst.data(), ts_src.data(), ts_src.size());
-		cuda::barrier();
+		cuda::execution_policy policy;
+		cuda::configure_grid(policy, each_copy_gold_kenel<typename _Tensor::value_type>);
+		each_copy_gold_kenel<<< policy.grid_size(),
+			policy.block_size(),
+			policy.shared_mem_bytes(),
+			policy.stream() >>>(ts_dst.data(), ts_src.data(), ts_src.size());
+		cuda::device_synchronize();
 	}
 
 	auto bytes_size = static_cast<size_t>(ts_src.size()) * sizeof(decltype(ts_src[0]));
@@ -32,13 +32,13 @@ void BM_each_copy_gold(benchmark::State& state) {
 template <typename _TensorSrc, typename _TensorDst>
 static void BM_mem_copy(benchmark::State& state) {
 	_TensorSrc ts_src(state.range(0));
-	_TensorDst ts_dst(ts_src.extent());
+	_TensorDst ts_dst(ts_src.shape());
 
 	while (state.KeepRunning()) {
 		mem_copy(ts_src, ts_dst);
 
 	#ifdef MATAZURE_CUDA
-		cuda::barrier();
+		cuda::device_synchronize();
 	#endif
 	}
 
@@ -50,16 +50,16 @@ auto BM_host2host_mem_copy = BM_mem_copy<tensor<byte, 1>, tensor<byte, 1>>;
 BENCHMARK(BM_host2host_mem_copy)->Range(1 << 10, 1 << 28)->UseRealTime();
 
 #ifdef MATAZURE_CUDA
-auto BM_device2host_mem_copy = BM_mem_copy<cu_tensor<byte, 1>, tensor<byte, 1>>;
+auto BM_device2host_mem_copy = BM_mem_copy<cuda::tensor<byte, 1>, tensor<byte, 1>>;
 BENCHMARK(BM_device2host_mem_copy)->Range(1 << 10, 1 << 28)->UseRealTime();
-auto BM_host2device_mem_copy = BM_mem_copy<tensor<byte, 1>, cu_tensor<byte, 1>>;
+auto BM_host2device_mem_copy = BM_mem_copy<tensor<byte, 1>, cuda::tensor<byte, 1>>;
 BENCHMARK(BM_host2device_mem_copy)->Range(1 << 10, 1 << 28)->UseRealTime();
-auto BM_device2device_mem_copy = BM_mem_copy<cu_tensor<byte, 1>, cu_tensor<byte, 1>>;
+auto BM_device2device_mem_copy = BM_mem_copy<cuda::tensor<byte, 1>, cuda::tensor<byte, 1>>;
 BENCHMARK(BM_device2device_mem_copy)->Range(1 << 10, 1 << 28)->UseRealTime();
 #endif
 
-auto BM_each_copy_gold_byte = BM_each_copy_gold<cu_tensor<byte, 1>>;
+auto BM_each_copy_gold_byte = BM_each_copy_gold<cuda::tensor<byte, 1>>;
 BENCHMARK(BM_each_copy_gold_byte)->Range(1 << 10, 1 << 28)->UseRealTime();
 
-auto BM_each_copy_gold_float = BM_each_copy_gold<cu_tensor<float, 1>>;
+auto BM_each_copy_gold_float = BM_each_copy_gold<cuda::tensor<float, 1>>;
 BENCHMARK(BM_each_copy_gold_float)->Range(1 << 10, 1 << 28)->UseRealTime();

@@ -13,21 +13,21 @@ __global__ void tensor_operation_gold_kenel(_ValueType *p_dst, _ValueType *p1, _
 
 template <typename _ValueType>
 void BM_cu_tensor_operation_gold(benchmark::State& state) {
-	cu_tensor<_ValueType, 1> ts1(state.range(0));
-	cu_tensor<_ValueType, 1> ts2(state.range(0));
+	cuda::tensor<_ValueType, 1> ts1(state.range(0));
+	cuda::tensor<_ValueType, 1> ts2(state.range(0));
 	fill(ts1, _ValueType(1));
 	fill(ts2, _ValueType(1));
 
 	while (state.KeepRunning()) {
-		cu_tensor<_ValueType, 1> ts_re(ts1.extent());
-		cuda::ExecutionPolicy policy;
-		cuda::throw_on_error(cuda::condigure_grid(policy, tensor_operation_gold_kenel<_ValueType>));
-		tensor_operation_gold_kenel<<< policy.getGridSize(),
-			policy.getBlockSize(),
-			policy.getSharedMemBytes(),
-			policy.getStream() >>>(ts_re.data(), ts1.data(), ts2.data(), ts_re.size());
+		cuda::tensor<_ValueType, 1> ts_re(ts1.shape());
+		cuda::execution_policy policy;
+		cuda::configure_grid(policy, tensor_operation_gold_kenel<_ValueType>);
+		tensor_operation_gold_kenel<<< policy.grid_size(),
+			policy.block_size(),
+			policy.shared_mem_bytes(),
+			policy.stream() >>>(ts_re.data(), ts1.data(), ts2.data(), ts_re.size());
 
-		cuda::barrier();
+		cuda::device_synchronize();
 	}
 
 	auto bytes_size = static_cast<size_t>(ts1.size()) * sizeof(_ValueType);
@@ -42,7 +42,7 @@ void BM_host_tensor_operation_gold(benchmark::State &st) {
 	fill(ts2, _ValueType(1));
 
 	while (st.KeepRunning()) {
-		tensor<_ValueType, 1> ts_re(ts1.extent());
+		tensor<_ValueType, 1> ts_re(ts1.shape());
 		for (int_t i = 0; i < ts_re.size(); ++i) {
 			ts_re[i] = ts1[i] * ts2[i] / ts1[i] + ts2[i];
 		}
@@ -69,14 +69,14 @@ void BM_host_tensor_operation(benchmark::State &st) {
 
 template <typename _ValueType>
 void BM_cu_tensor_operation(benchmark::State &st) {
-	cu_tensor<_ValueType, 1> ts1(st.range(0));
-	cu_tensor<_ValueType, 1> ts2(st.range(0));
+	cuda::tensor<_ValueType, 1> ts1(st.range(0));
+	cuda::tensor<_ValueType, 1> ts2(st.range(0));
 	fill(ts1, _ValueType(1));
 	fill(ts2, _ValueType(1));
 
 	while (st.KeepRunning()) {
 		auto tsf_re = (ts1 * ts2 / ts1 + ts2).persist();
-		cuda::barrier();
+		cuda::device_synchronize();
 	}
 
 	auto bytes_size = static_cast<size_t>(ts1.size()) * sizeof(decltype(ts1[0]));

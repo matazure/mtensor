@@ -1,4 +1,13 @@
 ﻿#pragma once
 
 #include <matazure/io.hpp>
+#include <matazure/functor.hpp>
 #include <matazure/common.hpp>
+#include <matazure/meta.hpp>
+
+#include <matazure/numeric/prod.hpp>
+
+#ifdef MATAZURE_CUDA
+#include <matazure/cuda/numeric/prod.hpp>
+#include <matazure/cuda/puzzle/conv.hpp>
+#endif
