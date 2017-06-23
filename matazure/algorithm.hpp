@@ -12,16 +12,29 @@
 
 namespace matazure {
 
+/// special is_linear_array for point
 template <typename _Type, int_t _Rank>
 struct is_linear_array<point<_Type, _Rank>>: bool_constant<true> {};
 
+/**
+* @brief for each linear index, apply fun by the sequence policy
+* @param first the first index
+* @param last the last index
+* @param fun the functor,  int_t -> value formal.
+*/
 template <typename _Func>
-inline MATAZURE_GENERAL void for_index(sequence_policy policy, int_t first, int_t last, _Func fun) {
+inline MATAZURE_GENERAL void for_index(sequence_policy, int_t first, int_t last, _Func fun) {
 	for (int_t i = first; i < last; ++i) {
 		fun(i);
 	}
 }
 
+/**
+* @brief for each linear index, apply fun by the sequence vectorized policy
+* @param first the first index
+* @param last the last index
+* @param fun the functor,  int_t -> value formal.
+*/
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(sequence_vectorized_policy policy, int_t first, int_t last, _Func fun) {
 	#pragma MATAZURE_AUTO_VECTORISED
@@ -30,8 +43,14 @@ inline MATAZURE_GENERAL void for_index(sequence_vectorized_policy policy, int_t 
 	}
 }
 
-#ifdef _OPENMP
+#ifdef MATAZURE_OPENMP
 
+/**
+* @brief for each linear index, apply fun by the openmp parallel policy
+* @param first the first index
+* @param last the last index
+* @param fun the functor,  int_t -> value formal.
+*/
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(omp_policy policy, int_t first, int_t last, _Func fun){
 	#pragma omp parallel for
@@ -40,6 +59,12 @@ inline MATAZURE_GENERAL void for_index(omp_policy policy, int_t first, int_t las
 	}
 }
 
+/**
+* @brief for each linear index, apply fun by the openmp parallel vectorized policy
+* @param first the first index
+* @param last the last index
+* @param fun the functor,  int_t -> value formal.
+*/
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(omp_vectorized_policy policy, int_t first, int_t last, _Func fun){
 #if _OPENMP >= 201307
@@ -54,12 +79,24 @@ inline MATAZURE_GENERAL void for_index(omp_vectorized_policy policy, int_t first
 
 #endif
 
+/**
+* @brief for each linear index, apply fun by the sequence policy
+* @param first the first index
+* @param last the last index
+* @param fun the functor,  int_t -> value formal.
+*/
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(int_t first, int_t last, _Func fun) {
 	sequence_policy seq{};
 	for_index(seq, first, last, fun);
 }
 
+/**
+* @brief for each 1-dim array index, apply fun by the sequence policy
+* @param origin the origin index of the 1-dim rect
+* @param extent the extent of the rect
+* @param fun the functor,  pointi<1> -> value formal.
+*/
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(sequence_policy, pointi<1> origin, pointi<1> extent, _Func fun) {
 	for (int_t i = origin[0]; i < extent[0]; ++i) {
@@ -67,6 +104,12 @@ inline MATAZURE_GENERAL void for_index(sequence_policy, pointi<1> origin, pointi
 	}
 }
 
+/**
+* @brief for each 2-dim array index, apply fun by the sequence policy
+* @param origin the origin index of the 2-dim rect
+* @param extent the extent of the rect
+* @param fun the functor,  pointi<2> -> value formal.
+*/
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(sequence_policy, pointi<2> origin, pointi<2> extent, _Func fun) {
 	for (int_t j = origin[1]; j < extent[1]; ++j) {
@@ -76,6 +119,12 @@ inline MATAZURE_GENERAL void for_index(sequence_policy, pointi<2> origin, pointi
 	}
 }
 
+/**
+* @brief for each 3-dim array index, apply fun by the sequence policy
+* @param origin the origin index of the 3-dim rect
+* @param extent the extent of the rect
+* @param fun the functor,  pointi<3> -> value formal.
+*/
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(sequence_policy, pointi<3> origin, pointi<3> extent, _Func fun) {
 	for (int_t k = origin[2]; k < extent[2]; ++k) {
@@ -87,6 +136,12 @@ inline MATAZURE_GENERAL void for_index(sequence_policy, pointi<3> origin, pointi
 	}
 }
 
+/**
+* @brief for each 4-dim array index, apply fun by the sequence policy
+* @param origin the origin index of the 4-dim rect
+* @param extent the extent of the rect
+* @param fun the functor,  pointi<4> -> value formal.
+*/
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(sequence_policy, pointi<4> origin, pointi<4> extent, _Func fun) {
 	for (int_t l = origin[3]; l < extent[3]; ++l) {
@@ -100,6 +155,12 @@ inline MATAZURE_GENERAL void for_index(sequence_policy, pointi<4> origin, pointi
 	}
 }
 
+/**
+* @brief for each 1-dim array index, apply fun by the sequence vectorized policy
+* @param origin the origin index of the 1-dim rect
+* @param extent the extent of the rect
+* @param fun the functor,  pointi<1> -> value formal.
+*/
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(sequence_vectorized_policy, pointi<1> origin, pointi<1> extent, _Func fun) {
 	#pragma MATAZURE_AUTO_VECTORISED
@@ -108,6 +169,12 @@ inline MATAZURE_GENERAL void for_index(sequence_vectorized_policy, pointi<1> ori
 	}
 }
 
+/**
+* @brief for each 2-dim array index, apply fun by the sequence vectorized policy
+* @param origin the origin index of the 2-dim rect
+* @param extent the extent of the rect
+* @param fun the functor,  pointi<2> -> value formal.
+*/
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(sequence_vectorized_policy, pointi<2> origin, pointi<2> extent, _Func fun) {
 	for (int_t j = origin[1]; j < extent[1]; ++j) {
@@ -118,6 +185,12 @@ inline MATAZURE_GENERAL void for_index(sequence_vectorized_policy, pointi<2> ori
 	}
 }
 
+/**
+* @brief for each 3-dim array index, apply fun by the sequence vectorized policy
+* @param origin the origin index of the 3-dim rect
+* @param extent the extent of the rect
+* @param fun the functor,  pointi<3> -> value formal.
+*/
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(sequence_vectorized_policy, pointi<3> origin, pointi<3> extent, _Func fun) {
 	for (int_t k = origin[2]; k < extent[2]; ++k) {
@@ -130,6 +203,12 @@ inline MATAZURE_GENERAL void for_index(sequence_vectorized_policy, pointi<3> ori
 	}
 }
 
+/**
+* @brief for each 4-dim array index, apply fun by the sequence vectorized policy
+* @param origin the origin index of the 4-dim rect
+* @param extent the extent of the rect
+* @param fun the functor,  pointi<4> -> value formal.
+*/
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(sequence_vectorized_policy, pointi<4> origin, pointi<4> extent, _Func fun) {
 	for (int_t l = origin[3]; l < extent[3]; ++l) {
@@ -146,6 +225,12 @@ inline MATAZURE_GENERAL void for_index(sequence_vectorized_policy, pointi<4> ori
 
 #ifdef _OPENMP
 
+/**
+* @brief for each 1-dim array index, apply fun by the openmp parallel policy
+* @param origin the origin index of the 1-dim rect
+* @param extent the extent of the rect
+* @param fun the functor,  pointi<1> -> value formal.
+*/
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(omp_policy, pointi<1> origin, pointi<1> extent, _Func fun) {
 	#pragma omp parallel for
@@ -154,6 +239,12 @@ inline MATAZURE_GENERAL void for_index(omp_policy, pointi<1> origin, pointi<1> e
 	}
 }
 
+/**
+* @brief for each 2-dim array index, apply fun by the openmp parallel policy
+* @param origin the origin index of the 2-dim rect
+* @param extent the extent of the rect
+* @param fun the functor,  pointi<2> -> value formal.
+*/
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(omp_policy, pointi<2> origin, pointi<2> extent, _Func fun) {
 #if  _OPENMP >= 200805
@@ -168,6 +259,12 @@ inline MATAZURE_GENERAL void for_index(omp_policy, pointi<2> origin, pointi<2> e
 	}
 }
 
+/**
+* @brief for each 3-dim array index, apply fun by the openmp parallel policy
+* @param origin the origin index of the 3-dim rect
+* @param extent the extent of the rect
+* @param fun the functor,  pointi<3> -> value formal.
+*/
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(omp_policy, pointi<3> origin, pointi<3> extent, _Func fun) {
 #if  _OPENMP >= 200805
@@ -184,6 +281,12 @@ inline MATAZURE_GENERAL void for_index(omp_policy, pointi<3> origin, pointi<3> e
 	}
 }
 
+/**
+* @brief for each 4-dim array index, apply fun by the openmp parallel policy
+* @param origin the origin index of the 4-dim rect
+* @param extent the extent of the rect
+* @param fun the functor,  pointi<4> -> value formal.
+*/
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(omp_policy, pointi<4> origin, pointi<4> extent, _Func fun) {
 #if  _OPENMP >= 200805
@@ -202,6 +305,12 @@ inline MATAZURE_GENERAL void for_index(omp_policy, pointi<4> origin, pointi<4> e
 	}
 }
 
+/**
+* @brief for each 1-dim array index, apply fun by the openmp parallel vectorized policy
+* @param origin the origin index of the 1-dim rect
+* @param extent the extent of the rect
+* @param fun the functor,  pointi<1> -> value formal.
+*/
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(omp_vectorized_policy, pointi<1> origin, pointi<1> extent, _Func fun) {
 #if _OPENMP >= 201307
@@ -214,6 +323,12 @@ inline MATAZURE_GENERAL void for_index(omp_vectorized_policy, pointi<1> origin, 
 	}
 }
 
+/**
+* @brief for each 2-dim array index, apply fun by the openmp parallel vectorized policy
+* @param origin the origin index of the 2-dim rect
+* @param extent the extent of the rect
+* @param fun the functor,  pointi<2> -> value formal.
+*/
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(omp_vectorized_policy, pointi<2> origin, pointi<2> extent, _Func fun) {
 #if  _OPENMP >= 200805
@@ -229,6 +344,12 @@ inline MATAZURE_GENERAL void for_index(omp_vectorized_policy, pointi<2> origin, 
 	}
 }
 
+/**
+* @brief for each 3-dim array index, apply fun by the openmp parallel vectorized policy
+* @param origin the origin index of the 3-dim rect
+* @param extent the extent of the rect
+* @param fun the functor,  pointi<3> -> value formal.
+*/
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(omp_vectorized_policy, pointi<3> origin, pointi<3> extent, _Func fun) {
 #if  _OPENMP >= 200805
@@ -246,6 +367,12 @@ inline MATAZURE_GENERAL void for_index(omp_vectorized_policy, pointi<3> origin, 
 	}
 }
 
+/**
+* @brief for each 4-dim array index, apply fun by the openmp parallel vectorized policy
+* @param origin the origin index of the 4-dim rect
+* @param extent the extent of the rect
+* @param fun the functor,  pointi<4> -> value formal.
+*/
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(omp_vectorized_policy, pointi<4> origin, pointi<4> extent, _Func fun) {
 #if  _OPENMP >= 200805
@@ -267,12 +394,24 @@ inline MATAZURE_GENERAL void for_index(omp_vectorized_policy, pointi<4> origin, 
 
 #endif
 
+/**
+* @brief for each array index, apply fun by the sequence policy
+* @param origin the origin index of the rect
+* @param extent the extent of the rect
+* @param fun the functor,  pointi -> value formal.
+*/
 template <typename _Func, int_t _Rank>
 inline MATAZURE_GENERAL void for_index(pointi<_Rank> origin, pointi<_Rank> extent, _Func fun) {
 	sequence_policy policy{};
 	for_index(policy, origin, extent, fun);
 }
 
+/**
+* @brief for each element of a linear indexing tensor, apply fun
+* @param policy the execution policy
+* @param ts the input tensor
+* @param fun the functor, (element &) -> none formal
+*/
 template <typename _ExectutionPolicy, typename _Tensor, typename _Fun>
 inline MATAZURE_GENERAL void for_each(_ExectutionPolicy policy, _Tensor &ts, _Fun fun, enable_if_t<are_linear_access<_Tensor>::value && none_device_memory<_Tensor>::value>* = 0) {
 	for_index(policy, 0, ts.size(), [&](int_t i) {
@@ -280,6 +419,12 @@ inline MATAZURE_GENERAL void for_each(_ExectutionPolicy policy, _Tensor &ts, _Fu
 	});
 }
 
+/**
+* @brief for each element of an array indexing tensor, apply fun
+* @param policy the execution policy
+* @param ts the input tensor
+* @param fun the functor, (element &) -> none formal
+*/
 template <typename _ExectutionPolicy, typename _Tensor, typename _Fun>
 inline MATAZURE_GENERAL void for_each(_ExectutionPolicy policy, _Tensor &ts, _Fun fun, enable_if_t<!are_linear_access<_Tensor>::value && none_device_memory<_Tensor>::value>* = 0) {
 	for_index(policy, pointi<_Tensor::rank>::zeros(), ts.shape(), [&](pointi<_Tensor::rank> idx) {
@@ -287,108 +432,108 @@ inline MATAZURE_GENERAL void for_each(_ExectutionPolicy policy, _Tensor &ts, _Fu
 	});
 }
 
+/**
+* @brief for each element of a tensor, apply fun by the sequence policy
+* @param ts the input tensor
+* @param fun the functor, (element &) -> none formal
+*/
 template <typename _Tensor, typename _Fun>
 inline MATAZURE_GENERAL void for_each(_Tensor &ts, _Fun fun, enable_if_t<none_device_memory<enable_if_t<is_linear_array<_Tensor>::value, _Tensor>>::value>* = 0) {
 	sequence_policy policy{};
 	for_each(policy, ts, fun);
 }
 
+/**
+* @brief fill a tensor value elementwise
+* @param policy the execution policy
+* @param ts the input tensor
+* @param v the filled value
+*/
 template <typename _ExectutionPolicy, typename _Tensor>
 inline MATAZURE_GENERAL void fill(_ExectutionPolicy policy, _Tensor &ts, typename _Tensor::value_type v, enable_if_t<none_device_memory<_Tensor>::value>* = 0) {
 	for_each(policy, ts, [v](typename _Tensor::value_type &x) { x = v;});
 }
 
+/**
+* @brief fill a tensor value elementwise by the sequence policy
+* @param ts the input tensor
+* @param v the filled value
+*/
 template <typename _Tensor>
 inline MATAZURE_GENERAL void fill(_Tensor &ts, typename _Tensor::value_type v, enable_if_t<none_device_memory<enable_if_t<is_linear_array<_Tensor>::value, _Tensor>>::value>* = 0) {
 	sequence_policy policy{};
 	fill(policy, ts, v);
 }
 
+/**
+* @brief elementwisely copy a linear indexing tensor to another one
+* @param policy the execution policy
+* @param ts_src the source tensor
+* @param ts_dst the dest tensor
+*/
 template <typename _ExectutionPolicy, typename _T1, typename _T2>
-inline MATAZURE_GENERAL void copy(_ExectutionPolicy policy, const _T1 &lhs, _T2 &rhs, enable_if_t<are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
-	for_index(policy, 0, lhs.size(), [&](int_t i) {
-		rhs[i] = lhs[i];
+inline MATAZURE_GENERAL void copy(_ExectutionPolicy policy, const _T1 &ts_src, _T2 &ts_dst, enable_if_t<are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
+	for_index(policy, 0, ts_src.size(), [&](int_t i) {
+		ts_dst[i] = ts_src[i];
 	});
 }
 
+/**
+* @brief elementwisely copy a array indexing tensor to another one
+* @param policy the execution policy
+* @param ts_src the source tensor
+* @param ts_dst the dest tensor
+*/
 template <typename _ExectutionPolicy, typename _T1, typename _T2>
-inline MATAZURE_GENERAL void copy(_ExectutionPolicy policy, const _T1 &lhs, _T2 &rhs, enable_if_t<!are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
-	for_index(policy, pointi<_T1::rank>::zeros(), lhs.shape(), [&](pointi<_T1::rank> idx) {
-		rhs[idx] = lhs[idx];
+inline MATAZURE_GENERAL void copy(_ExectutionPolicy policy, const _T1 &ts_src, _T2 &ts_dst, enable_if_t<!are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
+	for_index(policy, pointi<_T1::rank>::zeros(), ts_src.shape(), [&](pointi<_T1::rank> idx) {
+		ts_dst[idx] = ts_src[idx];
 	});
 }
 
+/**
+* @brief elementwisely copy a tensor to another one by the sequence policy
+* @param ts_src the source tensor
+* @param ts_dst the dest tensor
+*/
 template <typename _T1, typename _T2>
-inline MATAZURE_GENERAL void copy(const _T1 &lhs, _T2 &rhs, enable_if_t<none_device_memory<enable_if_t<is_linear_array<_T1>::value, _T1>, _T2>::value>* = 0) {
+inline MATAZURE_GENERAL void copy(const _T1 &ts_src, _T2 &ts_dst, enable_if_t<none_device_memory<enable_if_t<is_linear_array<_T1>::value, _T1>, _T2>::value>* = 0) {
 	sequence_policy policy;
-	copy(policy, lhs, rhs);
+	copy(policy, ts_src, ts_dst);
 }
 
-template <typename _ExectutionPolicy, typename _T1, typename _T2, typename _TransFun>
-inline MATAZURE_GENERAL void transform(_ExectutionPolicy policy, const _T1 &lhs, _T2 &rhs, _TransFun fun, enable_if_t<are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
-	for_index(policy, 0, lhs.size(), [&](int_t i) {
-		fun(lhs[i], rhs[i]);
-	});
-}
-
-template <typename _ExectutionPolicy, typename _T1, typename _T2, typename _TransFun>
-inline MATAZURE_GENERAL void transform(_ExectutionPolicy policy, const _T1 &lhs, _T2 &rhs, _TransFun fun, enable_if_t<!are_linear_access<_T1, _T2>::value && none_device_memory<_T1, _T2>::value>* = 0) {
-	for_index(policy, pointi<_T1::rank>::zeros(), lhs.shape(), [&](pointi<_T1::rank> idx) {
-		fun(lhs[idx], rhs[idx]);
-	});
-}
-
-template <typename _T1, typename _T2, typename _TransFun>
-inline MATAZURE_GENERAL void transform(const _T1 &lhs, _T2 &rhs, _TransFun fun, enable_if_t<!are_linear_access<_T1, _T2>::value && none_device_memory<enable_if_t<is_linear_array<_T1>::value, _T1>, _T2>::value>* = 0) {
-	sequence_policy policy;
-	for_index(policy, lhs, rhs, fun, (void *)(0));
-}
-
-template <typename _Tensor, typename _VT, typename _BinaryOp>
-inline MATAZURE_GENERAL _VT reduce(const _Tensor &ts, _VT init, _BinaryOp binaryop, enable_if_t<none_device_memory<_Tensor>::value>* = 0) {
+/**
+* @brief reduce the elements of a tensor
+* @param the execution policy
+* @param ts the input tensor
+* @param init the initial value
+* @param binary_fun the reduce functor, must be (element, element)-> value formal
+*/
+template <typename _ExectutionPolicy, typename _Tensor, typename _VT, typename _BinaryFunc>
+inline MATAZURE_GENERAL _VT reduce(_ExectutionPolicy policy, _Tensor ts, _VT init, _BinaryFunc binary_fun, enable_if_t<none_device_memory<_Tensor>::value>* = 0) {
 	auto re = init;
-	for_each(ts, [&re, binaryop](decltype(ts[0]) x) {
-		re = binaryop(re, x);
+	for_each(ts, [&re, binary_fun](decltype(ts[0]) x) {
+		re = binary_fun(re, x);
 	});
 
 	return re;
 }
 
-// template <typename _TS>
-// inline MATAZURE_GENERAL auto sum(const _TS &ts)->typename _TS::value_type {
-// 	typedef typename _TS::value_type value_type;
-// 	return reduce(ts, zero<value_type>::value(), [&](value_type lhs, value_type rhs) {
-// 		return lhs + rhs;
-// 	});
-// }
-//
-// template <typename _TS>
-// inline MATAZURE_GENERAL typename _TS::value_type prod(const _TS &ts) {
-// 	typedef typename _TS::value_type value_type;
-// 	return reduce(ts, value_type(1), [&](value_type lhs, value_type rhs) {
-// 		return lhs * rhs;
-// 	});
-// }
-//
-// template <typename _TS>
-// inline MATAZURE_GENERAL auto mean(const _TS &ts)->typename _TS::value_type {
-// 	return sum(ts) / ts.size();
-// }
-//
-// template <typename _TS>
-// inline MATAZURE_GENERAL typename _TS::value_type max(const _TS &ts) {
-// 	typedef typename _TS::value_type value_type;
-// 	return reduce(ts, ts[0], [&](value_type lhs, value_type rhs) {
-// 		return rhs > lhs ? rhs : lhs;
-// 	});
-// }
-//
-// template <typename _TS>
-// inline MATAZURE_GENERAL typename _TS::value_type min(const _TS &ts) {
-// 	typedef typename _TS::value_type value_type;
-// 	return reduce(ts, numeric_limits<value_type>::max(), [&](value_type lhs, value_type rhs) {
-// 		return lhs <= rhs ? lhs : rhs;
-// 	});
-// }
+/**
+* @brief reduce the elements of a tensor by the sequence policy
+* @param ts the input tensor
+* @param init the initial value
+* @param binary_fun the reduce functor, must be (element, element)-> value formal
+*/
+template <typename _Tensor, typename _VT, typename _BinaryFunc>
+inline MATAZURE_GENERAL _VT reduce( _Tensor ts, _VT init, _BinaryFunc binary_fun, enable_if_t<!are_linear_access<_Tensor>::value && none_device_memory<_Tensor>::value>* = 0) {
+	sequence_policy policy{};
+	auto re = init;
+	for_each(policy, ts, [&re, binary_fun](decltype(ts[0]) x) {
+		re = binary_fun(re, x);
+	});
+
+	return re;
+}
 
 }

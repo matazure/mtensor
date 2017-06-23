@@ -56,8 +56,7 @@ int main() {
 #endif
 #endif
 	//将结果写入raw数据了，可以使用ImageMagick等工具查看
-	std::string file_path = "data/mandelbrot_rgb888_" + std::to_string(shape[0]) + "x" + std::to_string(shape[1]) + ".raw_data";
-	io::write_raw_data(file_path, ts_mandelbrot_rgb);
+	io::write_raw_data("data/mandelbrot_rgb888_2048x2048.raw_data", ts_mandelbrot_rgb);
 
 	return 0;
 }

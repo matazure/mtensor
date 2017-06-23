@@ -4,26 +4,55 @@
 
 namespace matazure {
 
-template <typename _Type, int_t _Rank>
+/**
+* @brief a point class, like as std::array.
+*
+* uses point<int_t, rank> to represent an array index, a tensor shape, stride etc.
+* we clould look point as fixed length vector or array
+*
+* @tparam _ValueType the point element value type, must be pod
+* @tparam _Rank the rank of point, it equals to point length/size
+*/
+template <typename _ValueType, int_t _Rank>
 class point {
 public:
+	/// point length
 	static const int_t				rank = _Rank;
-	typedef _Type					value_type;
+	typedef _ValueType				value_type;
 	typedef value_type &			reference;
 	typedef const value_type &		const_reference;
 	typedef linear_access_t			access_type;
 	typedef local_t					memory_type;
 
-	MATAZURE_GENERAL constexpr const_reference operator[](int_t index) const { return elements_[index]; }
+	/**
+	* @brief accesses element by index
+	* @param i element index
+	* @return element const referece
+	*/
+	MATAZURE_GENERAL constexpr const_reference operator[](int_t i) const {
+		return elements_[i];
+	}
 
-	MATAZURE_GENERAL reference operator[](int_t index) { return elements_[index]; }
+	/**
+	* @brief accesses element by index
+	* @param i element index
+	* @return element referece
+	*/
+	MATAZURE_GENERAL reference operator[](int_t i) {
+		return elements_[i];
+	}
 
-	MATAZURE_GENERAL constexpr int_t size() const { return rank; }
+	/// return the length of point
+	MATAZURE_GENERAL constexpr int_t size() const {
+		return rank;
+	}
 
+	/// return a zero point
 	MATAZURE_GENERAL static constexpr point zeros() {
 		return { 0 };
 	}
 
+	/// return a point whose elements are v
 	MATAZURE_GENERAL static point all(value_type v) {
 		point re{};
 		for (int_t i = 0;i < re.size(); ++i) {
@@ -158,6 +187,7 @@ MATAZURE_GENERAL point<_DstType, _Rank> point_cast(const point<_T, _Rank> &p) {
 	return re;
 }
 
+/// get point element like as std::get
 template<int_t _Idx, class _Ty, int_t _Rank>
 MATAZURE_GENERAL constexpr _Ty& get(point<_Ty, _Rank>& pt) {
 	// return element at _Idx in point pt
@@ -184,6 +214,7 @@ template <int_t _Rank> using points = point<short, _Rank>;
 template <int_t _Rank> using pointi = point<int_t, _Rank>;
 template <int_t _Rank> using pointf = point<float, _Rank>;
 
+/// if two points are equal elementwise, return true, others false.
 template <typename _Ty, int_t _Rank>
 inline MATAZURE_GENERAL bool equal(point<_Ty, _Rank> lhs, point<_Ty, _Rank> rhs) {
 	for (int_t i = 0; i < lhs.size(); ++i) {
@@ -192,6 +223,7 @@ inline MATAZURE_GENERAL bool equal(point<_Ty, _Rank> lhs, point<_Ty, _Rank> rhs)
 	return true;
 }
 
+/// special zero for point
 template <typename _T, int_t _Rank>
 struct zero<point<_T, _Rank>>{
 	static constexpr point<_T, _Rank> value(){
@@ -199,8 +231,9 @@ struct zero<point<_T, _Rank>>{
 	};
 };
 
+/// return cumulative prod of point elements
 template <int_t _Rank>
-inline MATAZURE_GENERAL pointi<_Rank> accumulate_stride(pointi<_Rank> ex) {
+inline MATAZURE_GENERAL pointi<_Rank> cumulative_prod(pointi<_Rank> ex) {
 	pointi<_Rank>  stride;
 	stride[0] = ex[0];
 	for (int_t i = 1; i < _Rank; ++i) {
@@ -209,6 +242,13 @@ inline MATAZURE_GENERAL pointi<_Rank> accumulate_stride(pointi<_Rank> ex) {
 	return stride;
 }
 
+/**
+* @brief detect whether a point is inside of a rect (left close, right open)
+* @param idx point position
+* @param origin the lef top position of the rect
+* @param extent the extent of the rect
+* @return returns true if the point is inside of the rect
+*/
 template <typename _ValueType, int_t _Rank>
 inline MATAZURE_GENERAL bool inside(point<_ValueType, _Rank> idx, point<_ValueType, _Rank> origin, point<_ValueType, _Rank> extent) {
 	for (int_t i = 0; i < _Rank; ++i) {
@@ -219,6 +259,13 @@ inline MATAZURE_GENERAL bool inside(point<_ValueType, _Rank> idx, point<_ValueTy
 	return true;
 }
 
+/**
+* @brief detect whether a point is outside of a rect (left close, right open)
+* @param idx point position
+* @param origin the lef top index of the rect
+* @param extent the extent of the rect
+* @return true if the point is outside of the rect
+*/
 template <typename _ValueType, int_t _Rank>
 inline MATAZURE_GENERAL bool outside(point<_ValueType, _Rank> idx, point<_ValueType, _Rank> origin, point<_ValueType, _Rank> extent) {
 	for (int_t i = 0; i < _Rank; ++i) {
@@ -229,9 +276,19 @@ inline MATAZURE_GENERAL bool outside(point<_ValueType, _Rank> idx, point<_ValueT
 	return false;
 }
 
+/**
+* @brief a wrapper for tuple to cast with point each other
+*
+* tuple<byte, byte, byte> and point<int, 3> can represent a rgb pixel, but they could not cast each other
+* point_viewer make it work
+*
+* @tparam _Typle  the tuple type, such as tuple<int, int, int>
+* @tparap the size of tuple elements
+*/
 template <typename _Tuple, int_t rank = tuple_size<_Tuple>::value>
 class point_viewer;
 
+/// special point_viewer for tuple<_T, 3>
 template <typename _Tuple>
 class point_viewer<_Tuple, 3> : public _Tuple{
 public:

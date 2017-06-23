@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include <matazure/io.hpp>
-#include <matazure/functor.hpp>
+#include <matazure/unary.hpp>
 #include <matazure/common.hpp>
 #include <matazure/meta.hpp>
 

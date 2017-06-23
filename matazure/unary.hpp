@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <matazure/tensor.hpp>
 #include <matazure/algorithm.hpp>
@@ -9,10 +9,19 @@
 #endif
 
 namespace matazure {
-namespace op {
+///	unary is the namespace for unary functor
+namespace unary {
 
+/**
+* @brief saturate convert a value to a narrow type value
+*
+* for example, saturate_convert<byte>{}(256) == byte(255), but byte(256) == byte(0)
+*
+* @tparam _Type dest value type
+*/
 template <typename _Type>
 struct saturate_convert {
+
 	template <typename _SrcType>
 	MATAZURE_GENERAL _Type operator()(_SrcType v) const {
 		if (v < std::numeric_limits<_Type>::min())	return std::numeric_limits<_Type>::min();

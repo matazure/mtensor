@@ -8,19 +8,35 @@
 namespace matazure {
 namespace io {
 
-///TODO：考虑非POD的类型
+/**
+* @brief read the binary raw data of a data container(such as tensor, std::vector) from an istream
+* @param istr an input istream
+* @param container dest container
+* @todo 考虑非POD的类型
+*/
 template <typename _T>
 void read_raw_data(std::istream &istr, _T &container) {
 	istr.exceptions(std::ifstream::failbit | std::ifstream::badbit | std::ifstream::eofbit);
 	istr.read(reinterpret_cast<char *>(container.data()), container.size() * sizeof(typename _T::value_type));
 }
 
+/**
+* @brief write binary raw data of a data container(such as tensor, std::vector) to an istream
+* @param ostr an output istream
+* @param container source container
+*/
 template <typename _T>
 void write_raw_data(std::ostream &ostr, const _T &container) {
 	ostr.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 	ostr.write(reinterpret_cast<const char *>(container.data()), container.size() * sizeof(typename _T::value_type));
 }
 
+/**
+* @brief read the binary raw data of a data container(such as tensor, std::vector) from a file
+* @param path source file
+* @param container dest container
+* @todo 考虑非POD的类型
+*/
 template <typename _T>
 void read_raw_data(const std::string &path, _T &container) {
 	std::ifstream ifs(path, std::ios::binary);
@@ -29,6 +45,11 @@ void read_raw_data(const std::string &path, _T &container) {
 	ifs.close();
 }
 
+/**
+* @brief write binary raw data of a data container(such as tensor, std::vector) to a file
+* @param path dest file
+* @param container source container
+*/
 template <typename _T>
 void write_raw_data(const std::string &path, const _T &container) {
 	std::ofstream ofs(path, std::ios::binary);

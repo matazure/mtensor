@@ -1,4 +1,8 @@
-﻿#pragma once
+﻿/**
+* Defines tensor classes of host end
+*/
+
+#pragma once
 
 #include <matazure/meta.hpp>
 #include <matazure/type_traits.hpp>
@@ -8,11 +12,19 @@
 #include <matazure/cuda/exception.hpp>
 #endif
 
+///  matazure is the top namespace for all classes and functions
 namespace matazure {
 
 template <int_t... _Values>
 using dim = meta::array<_Values ...>;
 
+/**
+* @brief convert array index to linear index by first marjor
+* @param id array index
+* @param stride tensor stride
+* @param first_major_t
+* @return linear index
+*/
 template <int_t _Rank>
 inline MATAZURE_GENERAL typename pointi<_Rank>::value_type index2offset(const pointi<_Rank> &id, const pointi<_Rank> &stride, first_major_t) {
 	typename pointi<_Rank>::value_type offset = id[0];
@@ -23,6 +35,13 @@ inline MATAZURE_GENERAL typename pointi<_Rank>::value_type index2offset(const po
 	return offset;
 };
 
+/**
+* @brief convert array index to linear index by first marjor
+* @param offset linear index
+* @param stride the stride of tensor
+* @param first_major_t
+* @return array index
+*/
 template <int_t _Rank>
 inline MATAZURE_GENERAL pointi<_Rank> offset2index(typename pointi<_Rank>::value_type offset, const pointi<_Rank> &stride, first_major_t) {
 	pointi<_Rank> id;
@@ -35,6 +54,13 @@ inline MATAZURE_GENERAL pointi<_Rank> offset2index(typename pointi<_Rank>::value
 	return id;
 }
 
+/**
+* @brief convert array index to linear index by last marjor
+* @param id array index
+* @param stride tensor stride
+* @param first_major_t
+* @return linear index
+*/
 template <int_t _Rank>
 inline MATAZURE_GENERAL typename pointi<_Rank>::value_type index2offset(const pointi<_Rank> &id, const pointi<_Rank> &stride, last_major_t) {
 	typename pointi<_Rank>::value_type offset = id[_Rank - 1];
@@ -45,6 +71,13 @@ inline MATAZURE_GENERAL typename pointi<_Rank>::value_type index2offset(const po
 	return offset;
 };
 
+/**
+* @brief convert array index to linear index by last marjor
+* @param offset linear index
+* @param stride the stride of tensor
+* @param first_major_t
+* @return array index
+*/
 template <int_t _Rank>
 inline MATAZURE_GENERAL pointi<_Rank> offset2index(typename pointi<_Rank>::value_type offset, const pointi<_Rank> &stride, last_major_t) {
 	pointi<_Rank> id;
@@ -57,6 +90,15 @@ inline MATAZURE_GENERAL pointi<_Rank> offset2index(typename pointi<_Rank>::value
 	return id;
 }
 
+/**
+* @brief the base class of tensor expression models
+*
+* this is a nonassignable class, implement the casts to the statically derived
+* for disambiguating glommable expression templates.
+*
+* @tparam _Tensor an tensor expression type
+*
+*/
 template <typename _Tensor>
 class tensor_expression {
 public:
@@ -75,7 +117,12 @@ protected:
 	MATAZURE_GENERAL ~tensor_expression() {}
 };
 
-template <typename _Type, typename _Ext>
+/**
+* @brief a compile time tensor which uses static memory
+* @tparam _ValueType element value type, must be pod
+* @tparam _Ext a fixed shape, must be dim(meta::array) type
+*/
+template <typename _ValueType, typename _Ext>
 class static_tensor {
 private:
 	template <int_t ..._Values>
@@ -136,10 +183,10 @@ private:
 	typedef typename traits_helper<_Ext>::type traits_t;
 
 public:
+	/// the meta shape type which has compile time extent
 	typedef _Ext					meta_shape_type;
 	static	const int_t				rank = meta_shape_type::size();
-
-	typedef _Type					value_type;
+	typedef _ValueType				value_type;
 	typedef value_type *			pointer;
 	typedef const pointer			const_pointer;
 	typedef value_type &			reference;
@@ -147,58 +194,102 @@ public:
 	typedef linear_access_t			access_type;
 	typedef local_t					memory_type;
 
-	MATAZURE_GENERAL static constexpr meta_shape_type meta_shape() {
-		return meta_shape_type();
+	/**
+	* @brief accesses element by linear access mode
+	* @param i linear index
+	* @return element const referece
+	*/
+	MATAZURE_GENERAL reference operator[](int_t i) {
+		 return elements_[i];
 	}
 
-	MATAZURE_GENERAL constexpr pointi<rank> stride() const {
-		return traits_t::stride();
+	/**
+	* @brief accesses element by linear access mode
+	* @param i linear index
+	* @return element referece
+	*/
+	MATAZURE_GENERAL constexpr const_reference operator[](int_t i) const {
+		return elements_[i];
 	}
 
-	MATAZURE_GENERAL constexpr pointi<rank> shape() const {
-		return meta_shape_type::value();
+	/**
+	* @brief accesses element by array access mode
+	* @param idx array index
+	* @return element const reference
+	*/
+	MATAZURE_GENERAL constexpr const_reference operator[](const pointi<rank> &idx) const {
+		return (*this)[index2offset(idx, stride(), first_major_t{})];
 	}
 
-	template <typename _Idx>
-	reference operator()(_Idx idx) const {
-		static_assert(std::is_same<_Idx, int_t>::value && rank == 1, "only operator [] support access data by pointi");
-		return (*this)[pointi<1>{idx}];
+	/**
+	* @brief accesses element by array access mode
+	* @param idx array index
+	* @return element reference
+	*/
+	MATAZURE_GENERAL reference operator[](const pointi<rank> &idx) {
+		return (*this)[index2offset(idx, stride(), first_major_t{})];
 	}
 
-	template <typename _Idx>
-	const_reference operator()(_Idx idx) {
-		static_assert(std::is_same<_Idx, int_t>::value && rank == 1, "only operator [] support access data by pointi");
-		return (*this)[pointi<1>{idx}];
-	}
-
-	template <typename ..._Idx>
-	MATAZURE_GENERAL constexpr const_reference operator()(_Idx... idx) const {
-		return (*this)[pointi<rank>{ idx... }];
-	}
-
+	/**
+	* @brief accesses element by array access mode
+	* @param idx packed array index parameters
+	* @return element const reference
+	*/
 	template <typename ..._Idx>
 	MATAZURE_GENERAL reference operator()(_Idx... idx) {
 		return (*this)[pointi<rank>{ idx... }];
 	}
 
-	MATAZURE_GENERAL constexpr const_reference operator[](int_t i) const { return elements_[i]; }
-
-	MATAZURE_GENERAL reference operator[](int_t i) { return elements_[i]; }
-
-	MATAZURE_GENERAL constexpr const_reference operator[](const pointi<rank> &idx) const {
-		return (*this)[index2offset(idx, stride(), first_major_t{})];
+	/// prevents operator() const matching with pointi<rank> argument
+	template <typename _Idx>
+	MATAZURE_GENERAL reference operator()(_Idx idx) const {
+		static_assert(std::is_same<_Idx, int_t>::value && rank == 1, "only operator [] support access data by pointi");
+		return (*this)[pointi<1>{idx}];
 	}
 
-	MATAZURE_GENERAL reference operator[](const pointi<rank> &idx) {
-		return (*this)[index2offset(idx, stride(), first_major_t{})];
+	/**
+	* @brief accesses element by array access mode
+	* @param idx packed array index parameters
+	* @return element reference
+	*/
+	template <typename ..._Idx>
+	MATAZURE_GENERAL constexpr const_reference operator()(_Idx... idx) const {
+		return (*this)[pointi<rank>{ idx... }];
 	}
 
-	MATAZURE_GENERAL constexpr int_t size() const { return traits_t::size(); }
+	/// prevents operator() matching with pointi<rank> argument
+	template <typename _Idx>
+	MATAZURE_GENERAL const_reference operator()(_Idx idx) {
+		static_assert(std::is_same<_Idx, int_t>::value && rank == 1, "only operator [] support access data by pointi");
+		return (*this)[pointi<1>{idx}];
+	}
 
+	/// @return the meta shape instance of tensor
+	MATAZURE_GENERAL static constexpr meta_shape_type meta_shape() {
+		return meta_shape_type();
+	}
+
+	/// @return the shape of tensor
+	MATAZURE_GENERAL constexpr pointi<rank> shape() const {
+		return meta_shape_type::value();
+	}
+
+	/// @return the stride of tensor
+	MATAZURE_GENERAL constexpr pointi<rank> stride() const {
+		return traits_t::stride();
+	}
+
+	/// return the total size of tensor elements
+	MATAZURE_GENERAL constexpr int_t size() const {
+		return traits_t::size();
+	}
+
+	/// return the const pointer of tensor elements
 	MATAZURE_GENERAL const_pointer data() const {
 		return elements_;
 	}
 
+	/// return the pointer of tensor elements
 	MATAZURE_GENERAL pointer data() {
 		return elements_;
 	}
@@ -207,84 +298,153 @@ public:
 	value_type			elements_[traits_t::size()];
 };
 
-static_assert(std::is_pod<static_tensor<float, dim<3,3>>>::value, "static tensor should be pod type");
+static_assert(std::is_pod<static_tensor<float, dim<3,3>>>::value, "static_tensor should be pod type");
 
-template <typename _Type, typename _Ext, typename _Tmp = enable_if_t<_Ext::size() == 2>>
-using static_matrix = static_tensor<_Type, _Ext>;
+/// alias of static_tensor<_ValueType, 2>
+template <typename _ValueType, typename _Ext, typename _Tmp = enable_if_t<_Ext::size() == 2>>
+using static_matrix = static_tensor<_ValueType, _Ext>;
 
+/// alias of static_tensor<_ValueType, 1>
+template <typename _ValueType, typename _Ext, typename _Tmp = enable_if_t<_Ext::size() == 1>>
+using static_vector = static_tensor<_ValueType, _Ext>;
+
+/// special for static_tensor
 template <typename _ValueType, typename _Ext>
 struct is_tensor<static_tensor<_ValueType, _Ext>> : bool_constant<true> {};
 
-template <typename _Type, int_t _Rank, typename _Layout = first_major_t>
-class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout>> {
+/**
+@ brief a dense tensor on host which uses dynamic alloced memory
+@ tparam _ValueType the value type of elements
+@ tparam _Rank the rank of tensor
+@ tparam _Layout the memory layout of tensor, the default is first major
+*/
+template <typename _ValueType, int_t _Rank, typename _Layout = first_major_t>
+class tensor : public tensor_expression<tensor<_ValueType, _Rank, _Layout>> {
 public:
-	static_assert(std::is_pod<_Type>::value, "only supports pod type now");
-
+	static_assert(std::is_pod<_ValueType>::value, "only supports pod type now");
+	/// the rank of tensor
 	static const int_t						rank = _Rank;
-	typedef _Type							value_type;
-	typedef _Type &							reference;
+	/**
+	* @brief tensor element value type
+	*
+	* a value type should be pod without & qualifier. when a value with const qualifier,
+	* tensor is readable only.
+	*/
+	typedef _ValueType						value_type;
+	typedef _ValueType &					reference;
 	typedef _Layout							layout_type;
+	/// primitive linear access mode
 	typedef linear_access_t					access_type;
+	/// host memory type
 	typedef host_t							memory_type;
 
 public:
+	/// default constructor
 	tensor() :
 		tensor(pointi<rank>::zeros())
 	{ }
 
+#ifndef MATZURE_CUDA
+
+	/**
+	* @brief constructs by the shape
+	* @prama extent the shape of tensor
+	*/
+	explicit tensor(pointi<rank> extent) :
+		extent_(extent),
+		stride_(cumulative_prod(extent)),
+		sp_data_(malloc_shared_memory(stride_[rank - 1])),
+		data_(sp_data_.get())
+	{ }
+
+#else
+
+	/**
+	* @brief constructs by the shape. alloc host pinned memory when with cuda by default
+	* @param extent the shape of tensor
+	*/
+	explicit tensor(pointi<rank> extent) :
+		tensor(extent, pinned_t{})
+	{}
+
+	/**
+	* @brief constructs by the shape. alloc host pinned memory when with cuda
+	* @param extent the shape of tensor
+	* @param pinned_v  the instance of pinned_t
+	*/
+	explicit tensor(pointi<rank> extent, pinned_t pinned_v) :
+		extent_(extent),
+		stride_(cumulative_prod(extent)),
+		sp_data_(malloc_shared_memory(stride_[rank - 1], pinned_v)),
+		data_(sp_data_.get())
+	{ }
+
+	/**
+	* @brief constructs by the shape. alloc host unpinned memory when with cuda
+	* @param extent the shape of tensor
+	* @param pinned_v  the instance of unpinned_t
+	*/
+	explicit tensor(pointi<rank> extent, unpinned_t) :
+		extent_(extent),
+		stride_(cumulative_prod(extent)),
+		sp_data_(malloc_shared_memory(stride_[rank - 1])),
+		data_(sp_data_.get())
+	{ }
+
+#endif
+
+	/**
+	* @brief constructs by the shape
+	* @prama ext the packed shape parameters
+	*/
 	template <typename ..._Ext>
 	explicit tensor(_Ext... ext) :
 		tensor(pointi<rank>{ ext... })
 	{}
 
-	#ifndef MATZURE_CUDA
-
-	explicit tensor(pointi<rank> extent) :
-		extent_(extent),
-		stride_(accumulate_stride(extent)),
-		sp_data_(malloc_shared_memory(stride_[rank - 1])),
-		data_(sp_data_.get())
-	{ }
-
-	#else
-
-	explicit tensor(pointi<rank> extent):
-		tensor(extent, pinned_t{})
-	{}
-
-	explicit tensor(pointi<rank> extent, pinned_t pinned_v) :
-		extent_(extent),
-		stride_(accumulate_stride(extent)),
-		sp_data_(malloc_shared_memory(stride_[rank - 1], pinned_v)),
-		data_(sp_data_.get())
-	{ }
-
-	explicit tensor(pointi<rank> extent, unpinned_t) :
-		extent_(extent),
-		stride_(accumulate_stride(extent)),
-		sp_data_(malloc_shared_memory(stride_[rank - 1])),
-		data_(sp_data_.get())
-	{ }
-
-	#endif
-
+	/**
+	* @brief constructs by the shape and alloced memory
+	* @param extent the shape of tensor
+	* @param sp_data the shared_ptr of host memory
+	*/
 	explicit tensor(pointi<rank> extent, std::shared_ptr<value_type> sp_data) :
 		extent_(extent),
-		stride_(accumulate_stride(extent)),
+		stride_(cumulative_prod(extent)),
 		sp_data_(sp_data),
 		data_(sp_data_.get())
 	{ }
 
+	/**
+	* @brief shallowly copy constructor
+	*
+	* we use _VT template argument as source value type.
+	* a tensor<int, 3> could be construced by a tensor<const intver,3>,
+	* but a tensor<const int, 3> could not be constructed by a tensor<int, 3>
+	*
+	* @param ts the source tensor
+	* @tparam _VT the value type of the source tensor, should be value_type or const value_type
+	*/
 	template <typename _VT>
-	explicit tensor(const tensor<_VT, _Rank, _Layout> &ts) :
+	explicit tensor(const tensor<_VT, rank, layout_type> &ts) :
 		extent_(ts.shape()),
 		stride_(ts.stride()),
 		sp_data_(ts.shared_data()),
 		data_(ts.data())
 	{ }
 
+	/// prevents constructing tensor by {...}, such as tensor<int,3> ts({10, 10});
 	tensor(std::initializer_list<int_t> v) = delete;
 
+	/**
+	* @brief shallowly assign operator
+	*
+	* we use _VT template argument as source value type.
+	* a tensor<int, 3> could be assigned by a tensor<const intver,3>,
+	* but a tensor<const int, 3> could not be assigned by a tensor<int, 3>
+	*
+	* @param ts the source tensor
+	* @tparam _VT the value type of the source tensor, should be value_type or const value_type
+	*/
 	template <typename _VT>
 	const tensor &operator=(const tensor<_VT, _Rank, _Layout> &ts) {
 		extent_ = ts.shape();
@@ -295,29 +455,63 @@ public:
 		return *this;
 	}
 
-	template <typename _Idx>
-	reference operator()(_Idx idx) const {
-		static_assert(std::is_same<_Idx, int_t>::value && rank == 1, "only operator [] support access data by pointi");
-		return (*this)[pointi<1>{idx}];
+	/**
+	* @brief accesses element by linear access mode
+	* @param i linear index
+	* @return element referece
+	*/
+	reference operator[](int_t i) const {
+		 return data_[i];
 	}
 
+	/**
+	* @brief accesses element by array access mode
+	* @param idx array index
+	* @return element const reference
+	*/
+	reference operator[](const pointi<rank> &idx) const {
+		return (*this)[index2offset(idx, stride_, layout_type{})];
+	}
+
+	/**
+	* @brief accesses element by array access mode
+	* @param idx packed array index parameters
+	* @return element const reference
+	*/
 	template <typename ..._Idx>
 	reference operator()(_Idx... idx) const {
 		return (*this)[pointi<rank>{ idx... }];
 	}
 
-	reference operator[](int_t i) const { return data_[i]; }
-
-	reference operator[](const pointi<rank> &idx) const {
-		return (*this)[index2offset(idx, stride_, layout_type{})];
+	/// prevents operator() const matching with pointi<rank> argument
+	template <typename _Idx>
+	reference operator()(_Idx idx) const {
+		static_assert(std::is_same<_Idx, int_t>::value && rank == 1,\
+					  "only operator [] support access data by pointi");
+		return (*this)[pointi<1>{idx}];
 	}
 
-	pointi<rank> shape() const { return extent_; }
-	pointi<rank> stride() const { return stride_; }
+	/// @return the shape of tensor
+	pointi<rank> shape() const {
+		return extent_;
+	}
 
-	int_t size() const { return stride_[rank - 1]; }
+	/// @return the stride of tensor
+	pointi<rank> stride() const {
+		return stride_;
+	}
 
-	shared_ptr<value_type> shared_data() const { return sp_data_; }
+	/// return the total size of tensor elements
+	int_t size() const {
+		 return stride_[rank - 1];
+	}
+
+	/// return the shared point of tensor elements
+	shared_ptr<value_type> shared_data() const {
+		 return sp_data_;
+	}
+
+	/// return the pointer of tensor elements
 	value_type * data() const { return sp_data_.get(); }
 
 private:
@@ -345,14 +539,17 @@ private:
 	value_type * 	data_;
 };
 
-
+/// alias of tensor<_ValueType, 2>
 template <typename _ValueType, typename _Layout = first_major_t>
 using matrix = tensor<_ValueType, 2, _Layout>;
+
+/// alias of tensor <_ValueType, 1>
 template <typename _ValueType, typename _Layout = first_major_t>
 using vector = tensor<_ValueType, 1, _Layout>;
 
-template <typename _Type, typename _BlockDim, typename _Layout = first_major_t>
-using block_tensor = tensor<static_tensor<_Type, _BlockDim>, _BlockDim::size(), _Layout>;
+/// alias of tensor<static_tensor<_ValueType, _BlockDim>, _BlockDim::size(), _Layout>
+template <typename _ValueType, typename _BlockDim, typename _Layout = first_major_t>
+using block_tensor = tensor<static_tensor<_ValueType, _BlockDim>, _BlockDim::size(), _Layout>;
 
 namespace internal {
 
@@ -373,43 +570,103 @@ public:
 
 }
 
+/**
+* @brief a tensor without memory defined by the shape and lambda(functor)
+*
+* TODO:
+*
+* @tparam _Rank the rank of tensor
+* @tparam _Func the functor type of tensor, should be Index -> Value formal
+* @see tensor
+*/
 template <int_t _Rank, typename _Func>
 class lambda_tensor : public tensor_expression<lambda_tensor<_Rank, _Func>> {
 	typedef function_traits<_Func>						functor_traits;
 public:
 	static const int_t										rank = _Rank;
+	typedef _Func											functor_type;
 	typedef typename functor_traits::result_type			reference;
+	/// the value type of lambdd_tensor, it's the result type of functor_type
 	typedef remove_reference_t<reference>					value_type;
+	/**
+	* @brief the access mode of lambdd_tensor, it's decided by the argument formal.
+	*
+	* when the functor is int_t -> value formal, the access mode is linear access.
+	* when the functor is pointi<rank> -> value formal, the access mode is array access.
+	*/
 	typedef typename internal::get_functor_accessor_type<_Rank, _Func>::type
 															access_type;
+
 	typedef host_t											memory_type;
 
 public:
+	/**
+	* @brief constructs a lambdd_tensor by the shape and fun
+	* @param extent the shape of tensor
+	* @param fun the functor of lambdd_tensor, should be Index -> Value formal
+	*/
 	lambda_tensor(const pointi<rank> &extent, _Func fun) :
 		extent_(extent),
-		stride_(matazure::accumulate_stride(extent)),
+		stride_(matazure::cumulative_prod(extent)),
 		fun_(fun)
 	{}
 
+	/**
+	* @brief accesses element by linear access mode
+	* @param i linear index
+	* @return element referece
+	*/
+	reference operator[](int_t i) const {
+		return offset_imp<access_type>(i);
+	}
+
+	/**
+	* @brief accesses element by array access mode
+	* @param idx array index
+	* @return element const reference
+	*/
 	reference operator[](pointi<rank> idx) const {
 		return index_imp<access_type>(idx);
 	}
 
-	template <typename _Idx>
-	reference operator()(_Idx idx) const {
-		static_assert(std::is_same<_Idx, int_t>::value && rank == 1, "only operator [] support access data by pointi");
-		return (*this)[pointi<1>{idx}];
-	}
-
+	/**
+	* @brief accesses element by array access mode
+	* @param idx packed array index parameters
+	* @return element const reference
+	*/
 	template <typename ..._Idx>
 	reference operator()(_Idx... idx) const {
 		return (*this)[pointi<rank>{ idx... }];
 	}
 
-	reference operator[](int_t i) const {
-		return offset_imp<access_type>(i);
+	/// prevents operator() const matching with pointi<rank> argument
+	template <typename _Idx>
+	reference operator()(_Idx idx) const {
+		static_assert(std::is_same<_Idx, int_t>::value && rank == 1, \
+					  "only operator [] support access data by pointi");
+		return (*this)[pointi<1>{idx}];
 	}
 
+	/// @return the shape of lambed_tensor
+	pointi<rank> shape() const {
+		return extent_;
+	}
+
+	/// @return the stride of lambda_tensor
+	pointi<rank> stride() const {
+		return stride_;
+	}
+
+	/// return the total size of lambda_tensor elements
+	int_t size() const {
+		 return stride_[rank - 1];
+	}
+
+	/**
+	* @brief perisits a lambdd_tensor to a tensor with memory
+	* @param policy the execution policy
+	* @return a tensor which copys elements value from lambdd_tensor
+	*/
 	template <typename _ExecutionPolicy>
 	MATAZURE_GENERAL tensor<decay_t<value_type>, rank> persist(_ExecutionPolicy policy) const {
 		tensor<decay_t<value_type>, rank> re(this->shape());
@@ -417,14 +674,11 @@ public:
 		return re;
 	}
 
+	/// persists a lambdd_tensor to a tensor by sequence policy
 	MATAZURE_GENERAL tensor<decay_t<value_type>, rank> persist() const {
 		sequence_policy policy{};
 		return persist(policy);
 	}
-
-	pointi<rank> shape() const { return extent_; }
-	pointi<rank> stride() const { return stride_; }
-	int_t size() const { return stride_[rank - 1]; }
 
 private:
 	template <typename _Mode>
@@ -453,24 +707,45 @@ private:
 	const _Func fun_;
 };
 
+/**
+* @brief memcpy a dense tensor to another dense tensor
+* @param ts_src source tensor
+* @param ts_dst dest tensor
+*/
 template <typename _TensorSrc, typename _TensorDst>
-inline void mem_copy(_TensorSrc ts_src, _TensorDst cts_dst, enable_if_t<are_host_memory<_TensorSrc, _TensorDst>::value && is_same<typename _TensorSrc::layout_type, typename _TensorDst::layout_type>::value>* = nullptr) {
+inline void mem_copy(_TensorSrc ts_src, _TensorDst ts_dst, enable_if_t<are_host_memory<_TensorSrc, _TensorDst>::value && is_same<typename _TensorSrc::layout_type, typename _TensorDst::layout_type>::value>* = nullptr) {
 	MATAZURE_STATIC_ASSERT_VALUE_TYPE_MATCHED(_TensorSrc, _TensorDst);
-	memcpy(cts_dst.data(), ts_src.data(), sizeof(typename _TensorDst::value_type) * ts_src.size());
+	memcpy(ts_dst.data(), ts_src.data(), sizeof(typename _TensorDst::value_type) * ts_src.size());
 }
 
-template <typename _Type, int_t _Rank, typename _Layout>
-inline tensor<_Type, _Rank, _Layout> mem_clone(tensor<_Type, _Rank, _Layout> ts, host_t) {
-	tensor<_Type, _Rank, _Layout> ts_re(ts.shape());
+/**
+* @brief deeply clone a tensor
+* @param ts input tensor
+* @return a new tensor which clones input tensor
+*/
+template <typename _ValueType, int_t _Rank, typename _Layout>
+inline tensor<_ValueType, _Rank, _Layout> mem_clone(tensor<_ValueType, _Rank, _Layout> ts, host_t) {
+	tensor<_ValueType, _Rank, _Layout> ts_re(ts.shape());
 	mem_copy(ts, ts_re);
 	return ts_re;
 }
 
-template <typename _Type, int_t _Rank, typename _Layout>
-inline auto mem_clone(tensor<_Type, _Rank, _Layout> ts)->decltype(mem_clone(ts, host_t{})) {
+/**
+* @brief deeply clone a tensor
+* @param ts input tensor
+* @return a new tensor which clones input tensor
+*/
+template <typename _ValueType, int_t _Rank, typename _Layout>
+inline auto mem_clone(tensor<_ValueType, _Rank, _Layout> ts)->decltype(mem_clone(ts, host_t{})) {
 	return mem_clone(ts, host_t{});
 }
 
+/**
+* @brief reshapes a tensor
+* @param ts input tensor
+* @param ext a valid new shape
+* @return a new ext shape tensor which uses the input tensor memory
+*/
 template <typename _ValueType, int_t _Rank, typename _Layout, int_t _OutDim, typename _OutLayout = _Layout>
 inline auto reshape(tensor<_ValueType, _Rank, _Layout> ts, pointi<_OutDim> ext, _OutLayout* = nullptr)->tensor<_ValueType, _OutDim, _OutLayout> {
 	tensor<_ValueType, _OutDim, _OutLayout> re(ext, ts.shared_data());

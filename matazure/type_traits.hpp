@@ -19,9 +19,11 @@ struct local_t {};
 struct pinned_t {};
 struct unpinned_t {};
 
+/// define a generical compile time zero
 template <typename _T>
 struct zero;
 
+/// special for most type, value() return 0 directly;
 template <typename _T>
 struct zero {
 	MATAZURE_GENERAL static constexpr _T value() {
@@ -29,17 +31,17 @@ struct zero {
 	};
 };
 
+/// forward declare of tensor_expression
 template <typename _Tensor>
 class tensor_expression;
 
-template <typename T>
+/// a type traits to get the argument type and result type of a functor
+template <typename _Func>
 struct function_traits
-	: public function_traits<decltype(&T::operator())>
-{
-	typedef double type;
-};
+	: public function_traits<decltype(&_Func::operator())>
+{ };
 
-
+/// implements
 template <typename _ClassType, typename _ReturnType, typename... _Args>
 struct function_traits<_ReturnType(_ClassType::*)(_Args...) const> {
 	enum { arguments_size = sizeof...(_Args) };
@@ -53,14 +55,13 @@ struct function_traits<_ReturnType(_ClassType::*)(_Args...) const> {
 	};
 };
 
+/// special for the tensor_expression models, they are tensor.
 template <typename _Type>
 struct is_tensor : bool_constant<std::is_base_of<tensor_expression<_Type>, _Type>::value> {};
 
+/// specail for the tensor liked type, they are linear array tensor.
 template <typename _Type>
 struct is_linear_array : bool_constant<is_tensor<_Type>::value> {};
-
-template <typename _Tensor>
-class tensor_expression;
 
 //are tag
 #define MATAZURE_DEFINE_ARE_TAG(name, tag_name, tag)						\

@@ -160,7 +160,7 @@ inline void for_index(int_t first, int_t last, _Fun fun) {
 
 template <typename _ExecutionPolicy, int_t _Rank, typename _Fun>
 inline void for_index(_ExecutionPolicy policy, pointi<_Rank> ext, _Fun fun) {
-	auto stride = matazure::accumulate_stride(ext);
+	auto stride = matazure::cumulative_prod(ext);
 	auto max_size = index2offset((ext - 1), stride, first_major_t{}) + 1; //要包含最后一个元素
 
 	cuda::for_index(policy, 0, max_size, [=] MATAZURE_DEVICE (int_t i) {
