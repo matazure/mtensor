@@ -16,7 +16,7 @@ if (WIN32)
 endif()
 
 if (WITH_OPENMP)
-	find_package(OpenMP)
+	find_package(OpenMP REQUIRED)
 	set(CMAKE_CXX_FLAGS "${OpenMP_CXX_FLAGS}")
 endif()
 
