@@ -1,8 +1,8 @@
 ﻿#pragma once
 
 #include <matazure/io.hpp>
-#include <matazure/heterogeneous/unary.hpp>
-#include <matazure/heterogeneous/operation.hpp>
+#include <matazure/unary.hpp>
+#include <matazure/operation.hpp>
 #include <matazure/meta.hpp>
 
 #include <matazure/numeric/prod.hpp>

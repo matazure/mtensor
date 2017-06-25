@@ -1,6 +1,6 @@
 #pragma once
 
-#include <matazure/heterogeneous/operation.hpp>
+#include <matazure/operation.hpp>
 
 namespace matazure {
 namespace numeric{

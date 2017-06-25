@@ -41,8 +41,8 @@ if (WITH_CUDA)
 	endif()
 endif()
 
-#add host examples
-file(GLOB Files ${CMAKE_CURRENT_SOURCE_DIR}/examples/*.cpp)
+#add host example
+file(GLOB Files ${CMAKE_CURRENT_SOURCE_DIR}/example/*.cpp)
 foreach(File ${Files})
 	set_source_files_properties(${File} PROPERTIES LANGUAGE CXX)
 	get_filename_component(FileName ${File} NAME_WE)
@@ -51,15 +51,15 @@ foreach(File ${Files})
 	target_compile_features(${FileName} PRIVATE cxx_constexpr cxx_deleted_functions cxx_lambdas cxx_rvalue_references cxx_variadic_templates)
 endforeach()
 
-#add heterogeneous examples
+#add heterogeneous example
 if (WITH_CUDA)
-	file(GLOB Files ${CMAKE_CURRENT_SOURCE_DIR}/examples/heterogeneous/*.cu)
+	file(GLOB Files ${CMAKE_CURRENT_SOURCE_DIR}/example/*.cu)
 	foreach(File ${Files})
 		get_filename_component(FileName ${File} NAME_WE)
 		CUDA_ADD_EXECUTABLE(hete_${FileName} ${File})
 	endforeach()
 else()
-	file(GLOB Files ${CMAKE_CURRENT_SOURCE_DIR}/examples/heterogeneous/*.cu)
+	file(GLOB Files ${CMAKE_CURRENT_SOURCE_DIR}/example/*.cu)
 	foreach(File ${Files})
 		set_source_files_properties(${File} PROPERTIES LANGUAGE CXX)
 		get_filename_component(FileName ${File} NAME_WE)
@@ -70,9 +70,9 @@ else()
 	endforeach()
 endif()
 
-#add cuda examples
+#add cuda example
 if (WITH_CUDA)
-	file(GLOB Files ${CMAKE_CURRENT_SOURCE_DIR}/examples/cuda/*.cu)
+	file(GLOB Files ${CMAKE_CURRENT_SOURCE_DIR}/example/cuda/*.cu)
 	foreach(File ${Files})
 		get_filename_component(FileName ${File} NAME_WE)
 		CUDA_ADD_EXECUTABLE(cu_${FileName} ${File})
