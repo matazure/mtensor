@@ -3,9 +3,14 @@
 using namespace matazure;
 
 __constant__ static_tensor<float, dim< 3, 3>> mask;
+//之所以使用宏来定义卷积函数，是因为cuda的constant内存必须全局申明
+//声明一个叫做conv_global的卷积函数 用mask作为卷积核
 MATAZURE_CUDA_PUZZEL_CONV_GLOBAL(conv_global, mask)
+//分块的卷积实现
 MATAZURE_CUDA_PUZZEL_CONV_BLOCK_ALIGNED(conv_block, mask)
+//边缘不处理的卷积实现
 MATAZURE_CUDA_PUZZEL_CONV_BLOCK_CRACK(conv_block_crack, mask)
+//处理了边缘的卷积实现
 MATAZURE_CUDA_PUZZEL_CONV_BLOCK_OVERLAP(conv_block_overlap, mask)
 
 int main() {
