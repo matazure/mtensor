@@ -1,6 +1,6 @@
 #pragma once
 
-#include <matazure/common.hpp>
+#include <matazure/heterogeneous/operation.hpp>
 
 namespace matazure {
 namespace numeric{
@@ -12,7 +12,7 @@ struct prod_op {
 	typedef typename _MatrixLhs::value_type result_type;
 
 	prod_op(_MatrixLhs cmat_lhs, _MatrixRhs cmat_rhs) :
-		mat_lhs_(cmat_lhs), mat_rhs_(cmat_rhs) 
+		mat_lhs_(cmat_lhs), mat_rhs_(cmat_rhs)
 	{}
 
 	MATAZURE_GENERAL result_type operator()(pointi<2> idx) const {

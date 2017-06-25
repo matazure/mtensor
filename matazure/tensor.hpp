@@ -576,7 +576,7 @@ public:
 * TODO:
 *
 * @tparam _Rank the rank of tensor
-* @tparam _Func the functor type of tensor, should be Index -> Value formal
+* @tparam _Func the functor type of tensor, should be Index -> Value pattern
 * @see tensor
 */
 template <int_t _Rank, typename _Func>
@@ -589,10 +589,10 @@ public:
 	/// the value type of lambdd_tensor, it's the result type of functor_type
 	typedef remove_reference_t<reference>					value_type;
 	/**
-	* @brief the access mode of lambdd_tensor, it's decided by the argument formal.
+	* @brief the access mode of lambdd_tensor, it's decided by the argument pattern.
 	*
-	* when the functor is int_t -> value formal, the access mode is linear access.
-	* when the functor is pointi<rank> -> value formal, the access mode is array access.
+	* when the functor is int_t -> value pattern, the access mode is linear access.
+	* when the functor is pointi<rank> -> value pattern, the access mode is array access.
 	*/
 	typedef typename internal::get_functor_accessor_type<_Rank, _Func>::type
 															access_type;
@@ -603,7 +603,7 @@ public:
 	/**
 	* @brief constructs a lambdd_tensor by the shape and fun
 	* @param extent the shape of tensor
-	* @param fun the functor of lambdd_tensor, should be Index -> Value formal
+	* @param fun the functor of lambdd_tensor, should be Index -> Value pattern
 	*/
 	lambda_tensor(const pointi<rank> &extent, _Func fun) :
 		extent_(extent),
@@ -720,8 +720,8 @@ inline void mem_copy(_TensorSrc ts_src, _TensorDst ts_dst, enable_if_t<are_host_
 
 /**
 * @brief deeply clone a tensor
-* @param ts input tensor
-* @return a new tensor which clones input tensor
+* @param ts source tensor
+* @return a new tensor which clones source tensor
 */
 template <typename _ValueType, int_t _Rank, typename _Layout>
 inline tensor<_ValueType, _Rank, _Layout> mem_clone(tensor<_ValueType, _Rank, _Layout> ts, host_t) {
@@ -732,8 +732,8 @@ inline tensor<_ValueType, _Rank, _Layout> mem_clone(tensor<_ValueType, _Rank, _L
 
 /**
 * @brief deeply clone a tensor
-* @param ts input tensor
-* @return a new tensor which clones input tensor
+* @param ts source tensor
+* @return a new tensor which clones source tensor
 */
 template <typename _ValueType, int_t _Rank, typename _Layout>
 inline auto mem_clone(tensor<_ValueType, _Rank, _Layout> ts)->decltype(mem_clone(ts, host_t{})) {
@@ -742,9 +742,9 @@ inline auto mem_clone(tensor<_ValueType, _Rank, _Layout> ts)->decltype(mem_clone
 
 /**
 * @brief reshapes a tensor
-* @param ts input tensor
+* @param ts source tensor
 * @param ext a valid new shape
-* @return a new ext shape tensor which uses the input tensor memory
+* @return a new ext shape tensor which uses the source tensor memory
 */
 template <typename _ValueType, int_t _Rank, typename _Layout, int_t _OutDim, typename _OutLayout = _Layout>
 inline auto reshape(tensor<_ValueType, _Rank, _Layout> ts, pointi<_OutDim> ext, _OutLayout* = nullptr)->tensor<_ValueType, _OutDim, _OutLayout> {

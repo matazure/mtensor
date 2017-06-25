@@ -5,6 +5,9 @@
 #include <matazure/cuda/algorithm.hpp>
 #include <matazure/cuda/runtime.hpp>
 
+#define MATAZURE_IS_D_LAMBDA(X) __nv_is_extended_device_lambda_closure_type(X)
+#define MATAZURE_IS_HD_LAMBDA(X) __nv_is_extended_host_device_lambda_closure_type(X)
+
 namespace matazure {
 namespace cuda {
 
