@@ -1,6 +1,6 @@
 #pragma once
 
-#include <matazure/heterogeneous/common.hpp>
+#include <matazure/common.hpp>
 
 namespace matazure{
 
