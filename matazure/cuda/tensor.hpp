@@ -87,6 +87,7 @@ public:
 private:
 	shared_ptr<value_type> malloc_shared_memory(int_t size) {
 		decay_t<value_type> *data = nullptr;
+		size = size > 0 ? size : 1;
 		assert_runtime_success(cudaMalloc(&data, size * sizeof(value_type)));
 		return shared_ptr<value_type>(data, [](value_type *ptr) {
 			assert_runtime_success(cudaFree(const_cast<decay_t<value_type> *>(ptr)));

@@ -2,12 +2,14 @@
 
 using namespace matazure;
 
-#ifdef MATAZURE_CUDA
-#define WITH_CUDA
+#ifdef USE_CUDA
+#ifndef MATAZURE_CUDA
+#error "does not support cuda"
+#endif
 #endif
 
 #ifdef _OPENMP
-#define WITH_OPENMP
+#define USE_OPENMP
 #endif
 
 typedef point<byte, 3> rgb;
@@ -43,12 +45,12 @@ int main() {
 		return color_fun(i);
 	};
 
-#ifdef WITH_CUDA
+#ifdef USE_CUDA
 	//通过shape和mandelbrot_fun构造lambda tensor并直接把结果固化的内存（显存）里
 	auto cts_mandelbrot_rgb = make_lambda(shape, mandelbrot_fun, device_t{}).persist();
 	auto ts_mandelbrot_rgb = mem_clone(cts_mandelbrot_rgb, host_t{});
 #else
-#ifdef WITH_OPENMP
+#ifdef USE_OPENMP
 	//使用omp_policy并行策略
 	auto ts_mandelbrot_rgb = make_lambda(shape, mandelbrot_fun, host_t{}).persist(omp_policy{});
 #else

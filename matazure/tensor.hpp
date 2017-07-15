@@ -182,6 +182,9 @@ private:
 
 	typedef typename traits_helper<_Ext>::type traits_t;
 
+	/// @todo should check each dim 
+	static_assert(traits_t::size() > 0, "");
+
 public:
 	/// the meta shape type which has compile time extent
 	typedef _Ext					meta_shape_type;
@@ -516,6 +519,7 @@ public:
 
 private:
 	shared_ptr<value_type> malloc_shared_memory(int_t size) {
+		size = size > 0 ? size : 1;
 		value_type *data = new decay_t<value_type>[size];
 		return shared_ptr<value_type>(data, [](value_type *ptr) {
 			delete[] ptr;

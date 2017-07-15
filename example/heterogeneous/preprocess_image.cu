@@ -1,9 +1,10 @@
 ﻿#include <matazure/tensor>
 using namespace matazure;
 
-//若支持CUDA则使用
-#ifdef MATAZURE_CUDA
-#define WITH_CUDA
+#ifdef USE_CUDA
+#ifndef MATAZURE_CUDA
+#error "does not support cuda"
+#endif
 #endif
 
 int main(int argc, char *argv[]) {
@@ -14,7 +15,7 @@ int main(int argc, char *argv[]) {
 	//将raw数据加载到ts_rgb中来
 	io::read_raw_data("data/lena_rgb888_512x512.raw_data", ts_rgb);
 	//选择是否使用CUDA
-#ifdef WITH_CUDA
+#ifdef USE_CUDA
 	auto gts_rgb = mem_clone(ts_rgb, device_t{});
 #else
 	auto &gts_rgb = ts_rgb;
@@ -25,7 +26,7 @@ int main(int argc, char *argv[]) {
 	auto glts_rgb_normalized = tensor_cast<pointf<3>>(glts_rgb_stride) / pointf<3>::all(128.0f);
 	//前面并未进行实质的计算，这一步将上面的运算合并处理并把结果写入到memory中, 避免了额外的内存开销
 	auto gts_rgb_normalized = glts_rgb_normalized.persist();
-#ifdef WITH_CUDA
+#ifdef USE_CUDA
 	cuda::device_synchronize();
 	auto ts_rgb_normalized = mem_clone(gts_rgb_normalized, host_t{});
 #else
