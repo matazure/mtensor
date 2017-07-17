@@ -1,5 +1,5 @@
 #add host example
-file(GLOB Files ${CMAKE_CURRENT_SOURCE_DIR}/example/*.cpp)
+file(GLOB Files ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 foreach(File ${Files})
 	set_source_files_properties(${File} PROPERTIES LANGUAGE CXX)
 	get_filename_component(FileName ${File} NAME_WE)

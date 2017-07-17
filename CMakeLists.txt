@@ -50,6 +50,8 @@ if (WITH_CUDA)
 	if (MSVC)
 		set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -Xcompiler \"/wd4819 /wd4503\" ")
 	endif()
+else()
+	set(CMAKE_CXX_STANDARD 14)
 endif()
 
 if (BUILD_EXAMPLE)

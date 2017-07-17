@@ -107,7 +107,7 @@ public:
 };
 
 inline void assertion_failed(char const * expr, char const * msg, char const * function, char const * file, long line) {
-	throw assert_failed(std::string(msg));
+	//throw assert_failed(std::string(msg));
 }
 
 }

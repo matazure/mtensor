@@ -3,6 +3,8 @@
 
 using namespace matazure;
 
+#ifdef USE_CUDA
+
 //binary operation benchmark
 template <typename _ValueType>
 __global__ void tensor_operation_gold_kenel(_ValueType *p_dst, _ValueType *p1, _ValueType *p2, int_t count){
@@ -33,6 +35,8 @@ void BM_cu_tensor_operation_gold(benchmark::State& state) {
 	auto bytes_size = static_cast<size_t>(ts1.size()) * sizeof(_ValueType);
 	state.SetBytesProcessed(state.iterations() * bytes_size * 3);
 }
+
+#endif
 
 template <typename _ValueType>
 void BM_host_tensor_operation_gold(benchmark::State &st) {
@@ -84,9 +88,9 @@ void BM_cu_tensor_operation(benchmark::State &st) {
 }
 
 BENCHMARK_TEMPLATE(BM_host_tensor_operation_gold, float)->Range(1 << 10, 1 << 28)->UseRealTime();
-
 BENCHMARK_TEMPLATE(BM_host_tensor_operation, float)->Range(1 << 10, 1 << 28)->UseRealTime();
 
+#ifdef USE_CUDA
 BENCHMARK_TEMPLATE(BM_cu_tensor_operation_gold, float)->Range(1 << 10, 1 << 28)->UseRealTime();
-
 BENCHMARK_TEMPLATE(BM_cu_tensor_operation, float)->Range(1 << 10, 1 << 28)->UseRealTime();
+#endif

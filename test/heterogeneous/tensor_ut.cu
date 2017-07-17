@@ -12,7 +12,13 @@ public:
 	typedef _Type tensor_type;
 };
 
-typedef Types<tensor<int, 1>, tensor<int, 2>, tensor<int, 3>, cuda::tensor<int, 1>> ImplementTypes;
+#ifdef USE_CUDA
+#define TENSOR cuda::tensor
+#else
+#define TENSOR tensor
+#endif
+
+typedef Types<TENSOR<int, 1>, TENSOR<int, 2>, TENSOR<int, 3>, TENSOR<int, 4>> ImplementTypes;
 
 TYPED_TEST_CASE(TensorTest, ImplementTypes);
 

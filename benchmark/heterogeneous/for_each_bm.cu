@@ -3,6 +3,8 @@
 
 using namespace matazure;
 
+#ifdef USE_CUDA
+
 template <typename _ValueType>
 __global__ void for_each_gold_kenel(_ValueType *p_dst, int_t count){
 	for (int_t i = threadIdx.x + blockIdx.x * blockDim.x; i < count; i += blockDim.x * gridDim.x) {
@@ -59,3 +61,5 @@ BENCHMARK_TEMPLATE1(BM_cu_for_each, int32_t)->Range(1<<10, 1 << 28)->UseRealTime
 BENCHMARK_TEMPLATE1(BM_cu_for_each, int64_t)->Range(1<<10, 1 << 28)->UseRealTime();
 BENCHMARK_TEMPLATE1(BM_cu_for_each, float)->Range(1<<10, 1 << 28)->UseRealTime();
 BENCHMARK_TEMPLATE1(BM_cu_for_each, double)->Range(1<<10, 1 << 28)->UseRealTime();
+
+#endif
