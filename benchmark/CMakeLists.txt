@@ -7,12 +7,20 @@ link_directories(${EXTERNAL_INSTALL_LOCATION}/lib)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/vendors/benchmark/include)
 
-file(GLOB Files ${CMAKE_CURRENT_SOURCE_DIR}/heterogeneous/*.cu)
+file(GLOB Files ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 set_source_files_properties(${Files} PROPERTIES LANGUAGE CXX)
-add_executable(hete_host_tensor_benchmark ${Files})
-add_dependencies(hete_host_tensor_benchmark benchmark)
-target_link_libraries(hete_host_tensor_benchmark benchmark)
-set_target_properties(hete_host_tensor_benchmark PROPERTIES LINKER_LANGUAGE CXX)
+add_executable(tensor_benchmark ${Files})
+add_dependencies(tensor_benchmark benchmark)
+target_link_libraries(tensor_benchmark benchmark)
+set_target_properties(tensor_benchmark PROPERTIES LINKER_LANGUAGE CXX)
+
+
+# file(GLOB Files ${CMAKE_CURRENT_SOURCE_DIR}/heterogeneous/*.cu)
+# set_source_files_properties(${Files} PROPERTIES LANGUAGE CXX)
+# add_executable(hete_host_tensor_benchmark ${Files})
+# add_dependencies(hete_host_tensor_benchmark benchmark)
+# target_link_libraries(hete_host_tensor_benchmark benchmark)
+# set_target_properties(hete_host_tensor_benchmark PROPERTIES LINKER_LANGUAGE CXX)
 
 if(WITH_CUDA)
 	file(GLOB Files ${CMAKE_CURRENT_SOURCE_DIR}/heterogeneous/*.cu)
