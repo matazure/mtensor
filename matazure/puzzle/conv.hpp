@@ -62,4 +62,6 @@ inline void conv_direct(_Tensor ts, _Kenel kenel, _TensorOut ts_out) {
 	}
 }
 
+// template <typename _Tensor, typename _Kenel, typename _TensorOut>
+
 } }
