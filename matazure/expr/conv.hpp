@@ -4,7 +4,7 @@
 
 namespace matazure { namespace expr {
 
-	void conv_kenel3x3(tensor<float, 2> ts_input, static_tensor<float, dim<3,3>> sts_kenel, tensor<float, 2> ts_output){
+	inline void conv_kenel3x3(tensor<const float, 2> ts_input, static_tensor<float, dim<3,3>> sts_kenel, tensor<float, 2> ts_output){
 		auto kenel_radius = sts_kenel.shape() / 2;
 
 		auto width = ts_input.shape()[0];

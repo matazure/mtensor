@@ -182,7 +182,7 @@ private:
 
 	typedef typename traits_helper<_Ext>::type traits_t;
 
-	/// @todo should check each dim 
+	/// @todo should check each dim
 	static_assert(traits_t::size() > 0, "");
 
 public:
@@ -400,10 +400,10 @@ public:
 	* @brief constructs by the shape
 	* @prama ext the packed shape parameters
 	*/
-	template <typename ..._Ext>
-	explicit tensor(_Ext... ext) :
-		tensor(pointi<rank>{ ext... })
-	{}
+	// template <typename ..._Ext>
+	// explicit tensor(_Ext... ext) :
+	// 	tensor(pointi<rank>{ ext... })
+	// {}
 
 	/**
 	* @brief constructs by the shape and alloced memory
@@ -428,7 +428,7 @@ public:
 	* @tparam _VT the value type of the source tensor, should be value_type or const value_type
 	*/
 	template <typename _VT>
-	explicit tensor(const tensor<_VT, rank, layout_type> &ts) :
+	tensor(const tensor<_VT, rank, layout_type> &ts) :
 		extent_(ts.shape()),
 		stride_(ts.stride()),
 		sp_data_(ts.shared_data()),
