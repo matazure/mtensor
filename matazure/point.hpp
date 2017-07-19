@@ -252,7 +252,7 @@ inline MATAZURE_GENERAL pointi<_Rank> cumulative_prod(pointi<_Rank> ex) {
 template <typename _ValueType, int_t _Rank>
 inline MATAZURE_GENERAL bool inside(point<_ValueType, _Rank> idx, point<_ValueType, _Rank> origin, point<_ValueType, _Rank> extent) {
 	for (int_t i = 0; i < _Rank; ++i) {
-		if (MATAZURE_LIKELY(idx[i] < origin[i] || idx[i] >= extent[i] ))
+		if ((idx[i] < origin[i] || idx[i] >= extent[i]))
 			return false;
 	}
 
@@ -269,7 +269,7 @@ inline MATAZURE_GENERAL bool inside(point<_ValueType, _Rank> idx, point<_ValueTy
 template <typename _ValueType, int_t _Rank>
 inline MATAZURE_GENERAL bool outside(point<_ValueType, _Rank> idx, point<_ValueType, _Rank> origin, point<_ValueType, _Rank> extent) {
 	for (int_t i = 0; i < _Rank; ++i) {
-		if (MATAZURE_LIKELY(idx[i] < origin[i] || idx[i] >= extent[i] ))
+		if ((idx[i] < origin[i] || idx[i] >= extent[i]))
 			return true;
 	}
 

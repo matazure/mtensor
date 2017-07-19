@@ -524,7 +524,7 @@ inline auto slice(_Tensor ts, int_t positon_index)->decltype(make_lambda(interna
 template <int_t _DimIdx, typename _T, int_t _Rank, typename _Layout>
 inline auto slice(tensor<_T, _Rank, _Layout> ts, int_t positon_index, enable_if_t<_DimIdx == _Rank-1>* = nullptr)->tensor<_T, _Rank-1, _Layout>{
 	auto slice_ext = internal::slice_point<_DimIdx>(ts.shape());
-	auto slice_size = prod(slice_ext);
+	auto slice_size = cumulative_prod(slice_ext)[_Rank-1];
 	tensor<_T, _Rank-1, _Layout> ts_re(slice_ext, shared_ptr<_T>(ts.shared_data().get() + positon_index * slice_size, [ts](_T *){ }));
 	return ts_re;
 }
@@ -535,7 +535,7 @@ inline auto slice(tensor<_T, _Rank, _Layout> ts, int_t positon_index, enable_if_
 template <int_t _DimIdx, typename _T, int_t _Rank, typename _Layout>
 inline auto slice(cuda::tensor<_T, _Rank, _Layout> ts, int_t positon_index, enable_if_t<_DimIdx == _Rank-1>* = nullptr)->cuda::tensor<_T, _Rank-1, _Layout>{
 	auto slice_ext = internal::slice_point<_DimIdx>(ts.shape());
-	auto slice_size = prod(slice_ext);
+	auto slice_size = cumulative_prod(slice_ext)[_Rank-1];
 	cuda::tensor<_T, _Rank-1, _Layout> ts_re(slice_ext, shared_ptr<_T>(ts.shared_data().get() + positon_index * slice_size, [ts](_T *){ }));
 	return ts_re;
 }
