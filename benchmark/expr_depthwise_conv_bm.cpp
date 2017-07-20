@@ -207,7 +207,7 @@ void bm_conv_expand_inside_check(benchmark::State &state){
 BENCHMARK(bm_conv_expand_inside_check)->Arg(7)->Arg(14)->Arg(28)->Arg(56)->Arg(112)->Arg(224)->UseRealTime();
 // BENCHMARK(bm_conv_expand_inside_check)->RangeMultiplier(2)->Range(16, 256)->UseRealTime();
 
-void bm_conv_expand_inside_check_block(benchmark::State &state){
+void bm_conv_inside_check_block(benchmark::State &state){
 	pointi<2> ext;
 	fill(ext, state.range(0));
 	tensor<float, 2> ts_input(ext);
@@ -234,17 +234,13 @@ void bm_conv_expand_inside_check_block(benchmark::State &state){
 						auto y = j * block_size + n;
 						if (x > 0 && y > 0 && x < width && y < height){
 							float sum = 0.0f;
-							sum += ts_input[pointi<2>{x, y} +pointi<2>{0, 0} -kenel_radius] * kenel[pointi<2>{0, 0}];
-							sum += ts_input[pointi<2>{x, y} +pointi<2>{1, 0} -kenel_radius] * kenel[pointi<2>{1, 0}];
-							sum += ts_input[pointi<2>{x, y} +pointi<2>{2, 0} -kenel_radius] * kenel[pointi<2>{2, 0}];
-							sum += ts_input[pointi<2>{x, y} +pointi<2>{0, 1} -kenel_radius] * kenel[pointi<2>{0, 1}];
-							sum += ts_input[pointi<2>{x, y} +pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
-							sum += ts_input[pointi<2>{x, y} +pointi<2>{2, 1} -kenel_radius] * kenel[pointi<2>{2, 1}];
-							sum += ts_input[pointi<2>{x, y} +pointi<2>{0, 2} -kenel_radius] * kenel[pointi<2>{0, 2}];
-							sum += ts_input[pointi<2>{x, y} +pointi<2>{1, 2} -kenel_radius] * kenel[pointi<2>{1, 2}];
-							sum += ts_input[pointi<2>{x, y} +pointi<2>{2, 2} -kenel_radius] * kenel[pointi<2>{2, 2}];
+							for (int_t n = 0; n < kenel.shape()[1]; ++n) {
+								for (int_t m = 0; m < kenel.shape()[0]; ++m) {
+									sum += ts_input[pointi<2>{i, j} +pointi<2>{m, n} -kenel_radius] * kenel[pointi<2>{m, n}];
+								}
+							}
 
-							ts_output[pointi<2>{x, y}] = sum;
+							ts_output[pointi<2>{i, }] = sum;
 						}else{
 							ts_output[pointi<2>{x, y}] = 0.0f;
 						}
@@ -257,13 +253,13 @@ void bm_conv_expand_inside_check_block(benchmark::State &state){
 	state.SetBytesProcessed(state.iterations() * ts_output.size() * sizeof(float));
 	state.SetItemsProcessed(state.iterations() * ts_output.size() * kenel.size());
 }
-BENCHMARK(bm_conv_expand_inside_check_block)->RangeMultiplier(2)->Range(32, 256)->UseRealTime();
+BENCHMARK(bm_conv_inside_check_block)->RangeMultiplier(2)->Range(32, 256)->UseRealTime();
 
-void bm_conv_expand_inside_check_block_with_block_tensor(benchmark::State &state){
+void bm_conv_inside_check_block_with_block_tensor(benchmark::State &state){
 	pointi<2> ext;
 	fill(ext, state.range(0));
 
-	typedef dim<8,8> block_type;
+	typedef dim<5,5> block_type;
 	auto block_dim = block_type::value();
 	block_tensor<float, block_type> ts_src(ext / block_dim);
 	block_tensor<float, block_type> ts_dst(ext / block_dim);
@@ -294,17 +290,13 @@ void bm_conv_expand_inside_check_block_with_block_tensor(benchmark::State &state
 						auto y = j * block_size + n;
 						if (x > 0 && y > 0 && x < width && y < height){
 							float sum = 0.0f;
-							sum += ts_input[pointi<2>{x, y} +pointi<2>{0, 0} -kenel_radius] * kenel[pointi<2>{0, 0}];
-							sum += ts_input[pointi<2>{x, y} +pointi<2>{1, 0} -kenel_radius] * kenel[pointi<2>{1, 0}];
-							sum += ts_input[pointi<2>{x, y} +pointi<2>{2, 0} -kenel_radius] * kenel[pointi<2>{2, 0}];
-							sum += ts_input[pointi<2>{x, y} +pointi<2>{0, 1} -kenel_radius] * kenel[pointi<2>{0, 1}];
-							sum += ts_input[pointi<2>{x, y} +pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
-							sum += ts_input[pointi<2>{x, y} +pointi<2>{2, 1} -kenel_radius] * kenel[pointi<2>{2, 1}];
-							sum += ts_input[pointi<2>{x, y} +pointi<2>{0, 2} -kenel_radius] * kenel[pointi<2>{0, 2}];
-							sum += ts_input[pointi<2>{x, y} +pointi<2>{1, 2} -kenel_radius] * kenel[pointi<2>{1, 2}];
-							sum += ts_input[pointi<2>{x, y} +pointi<2>{2, 2} -kenel_radius] * kenel[pointi<2>{2, 2}];
+							for (int_t n = 0; n < kenel.shape()[1]; ++n) {
+								for (int_t m = 0; m < kenel.shape()[0]; ++m) {
+									sum += ts_input[pointi<2>{i, j} +pointi<2>{m, n} -kenel_radius] * kenel[pointi<2>{m, n}];
+								}
+							}
 
-							ts_output[pointi<2>{x, y}] = sum;
+							ts_output[pointi<2>{i, }] = sum;
 						}else{
 							ts_output[pointi<2>{x, y}] = 0.0f;
 						}
@@ -317,9 +309,9 @@ void bm_conv_expand_inside_check_block_with_block_tensor(benchmark::State &state
 	state.SetBytesProcessed(state.iterations() * ts_output.size() * sizeof(float));
 	state.SetItemsProcessed(state.iterations() * ts_output.size() * kenel.size());
 }
-BENCHMARK(bm_conv_expand_inside_check_block_with_block_tensor)->RangeMultiplier(2)->Range(32, 256)->UseRealTime();
+BENCHMARK(bm_conv_inside_check_block_with_block_tensor)->RangeMultiplier(2)->Range(32, 256)->UseRealTime();
 
-void bm_conv_expand_check(benchmark::State &state){
+void bm_conv_outside_check(benchmark::State &state){
 	pointi<2> ext;
 	fill(ext, state.range(0));
 	tensor<float, 2> ts_input(ext);
@@ -336,17 +328,13 @@ void bm_conv_expand_check(benchmark::State &state){
 		for (int_t j = 1; j < ts_input.shape()[1] - 1; ++j) {
 			for (int_t i = 1; i < ts_input.shape()[0] - 1; ++i) {
 				float sum = 0.0f;
-				sum += ts_input[pointi<2>{i, j} +pointi<2>{0, 0} -kenel_radius] * kenel[pointi<2>{0, 0}];
-				sum += ts_input[pointi<2>{i, j} +pointi<2>{1, 0} -kenel_radius] * kenel[pointi<2>{1, 0}];
-				sum += ts_input[pointi<2>{i, j} +pointi<2>{2, 0} -kenel_radius] * kenel[pointi<2>{2, 0}];
-				sum += ts_input[pointi<2>{i, j} +pointi<2>{0, 1} -kenel_radius] * kenel[pointi<2>{0, 1}];
-				sum += ts_input[pointi<2>{i, j} +pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
-				sum += ts_input[pointi<2>{i, j} +pointi<2>{2, 1} -kenel_radius] * kenel[pointi<2>{2, 1}];
-				sum += ts_input[pointi<2>{i, j} +pointi<2>{0, 2} -kenel_radius] * kenel[pointi<2>{0, 2}];
-				sum += ts_input[pointi<2>{i, j} +pointi<2>{1, 2} -kenel_radius] * kenel[pointi<2>{1, 2}];
-				sum += ts_input[pointi<2>{i, j} +pointi<2>{2, 2} -kenel_radius] * kenel[pointi<2>{2, 2}];
+				for (int_t n = 0; n < kenel.shape()[1]; ++n) {
+					for (int_t m = 0; m < kenel.shape()[0]; ++m) {
+						sum += ts_input[pointi<2>{i, j} +pointi<2>{m, n} -kenel_radius] * kenel[pointi<2>{m, n}];
+					}
+				}
 
-				ts_output[pointi<2>{i, j}] = sum;
+				ts_output[pointi<2>{i, }] = sum;
 			}
 		}
 
@@ -478,7 +466,7 @@ void bm_conv_expand_check(benchmark::State &state){
 	state.SetBytesProcessed(state.iterations() * ts_output.size() * sizeof(float));
 	state.SetItemsProcessed(state.iterations() * ts_output.size() * kenel.size());
 }
-BENCHMARK(bm_conv_expand_check)->Arg(7)->Arg(14)->Arg(28)->Arg(56)->Arg(112)->Arg(224)->UseRealTime();
+BENCHMARK(bm_conv_outside_check)->Arg(7)->Arg(14)->Arg(28)->Arg(56)->Arg(112)->Arg(224)->UseRealTime();
 
 void bm_conv_halo(benchmark::State &state){
 	pointi<2> ext;
@@ -511,17 +499,13 @@ void bm_conv_halo(benchmark::State &state){
 		for (int_t j = 1; j < ts_halo.shape()[1] - 1; ++j) {
 			for (int_t i = 1; i < ts_halo.shape()[0] - 1; ++i) {
 				float sum = 0.0f;
-				sum += ts_halo[pointi<2>{i, j} +pointi<2>{0, 0} -kenel_radius] * kenel[pointi<2>{0, 0}];
-				sum += ts_halo[pointi<2>{i, j} +pointi<2>{1, 0} -kenel_radius] * kenel[pointi<2>{1, 0}];
-				sum += ts_halo[pointi<2>{i, j} +pointi<2>{2, 0} -kenel_radius] * kenel[pointi<2>{2, 0}];
-				sum += ts_halo[pointi<2>{i, j} +pointi<2>{0, 1} -kenel_radius] * kenel[pointi<2>{0, 1}];
-				sum += ts_halo[pointi<2>{i, j} +pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
-				sum += ts_halo[pointi<2>{i, j} +pointi<2>{2, 1} -kenel_radius] * kenel[pointi<2>{2, 1}];
-				sum += ts_halo[pointi<2>{i, j} +pointi<2>{0, 2} -kenel_radius] * kenel[pointi<2>{0, 2}];
-				sum += ts_halo[pointi<2>{i, j} +pointi<2>{1, 2} -kenel_radius] * kenel[pointi<2>{1, 2}];
-				sum += ts_halo[pointi<2>{i, j} +pointi<2>{2, 2} -kenel_radius] * kenel[pointi<2>{2, 2}];
+				for (int_t n = 0; n < kenel.shape()[1]; ++n) {
+					for (int_t m = 0; m < kenel.shape()[0]; ++m) {
+						sum += ts_input[pointi<2>{i, j} +pointi<2>{m, n} -kenel_radius] * kenel[pointi<2>{m, n}];
+					}
+				}
 
-				ts_output[pointi<2>{i, j}] = sum;
+				ts_output[pointi<2>{i, }] = sum;
 			}
 		}
 	}
@@ -551,6 +535,7 @@ void bm_conv_linear(benchmark::State &state){
 	poses[8] = 1+ts_input.shape()[0];
 
 	pointf<9> weights;
+	fill(weights, 1.0f);
 
 	while (state.KeepRunning()){
 	#ifdef __LOCAL_USE_OMP
@@ -558,17 +543,135 @@ void bm_conv_linear(benchmark::State &state){
 	#endif
 		for (int_t i = 0; i < ts_input.size(); ++i){
 			float sum = 0.0f;
-			sum += ts_input[i+poses[0]] * weights[0];
-			sum += ts_input[i+poses[1]] * weights[1];
-			sum += ts_input[i+poses[2]] * weights[2];
-			sum += ts_input[i+poses[3]] * weights[3];
-			sum += ts_input[i+poses[4]] * weights[4];
-			sum += ts_input[i+poses[5]] * weights[5];
-			sum += ts_input[i+poses[6]] * weights[6];
-			sum += ts_input[i+poses[7]] * weights[7];
-			sum += ts_input[i+poses[8]] * weights[8];
-
+			for (int_t j = 0; j < poses.size(); ++j){
+				sum += ts_input[i+poses[j]] * weights[j];
+			}
 			ts_output[i] = sum;
+		}
+
+		auto last_row_pos = ts_input.shape()[1] - 1;
+		auto last_col_pos = ts_input.shape()[0] - 1;
+
+		auto kenel_radius = kenel.shape() / 2;
+		//left top corner
+		{
+			float sum = 0.0f;
+			// sum += ts_input[pointi<2>{0, 0} + pointi<2>{0, 0} -kenel_radius] * kenel[pointi<2>{0, 0}];
+			// sum += ts_input[pointi<2>{0, 0} + pointi<2>{1, 0} -kenel_radius] * kenel[pointi<2>{1, 0}];
+			// sum += ts_input[pointi<2>{0, 0} + pointi<2>{2, 0} -kenel_radius] * kenel[pointi<2>{2, 0}];
+			// sum += ts_input[pointi<2>{0, 0} + pointi<2>{0, 1} -kenel_radius] * kenel[pointi<2>{0, 1}];
+			sum += ts_input[pointi<2>{0, 0} + pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
+			sum += ts_input[pointi<2>{0, 0} + pointi<2>{2, 1} -kenel_radius] * kenel[pointi<2>{2, 1}];
+			// sum += ts_input[pointi<2>{0, 0} + pointi<2>{0, 2} -kenel_radius] * kenel[pointi<2>{0, 2}];
+			sum += ts_input[pointi<2>{0, 0} + pointi<2>{1, 2} -kenel_radius] * kenel[pointi<2>{1, 2}];
+			sum += ts_input[pointi<2>{0, 0} + pointi<2>{2, 2} -kenel_radius] * kenel[pointi<2>{2, 2}];
+			ts_output[pointi<2>{0, 0}] = sum;
+		}
+
+		// top right corner
+		{
+			float sum = 0.0f;
+			// sum += ts_input[pointi<2>{last_row_pos, 0} + pointi<2>{0, 0} -kenel_radius] * kenel[pointi<2>{0, 0}];
+			// sum += ts_input[pointi<2>{last_row_pos, 0} + pointi<2>{1, 0} -kenel_radius] * kenel[pointi<2>{1, 0}];
+			// sum += ts_input[pointi<2>{last_row_pos, 0} + pointi<2>{2, 0} -kenel_radius] * kenel[pointi<2>{2, 0}];
+			sum += ts_input[pointi<2>{last_row_pos, 0} + pointi<2>{0, 1} -kenel_radius] * kenel[pointi<2>{0, 1}];
+			sum += ts_input[pointi<2>{last_row_pos, 0} + pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
+			// sum += ts_input[pointi<2>{last_row_pos, 0} + pointi<2>{2, 1} -kenel_radius] * kenel[pointi<2>{2, 1}];
+			sum += ts_input[pointi<2>{last_row_pos, 0} + pointi<2>{0, 2} -kenel_radius] * kenel[pointi<2>{0, 2}];
+			sum += ts_input[pointi<2>{last_row_pos, 0} + pointi<2>{1, 2} -kenel_radius] * kenel[pointi<2>{1, 2}];
+			// sum += ts_input[pointi<2>{last_row_pos, 0} + pointi<2>{2, 2} -kenel_radius] * kenel[pointi<2>{2, 2}];
+			ts_output[pointi<2>{last_row_pos, 0}] = sum;
+		}
+
+		//left  bottom
+		{
+			float sum = 0.0f;
+			// sum += ts_input[pointi<2>{0, last_row_pos} + pointi<2>{0, 0} -kenel_radius] * kenel[pointi<2>{0, 0}];
+			sum += ts_input[pointi<2>{0, last_row_pos} + pointi<2>{1, 0} -kenel_radius] * kenel[pointi<2>{1, 0}];
+			sum += ts_input[pointi<2>{0, last_row_pos} + pointi<2>{2, 0} -kenel_radius] * kenel[pointi<2>{2, 0}];
+			// sum += ts_input[pointi<2>{0, last_row_pos} + pointi<2>{0, 1} -kenel_radius] * kenel[pointi<2>{0, 1}];
+			sum += ts_input[pointi<2>{0, last_row_pos} + pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
+			sum += ts_input[pointi<2>{0, last_row_pos} + pointi<2>{2, 1} -kenel_radius] * kenel[pointi<2>{2, 1}];
+			// sum += ts_input[pointi<2>{0, last_row_pos} + pointi<2>{0, 2} -kenel_radius] * kenel[pointi<2>{0, 2}];
+			// sum += ts_input[pointi<2>{0, last_row_pos} + pointi<2>{1, 2} -kenel_radius] * kenel[pointi<2>{1, 2}];
+			// sum += ts_input[pointi<2>{0, last_row_pos} + pointi<2>{2, 2} -kenel_radius] * kenel[pointi<2>{2, 2}];
+			ts_output[pointi<2>{0, last_row_pos}] = sum;
+
+		}
+
+		//right bottom
+		{
+			float sum = 0.0f;
+			sum += ts_input[pointi<2>{last_col_pos, last_row_pos} + pointi<2>{0, 0} -kenel_radius] * kenel[pointi<2>{0, 0}];
+			sum += ts_input[pointi<2>{last_col_pos, last_row_pos} + pointi<2>{1, 0} -kenel_radius] * kenel[pointi<2>{1, 0}];
+			// sum += ts_input[pointi<2>{last_col_pos, last_row_pos} + pointi<2>{2, 0} -kenel_radius] * kenel[pointi<2>{2, 0}];
+			sum += ts_input[pointi<2>{last_col_pos, last_row_pos} + pointi<2>{0, 1} -kenel_radius] * kenel[pointi<2>{0, 1}];
+			sum += ts_input[pointi<2>{last_col_pos, last_row_pos} + pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
+			// sum += ts_input[pointi<2>{last_col_pos, last_row_pos} + pointi<2>{2, 1} -kenel_radius] * kenel[pointi<2>{2, 1}];
+			// sum += ts_input[pointi<2>{last_col_pos, last_row_pos} + pointi<2>{0, 2} -kenel_radius] * kenel[pointi<2>{0, 2}];
+			// sum += ts_input[pointi<2>{last_col_pos, last_row_pos} + pointi<2>{1, 2} -kenel_radius] * kenel[pointi<2>{1, 2}];
+			// sum += ts_input[pointi<2>{last_col_pos, last_row_pos} + pointi<2>{2, 2} -kenel_radius] * kenel[pointi<2>{2, 2}];
+			ts_output[pointi<2>{last_col_pos, last_row_pos}] = sum;
+		}
+
+		//top
+		for (int_t i = 1; i < ts_input.shape()[0] - 1; ++i){
+			float sum = 0.0f;
+			// sum += ts_input[pointi<2>{i, 0} + pointi<2>{0, 0} -kenel_radius] * kenel[pointi<2>{0, 0}];
+			// sum += ts_input[pointi<2>{i, 0} + pointi<2>{1, 0} -kenel_radius] * kenel[pointi<2>{1, 0}];
+			// sum += ts_input[pointi<2>{i, 0} + pointi<2>{2, 0} -kenel_radius] * kenel[pointi<2>{2, 0}];
+			sum += ts_input[pointi<2>{i, 0} + pointi<2>{0, 1} -kenel_radius] * kenel[pointi<2>{0, 1}];
+			sum += ts_input[pointi<2>{i, 0} + pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
+			sum += ts_input[pointi<2>{i, 0} + pointi<2>{2, 1} -kenel_radius] * kenel[pointi<2>{2, 1}];
+			sum += ts_input[pointi<2>{i, 0} + pointi<2>{0, 2} -kenel_radius] * kenel[pointi<2>{0, 2}];
+			sum += ts_input[pointi<2>{i, 0} + pointi<2>{1, 2} -kenel_radius] * kenel[pointi<2>{1, 2}];
+			sum += ts_input[pointi<2>{i, 0} + pointi<2>{2, 2} -kenel_radius] * kenel[pointi<2>{2, 2}];
+			ts_output[pointi<2>{i, 0}] = sum;
+		}
+
+		// //left
+		for (int_t j = 1; j < ts_input.shape()[1] - 1; ++j){
+			float sum = 0.0f;
+			// sum += ts_input[pointi<2>{0, j} + pointi<2>{0, 0} -kenel_radius] * kenel[pointi<2>{0, 0}];
+			sum += ts_input[pointi<2>{0, j} + pointi<2>{1, 0} -kenel_radius] * kenel[pointi<2>{1, 0}];
+			sum += ts_input[pointi<2>{0, j} + pointi<2>{2, 0} -kenel_radius] * kenel[pointi<2>{2, 0}];
+			// sum += ts_input[pointi<2>{0, j} + pointi<2>{0, 1} -kenel_radius] * kenel[pointi<2>{0, 1}];
+			sum += ts_input[pointi<2>{0, j} + pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
+			sum += ts_input[pointi<2>{0, j} + pointi<2>{2, 1} -kenel_radius] * kenel[pointi<2>{2, 1}];
+			// sum += ts_input[pointi<2>{0, j} + pointi<2>{0, 2} -kenel_radius] * kenel[pointi<2>{0, 2}];
+			sum += ts_input[pointi<2>{0, j} + pointi<2>{1, 2} -kenel_radius] * kenel[pointi<2>{1, 2}];
+			sum += ts_input[pointi<2>{0, j} + pointi<2>{2, 2} -kenel_radius] * kenel[pointi<2>{2, 2}];
+			ts_output[pointi<2>{0, j}] = sum;
+		}
+
+		//right
+		for (int_t j = 1; j < ts_input.shape()[1] - 1; ++j){
+			float sum = 0.0f;
+			sum += ts_input[pointi<2>{last_col_pos, j} + pointi<2>{0, 0} -kenel_radius] * kenel[pointi<2>{0, 0}];
+			sum += ts_input[pointi<2>{last_col_pos, j} + pointi<2>{1, 0} -kenel_radius] * kenel[pointi<2>{1, 0}];
+			// sum += ts_input[pointi<2>{last_col_pos, j} + pointi<2>{2, 0} -kenel_radius] * kenel[pointi<2>{2, 0}];
+			sum += ts_input[pointi<2>{last_col_pos, j} + pointi<2>{0, 1} -kenel_radius] * kenel[pointi<2>{0, 1}];
+			sum += ts_input[pointi<2>{last_col_pos, j} + pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
+			// sum += ts_input[pointi<2>{last_col_pos, j} + pointi<2>{2, 1} -kenel_radius] * kenel[pointi<2>{2, 1}];
+			sum += ts_input[pointi<2>{last_col_pos, j} + pointi<2>{0, 2} -kenel_radius] * kenel[pointi<2>{0, 2}];
+			sum += ts_input[pointi<2>{last_col_pos, j} + pointi<2>{1, 2} -kenel_radius] * kenel[pointi<2>{1, 2}];
+			// sum += ts_input[pointi<2>{last_col_pos, j} + pointi<2>{2, 2} -kenel_radius] * kenel[pointi<2>{2, 2}];
+			ts_output[pointi<2>{last_col_pos, j}] = sum;
+		}
+
+		//bottom
+		for (int_t i = 1; i < ts_input.shape()[0] - 1; ++i){
+			float sum = 0.0f;
+			sum += ts_input[pointi<2>{i, last_row_pos} + pointi<2>{0, 0} -kenel_radius] * kenel[pointi<2>{0, 0}];
+			sum += ts_input[pointi<2>{i, last_row_pos} + pointi<2>{1, 0} -kenel_radius] * kenel[pointi<2>{1, 0}];
+			sum += ts_input[pointi<2>{i, last_row_pos} + pointi<2>{2, 0} -kenel_radius] * kenel[pointi<2>{2, 0}];
+			sum += ts_input[pointi<2>{i, last_row_pos} + pointi<2>{0, 1} -kenel_radius] * kenel[pointi<2>{0, 1}];
+			sum += ts_input[pointi<2>{i, last_row_pos} + pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
+			sum += ts_input[pointi<2>{i, last_row_pos} + pointi<2>{2, 1} -kenel_radius] * kenel[pointi<2>{2, 1}];
+			// sum += ts_input[pointi<2>{i, last_row_pos} + pointi<2>{0, 2} -kenel_radius] * kenel[pointi<2>{0, 2}];
+			// sum += ts_input[pointi<2>{i, last_row_pos} + pointi<2>{1, 2} -kenel_radius] * kenel[pointi<2>{1, 2}];
+			// sum += ts_input[pointi<2>{i, last_row_pos} + pointi<2>{2, 2} -kenel_radius] * kenel[pointi<2>{2, 2}];
+			ts_output[pointi<2>{i, last_row_pos}] = sum;
 		}
 	}
 
