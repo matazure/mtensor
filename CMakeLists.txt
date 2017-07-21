@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.1)
 
 project(MatazureTensor CXX)
 
-option(WITH_CUDA "With CUDA" ON)
-option(WITH_OPENMP "With OpenMP" ON)
+option(WITH_CUDA "With CUDA" OFF)
+option(WITH_OPENMP "With OpenMP" OFF)
 
 option(BUILD_EXAMPLE "Build Example" ON)
 option(BUILD_BENCHMARK "Build Benchmark" ON)
@@ -36,6 +36,10 @@ if (UNIX)
 	add_definitions("-x c++")
 	# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx2")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s -O3 -Wall -funroll-loops -ffast-math")
+
+	if (ANDROID)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=atom -mtune=atom")
+	endif()
 endif()
 
 if (WITH_CUDA)

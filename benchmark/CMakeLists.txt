@@ -1,4 +1,5 @@
 set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Build gtest's sample programs." FORCE)
+set(HAVE_STD_REGEX ON CACHE BOOL "Walkadround" FORCE)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/vendors/benchmark)
 set_property(TARGET benchmark PROPERTY FOLDER "vendors")
 
