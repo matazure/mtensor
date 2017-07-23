@@ -19,6 +19,11 @@ template <int_t... _Values>
 using dim = meta::array<_Values ...>;
 
 /**
+* \defgroup Memory Layout
+* @{
+*/
+
+/**
 * @brief convert array index to linear index by first marjor
 * @param id array index
 * @param stride tensor stride
@@ -89,6 +94,8 @@ inline MATAZURE_GENERAL pointi<_Rank> offset2index(typename pointi<_Rank>::value
 
 	return id;
 }
+
+/**@}*/
 
 /**
 * @brief the base class of tensor expression models
@@ -400,10 +407,10 @@ public:
 	* @brief constructs by the shape
 	* @prama ext the packed shape parameters
 	*/
-	// template <typename ..._Ext>
-	// explicit tensor(_Ext... ext) :
-	// 	tensor(pointi<rank>{ ext... })
-	// {}
+	 template <typename ..._Ext>
+	 explicit tensor(_Ext... ext) :
+	 	tensor(pointi<rank>{ ext... })
+	 {}
 
 	/**
 	* @brief constructs by the shape and alloced memory

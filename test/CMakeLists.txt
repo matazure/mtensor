@@ -12,6 +12,7 @@ set_source_files_properties(${Files} PROPERTIES LANGUAGE CXX)
 add_executable(hete_host_tensor_test ${Files})
 add_dependencies(hete_host_tensor_test gtest)
 target_link_libraries(hete_host_tensor_test gtest)
+target_compile_definitions(hete_host_tensor_test PRIVATE USE_HOST)
 set_target_properties(hete_host_tensor_test PROPERTIES LINKER_LANGUAGE CXX)
 
 if(WITH_CUDA)

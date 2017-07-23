@@ -1,4 +1,6 @@
 ﻿#include <benchmark/benchmark.h>
+#include <bm_config.hpp>
+#include <bm_config.hpp>
 #include <matazure/tensor>
 #include <matazure/expr/conv.hpp>
 #include <emmintrin.h>
@@ -784,4 +786,4 @@ void bm_conv_sperate_sse2(benchmark::State &state){
 	state.SetBytesProcessed(state.iterations() * ts_output.size() * sizeof(float));
 	state.SetItemsProcessed(state.iterations() * ts_output.size() * kenel.size());
 }
-BENCHMARK(bm_conv_sperate_sse2)->RangeMultiplier(2)->Range(16, 256)->UseRealTime();
+// BENCHMARK(bm_conv_sperate_sse2)->RangeMultiplier(2)->Range(16, 256)->UseRealTime();

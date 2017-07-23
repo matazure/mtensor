@@ -1,4 +1,5 @@
 #include <benchmark/benchmark.h>
+#include <bm_config.hpp>
 #include <matazure/tensor>
 
 using namespace matazure;
@@ -60,12 +61,12 @@ void BM_stride(benchmark::State &state) {
 	int_t ts_stride = state.range(0);
 	auto ts_re_ext = ts.shape() / ts_stride;
 	_Tensor ts_re(ts_re_ext);
-	
+
 	while (state.KeepRunning()) {
 		auto lts_re = stride(ts, ts_stride);
 		copy(lts_re, ts_re);
 
-	#ifdef MATAZURE_CUDA
+	#ifdef USE_CUDA
 		cuda::device_synchronize();
 	#endif
 
@@ -129,17 +130,20 @@ BENCHMARK_TEMPLATE(BM_host_stride_dim2_gold, byte)->UseRealTime()->Apply(custom_
 //BENCHMARK_TEMPLATE(BM_host_stride_dim2_gold, float)->UseRealTime()->Apply(custom_arguments);
 //BENCHMARK_TEMPLATE(BM_host_stride_dim2_gold, double)->UseRealTime()->Apply(custom_arguments);
 
+#ifdef USE_HOST
 auto BM_stride_tensor_byte_dim2 = BM_stride<tensor<byte, 2>>;
 BENCHMARK(BM_stride_tensor_byte_dim2)->UseRealTime()->Apply(custom_arguments);
+#endif
 
+#ifdef USE_CUDA
 auto BM_stride_cu_tensor_byte_dim2 = BM_stride<cuda::tensor<byte, 2>>;
 BENCHMARK(BM_stride_cu_tensor_byte_dim2)->UseRealTime()->Apply(custom_arguments);
-
+#endif
 //auto BM_stride_cu_tensor_byte_dim1 = BM_stride<cuda::tensor<byte, 1>>;
 //BENCHMARK(BM_stride_cu_tensor_byte_dim1)->UseRealTime()->Apply(custom_arguments);
 
 
-//BENCHMARK_TEMPLATE(BM_host_stride, float)->Range(1 << 10, 1 << 28)->UseRealTime();
+//BENCHMARK_TEMPLATE(BM_host_stride, float)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
 //
-//BENCHMARK_TEMPLATE(BM_cu_stride_gold, float)->Range(1 << 10, 1 << 28)->UseRealTime();
-//BENCHMARK_TEMPLATE(BM_hcu_stride, float)->Range(1 << 10, 1 << 28)->UseRealTime();
+//BENCHMARK_TEMPLATE(BM_cu_stride_gold, float)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
+//BENCHMARK_TEMPLATE(BM_hcu_stride, float)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();

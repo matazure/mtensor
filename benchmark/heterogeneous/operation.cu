@@ -1,4 +1,5 @@
 #include <benchmark/benchmark.h>
+#include <bm_config.hpp>
 #include <matazure/tensor>
 
 using namespace matazure;
@@ -36,7 +37,25 @@ void BM_cu_tensor_operation_gold(benchmark::State& state) {
 	state.SetBytesProcessed(state.iterations() * bytes_size * 3);
 }
 
+template <typename _ValueType>
+void BM_cu_tensor_operation(benchmark::State &st) {
+	cuda::tensor<_ValueType, 1> ts1(st.range(0));
+	cuda::tensor<_ValueType, 1> ts2(st.range(0));
+	fill(ts1, _ValueType(1));
+	fill(ts2, _ValueType(1));
+
+	while (st.KeepRunning()) {
+		auto tsf_re = (ts1 * ts2 / ts1 + ts2).persist();
+		cuda::device_synchronize();
+	}
+
+	auto bytes_size = static_cast<size_t>(ts1.size()) * sizeof(decltype(ts1[0]));
+	st.SetBytesProcessed(2 * st.iterations() * bytes_size * 3);
+}
+
 #endif
+
+#ifdef USE_HOST
 
 template <typename _ValueType>
 void BM_host_tensor_operation_gold(benchmark::State &st) {
@@ -71,26 +90,14 @@ void BM_host_tensor_operation(benchmark::State &st) {
 	st.SetBytesProcessed(2 * st.iterations() * bytes_size * 3);
 }
 
-template <typename _ValueType>
-void BM_cu_tensor_operation(benchmark::State &st) {
-	cuda::tensor<_ValueType, 1> ts1(st.range(0));
-	cuda::tensor<_ValueType, 1> ts2(st.range(0));
-	fill(ts1, _ValueType(1));
-	fill(ts2, _ValueType(1));
+#endif
 
-	while (st.KeepRunning()) {
-		auto tsf_re = (ts1 * ts2 / ts1 + ts2).persist();
-		cuda::device_synchronize();
-	}
-
-	auto bytes_size = static_cast<size_t>(ts1.size()) * sizeof(decltype(ts1[0]));
-	st.SetBytesProcessed(2 * st.iterations() * bytes_size * 3);
-}
-
-BENCHMARK_TEMPLATE(BM_host_tensor_operation_gold, float)->Range(1 << 10, 1 << 28)->UseRealTime();
-BENCHMARK_TEMPLATE(BM_host_tensor_operation, float)->Range(1 << 10, 1 << 28)->UseRealTime();
+#ifdef USE_HOST
+BENCHMARK_TEMPLATE(BM_host_tensor_operation_gold, float)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
+BENCHMARK_TEMPLATE(BM_host_tensor_operation, float)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
+#endif
 
 #ifdef USE_CUDA
-BENCHMARK_TEMPLATE(BM_cu_tensor_operation_gold, float)->Range(1 << 10, 1 << 28)->UseRealTime();
-BENCHMARK_TEMPLATE(BM_cu_tensor_operation, float)->Range(1 << 10, 1 << 28)->UseRealTime();
+BENCHMARK_TEMPLATE(BM_cu_tensor_operation_gold, float)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
+BENCHMARK_TEMPLATE(BM_cu_tensor_operation, float)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
 #endif

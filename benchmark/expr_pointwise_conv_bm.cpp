@@ -1,4 +1,5 @@
 //#include <benchmark/benchmark.h>
+#include <bm_config.hpp>
 //#include <matazure/tensor>
 //#include <emmintrin.h>
 //
