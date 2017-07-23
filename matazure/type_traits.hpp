@@ -10,7 +10,7 @@ typedef first_major_t col_major_t;
 typedef last_major_t row_major_t;
 
 struct linear_access_t {};
-struct array_access_t {};
+struct array_index {};
 
 struct host_t {};
 struct device_t {};
@@ -79,7 +79,7 @@ struct name<_Tensor, _OtherTensors...> : bool_constant<						\
 MATAZURE_DEFINE_ARE_TAG(are_host_memory, memory_type, host_t)
 MATAZURE_DEFINE_ARE_TAG(are_device_memory, memory_type, device_t)
 MATAZURE_DEFINE_ARE_TAG(are_linear_access, access_type, linear_access_t)
-MATAZURE_DEFINE_ARE_TAG(are_array_access, access_type, array_access_t)
+MATAZURE_DEFINE_ARE_TAG(are_array_access, access_type, array_index)
 
 //none tag
 #define MATAZURE_DEFINE_NONE_TAG(name, tag_name, tag)		\
@@ -97,6 +97,6 @@ struct name<_Tensor, _OtherTensors...> : bool_constant<		\
 MATAZURE_DEFINE_NONE_TAG(none_host_memory, memory_type, host_t)
 MATAZURE_DEFINE_NONE_TAG(none_device_memory, memory_type, device_t)
 MATAZURE_DEFINE_NONE_TAG(none_linear_access, access_type, linear_access_t)
-MATAZURE_DEFINE_NONE_TAG(none_array_access, access_type, array_access_t)
+MATAZURE_DEFINE_NONE_TAG(none_array_access, access_type, array_index)
 
 }

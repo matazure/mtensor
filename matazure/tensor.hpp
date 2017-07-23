@@ -575,7 +575,7 @@ public:
 	typedef conditional_t<
 		is_same<int_t, _tmp_type>::value,
 		linear_access_t,
-		conditional_t<is_same<_tmp_type, pointi<_Rank>>::value, array_access_t, void>
+		conditional_t<is_same<_tmp_type, pointi<_Rank>>::value, array_index, void>
 	> type;
 };
 
@@ -693,7 +693,7 @@ public:
 
 private:
 	template <typename _Mode>
-	enable_if_t<is_same<_Mode, array_access_t>::value, reference> index_imp(pointi<rank> idx) const {
+	enable_if_t<is_same<_Mode, array_index>::value, reference> index_imp(pointi<rank> idx) const {
 		return fun_(idx);
 	}
 
@@ -703,7 +703,7 @@ private:
 	}
 
 	template <typename _Mode>
-	enable_if_t<is_same<_Mode, array_access_t>::value, reference> offset_imp(int_t i) const {
+	enable_if_t<is_same<_Mode, array_index>::value, reference> offset_imp(int_t i) const {
 		return (*this)(offset2index(i, stride(), first_major_t{}));
 	}
 

@@ -176,7 +176,7 @@ public:
 
 private:
 	template <typename _Mode>
-	MATAZURE_DEVICE enable_if_t<is_same<_Mode, array_access_t>::value, reference>
+	MATAZURE_DEVICE enable_if_t<is_same<_Mode, array_index>::value, reference>
 		index_imp(pointi<rank> index) const {
 		return fun_(index);
 	}
@@ -188,7 +188,7 @@ private:
 	}
 
 	template <typename _Mode>
-	MATAZURE_DEVICE enable_if_t<is_same<_Mode, array_access_t>::value, reference>
+	MATAZURE_DEVICE enable_if_t<is_same<_Mode, array_index>::value, reference>
 		offset_imp(int_t i) const {
 		return (*this)(offset2index(i, stride()));
 	}
@@ -255,7 +255,7 @@ public:
 
 public:
 	template <typename _Mode>
-	MATAZURE_GENERAL enable_if_t<is_same<_Mode, array_access_t>::value, reference> index_imp(pointi<rank> index) const {
+	MATAZURE_GENERAL enable_if_t<is_same<_Mode, array_index>::value, reference> index_imp(pointi<rank> index) const {
 		return fun_(index);
 	}
 
@@ -265,7 +265,7 @@ public:
 	}
 
 	template <typename _Mode>
-	MATAZURE_GENERAL enable_if_t<is_same<_Mode, array_access_t>::value, reference> offset_imp(int_t i) const {
+	MATAZURE_GENERAL enable_if_t<is_same<_Mode, array_index>::value, reference> offset_imp(int_t i) const {
 		return (*this)(offset2index(i, stride(), first_major_t{}));
 	}
 
