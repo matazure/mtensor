@@ -318,7 +318,7 @@ public:
 	typedef const pointer			const_pointer;
 	typedef value_type &			reference;
 	typedef const value_type &		const_reference;
-	typedef linear_access_t			access_type;
+	typedef linear_access_t			index_type;
 	typedef local_t					memory_type;
 
 	/**
@@ -461,7 +461,7 @@ public:
 	typedef _ValueType &					reference;
 	typedef _Layout							layout_type;
 	/// primitive linear access mode
-	typedef linear_access_t					access_type;
+	typedef linear_access_t					index_type;
 	/// host memory type
 	typedef host_t							memory_type;
 
@@ -671,7 +671,7 @@ template <typename _ValueType, typename _Layout = column_major_layout>
 using matrix = tensor<_ValueType, 2, _Layout>;
 
 /// alias of tensor <_ValueType, 1>
-template <typename _ValueType, typename _Layout = column_major_layout>
+template <typename _ValueType, typename _Layout = first_major_layout<1>>
 using vector = tensor<_ValueType, 1, _Layout>;
 
 /// alias of tensor<static_tensor<_ValueType, _BlockDim>, _BlockDim::size(), _Layout>
@@ -718,7 +718,7 @@ public:
 	* when the functor is int_t -> value pattern, the access mode is linear access.
 	* when the functor is pointi<rank> -> value pattern, the access mode is array access.
 	*/
-	typedef typename internal::get_functor_accessor_type<_Rank, _Func>::type	access_type;
+	typedef typename internal::get_functor_accessor_type<_Rank, _Func>::type	index_type;
 
 	typedef _Layout											layout_type;
 	typedef host_t											memory_type;
@@ -741,7 +741,7 @@ public:
 	* @return element referece
 	*/
 	reference operator[](int_t i) const {
-		return offset_imp<access_type>(i);
+		return offset_imp<index_type>(i);
 	}
 
 	/**
@@ -750,7 +750,7 @@ public:
 	* @return element const reference
 	*/
 	reference operator[](pointi<rank> idx) const {
-		return index_imp<access_type>(idx);
+		return index_imp<index_type>(idx);
 	}
 
 	/**

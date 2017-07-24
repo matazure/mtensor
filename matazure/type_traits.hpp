@@ -78,8 +78,8 @@ struct name<_Tensor, _OtherTensors...> : bool_constant<						\
 
 MATAZURE_DEFINE_ARE_TAG(are_host_memory, memory_type, host_t)
 MATAZURE_DEFINE_ARE_TAG(are_device_memory, memory_type, device_t)
-MATAZURE_DEFINE_ARE_TAG(are_linear_access, access_type, linear_access_t)
-MATAZURE_DEFINE_ARE_TAG(are_array_access, access_type, array_index)
+MATAZURE_DEFINE_ARE_TAG(are_linear_access, index_type, linear_access_t)
+MATAZURE_DEFINE_ARE_TAG(are_array_access, index_type, array_index)
 
 //none tag
 #define MATAZURE_DEFINE_NONE_TAG(name, tag_name, tag)		\
@@ -96,7 +96,7 @@ struct name<_Tensor, _OtherTensors...> : bool_constant<		\
 
 MATAZURE_DEFINE_NONE_TAG(none_host_memory, memory_type, host_t)
 MATAZURE_DEFINE_NONE_TAG(none_device_memory, memory_type, device_t)
-MATAZURE_DEFINE_NONE_TAG(none_linear_access, access_type, linear_access_t)
-MATAZURE_DEFINE_NONE_TAG(none_array_access, access_type, array_index)
+MATAZURE_DEFINE_NONE_TAG(none_linear_access, index_type, linear_access_t)
+MATAZURE_DEFINE_NONE_TAG(none_array_access, index_type, array_index)
 
 }

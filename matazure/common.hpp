@@ -405,7 +405,7 @@ public:
 * @param fun the functor, element -> value  pattern
 */
 template <typename _Tensor, typename _Func>
-inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<linear_access_t, typename _Tensor::access_type>::value>* = 0)->decltype(make_lambda(ts.shape(), internal::linear_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{}))
+inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<linear_access_t, typename _Tensor::index_type>::value>* = 0)->decltype(make_lambda(ts.shape(), internal::linear_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{}))
 {
 	return make_lambda(ts.shape(), internal::linear_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{});
 }
@@ -416,7 +416,7 @@ inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<linear_access_t, ty
 * @param fun the functor, element -> value  pattern
 */
 template <typename _Tensor, typename _Func>
-inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<array_index, typename _Tensor::access_type>::value>* = 0)->decltype(make_lambda(ts.shape(), internal::array_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{}))
+inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<array_index, typename _Tensor::index_type>::value>* = 0)->decltype(make_lambda(ts.shape(), internal::array_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{}))
 {
 	return make_lambda(ts.shape(), internal::array_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{});
 }
@@ -424,25 +424,25 @@ inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<array_index, typena
 #else
 
 template <typename _Tensor, typename _Func>
-inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<linear_access_t, typename _Tensor::access_type>::value>* = 0, enable_if_t<!MATAZURE_IS_D_LAMBDA(_Func)>* = nullptr)->decltype(make_lambda(ts.shape(), internal::linear_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{}))
+inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<linear_access_t, typename _Tensor::index_type>::value>* = 0, enable_if_t<!MATAZURE_IS_D_LAMBDA(_Func)>* = nullptr)->decltype(make_lambda(ts.shape(), internal::linear_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{}))
 {
 	return make_lambda(ts.shape(), internal::linear_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{});
 }
 
 template <typename _Tensor, typename _Func>
-inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<array_index, typename _Tensor::access_type>::value>* = 0, enable_if_t<!MATAZURE_IS_D_LAMBDA(_Func)>* = nullptr)->decltype(make_lambda(ts.shape(), internal::array_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{}))
+inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<array_index, typename _Tensor::index_type>::value>* = 0, enable_if_t<!MATAZURE_IS_D_LAMBDA(_Func)>* = nullptr)->decltype(make_lambda(ts.shape(), internal::array_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{}))
 {
 	return make_lambda(ts.shape(), internal::array_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{});
 }
 
 template <typename _Tensor, typename _Func>
-inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<linear_access_t, typename _Tensor::access_type>::value>* = 0, enable_if_t<MATAZURE_IS_D_LAMBDA(_Func)>* = nullptr)->decltype(make_lambda(ts.shape(), internal::device_linear_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{}))
+inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<linear_access_t, typename _Tensor::index_type>::value>* = 0, enable_if_t<MATAZURE_IS_D_LAMBDA(_Func)>* = nullptr)->decltype(make_lambda(ts.shape(), internal::device_linear_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{}))
 {
 	return make_lambda(ts.shape(), internal::device_linear_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{});
 }
 
 template <typename _Tensor, typename _Func>
-inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<array_index, typename _Tensor::access_type>::value>* = 0, enable_if_t<MATAZURE_IS_D_LAMBDA(_Func)>* = nullptr)->decltype(make_lambda(ts.shape(), internal::device_array_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{}))
+inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<array_index, typename _Tensor::index_type>::value>* = 0, enable_if_t<MATAZURE_IS_D_LAMBDA(_Func)>* = nullptr)->decltype(make_lambda(ts.shape(), internal::device_array_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{}))
 {
 	return make_lambda(ts.shape(), internal::device_array_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{});
 }

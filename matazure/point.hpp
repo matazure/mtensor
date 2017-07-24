@@ -21,7 +21,7 @@ public:
 	typedef _ValueType				value_type;
 	typedef value_type &			reference;
 	typedef const value_type &		const_reference;
-	typedef linear_access_t			access_type;
+	typedef linear_access_t			index_type;
 	typedef local_t					memory_type;
 
 	/**
