@@ -4,3 +4,6 @@
 [submodule "benchmark/vendor/benchmark"]
 	path = benchmark/vendor/benchmark
 	url = git@github.com:Matazure/benchmark.git
+[submodule "test/vendor/googletest"]
+	path = test/vendor/googletest
+	url = git@github.com:Matazure/googletest.git

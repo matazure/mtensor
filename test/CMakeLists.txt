@@ -1,11 +1,11 @@
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/vendors/googletest/googletest)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/vendor/googletest/googletest)
 set_property(TARGET gtest PROPERTY FOLDER "vendors")
 set_property(TARGET gtest_main PROPERTY FOLDER "vendors")
 
 include_directories(${EXTERNAL_INSTALL_LOCATION}/include)
 link_directories(${EXTERNAL_INSTALL_LOCATION}/lib)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/vendors/googletest/googletest/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/vendor/googletest/googletest/include)
 
 file(GLOB Files ${CMAKE_CURRENT_SOURCE_DIR}/heterogeneous/*.cu)
 set_source_files_properties(${Files} PROPERTIES LANGUAGE CXX)
