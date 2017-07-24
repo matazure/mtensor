@@ -10,7 +10,7 @@ void BM_cu_tensor_construct_and_destruct(benchmark::State& state) {
 	while (state.KeepRunning()) {
 		DoNotOptimize(cuda::tensor<_ValueType,1> ts(state.range(0)));
 		size = ts.size();
-		benchmark::ClobberMemory();
+		//benchmark::ClobberMemory();
 	}
 
 	auto bytes_size = static_cast<size_t>(size) * sizeof(_ValueType);

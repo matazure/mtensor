@@ -10,7 +10,7 @@ void BM_tensor_construct_and_destruct(benchmark::State& state) {
 	while (state.KeepRunning()) {
 		tensor<_ValueType,1> ts(state.range(0));
 		size = ts.size();
-		benchmark::ClobberMemory();
+		//benchmark::ClobberMemory();
 	}
 
 	auto bytes_size = static_cast<size_t>(size) * sizeof(_ValueType);
@@ -30,7 +30,7 @@ void BM_tensor_linear_access_glod(benchmark::State& state){
 		for (int_t i = 0; i < size; ++i) {
 			p_data[i] = _ValueType(i);
 		}
-		benchmark::ClobberMemory();
+		//benchmark::ClobberMemory();
 	}
 
 	state.SetBytesProcessed(state.iterations() * static_cast<size_t>(size) * sizeof(_ValueType));
@@ -48,7 +48,7 @@ void BM_tensor_linear_access(benchmark::State& state) {
 		for(int_t i = 0; i < ts.size(); ++i){
 			ts[i] = typename _TensorType::value_type(i);
 		}
-		benchmark::ClobberMemory();
+		//benchmark::ClobberMemory();
 	}
 
 	state.SetBytesProcessed(state.iterations() * static_cast<size_t>(ts.size()) * sizeof(typename _TensorType::value_type));
@@ -69,7 +69,7 @@ void BM_tensor_1d_array_index(benchmark::State& state) {
 		for(int_t i = 0; i < ts.size(); ++i){
 			ts[i] = _ValueType(i);
 		}
-		benchmark::ClobberMemory();
+		//benchmark::ClobberMemory();
 	}
 
 	state.SetBytesProcessed(state.iterations() * static_cast<size_t>(ts.size()) * sizeof(_ValueType));
@@ -91,7 +91,7 @@ void BM_tensor_2d_array_index_gold(benchmark::State& state) {
 				p_data[i + j * width] = _ValueType(i);
 			}
 		}
-		benchmark::ClobberMemory();
+		//benchmark::ClobberMemory();
 	}
 
 	state.SetBytesProcessed(state.iterations() * static_cast<size_t>(ts.size()) * sizeof(_ValueType));
@@ -111,7 +111,7 @@ void BM_tensor_2d_array_index(benchmark::State& state) {
 				ts[pointi<2>{i, j}] = _ValueType(i);
 			}
 		}
-		benchmark::ClobberMemory();
+		//benchmark::ClobberMemory();
 	}
 
 	state.SetBytesProcessed(state.iterations() * static_cast<size_t>(ts.size()) * sizeof(_ValueType));
@@ -119,6 +119,26 @@ void BM_tensor_2d_array_index(benchmark::State& state) {
 BENCHMARK_TEMPLATE(BM_tensor_2d_array_index, byte)->RangeMultiplier(4)->Range(1<<5, 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
 BENCHMARK_TEMPLATE(BM_tensor_2d_array_index, int)->RangeMultiplier(4)->Range(1<<5, 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
 BENCHMARK_TEMPLATE(BM_tensor_2d_array_index, float)->RangeMultiplier(4)->Range(1<<5, 1 << ((bm_config::max_host_memory_exponent() -2 ) / 2))->UseRealTime();
+
+template <typename _ValueType>
+void BM_tensor_2d_last_marjor_array_index(benchmark::State& state) {
+	pointi<2> ext{};
+	fill(ext, state.range(0));
+	tensor<_ValueType, 2, last_major_t> ts(ext);
+	while (state.KeepRunning()) {
+		for (int_t j = 0; j < ts.shape()[1]; ++j){
+			for(int_t i = 0; i < ts.shape()[0]; ++i){
+				ts[pointi<2>{j, i}] = _ValueType(i);
+			}
+		}
+		//benchmark::ClobberMemory();
+	}
+
+	state.SetBytesProcessed(state.iterations() * static_cast<size_t>(ts.size()) * sizeof(_ValueType));
+}
+BENCHMARK_TEMPLATE(BM_tensor_2d_last_marjor_array_index, byte)->RangeMultiplier(4)->Range(1<<5, 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
+BENCHMARK_TEMPLATE(BM_tensor_2d_last_marjor_array_index, int)->RangeMultiplier(4)->Range(1<<5, 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
+BENCHMARK_TEMPLATE(BM_tensor_2d_last_marjor_array_index, float)->RangeMultiplier(4)->Range(1<<5, 1 << ((bm_config::max_host_memory_exponent() -2 ) / 2))->UseRealTime();
 
 template <typename _ValueType>
 void BM_tensor_3d_array_index(benchmark::State& state) {
@@ -133,7 +153,7 @@ void BM_tensor_3d_array_index(benchmark::State& state) {
 				}
 			}
 		}
-		benchmark::ClobberMemory();
+		//benchmark::ClobberMemory();
 	}
 
 	state.SetBytesProcessed(state.iterations() * static_cast<size_t>(ts.size()) * sizeof(_ValueType));

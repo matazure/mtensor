@@ -16,7 +16,7 @@ foreach(File ${Files})
 	add_executable(${TargetName} ${File})
 	set_target_properties(${TargetName} PROPERTIES LINKER_LANGUAGE CXX)
 	target_compile_definitions(${TargetName} PRIVATE USE_HOST)
-	target_compile_features(${TargetName} PRIVATE cxx_constexpr cxx_deleted_functions cxx_lambdas cxx_rvalue_references cxx_variadic_templates)
+	# target_compile_features(${TargetName} PRIVATE cxx_constexpr cxx_deleted_functions cxx_lambdas cxx_rvalue_references cxx_variadic_templates)
 endforeach()
 
 #add cuda example

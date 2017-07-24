@@ -9,11 +9,12 @@ mkdir -p build_android
 cd build_android
 
 cmake .. \
-    -DCMAKE_TOOLCHAIN_FILE=../third_party/android-cmake/android.toolchain.cmake \
+    -DCMAKE_TOOLCHAIN_FILE=../vendor/android-cmake/android.toolchain.cmake \
     -DANDROID_NDK=$ANDROID_NDK \
     -DCMAKE_BUILD_TYPE=Release \
     -DANDROID_ABI="x86_64" \
     -DANDROID_NATIVE_API_LEVEL=21 \
+    -DWITH_CUDA=OFF \
     $@ \
     || exit 1
 

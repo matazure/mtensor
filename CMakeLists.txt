@@ -34,7 +34,7 @@ endif()
 
 if (UNIX)
 	add_definitions("-x c++")
-	# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx2")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s -O3 -Wall -funroll-loops -ffast-math")
 
 	if (ANDROID)
@@ -56,7 +56,7 @@ if (WITH_CUDA)
 		set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -Xcompiler \"/wd4819 /wd4503\" ")
 	endif()
 else()
-	set(CMAKE_CXX_STANDARD 14)
+	set(CMAKE_CXX_STANDARD 11)
 endif()
 
 if (BUILD_EXAMPLE)

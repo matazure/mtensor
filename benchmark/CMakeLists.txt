@@ -1,12 +1,16 @@
 set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Build gtest's sample programs." FORCE)
-set(HAVE_STD_REGEX ON CACHE BOOL "Walkadround" FORCE)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/vendor/benchmark)
 set_property(TARGET benchmark PROPERTY FOLDER "vendors")
+
+# add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/vendor/eigen)
+# set_property(T)
 
 include_directories(${EXTERNAL_INSTALL_LOCATION}/include)
 link_directories(${EXTERNAL_INSTALL_LOCATION}/lib)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/vendors/benchmark/include)
+# include_directories(${CMAKE_CURRENT_SOURCE_DIR}/vendors/benchmark/include)
+# include_directories(${CMAKE_CURRENT_SOURCE_DIR}/vendor)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/vendor/eigen)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 file(GLOB Files ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
