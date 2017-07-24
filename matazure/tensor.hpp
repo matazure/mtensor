@@ -19,9 +19,126 @@ template <int_t... _Values>
 using dim = meta::array<_Values ...>;
 
 /**
-* \defgroup Memory Layout
+* \defgroup Tensor Memory Layout
 * @{
 */
+
+template <int_t _Rank>
+class first_major_layout{
+public:
+	const static int_t rank = _Rank;
+
+	first_major_layout(const pointi<rank> &shape) :
+		shape_(shape),
+		stride_(get_stride(shape))
+	{ }
+
+	MATAZURE_GENERAL int_t index2offset(const pointi<rank> &id) const {
+		int_t offset = id[0];
+		for (int_t i = 1; i < rank; ++i) {
+			offset += id[i] * stride_[i - 1];
+		}
+
+		return offset;
+	};
+
+	MATAZURE_GENERAL pointi<rank> offset2index(int_t offset) const {
+		pointi<rank> id{};
+		for (int_t i = rank - 1; i > 0; --i) {
+			id[i] = offset / stride_[i - 1];
+			offset = offset % stride_[i - 1];
+		}
+		id[0] = offset;
+
+		return id;
+	}
+
+	pointi<rank> shape() const{
+		return shape_;
+	}
+
+	pointi<rank> stride() const{
+		return stride_;
+	}
+
+private:
+	static pointi<rank> get_stride(pointi<rank> ext) {
+		pointi<rank>  stride{};
+		stride[0] = ext[0];
+		for (int_t i = 1; i < rank; ++i) {
+			stride[i] = ext[i] * stride[i - 1];
+		}
+
+		return stride;
+	}
+
+private:
+	pointi<rank> shape_;
+	pointi<rank> stride_;
+};
+
+template <int_t _Rank>
+class last_major_layout{
+public:
+	const static int_t rank = _Rank;
+
+	last_major_layout(const pointi<rank> &shape) :
+		shape_(shape),
+		stride_(get_stride(shape))
+	{ }
+
+	MATAZURE_GENERAL int_t index2offset(const pointi<rank> &id) const {
+		typename pointi<rank>::value_type offset = id[rank - 1];
+		for (int_t i = 1; i < rank; ++i) {
+			offset += id[rank - 1 - i] * stride_[i - 1];
+		}
+
+		return offset;
+	};
+
+	MATAZURE_GENERAL pointi<rank> offset2index(int_t offset) const {
+		pointi<rank> id{};
+		for (int_t i = rank - 1; i > 0; --i) {
+			id[rank - 1 - i] = offset / stride_[i - 1];
+			offset = offset % stride_[i - 1];
+		}
+		id[rank - 1] = offset;
+
+		return id;
+	}
+
+	pointi<rank> shape() const{
+		return shape_;
+	}
+
+	pointi<rank> stride() const{
+		return stride_;
+	}
+
+
+private:
+	static pointi<rank> get_stride(pointi<rank> ext) {
+		pointi<rank>  stride{};
+		stride[0] = ext[rank - 1];
+		for (int_t i = 1; i < rank; ++i) {
+			stride[i] = ext[rank - 1 -i] * stride[i - 1];
+		}
+		return stride;
+	}
+
+private:
+	pointi<rank> shape_;
+	pointi<rank> stride_;
+};
+
+// template <int_t _Rank>
+// class last_major_layout{
+// 	const static int_t rank = _Rank;
+//
+// private:
+// 	pointi<rank> shape_;
+// 	pointi<rank> stride_;
+// };
 
 /**
 * @brief convert array index to linear index by first marjor
@@ -193,7 +310,7 @@ private:
 	static_assert(traits_t::size() > 0, "");
 
 public:
-	/// the meta shape type which has compile time extent
+	/// the meta shape type which has compile time ext
 	typedef _Ext					meta_shape_type;
 	static	const int_t				rank = meta_shape_type::size();
 	typedef _ValueType				value_type;
@@ -328,7 +445,7 @@ struct is_tensor<static_tensor<_ValueType, _Ext>> : bool_constant<true> {};
 @ tparam _Rank the rank of tensor
 @ tparam _Layout the memory layout of tensor, the default is first major
 */
-template <typename _ValueType, int_t _Rank, typename _Layout = first_major_t>
+template <typename _ValueType, int_t _Rank, typename _Layout = first_major_layout<_Rank>>
 class tensor : public tensor_expression<tensor<_ValueType, _Rank, _Layout>> {
 public:
 	static_assert(std::is_pod<_ValueType>::value, "only supports pod type now");
@@ -358,12 +475,12 @@ public:
 
 	/**
 	* @brief constructs by the shape
-	* @prama extent the shape of tensor
+	* @prama ext the shape of tensor
 	*/
-	explicit tensor(pointi<rank> extent) :
-		extent_(extent),
-		stride_(cumulative_prod(extent)),
-		sp_data_(malloc_shared_memory(stride_[rank - 1])),
+	explicit tensor(pointi<rank> ext) :
+		extent_(ext),
+		layout_(ext),
+		sp_data_(malloc_shared_memory(layout_.stride()[rank - 1])),
 		data_(sp_data_.get())
 	{ }
 
@@ -371,33 +488,33 @@ public:
 
 	/**
 	* @brief constructs by the shape. alloc host pinned memory when with cuda by default
-	* @param extent the shape of tensor
+	* @param ext the shape of tensor
 	*/
-	explicit tensor(pointi<rank> extent) :
-		tensor(extent, pinned_t{})
+	explicit tensor(pointi<rank> ext) :
+		tensor(ext, pinned_t{})
 	{}
 
 	/**
 	* @brief constructs by the shape. alloc host pinned memory when with cuda
-	* @param extent the shape of tensor
+	* @param ext the shape of tensor
 	* @param pinned_v  the instance of pinned_t
 	*/
-	explicit tensor(pointi<rank> extent, pinned_t pinned_v) :
-		extent_(extent),
-		stride_(cumulative_prod(extent)),
-		sp_data_(malloc_shared_memory(stride_[rank - 1], pinned_v)),
+	explicit tensor(pointi<rank> ext, pinned_t pinned_v) :
+		extent_(ext),
+		layout_(ext),
+		sp_data_(malloc_shared_memory(layout_.stride()[rank - 1], pinned_v)),
 		data_(sp_data_.get())
 	{ }
 
 	/**
 	* @brief constructs by the shape. alloc host unpinned memory when with cuda
-	* @param extent the shape of tensor
+	* @param ext the shape of tensor
 	* @param pinned_v  the instance of unpinned_t
 	*/
-	explicit tensor(pointi<rank> extent, unpinned_t) :
-		extent_(extent),
-		stride_(cumulative_prod(extent)),
-		sp_data_(malloc_shared_memory(stride_[rank - 1])),
+	explicit tensor(pointi<rank> ext, unpinned_t) :
+		extent_(ext),
+		layout_(ext),
+		sp_data_(malloc_shared_memory(layout_.stride()[rank - 1])),
 		data_(sp_data_.get())
 	{ }
 
@@ -414,12 +531,12 @@ public:
 
 	/**
 	* @brief constructs by the shape and alloced memory
-	* @param extent the shape of tensor
+	* @param ext the shape of tensor
 	* @param sp_data the shared_ptr of host memory
 	*/
-	explicit tensor(pointi<rank> extent, std::shared_ptr<value_type> sp_data) :
-		extent_(extent),
-		stride_(cumulative_prod(extent)),
+	explicit tensor(const pointi<rank> &ext, std::shared_ptr<value_type> sp_data) :
+		extent_(ext),
+		layout_(ext),
 		sp_data_(sp_data),
 		data_(sp_data_.get())
 	{ }
@@ -437,7 +554,7 @@ public:
 	template <typename _VT>
 	tensor(const tensor<_VT, rank, layout_type> &ts) :
 		extent_(ts.shape()),
-		stride_(ts.stride()),
+		layout_(ts.shape()),
 		sp_data_(ts.shared_data()),
 		data_(ts.data())
 	{ }
@@ -458,7 +575,7 @@ public:
 	template <typename _VT>
 	const tensor &operator=(const tensor<_VT, _Rank, _Layout> &ts) {
 		extent_ = ts.shape();
-		stride_ = ts.stride();
+		layout_ = ts.layout_;
 		sp_data_ = ts.shared_data();
 		data_ = ts.data();
 
@@ -480,7 +597,7 @@ public:
 	* @return element const reference
 	*/
 	reference operator[](const pointi<rank> &idx) const {
-		return (*this)[index2offset(idx, stride_, layout_type{})];
+		return (*this)[layout_.index2offset(idx)];
 	}
 
 	/**
@@ -506,14 +623,10 @@ public:
 		return extent_;
 	}
 
-	/// @return the stride of tensor
-	pointi<rank> stride() const {
-		return stride_;
-	}
 
 	/// return the total size of tensor elements
 	int_t size() const {
-		 return stride_[rank - 1];
+		 return layout_.stride()[rank - 1];
 	}
 
 	/// return the shared point of tensor elements
@@ -544,22 +657,25 @@ private:
 	#endif
 
 private:
-	pointi<rank>	extent_;
-	pointi<rank>	stride_;
-	shared_ptr<value_type>	sp_data_;
-	value_type * 	data_;
+	const pointi<rank>	extent_;
+	const layout_type		layout_;
+	const shared_ptr<value_type>	sp_data_;
+	value_type * const data_;
 };
 
+using column_major_layout = first_major_layout<2>;
+using row_major_layout = last_major_layout<2>;
+
 /// alias of tensor<_ValueType, 2>
-template <typename _ValueType, typename _Layout = first_major_t>
+template <typename _ValueType, typename _Layout = column_major_layout>
 using matrix = tensor<_ValueType, 2, _Layout>;
 
 /// alias of tensor <_ValueType, 1>
-template <typename _ValueType, typename _Layout = first_major_t>
+template <typename _ValueType, typename _Layout = column_major_layout>
 using vector = tensor<_ValueType, 1, _Layout>;
 
 /// alias of tensor<static_tensor<_ValueType, _BlockDim>, _BlockDim::size(), _Layout>
-template <typename _ValueType, typename _BlockDim, typename _Layout = first_major_t>
+template <typename _ValueType, typename _BlockDim, typename _Layout = first_major_layout<_BlockDim::size()>>
 using block_tensor = tensor<static_tensor<_ValueType, _BlockDim>, _BlockDim::size(), _Layout>;
 
 namespace internal {
@@ -583,15 +699,12 @@ public:
 
 /**
 * @brief a tensor without memory defined by the shape and lambda(functor)
-*
-* TODO:
-*
 * @tparam _Rank the rank of tensor
 * @tparam _Func the functor type of tensor, should be Index -> Value pattern
 * @see tensor
 */
-template <int_t _Rank, typename _Func>
-class lambda_tensor : public tensor_expression<lambda_tensor<_Rank, _Func>> {
+template <int_t _Rank, typename _Func, typename _Layout = first_major_layout<_Rank>>
+class lambda_tensor : public tensor_expression<lambda_tensor<_Rank, _Func, _Layout>> {
 	typedef function_traits<_Func>						functor_traits;
 public:
 	static const int_t										rank = _Rank;
@@ -605,20 +718,20 @@ public:
 	* when the functor is int_t -> value pattern, the access mode is linear access.
 	* when the functor is pointi<rank> -> value pattern, the access mode is array access.
 	*/
-	typedef typename internal::get_functor_accessor_type<_Rank, _Func>::type
-															access_type;
+	typedef typename internal::get_functor_accessor_type<_Rank, _Func>::type	access_type;
 
+	typedef _Layout											layout_type;
 	typedef host_t											memory_type;
 
 public:
 	/**
 	* @brief constructs a lambdd_tensor by the shape and fun
-	* @param extent the shape of tensor
+	* @param ext the shape of tensor
 	* @param fun the functor of lambdd_tensor, should be Index -> Value pattern
 	*/
-	lambda_tensor(const pointi<rank> &extent, _Func fun) :
-		extent_(extent),
-		stride_(matazure::cumulative_prod(extent)),
+	lambda_tensor(const pointi<rank> &ext, _Func fun) :
+		extent_(ext),
+		layout_(ext),
 		fun_(fun)
 	{}
 
@@ -663,14 +776,9 @@ public:
 		return extent_;
 	}
 
-	/// @return the stride of lambda_tensor
-	pointi<rank> stride() const {
-		return stride_;
-	}
-
 	/// return the total size of lambda_tensor elements
 	int_t size() const {
-		 return stride_[rank - 1];
+		 return layout_.stride()[rank - 1];
 	}
 
 	/**
@@ -699,12 +807,12 @@ private:
 
 	template <typename _Mode>
 	enable_if_t<is_same<_Mode, linear_access_t>::value, reference> index_imp(pointi<rank> idx) const {
-		return (*this)[index2offset(idx, stride(), first_major_t{})];
+		return (*this)[layout_.index2offset(idx)];
 	}
 
 	template <typename _Mode>
 	enable_if_t<is_same<_Mode, array_index>::value, reference> offset_imp(int_t i) const {
-		return (*this)(offset2index(i, stride(), first_major_t{}));
+		return (*this)[layout_.offset2index(i)];
 	}
 
 	template <typename _Mode>
@@ -714,7 +822,7 @@ private:
 
 private:
 	const pointi<rank> extent_;
-	const pointi<rank> stride_;
+	const layout_type layout_;
 	const _Func fun_;
 };
 

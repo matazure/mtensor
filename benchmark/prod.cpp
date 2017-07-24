@@ -33,13 +33,14 @@ void bm_prod_simple_gold(benchmark::State &state){
 				p_re[m + n * M] = re;
 			}
 		}
-
-		//benchmark::ClobberMemory();
+	#ifdef __linux__
+		benchmark::ClobberMemory();
+	#endif
 	}
 
 	state.SetItemsProcessed(state.iterations() * M * K * N);
 }
-BENCHMARK(bm_prod_simple_gold)->Args({2048, 2048, 2048})->UseRealTime();
+BENCHMARK(bm_prod_simple_gold)->Args({2048, 16, 2048})->UseRealTime();
 
 void bm_eigen_prod(benchmark::State &state){
 	Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> mat_lhs(state.range(0), state.range(1));
@@ -50,17 +51,17 @@ void bm_eigen_prod(benchmark::State &state){
 
 	while (state.KeepRunning()){
 		mat_output = mat_lhs * mat_rhs;
-		//auto tmp = mat_lhs.lazyProduct(mat_rhs);
-		//mat_output = tmp;
-		//benchmark::ClobberMemory();
+	#ifdef __linux__
+		benchmark::ClobberMemory();
+	#endif
 	}
 
 	state.SetItemsProcessed(state.iterations() * mat_lhs.rows() * mat_lhs.cols() * mat_rhs.cols());
 }
-BENCHMARK(bm_eigen_prod)->Args({2048, 2048, 2048 })->UseRealTime();
+BENCHMARK(bm_eigen_prod)->Args({2048, 16, 2048 })->UseRealTime();
 
 void bm_prod(benchmark::State &state){
-	matrix<float, last_major_t> ts_lhs(pointi<2>{state.range(0), state.range(1)});
+	matrix<float, last_major_layout<2>> ts_lhs(pointi<2>{state.range(0), state.range(1)});
 	matrix<float> ts_rhs(pointi<2>{state.range(1), state.range(2)});
 	matrix<float> ts_output(pointi<2>{ts_lhs.shape()[0], ts_rhs.shape()[1]});
 	fill(ts_lhs, 1.1f);
@@ -69,9 +70,11 @@ void bm_prod(benchmark::State &state){
 	while (state.KeepRunning()){
 		auto lts_re = numeric::prod_general(ts_lhs, ts_rhs);
 		copy(lts_re, ts_output);
-		//benchmark::ClobberMemory();
+	#ifdef __linux__
+		benchmark::ClobberMemory();
+	#endif
 	}
 
 	state.SetItemsProcessed(state.iterations() * ts_lhs.shape()[0] * ts_lhs.shape()[1] * ts_rhs.shape()[1]);
 }
-BENCHMARK(bm_prod)->Args({2048, 2048, 2048})->UseRealTime();
+BENCHMARK(bm_prod)->Args({2048, 16, 2048})->UseRealTime();
