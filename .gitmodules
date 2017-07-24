@@ -7,3 +7,6 @@
 [submodule "vendor/android-cmake"]
 	path = vendor/android-cmake
 	url = git@github.com:Matazure/android-cmake.git
+[submodule "benchmark/vendor/eigen"]
+	path = benchmark/vendor/eigen
+	url = git@github.com:Matazure/eigen.git
