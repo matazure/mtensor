@@ -1,6 +1,3 @@
-[submodule "third_party/android-cmake"]
-	path = third_party/android-cmake
-	url = git@github.com:taka-no-me/android-cmake.git
 [submodule "benchmark/vendor/benchmark"]
 	path = benchmark/vendor/benchmark
 	url = git@github.com:Matazure/benchmark.git
