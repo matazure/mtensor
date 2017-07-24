@@ -4,3 +4,6 @@
 [submodule "test/vendor/googletest"]
 	path = test/vendor/googletest
 	url = git@github.com:Matazure/googletest.git
+[submodule "vendor/android-cmake"]
+	path = vendor/android-cmake
+	url = git@github.com:Matazure/android-cmake.git
