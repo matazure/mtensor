@@ -656,7 +656,7 @@ private:
 	}
 	#endif
 
-private:
+public:
 	const pointi<rank>	extent_;
 	const layout_type		layout_;
 	const shared_ptr<value_type>	sp_data_;

@@ -431,7 +431,6 @@ void bm_conv_outside_check(benchmark::State &state){
 			// sum += ts_input[pointi<2>{0, j} + pointi<2>{0, 2} -kenel_radius] * kenel[pointi<2>{0, 2}];
 			sum += ts_input[pointi<2>{0, j} + pointi<2>{1, 2} -kenel_radius] * kenel[pointi<2>{1, 2}];
 			sum += ts_input[pointi<2>{0, j} + pointi<2>{2, 2} -kenel_radius] * kenel[pointi<2>{2, 2}];
-			ts_output[pointi<2>{0, j}] = sum;
 		}
 
 		//right
@@ -682,20 +681,20 @@ void bm_conv_linear(benchmark::State &state){
 }
 BENCHMARK(bm_conv_linear)->Arg(7)->Arg(14)->Arg(28)->Arg(56)->Arg(112)->Arg(224)->UseRealTime();
 
-void bm_conv_sse2(benchmark::State &state){
+void bm_conv_sse2_expand(benchmark::State &state){
 	pointi<2> ext;
 	fill(ext, state.range(0));
 	tensor<__m128, 2> ts_input(ext);
 	tensor<__m128, 2> ts_output(ts_input.shape());
 	static_tensor<__m128, dim<3,3>> kenel;
 	for_each(ts_input, [](__m128 &e){
-		e = _mm_setzero_ps();
+		e = _mm_set_ps(1.1f, 1.2f, 1.2f, 1.3f);
 	});
 	for_each(ts_output, [](__m128 &e){
-		e = _mm_setzero_ps();
+		e = _mm_set_ps(1.1f, 1.2f, 1.2f, 1.3f);
 	});
 	for_each(kenel, [](__m128 &e){
-		e = _mm_set_ps(1.0f, 1.0f, 1.0f, 1.0f);
+		e = _mm_set_ps(1.1f, 1.2f, 1.2f, 1.3f);
 	});
 
 	while (state.KeepRunning()){
@@ -720,6 +719,10 @@ void bm_conv_sse2(benchmark::State &state){
 				ts_output[pointi<2>{i, j}] = sum;
 			}
 		}
+
+	#ifdef __linux__
+		benchmark::ClobberMemory();
+	#endif
 	}
 
 	auto valid_shape = ts_output.shape() - 1;
@@ -727,7 +730,66 @@ void bm_conv_sse2(benchmark::State &state){
 	state.SetBytesProcessed(state.iterations() * valid_size * sizeof(__m128));
 	state.SetItemsProcessed(state.iterations() * valid_size * kenel.size() * sizeof(__m128) / sizeof(float));
 }
-BENCHMARK(bm_conv_sse2)->RangeMultiplier(2)->Range(16, 128)->UseRealTime();
+BENCHMARK(bm_conv_sse2_expand)->RangeMultiplier(2)->Range(16, 128)->UseRealTime();
+
+void bm_conv_sse2_expand_inside_check(benchmark::State &state){
+	pointi<2> ext;
+	fill(ext, state.range(0));
+	tensor<__m128, 2> ts_input(ext);
+	tensor<__m128, 2> ts_output(ts_input.shape());
+	static_tensor<__m128, dim<3,3>> kenel;
+	for_each(ts_input, [](__m128 &e){
+		e = _mm_set_ps(1.1f, 1.2f, 1.2f, 1.3f);
+	});
+	for_each(ts_output, [](__m128 &e){
+		e = _mm_set_ps(1.1f, 1.2f, 1.2f, 1.3f);
+	});
+	for_each(kenel, [](__m128 &e){
+		e = _mm_set_ps(1.1f, 1.2f, 1.2f, 1.3f);
+	});
+
+	auto width = ts_input.shape()[0];
+	auto height = ts_input.shape()[1];
+	const auto shape = ts_input.shape();
+
+	while (state.KeepRunning()){
+		auto kenel_radius = kenel.shape() / 2;
+	#ifdef __LOCAL_USE_OMP
+		#pragma omp parallel for collapse(2)
+	#endif
+		for(int_t j = 0; j < ts_input.shape()[1] ; ++j) {
+			for (int_t i = 0; i < ts_input.shape()[0] ; ++i) {
+
+				__m128 sum = _mm_setzero_ps();
+
+				// if (i > 1 && j > 1 && i < width - 1 && i < height - 1){
+				if (MATAZURE_LIKELY(inside(pointi<2>{i, j}, pointi<2>{1,1}, ts_input.shape()))){
+					sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{0, 0} -kenel_radius], kenel[pointi<2>{0, 0}]));
+					sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{1, 0} -kenel_radius], kenel[pointi<2>{1, 0}]));
+					sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{2, 0} -kenel_radius], kenel[pointi<2>{2, 0}]));
+					sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{0, 1} -kenel_radius], kenel[pointi<2>{0, 1}]));
+					sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{1, 1} -kenel_radius], kenel[pointi<2>{1, 1}]));
+					sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{2, 1} -kenel_radius], kenel[pointi<2>{2, 1}]));
+					sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{0, 2} -kenel_radius], kenel[pointi<2>{0, 2}]));
+					sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{1, 2} -kenel_radius], kenel[pointi<2>{1, 2}]));
+					sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{2, 2} -kenel_radius], kenel[pointi<2>{2, 2}]));
+				}
+
+				ts_output[pointi<2>{i, j}] = sum;
+			}
+		}
+
+	#ifdef __linux__
+		benchmark::ClobberMemory();
+	#endif
+	}
+
+	auto valid_shape = ts_output.shape() - 1;
+	auto valid_size = reduce(valid_shape, 1, [](int_t x, int_t y){ return x * y; });
+	state.SetBytesProcessed(state.iterations() * valid_size * sizeof(__m128));
+	state.SetItemsProcessed(state.iterations() * valid_size * kenel.size() * sizeof(__m128) / sizeof(float));
+}
+BENCHMARK(bm_conv_sse2_expand_inside_check)->RangeMultiplier(2)->Range(16, 128)->UseRealTime();
 
 // void bm_conv_sperate_sse2(benchmark::State &state){
 // 	pointi<2> ext;

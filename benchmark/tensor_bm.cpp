@@ -10,7 +10,9 @@ void BM_tensor_construct_and_destruct(benchmark::State& state) {
 	while (state.KeepRunning()) {
 		tensor<_ValueType,1> ts(state.range(0));
 		size = ts.size();
-		//benchmark::ClobberMemory();
+	#ifdef __linux__
+		benchmark::ClobberMemory();
+	#endif
 	}
 
 	first_major_layout<3> tmfdas(pointi<3>{1,2,3});

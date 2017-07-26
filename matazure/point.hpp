@@ -259,6 +259,42 @@ inline MATAZURE_GENERAL bool inside(point<_ValueType, _Rank> idx, point<_ValueTy
 	return true;
 }
 
+inline MATAZURE_GENERAL bool inside(pointi<1> idx, pointi<1> origin, pointi<1> extent) {
+	if ((idx[0] >= origin[0] && idx[0] < extent[0])){
+		return true;
+	} else {
+		return false;
+	}
+}
+
+inline MATAZURE_GENERAL bool inside(pointi<2> idx, pointi<2> origin, pointi<2> extent) {
+	if (idx[0] >= origin[0] && idx[0] < extent[0] &&
+		idx[1] >= origin[1] && idx[1] < extent[1])
+		return true;
+	else
+		return false;
+}
+
+inline MATAZURE_GENERAL bool inside(pointi<3> idx, pointi<3> origin, pointi<3> extent) {
+	if (idx[0] >= origin[0] && idx[0] < extent[0] &&
+		idx[1] >= origin[1] && idx[1] < extent[1] &&
+		idx[2] >= origin[2] && idx[2] < extent[2])
+		return true;
+	else
+		return false;
+}
+
+inline MATAZURE_GENERAL bool inside(pointi<4> idx, pointi<4> origin, pointi<4> extent) {
+	if (idx[0] >= origin[0] && idx[0] < extent[0] &&
+		idx[1] >= origin[1] && idx[1] < extent[1] &&
+		idx[2] >= origin[2] && idx[2] < extent[2] &&
+		idx[3] >= origin[3] && idx[3] < extent[3]){
+		return true;
+	} else{
+		return false;
+	}
+}
+
 /**
 * @brief detect whether a point is outside of a rect (left close, right open)
 * @param idx point position
@@ -274,6 +310,42 @@ inline MATAZURE_GENERAL bool outside(point<_ValueType, _Rank> idx, point<_ValueT
 	}
 
 	return false;
+}
+
+inline MATAZURE_GENERAL bool outside(pointi<1> idx, pointi<1> origin, pointi<1> extent) {
+	if ((idx[0] >= origin[0] && idx[0] < extent[0])){
+		return true;
+	} else {
+		return false;
+	}
+}
+
+inline MATAZURE_GENERAL bool outside(pointi<2> idx, pointi<2> origin, pointi<2> extent) {
+	if (idx[0] >= origin[0] && idx[0] < extent[0] &&
+		idx[1] >= origin[1] && idx[1] < extent[1])
+		return true;
+	else
+		return false;
+}
+
+inline MATAZURE_GENERAL bool outside(pointi<3> idx, pointi<3> origin, pointi<3> extent) {
+	if (idx[0] >= origin[0] && idx[0] < extent[0] &&
+		idx[1] >= origin[1] && idx[1] < extent[1] &&
+		idx[2] >= origin[2] && idx[2] < extent[2])
+		return true;
+	else
+		return false;
+}
+
+inline MATAZURE_GENERAL bool outside(pointi<4> idx, pointi<4> origin, pointi<4> extent) {
+	if (idx[0] >= origin[0] && idx[0] < extent[0] &&
+		idx[1] >= origin[1] && idx[1] < extent[1] &&
+		idx[2] >= origin[2] && idx[2] < extent[2] &&
+		idx[3] >= origin[3] && idx[3] < extent[3]){
+		return true;
+	} else{
+		return false;
+	}
 }
 
 /**
