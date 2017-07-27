@@ -50,6 +50,7 @@ BENCHMARK(bm_prod_simple_gold)
 	->Args({ 1, 9, 112 * 112 })
 	->Args({ 64, 32, 112 * 112 })
 	->Args({ 1024, 1024, 7 * 7})
+	->Args({ 1000, 1024, 1})
 	->UseRealTime();
 
 void bm_prod_block_gold(benchmark::State &state) {
@@ -114,6 +115,7 @@ BENCHMARK(bm_prod)
 	->Args({ 1, 9, 112 * 112 })
 	->Args({ 64, 32, 112 * 112 })
 	->Args({ 1024, 1024, 7 * 7})
+	->Args({ 1000, 1024, 1})
 	->UseRealTime();
 
 void bm_eigen_prod(benchmark::State &state){
@@ -136,6 +138,7 @@ BENCHMARK(bm_eigen_prod)
 	->Args({ 1024, 1024, 1024 })
 	->Args({ 1, 9, 112 * 112 })
 	->Args({ 64, 32, 112 * 112 })
+	->Args({ 1000, 1024, 1})
 	->Args({ 1024, 1024, 7 * 7})
 	->UseRealTime();
 

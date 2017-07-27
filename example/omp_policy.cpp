@@ -1,4 +1,6 @@
-﻿#include <matazure/tensor>
+#include <matazure/tensor>
+
+#ifdef MATAZRE_OPENMP
 
 using namespace matazure;
 
@@ -18,3 +20,5 @@ int main(){
 	printf("\n");
 	return 0;
 }
+
+#endif

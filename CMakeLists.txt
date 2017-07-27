@@ -14,6 +14,17 @@ message("current compiler is ${CMAKE_CXX_COMPILER}")
 include_directories(.)
 set_property( GLOBAL PROPERTY USE_FOLDERS ON)
 
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  # using Clang
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  # using GCC
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -xSSE3_ATOM -static-intel")
+  # using Intel C++
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  # using Visual Studio C++
+endif()
+
 set(BUILD_SHARED_LIBS OFF)
 if (MSVC)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
@@ -35,7 +46,7 @@ endif()
 if (UNIX)
 	add_definitions("-x c++")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s -O3 -Wall -funroll-loops -mfpmath=sse -ffast-math  ")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s -O3 -Wall -funroll-loops -ffast-math  ")
 
 	if (ANDROID)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=atom -mtune=atom")
@@ -58,6 +69,9 @@ if (WITH_CUDA)
 else()
 	set(CMAKE_CXX_STANDARD 11)
 endif()
+
+message("CXX Compiler: ${CMAKE_CXX_COMPILER}")
+message("CC Compiler: ${CMAKE_C_COMPILER}")
 
 if (BUILD_EXAMPLE)
 	add_subdirectory(example)
