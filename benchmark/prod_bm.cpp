@@ -51,6 +51,41 @@ BENCHMARK(bm_prod_simple_gold)
 	->Args({ 1000, 1024, 1})
 	->UseRealTime();
 
+	void bm_prod_simple_break_gold(benchmark::State &state){
+		auto M = state.range(0);
+		auto K = state.range(1);
+		auto N = state.range(2);
+		auto p_lhs = new float[K * M];
+		auto p_rhs = new float[K * N];
+		auto p_re = new float[M * N];
+
+		while (state.KeepRunning()){
+			for (int_t n = 0; n < N; ++n){
+				for (int_t m = 0; m < M; ++m){
+					float re = 0.0f;
+					for (int_t k = 0; k < K; ++k){
+						re += p_lhs[k + m * K] * p_rhs[k * N + n];
+					}
+
+					p_re[m + n * M] = re;
+				}
+			}
+		#ifdef __linux__
+			benchmark::ClobberMemory();
+		#endif
+		}
+
+		state.SetItemsProcessed(state.iterations() * M * K * N);
+	}
+	BENCHMARK(bm_prod_simple_break_gold)
+		->Args({ 1024, 1024, 1024 })
+		->Args({ 3, 9, 112 * 112})
+		->Args({ 1, 9, 112 * 112 })
+		->Args({ 64, 32, 112 * 112 })
+		->Args({ 1024, 1024, 7 * 7})
+		->Args({ 1000, 1024, 1})
+		->UseRealTime();
+
 void bm_prod_block_gold(benchmark::State &state) {
 	auto M = state.range(0);
 	auto K = state.range(1);
@@ -196,6 +231,22 @@ void bm_prod_block_static_gold(benchmark::State &state) {
 	state.SetItemsProcessed(state.iterations() * M * K * N);
 }
 BENCHMARK(bm_prod_block_static_gold)->Args({ 1024, 1024, 1024 })->UseRealTime();
+
+// void bm_prod_4x4_sse(benchmark::State &state) {
+// 	__m128 rhs[4];
+// 	__m128 lhs[4];
+// 	__m128 re[4];
+//
+// 	while (state.KeepRunning()) {
+// 		re = _mm_mul_ps(rhs)
+// #ifdef __linux__
+// 		benchmark::ClobberMemory();
+// #endif
+// 	}
+//
+// 	state.SetItemsProcessed(state.iterations() * M * K * N);
+// }
+// BENCHMARK(bm_prod_4x4_sse)->UseRealTime();
 
 //void bm_prod_packed_sse_gold(benchmark::State &state) {
 //	auto M = state.range(0);

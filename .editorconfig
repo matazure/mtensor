@@ -6,7 +6,7 @@ insert_final_newline = true
 
 # Matches multiple files with brace expansion notation
 # Set default charset
-[*.{cpp,hpp,h,cu}]
+[*.{c, cpp,hpp,h,cu}]
 end_of_line = lf
 charset = utf-8
 indent_style = tab

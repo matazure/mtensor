@@ -892,18 +892,18 @@ void bm_conv_sse2_4_caffe2(benchmark::State &state){
 
 	while (state.KeepRunning()){
 		for (int_t i = 0; i < ts_input.size(); ++i){
-			// ts_input[i] = _mm_set_ps(ts_input0[i], ts_input1[i], ts_input2[i], ts_input3[i]);
-			ts_input[i][0] = ts_input0[i];
-			ts_input[i][1] = ts_input1[i];
-			ts_input[i][2] = ts_input2[i];
-			ts_input[i][3] = ts_input3[i];
+			ts_input[i] = _mm_set_ps(ts_input0[i], ts_input1[i], ts_input2[i], ts_input3[i]);
+			// ts_input[i][0] = ts_input0[i];
+			// ts_input[i][1] = ts_input1[i];
+			// ts_input[i][2] = ts_input2[i];
+			// ts_input[i][3] = ts_input3[i];
 		}
 		for (int_t i = 0; i < kenel.size(); ++i){
-			// kenel[i][] = _mm_set_ps(kenel0[i], kenel1[i], kenel2[i], kenel3[i]);
-			kenel[i][0] = kenel0[i];
-			kenel[i][1] = kenel1[i];
-			kenel[i][2] = kenel2[i];
-			kenel[i][3] = kenel3[i];
+			kenel[i] = _mm_set_ps(kenel0[i], kenel1[i], kenel2[i], kenel3[i]);
+			// kenel[i][0] = kenel0[i];
+			// kenel[i][1] = kenel1[i];
+			// kenel[i][2] = kenel2[i];
+			// kenel[i][3] = kenel3[i];
 		}
 
 		auto kenel_radius = kenel.shape() / 2;

@@ -19,6 +19,8 @@ struct local {};
 struct pinned {};
 struct unpinned {};
 
+struct aligned{};
+
 /// define a generical compile time zero
 template <typename _T>
 struct zero;

@@ -645,7 +645,19 @@ private:
 			delete[] ptr;
 		});
 	}
-
+    // for (int i = 0; i < X.dim32(1); ++i){
+    //   const float * p_input = X.template data<float>() + X.dim32(3) * X.dim32(2) * i;
+    //   float * p_output = Y->template mutable_data<float>() + Y->dim32(3) * Y->dim32(2) * i;
+    //   const float * p_filter = filter.template data<float>();
+    //   auto sp_input = std::shared_ptr<const float>(p_input, [](const float *p){});
+    //   matazure::tensor<const float, 2> ts_input(pointi<2>{X.dim32(3), X.dim32(2)}, sp_input);
+    //   auto sp_output = std::shared_ptr<float>(p_output, [](const float *p){ });
+    //   matazure::tensor<float, 2> ts_output(pointi<2>{Y->dim32(3), Y->dim32(2)}, sp_output);
+    //   auto sp_filter = std::shared_ptr<const float>(p_filter, [](const float *p){});
+    //   static_tensor<float, dim<3,3>> ts_kenel;
+    //   fill(ts_kenel, 1.0f);
+    //   expr::conv_kenel3x3(ts_input, ts_kenel, ts_output);
+    // }
 	#ifdef MATAZURE_CUDA
 	shared_ptr<value_type> malloc_shared_memory(int_t size, pinned) {
 		decay_t<value_type> *data = nullptr;
@@ -677,6 +689,22 @@ using vector = tensor<_ValueType, 1, _Layout>;
 /// alias of tensor<static_tensor<_ValueType, _BlockDim>, _BlockDim::size(), _Layout>
 template <typename _ValueType, typename _BlockDim, typename _Layout = first_major_layout<_BlockDim::size()>>
 using block_tensor = tensor<static_tensor<_ValueType, _BlockDim>, _BlockDim::size(), _Layout>;
+
+template <typename _Type, int_t _Rank, typename _Layout = first_major_layout<_Rank>>
+auto make_tensor(pointi<_Rank> ext, _Type *p_data)->tensor<_Type, _Rank, _Layout>{
+	std::shared_ptr<_Type> sp_data(p_data, [](_Type *p){});
+	return tensor<_Type, _Rank, _Layout>(ext, sp_data);
+}
+
+template <typename _Type, int_t _Rank, typename _Layout = first_major_layout<_Rank>>
+auto make_tensor(pointi<_Rank> ext, aligned)->tensor<_Type, _Rank, _Layout>{
+	_Layout layout(ext);
+	auto ele_size = layout.stride()[_Rank - 1];
+	///TODO:
+	auto p_aligned = memalign(16, ele_size * sizeof(_Type));
+	std::shared_ptr<_Type> sp_data((_Type *)p_aligned, [](_Type *p){ free(p); });
+	return tensor<_Type, _Rank, _Layout>(ext, sp_data);
+}
 
 namespace internal {
 
