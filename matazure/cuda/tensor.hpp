@@ -20,9 +20,9 @@ public:
 	typedef _Type							value_type;
 	typedef value_type &					reference;
 	typedef value_type *					pointer;
-	typedef linear_access_t					index_type;
+	typedef linear_index					index_type;
 	typedef _Layout							layout_type;
-	typedef device_t						memory_type;
+	typedef device						memory_type;
 
 	tensor() :
 		tensor(pointi<rank>::zeros())
@@ -128,7 +128,7 @@ public:
 	typedef _Reference									reference;
 	typedef remove_reference_t<reference>				value_type;
 	typedef _AccessMode									index_type;
-	typedef device_t									memory_type;
+	typedef device									memory_type;
 	typedef _Layout										layout_type;
 
 public:
@@ -182,7 +182,7 @@ private:
 	}
 
 	template <typename _Mode>
-	MATAZURE_DEVICE enable_if_t<is_same<_Mode, linear_access_t>::value, reference>
+	MATAZURE_DEVICE enable_if_t<is_same<_Mode, linear_index>::value, reference>
 		index_imp(pointi<rank> index) const {
 		return (*this)[layout_.index2offset(index)];
 	}
@@ -194,7 +194,7 @@ private:
 	}
 
 	template <typename _Mode>
-	MATAZURE_DEVICE enable_if_t<is_same<_Mode, linear_access_t>::value, reference>
+	MATAZURE_DEVICE enable_if_t<is_same<_Mode, linear_index>::value, reference>
 		offset_imp(int_t i) const {
 		return fun_(i);
 	}
@@ -213,7 +213,7 @@ public:
 	typedef typename functor_traits::result_type			reference;
 	typedef remove_reference_t<reference>					value_type;
 	typedef typename matazure::internal::get_functor_accessor_type<_Rank, _Func>::type		index_type;
-	typedef device_t										memory_type;
+	typedef device										memory_type;
 	typedef _Layout											layout_type;
 
 public:
@@ -259,7 +259,7 @@ public:
 	}
 
 	template <typename _Mode>
-	MATAZURE_GENERAL enable_if_t<is_same<_Mode, linear_access_t>::value, reference> index_imp(pointi<rank> index) const {
+	MATAZURE_GENERAL enable_if_t<is_same<_Mode, linear_index>::value, reference> index_imp(pointi<rank> index) const {
 		return (*this)[layout_.index2offset(index)];
 	}
 
@@ -269,7 +269,7 @@ public:
 	}
 
 	template <typename _Mode>
-	MATAZURE_GENERAL enable_if_t<is_same<_Mode, linear_access_t>::value, reference> offset_imp(int_t i) const {
+	MATAZURE_GENERAL enable_if_t<is_same<_Mode, linear_index>::value, reference> offset_imp(int_t i) const {
 		return fun_(i);
 	}
 
@@ -307,7 +307,7 @@ inline void MATAZURE_DEVICE barrier() {
 } //device
 
 template <typename _Type, int_t _Rank, typename _Layout>
-inline tensor<_Type, _Rank, _Layout> mem_clone(tensor<_Type, _Rank, _Layout> ts, device_t) {
+inline tensor<_Type, _Rank, _Layout> mem_clone(tensor<_Type, _Rank, _Layout> ts, device) {
 	tensor<_Type, _Rank, _Layout> ts_re(ts.shape());
 	mem_copy(ts, ts_re);
 	return ts_re;
@@ -315,18 +315,18 @@ inline tensor<_Type, _Rank, _Layout> mem_clone(tensor<_Type, _Rank, _Layout> ts,
 
 template <typename _Type, int_t _Rank, typename _Layout>
 inline tensor<_Type, _Rank, _Layout> mem_clone(tensor<_Type, _Rank, _Layout> ts) {
-	return mem_clone(ts, device_t{});
+	return mem_clone(ts, device{});
 }
 
 template <typename _Type, int_t _Rank, typename _Layout>
-inline tensor<_Type, _Rank, _Layout> mem_clone(matazure::tensor<_Type, _Rank, _Layout> ts, device_t) {
+inline tensor<_Type, _Rank, _Layout> mem_clone(matazure::tensor<_Type, _Rank, _Layout> ts, device) {
 	tensor<_Type, _Rank, _Layout> ts_re(ts.shape());
 	mem_copy(ts, ts_re);
 	return ts_re;
 }
 
 template <typename _Type, int_t _Rank, typename _Layout>
-inline matazure::tensor<_Type, _Rank, _Layout> mem_clone(tensor<_Type, _Rank, _Layout> ts, host_t) {
+inline matazure::tensor<_Type, _Rank, _Layout> mem_clone(tensor<_Type, _Rank, _Layout> ts, host) {
 	matazure::tensor<_Type, _Rank, _Layout> ts_re(ts.shape());
 	mem_copy(ts, ts_re);
 	return ts_re;

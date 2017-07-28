@@ -4,20 +4,20 @@
 
 namespace matazure {
 
-struct first_major_t {};
-struct last_major_t {};
-typedef first_major_t col_major_t;
-typedef last_major_t row_major_t;
+struct first_major {};
+struct last_major {};
+typedef first_major col_major_t;
+typedef last_major row_major_t;
 
-struct linear_access_t {};
+struct linear_index {};
 struct array_index {};
 
-struct host_t {};
-struct device_t {};
-struct local_t {};
+struct host {};
+struct device {};
+struct local {};
 
-struct pinned_t {};
-struct unpinned_t {};
+struct pinned {};
+struct unpinned {};
 
 /// define a generical compile time zero
 template <typename _T>
@@ -76,9 +76,9 @@ struct name<_Tensor, _OtherTensors...> : bool_constant<						\
 	is_same<typename _Tensor::tag_name, tag>::value							\
 	&& name<_OtherTensors...>::value> {};
 
-MATAZURE_DEFINE_ARE_TAG(are_host_memory, memory_type, host_t)
-MATAZURE_DEFINE_ARE_TAG(are_device_memory, memory_type, device_t)
-MATAZURE_DEFINE_ARE_TAG(are_linear_access, index_type, linear_access_t)
+MATAZURE_DEFINE_ARE_TAG(are_host_memory, memory_type, host)
+MATAZURE_DEFINE_ARE_TAG(are_device_memory, memory_type, device)
+MATAZURE_DEFINE_ARE_TAG(are_linear_access, index_type, linear_index)
 MATAZURE_DEFINE_ARE_TAG(are_array_access, index_type, array_index)
 
 //none tag
@@ -94,9 +94,9 @@ struct name<_Tensor, _OtherTensors...> : bool_constant<		\
 	!is_same<typename _Tensor::tag_name, tag>::value		\
 	&& name<_OtherTensors...>::value> {};
 
-MATAZURE_DEFINE_NONE_TAG(none_host_memory, memory_type, host_t)
-MATAZURE_DEFINE_NONE_TAG(none_device_memory, memory_type, device_t)
-MATAZURE_DEFINE_NONE_TAG(none_linear_access, index_type, linear_access_t)
+MATAZURE_DEFINE_NONE_TAG(none_host_memory, memory_type, host)
+MATAZURE_DEFINE_NONE_TAG(none_device_memory, memory_type, device)
+MATAZURE_DEFINE_NONE_TAG(none_linear_access, index_type, linear_index)
 MATAZURE_DEFINE_NONE_TAG(none_array_access, index_type, array_index)
 
 }

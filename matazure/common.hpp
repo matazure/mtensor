@@ -27,7 +27,7 @@ inline auto make_lambda(pointi<_Rank> extent, _Func fun)->lambda_tensor<_Rank, _
 * @param the functor, a index -> value pattern
 */
 template <int_t _Rank, typename _Func>
-inline auto make_lambda(pointi<_Rank> extent, _Func fun, host_t)->lambda_tensor<_Rank, _Func>{
+inline auto make_lambda(pointi<_Rank> extent, _Func fun, host)->lambda_tensor<_Rank, _Func>{
 	return lambda_tensor<_Rank, _Func>(extent, fun);
 }
 
@@ -64,7 +64,7 @@ inline auto make_lambda(pointi<_Rank> ext, _Func fun, enable_if_t<!MATAZURE_IS_D
 }
 
 template <int_t _Rank, typename _Func>
-inline auto make_lambda(pointi<_Rank> ext, _Func fun, host_t, enable_if_t<!MATAZURE_IS_D_LAMBDA(_Func) && !MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)->decltype(make_host_lambda(ext, fun)) {
+inline auto make_lambda(pointi<_Rank> ext, _Func fun, host, enable_if_t<!MATAZURE_IS_D_LAMBDA(_Func) && !MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)->decltype(make_host_lambda(ext, fun)) {
 	return make_host_lambda(ext, fun);
 }
 
@@ -72,7 +72,7 @@ inline auto make_lambda(pointi<_Rank> ext, _Func fun, host_t, enable_if_t<!MATAZ
 * @todo: not support device struct operator, it's diffcult to do this.
 */
 template <int_t _Rank, typename _Func>
-inline auto make_lambda(pointi<_Rank> ext, _Func fun, device_t, enable_if_t<!MATAZURE_IS_D_LAMBDA(_Func) && !MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)->decltype(cuda::make_general_lambda(ext, fun)) {
+inline auto make_lambda(pointi<_Rank> ext, _Func fun, device, enable_if_t<!MATAZURE_IS_D_LAMBDA(_Func) && !MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)->decltype(cuda::make_general_lambda(ext, fun)) {
 	return cuda::make_general_lambda(ext, fun);
 }
 
@@ -82,12 +82,12 @@ inline auto make_lambda(pointi<_Rank> ext, _Func fun, enable_if_t<MATAZURE_IS_HD
 }
 
 template <int_t _Rank, typename _Func>
-inline auto make_lambda(pointi<_Rank> ext, _Func fun, device_t, enable_if_t<MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)->decltype(cuda::make_general_lambda(ext, fun)) {
+inline auto make_lambda(pointi<_Rank> ext, _Func fun, device, enable_if_t<MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)->decltype(cuda::make_general_lambda(ext, fun)) {
 	return cuda::make_general_lambda(ext, fun);
 }
 
 template <int_t _Rank, typename _Func>
-inline auto make_lambda(pointi<_Rank> ext, _Func fun, host_t, enable_if_t<MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)->decltype(make_host_lambda(ext, fun)) {
+inline auto make_lambda(pointi<_Rank> ext, _Func fun, host, enable_if_t<MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)->decltype(make_host_lambda(ext, fun)) {
 	return make_host_lambda(ext, fun);
 }
 
@@ -97,7 +97,7 @@ inline auto make_lambda(pointi<_Rank> ext, _Func fun, enable_if_t<MATAZURE_IS_D_
 }
 
 template <typename _ValueType, typename _Access, int_t _Rank, typename _Func>
-inline auto make_lambda(pointi<_Rank> ext, _Func fun, device_t, enable_if_t<MATAZURE_IS_D_LAMBDA(_Func)>* = nullptr)->decltype(cuda::make_device_lambda<_ValueType, _Access>(ext, fun)) {
+inline auto make_lambda(pointi<_Rank> ext, _Func fun, device, enable_if_t<MATAZURE_IS_D_LAMBDA(_Func)>* = nullptr)->decltype(cuda::make_device_lambda<_ValueType, _Access>(ext, fun)) {
 	return cuda::make_device_lambda<_ValueType, _Access>(ext, fun);
 }
 
@@ -405,7 +405,7 @@ public:
 * @param fun the functor, element -> value  pattern
 */
 template <typename _Tensor, typename _Func>
-inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<linear_access_t, typename _Tensor::index_type>::value>* = 0)->decltype(make_lambda(ts.shape(), internal::linear_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{}))
+inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<linear_index, typename _Tensor::index_type>::value>* = 0)->decltype(make_lambda(ts.shape(), internal::linear_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{}))
 {
 	return make_lambda(ts.shape(), internal::linear_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{});
 }
@@ -424,7 +424,7 @@ inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<array_index, typena
 #else
 
 template <typename _Tensor, typename _Func>
-inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<linear_access_t, typename _Tensor::index_type>::value>* = 0, enable_if_t<!MATAZURE_IS_D_LAMBDA(_Func)>* = nullptr)->decltype(make_lambda(ts.shape(), internal::linear_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{}))
+inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<linear_index, typename _Tensor::index_type>::value>* = 0, enable_if_t<!MATAZURE_IS_D_LAMBDA(_Func)>* = nullptr)->decltype(make_lambda(ts.shape(), internal::linear_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{}))
 {
 	return make_lambda(ts.shape(), internal::linear_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{});
 }
@@ -436,7 +436,7 @@ inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<array_index, typena
 }
 
 template <typename _Tensor, typename _Func>
-inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<linear_access_t, typename _Tensor::index_type>::value>* = 0, enable_if_t<MATAZURE_IS_D_LAMBDA(_Func)>* = nullptr)->decltype(make_lambda(ts.shape(), internal::device_linear_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{}))
+inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<linear_index, typename _Tensor::index_type>::value>* = 0, enable_if_t<MATAZURE_IS_D_LAMBDA(_Func)>* = nullptr)->decltype(make_lambda(ts.shape(), internal::device_linear_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{}))
 {
 	return make_lambda(ts.shape(), internal::device_linear_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{});
 }

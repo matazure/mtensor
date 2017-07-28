@@ -82,7 +82,7 @@
 //				sum = _mm_add_ps(sum, _mm_mul_ps(pixel12, weight12));
 //				sum = _mm_add_ps(sum, _mm_mul_ps(pixel22, weight22));
 //
-//				auto dst_p = ts_output.data() + index2offset(pointi<2>{i, j}, ts_output.stride(), first_major_t{});
+//				auto dst_p = ts_output.data() + index2offset(pointi<2>{i, j}, ts_output.stride(), first_major{});
 //				_mm_store_ps(dst_p, sum);
 //			}
 //		}

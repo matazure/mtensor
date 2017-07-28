@@ -47,14 +47,14 @@ int main() {
 
 #ifdef USE_CUDA
 	//通过shape和mandelbrot_fun构造lambda tensor并直接把结果固化的内存（显存）里
-	auto cts_mandelbrot_rgb = make_lambda(shape, mandelbrot_fun, device_t{}).persist();
-	auto ts_mandelbrot_rgb = mem_clone(cts_mandelbrot_rgb, host_t{});
+	auto cts_mandelbrot_rgb = make_lambda(shape, mandelbrot_fun, device{}).persist();
+	auto ts_mandelbrot_rgb = mem_clone(cts_mandelbrot_rgb, host{});
 #else
 #ifdef USE_OPENMP
 	//使用omp_policy并行策略
-	auto ts_mandelbrot_rgb = make_lambda(shape, mandelbrot_fun, host_t{}).persist(omp_policy{});
+	auto ts_mandelbrot_rgb = make_lambda(shape, mandelbrot_fun, host{}).persist(omp_policy{});
 #else
-	auto ts_mandelbrot_rgb = make_lambda(shape, mandelbrot_fun, host_t{}).persist();
+	auto ts_mandelbrot_rgb = make_lambda(shape, mandelbrot_fun, host{}).persist();
 #endif
 #endif
 	//将结果写入raw数据了，可以使用ImageMagick等工具查看

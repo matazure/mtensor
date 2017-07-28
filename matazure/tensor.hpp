@@ -144,11 +144,11 @@ private:
 * @brief convert array index to linear index by first marjor
 * @param id array index
 * @param stride tensor stride
-* @param first_major_t
+* @param first_major
 * @return linear index
 */
 template <int_t _Rank>
-inline MATAZURE_GENERAL typename pointi<_Rank>::value_type index2offset(const pointi<_Rank> &id, const pointi<_Rank> &stride, first_major_t) {
+inline MATAZURE_GENERAL typename pointi<_Rank>::value_type index2offset(const pointi<_Rank> &id, const pointi<_Rank> &stride, first_major) {
 	typename pointi<_Rank>::value_type offset = id[0];
 	for (int_t i = 1; i < _Rank; ++i) {
 		offset += id[i] * stride[i - 1];
@@ -161,11 +161,11 @@ inline MATAZURE_GENERAL typename pointi<_Rank>::value_type index2offset(const po
 * @brief convert array index to linear index by first marjor
 * @param offset linear index
 * @param stride the stride of tensor
-* @param first_major_t
+* @param first_major
 * @return array index
 */
 template <int_t _Rank>
-inline MATAZURE_GENERAL pointi<_Rank> offset2index(typename pointi<_Rank>::value_type offset, const pointi<_Rank> &stride, first_major_t) {
+inline MATAZURE_GENERAL pointi<_Rank> offset2index(typename pointi<_Rank>::value_type offset, const pointi<_Rank> &stride, first_major) {
 	pointi<_Rank> id;
 	for (int_t i = _Rank - 1; i > 0; --i) {
 		id[i] = offset / stride[i - 1];
@@ -180,11 +180,11 @@ inline MATAZURE_GENERAL pointi<_Rank> offset2index(typename pointi<_Rank>::value
 * @brief convert array index to linear index by last marjor
 * @param id array index
 * @param stride tensor stride
-* @param first_major_t
+* @param first_major
 * @return linear index
 */
 template <int_t _Rank>
-inline MATAZURE_GENERAL typename pointi<_Rank>::value_type index2offset(const pointi<_Rank> &id, const pointi<_Rank> &stride, last_major_t) {
+inline MATAZURE_GENERAL typename pointi<_Rank>::value_type index2offset(const pointi<_Rank> &id, const pointi<_Rank> &stride, last_major) {
 	typename pointi<_Rank>::value_type offset = id[_Rank - 1];
 	for (int_t i = 1; i < _Rank; ++i) {
 		offset += id[_Rank - 1 - i] * stride[i - 1];
@@ -197,11 +197,11 @@ inline MATAZURE_GENERAL typename pointi<_Rank>::value_type index2offset(const po
 * @brief convert array index to linear index by last marjor
 * @param offset linear index
 * @param stride the stride of tensor
-* @param first_major_t
+* @param first_major
 * @return array index
 */
 template <int_t _Rank>
-inline MATAZURE_GENERAL pointi<_Rank> offset2index(typename pointi<_Rank>::value_type offset, const pointi<_Rank> &stride, last_major_t) {
+inline MATAZURE_GENERAL pointi<_Rank> offset2index(typename pointi<_Rank>::value_type offset, const pointi<_Rank> &stride, last_major) {
 	pointi<_Rank> id;
 	for (int_t i = _Rank - 1; i > 0; --i) {
 		id[_Rank - 1 - i] = offset / stride[i - 1];
@@ -318,8 +318,8 @@ public:
 	typedef const pointer			const_pointer;
 	typedef value_type &			reference;
 	typedef const value_type &		const_reference;
-	typedef linear_access_t			index_type;
-	typedef local_t					memory_type;
+	typedef linear_index			index_type;
+	typedef local					memory_type;
 
 	/**
 	* @brief accesses element by linear access mode
@@ -345,7 +345,7 @@ public:
 	* @return element const reference
 	*/
 	MATAZURE_GENERAL constexpr const_reference operator[](const pointi<rank> &idx) const {
-		return (*this)[index2offset(idx, stride(), first_major_t{})];
+		return (*this)[index2offset(idx, stride(), first_major{})];
 	}
 
 	/**
@@ -354,7 +354,7 @@ public:
 	* @return element reference
 	*/
 	MATAZURE_GENERAL reference operator[](const pointi<rank> &idx) {
-		return (*this)[index2offset(idx, stride(), first_major_t{})];
+		return (*this)[index2offset(idx, stride(), first_major{})];
 	}
 
 	/**
@@ -461,9 +461,9 @@ public:
 	typedef _ValueType &					reference;
 	typedef _Layout							layout_type;
 	/// primitive linear access mode
-	typedef linear_access_t					index_type;
+	typedef linear_index					index_type;
 	/// host memory type
-	typedef host_t							memory_type;
+	typedef host							memory_type;
 
 public:
 	/// default constructor
@@ -491,15 +491,15 @@ public:
 	* @param ext the shape of tensor
 	*/
 	explicit tensor(pointi<rank> ext) :
-		tensor(ext, pinned_t{})
+		tensor(ext, pinned{})
 	{}
 
 	/**
 	* @brief constructs by the shape. alloc host pinned memory when with cuda
 	* @param ext the shape of tensor
-	* @param pinned_v  the instance of pinned_t
+	* @param pinned_v  the instance of pinned
 	*/
-	explicit tensor(pointi<rank> ext, pinned_t pinned_v) :
+	explicit tensor(pointi<rank> ext, pinned pinned_v) :
 		extent_(ext),
 		layout_(ext),
 		sp_data_(malloc_shared_memory(layout_.stride()[rank - 1], pinned_v)),
@@ -509,9 +509,9 @@ public:
 	/**
 	* @brief constructs by the shape. alloc host unpinned memory when with cuda
 	* @param ext the shape of tensor
-	* @param pinned_v  the instance of unpinned_t
+	* @param pinned_v  the instance of unpinned
 	*/
-	explicit tensor(pointi<rank> ext, unpinned_t) :
+	explicit tensor(pointi<rank> ext, unpinned) :
 		extent_(ext),
 		layout_(ext),
 		sp_data_(malloc_shared_memory(layout_.stride()[rank - 1])),
@@ -647,7 +647,7 @@ private:
 	}
 
 	#ifdef MATAZURE_CUDA
-	shared_ptr<value_type> malloc_shared_memory(int_t size, pinned_t) {
+	shared_ptr<value_type> malloc_shared_memory(int_t size, pinned) {
 		decay_t<value_type> *data = nullptr;
 		cuda::assert_runtime_success(cudaMallocHost(&data, size * sizeof(value_type)));
 		return shared_ptr<value_type>(data, [](value_type *ptr) {
@@ -690,7 +690,7 @@ private:
 public:
 	typedef conditional_t<
 		is_same<int_t, _tmp_type>::value,
-		linear_access_t,
+		linear_index,
 		conditional_t<is_same<_tmp_type, pointi<_Rank>>::value, array_index, void>
 	> type;
 };
@@ -721,7 +721,7 @@ public:
 	typedef typename internal::get_functor_accessor_type<_Rank, _Func>::type	index_type;
 
 	typedef _Layout											layout_type;
-	typedef host_t											memory_type;
+	typedef host											memory_type;
 
 public:
 	/**
@@ -806,7 +806,7 @@ private:
 	}
 
 	template <typename _Mode>
-	enable_if_t<is_same<_Mode, linear_access_t>::value, reference> index_imp(pointi<rank> idx) const {
+	enable_if_t<is_same<_Mode, linear_index>::value, reference> index_imp(pointi<rank> idx) const {
 		return (*this)[layout_.index2offset(idx)];
 	}
 
@@ -816,7 +816,7 @@ private:
 	}
 
 	template <typename _Mode>
-	enable_if_t<is_same<_Mode, linear_access_t>::value, reference> offset_imp(int_t i) const {
+	enable_if_t<is_same<_Mode, linear_index>::value, reference> offset_imp(int_t i) const {
 		return fun_(i);
 	}
 
@@ -843,7 +843,7 @@ inline void mem_copy(_TensorSrc ts_src, _TensorDst ts_dst, enable_if_t<are_host_
 * @return a new tensor which clones source tensor
 */
 template <typename _ValueType, int_t _Rank, typename _Layout>
-inline tensor<_ValueType, _Rank, _Layout> mem_clone(tensor<_ValueType, _Rank, _Layout> ts, host_t) {
+inline tensor<_ValueType, _Rank, _Layout> mem_clone(tensor<_ValueType, _Rank, _Layout> ts, host) {
 	tensor<_ValueType, _Rank, _Layout> ts_re(ts.shape());
 	mem_copy(ts, ts_re);
 	return ts_re;
@@ -855,8 +855,8 @@ inline tensor<_ValueType, _Rank, _Layout> mem_clone(tensor<_ValueType, _Rank, _L
 * @return a new tensor which clones source tensor
 */
 template <typename _ValueType, int_t _Rank, typename _Layout>
-inline auto mem_clone(tensor<_ValueType, _Rank, _Layout> ts)->decltype(mem_clone(ts, host_t{})) {
-	return mem_clone(ts, host_t{});
+inline auto mem_clone(tensor<_ValueType, _Rank, _Layout> ts)->decltype(mem_clone(ts, host{})) {
+	return mem_clone(ts, host{});
 }
 
 /**
