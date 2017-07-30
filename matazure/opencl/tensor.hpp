@@ -2,6 +2,7 @@
 
 namespace matazure{ namespace opencl{
 
+
 	class tensor{
 
 	};
