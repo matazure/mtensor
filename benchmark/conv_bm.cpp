@@ -45,23 +45,6 @@ void bm_conv_direct(benchmark::State &state){
 }
 BENCHMARK(bm_conv_direct)->Arg(7)->Arg(14)->Arg(28)->Arg(56)->Arg(112)->Arg(224)->UseRealTime();
 
-// void bm_conv_general(benchmark::State& state){
-// 	pointi<2> ext;
-// 	fill(ext, state.range(0));
-// 	tensor<float, 2> ts_input(ext);
-// 	tensor<float, 2> ts_output(ts_input.shape());
-// 	static_tensor<float, dim<3,3>> kenel;
-// 	fill(kenel, 1.0f);
-//
-// 	while (state.KeepRunning()){
-// 		copy(puzzle::conv_general(ts_input, kenel), ts_output);
-// 	}
-//
-// 	state.SetBytesProcessed(state.iterations() * ts_output.size() * sizeof(float));
-// 	state.SetItemsProcessed(state.iterations() * ts_output.size() * kenel.size());
-// }
-// BENCHMARK(bm_conv_general)->Arg(7)->Arg(14)->Arg(28)->Arg(56)->Arg(112)->Arg(224)->UseRealTime();
-
 void bm_conv_expand(benchmark::State &state){
 	pointi<2> ext;
 	fill(ext, state.range(0));
@@ -469,53 +452,6 @@ void bm_conv_outside_check(benchmark::State &state){
 }
 BENCHMARK(bm_conv_outside_check)->Arg(7)->Arg(14)->Arg(28)->Arg(56)->Arg(112)->Arg(224)->UseRealTime();
 
-// void bm_conv_halo(benchmark::State &state){
-// 	pointi<2> ext;
-// 	fill(ext, state.range(0));
-// 	tensor<float, 2> ts_input(ext);
-// 	tensor<float, 2> ts_output(ts_input.shape());
-// 	tensor<float, 2> ts_halo(ext+1);
-// 	static_tensor<float, dim<3,3>> kenel{};
-// 	fill(ts_input, 1.0f);
-// 	fill(kenel, 1.0f);
-//
-// 	while (state.KeepRunning()){
-// 		auto lts_valid = section(ts_halo, pointi<2>{1, 1}, ts_input.shape());
-// 		copy(ts_input, lts_valid);
-// 		auto top0 = slice<0>(ts_halo, 0);
-// 		auto top1 = slice<0>(ts_halo, 1);
-// 		copy(top1, top0);
-// 		auto bottom0 = slice<0>(ts_halo, ts_halo.shape()[1] - 1);
-// 		auto bottom1 = slice<0>(ts_halo, ts_halo.shape()[1] - 2);
-// 		copy(bottom1, bottom0);
-// 		auto left0 = slice<1>(ts_halo, 0);
-// 		auto left1 = slice<1>(ts_halo, 1);
-// 		auto right0 = slice<1>(ts_halo, ts_halo.shape()[0] - 1);
-// 		auto right1 = slice<1>(ts_halo, ts_halo.shape()[0] - 2);
-//
-// 		auto kenel_radius = kenel.shape() / 2;
-// 	#ifdef __LOCAL_USE_OMP
-// 		#pragma omp parallel for collapse(2)
-// 	#endif
-// 		for (int_t j = 1; j < ts_halo.shape()[1] - 1; ++j) {
-// 			for (int_t i = 1; i < ts_halo.shape()[0] - 1; ++i) {
-// 				float sum = 0.0f;
-// 				for (int_t n = 0; n < kenel.shape()[1]; ++n) {
-// 					for (int_t m = 0; m < kenel.shape()[0]; ++m) {
-// 						sum += ts_input[pointi<2>{i, j} +pointi<2>{m, n} -kenel_radius] * kenel[pointi<2>{m, n}];
-// 					}
-// 				}
-//
-// 				ts_output[pointi<2>{i, }] = sum;
-// 			}
-// 		}
-// 	}
-//
-// 	state.SetBytesProcessed(state.iterations() * ts_output.size() * sizeof(float));
-// 	state.SetItemsProcessed(state.iterations() * ts_output.size() * kenel.size());
-// }
-// BENCHMARK(bm_conv_halo)->Arg(7)->Arg(14)->Arg(28)->Arg(56)->Arg(112)->Arg(224)->UseRealTime();
-
 void bm_conv_linear(benchmark::State &state){
 	pointi<2> ext;
 	fill(ext, state.range(0));
@@ -869,18 +805,18 @@ void bm_conv_sse2_4_caffe2(benchmark::State &state){
 	static_tensor<float, dim<3,3>> kenel2;
 	static_tensor<float, dim<3,3>> kenel3;
 
-	fill(ts_input0, 1.2f);
-	fill(ts_input1, 1.2f);
-	fill(ts_input2, 1.2f);
-	fill(ts_input3, 1.2f);
-	fill(ts_output0, 1.2f);
-	fill(ts_output1, 1.2f);
-	fill(ts_output2, 1.2f);
-	fill(ts_output3, 1.2f);
-	fill(kenel0, 1.2f);
-	fill(kenel1, 1.2f);
-	fill(kenel2, 1.2f);
-	fill(kenel3, 1.2f);
+	fill(ts_input0, 1.0f);
+	fill(ts_input1, 2.0f);
+	fill(ts_input2, 3.0f);
+	fill(ts_input3, 4.0f);
+	fill(ts_output0, 0.0f);
+	fill(ts_output1, 0.0f);
+	fill(ts_output2, 0.0f);
+	fill(ts_output3, 0.0f);
+	fill(kenel0, 1.0f);
+	fill(kenel1, 1.0f);
+	fill(kenel2, 1.0f);
+	fill(kenel3, 1.0f);
 
 	tensor<__m128, 2> ts_input(ext);
 	tensor<__m128, 2> ts_output(ts_input.shape());
@@ -892,28 +828,18 @@ void bm_conv_sse2_4_caffe2(benchmark::State &state){
 
 	while (state.KeepRunning()){
 		for (int_t i = 0; i < ts_input.size(); ++i){
-			ts_input[i] = _mm_set_ps(ts_input0[i], ts_input1[i], ts_input2[i], ts_input3[i]);
-			// ts_input[i][0] = ts_input0[i];
-			// ts_input[i][1] = ts_input1[i];
-			// ts_input[i][2] = ts_input2[i];
-			// ts_input[i][3] = ts_input3[i];
+			ts_input[i] = _mm_set_ps(ts_input3[i], ts_input2[i], ts_input1[i], ts_input0[i]);
 		}
 		for (int_t i = 0; i < kenel.size(); ++i){
-			kenel[i] = _mm_set_ps(kenel0[i], kenel1[i], kenel2[i], kenel3[i]);
-			// kenel[i][0] = kenel0[i];
-			// kenel[i][1] = kenel1[i];
-			// kenel[i][2] = kenel2[i];
-			// kenel[i][3] = kenel3[i];
+			kenel[i] = _mm_set_ps(kenel3[i], kenel2[i], kenel1[i], kenel0[i]);
 		}
 
 		auto kenel_radius = kenel.shape() / 2;
-	#ifdef __LOCAL_USE_OMP
-		#pragma omp parallel for collapse(2)
-	#endif
+
 		for_index(pointi<2>{0,0}, ts_output.shape(), [&](pointi<2> idx){
 				__m128 sum = _mm_setzero_ps();
 
-				if (MATAZURE_LIKELY(inside(idx, pointi<2>{1,1}, ts_input.shape() - 2))){
+				if (MATAZURE_LIKELY(inside(idx, pointi<2>{1,1}, ts_input.shape() - 1))){
 					for_index(pointi<2>{0,0}, kenel.shape(), [&](pointi<2> kenel_idx){
  						sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[idx + kenel_idx -kenel_radius], kenel[kenel_idx]));
 					});
@@ -921,7 +847,7 @@ void bm_conv_sse2_4_caffe2(benchmark::State &state){
 					for_index(pointi<2>{0,0}, kenel.shape(), [&](pointi<2> kenel_idx){
 						__m128 value = _mm_setzero_ps();
 						auto value_index = idx + kenel_idx - kenel_radius;
-						if (MATAZURE_LIKELY(inside(value_index, pointi<2>{1,1}, ts_input.shape() - 2))){
+						if (MATAZURE_LIKELY(inside(value_index, pointi<2>{0,0}, ts_input.shape()))){
 							value = ts_input[value_index];
 						}
  						sum = _mm_add_ps(sum, _mm_mul_ps(value, kenel[kenel_idx]));
@@ -932,10 +858,17 @@ void bm_conv_sse2_4_caffe2(benchmark::State &state){
 		});
 
 		for (int_t i = 0; i < ts_input.size(); ++i){
+		#ifndef __linux__
+			ts_output0[i] = ts_output[i].m128_f32[0];
+			ts_output1[i] = ts_output[i].m128_f32[1];
+			ts_output2[i] = ts_output[i].m128_f32[2];
+			ts_output3[i] = ts_output[i].m128_f32[3];
+		#else
 			ts_output0[i] = ts_output[i][0];
 			ts_output1[i] = ts_output[i][1];
 			ts_output2[i] = ts_output[i][2];
 			ts_output3[i] = ts_output[i][3];
+		#endif
 		}
 
 	#ifdef __linux__
@@ -948,4 +881,132 @@ void bm_conv_sse2_4_caffe2(benchmark::State &state){
 	state.SetBytesProcessed(state.iterations() * valid_size * sizeof(__m128));
 	state.SetItemsProcessed(state.iterations() * valid_size * kenel.size() * sizeof(__m128) / sizeof(float));
 }
-BENCHMARK(bm_conv_sse2_4_caffe2)->Arg(7)->Arg(14)->Arg(28)->Arg(56)->Arg(112)->Arg(224)->UseRealTime();
+BENCHMARK(bm_conv_sse2_4_caffe2)->Arg(7)->UseRealTime();
+
+inline bool is_a_ge_zero_and_a_lt_b(int a, int b) {
+  return static_cast<unsigned>(a) < static_cast<unsigned>(b);
+}
+
+void bm_img2col(benchmark::State &state){
+	pointi<2> ext{};
+	fill(ext, state.range(0));
+	tensor<float, 2> mat_input(ext);
+	tensor<float, 3> mat_re(pointi<3>{ext[0], ext[1], 9});
+	fill(mat_input, 0.0f);
+	fill(mat_re, 0.0f);
+
+	static_tensor<float, dim<3,3>> sts_kernel;
+	auto kernel_h = sts_kernel.shape()[1];
+	auto kernel_w = sts_kernel.shape()[0];
+	int dilation_h = 1;
+	int dilation_w = 1;
+	int pad_h = 1;
+	int pad_w = 1;
+	int output_w = mat_re.shape()[0];
+	int output_h = mat_re.shape()[1];
+	int height = mat_input.shape()[1];
+	int width = mat_input.shape()[0];
+
+	int stride_w = 1;
+	int stride_h = 1;
+
+	while (state.KeepRunning()){
+		auto data_col = mat_re.data();
+	 	auto data_im = mat_input.data();
+
+		for (int kernel_row = 0; kernel_row < kernel_h; kernel_row++) {
+			for (int kernel_col = 0; kernel_col < kernel_w; kernel_col++) {
+				int input_row = -pad_h + kernel_row * dilation_h;
+				for (int output_rows = output_h; output_rows; output_rows--) {
+					if (MATAZURE_UNLIKELY(!is_a_ge_zero_and_a_lt_b(input_row, height))) {
+						for (int output_cols = output_w; output_cols; output_cols--) {
+							*(data_col++) = 0;
+						}
+					} else {
+						int input_col = -pad_w + kernel_col * dilation_w;
+						for (int output_col = output_w; output_col; output_col--) {
+							if (MATAZURE_LIKELY(is_a_ge_zero_and_a_lt_b(input_col, width))) {
+								*(data_col++) = data_im[input_row * width + input_col];
+							} else {
+								*(data_col++) = 0;
+							}
+							input_col += stride_w;
+						}
+					}
+					input_row += stride_h;
+				}
+			}
+		}
+
+	#ifdef __linux__
+		benchmark::ClobberMemory();
+	#endif
+	}
+
+	state.SetBytesProcessed(state.iterations() * mat_re.size() * sizeof(float));
+	state.SetItemsProcessed(state.iterations() * mat_re.size());
+}
+BENCHMARK(bm_img2col)->Arg(7)->Arg(14)->Arg(28)->Arg(56)->Arg(112)->Arg(224)->UseRealTime();
+
+void bm_img2col_conv(benchmark::State &state){
+	pointi<2> ext{};
+	fill(ext, state.range(0));
+	tensor<float, 2> mat_input(ext);
+	tensor<float, 2> mat_re(ext);
+	fill(mat_input, 1.1f);
+	fill(mat_re, 1.1f);
+	static_tensor<float, dim<3,3>> sts_kernel;
+	fill(sts_kernel, 1.1f);
+
+	auto kernel_h = sts_kernel.shape()[1];
+	auto kernel_w = sts_kernel.shape()[0];
+	int dilation_h = 1;
+	int dilation_w = 1;
+	int pad_h = 1;
+	int pad_w = 1;
+	int output_w = mat_re.shape()[0];
+	int output_h = mat_re.shape()[1];
+	int height = mat_input.shape()[1];
+	int width = mat_input.shape()[0];
+
+	int stride_w = 1;
+	int stride_h = 1;
+
+	while (state.KeepRunning()){
+	 	auto data_im = mat_input.data();
+
+		for (int kernel_row = 0; kernel_row < kernel_h; kernel_row++) {
+			for (int kernel_col = 0; kernel_col < kernel_w; kernel_col++) {
+				int input_row = -pad_h + kernel_row * dilation_h;
+				auto data_out = mat_re.data();
+				auto weight = sts_kernel(kernel_col, kernel_row);
+				for (int output_rows = output_h; output_rows; output_rows--) {
+					if (MATAZURE_UNLIKELY(!is_a_ge_zero_and_a_lt_b(input_row, height))) {
+						for (int output_cols = output_w; output_cols; output_cols--) {
+							*(data_out++) += 0;
+						}
+					} else {
+						int input_col = -pad_w + kernel_col * dilation_w;
+						for (int output_col = output_w; output_col; output_col--) {
+							if (MATAZURE_LIKELY(is_a_ge_zero_and_a_lt_b(input_col, width))) {
+								*(data_out++) += weight * data_im[input_row * width + input_col];
+							} else {
+								*(data_out++) += 0;
+							}
+							input_col += stride_w;
+						}
+					}
+					input_row += stride_h;
+				}
+			}
+		}
+
+	#ifdef __linux__
+		benchmark::ClobberMemory();
+	#endif
+	}
+
+	state.SetBytesProcessed(state.iterations() * mat_re.size() * sizeof(float));
+	state.SetItemsProcessed(state.iterations() * mat_re.size() * 9);
+}
+BENCHMARK(bm_img2col_conv)->Arg(7)->Arg(14)->Arg(28)->Arg(56)->Arg(112)->Arg(224)->UseRealTime();

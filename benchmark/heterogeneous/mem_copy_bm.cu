@@ -32,6 +32,8 @@ void BM_each_copy_gold(benchmark::State& state) {
 	state.SetBytesProcessed(state.iterations() * bytes_size);
 }
 
+#endif
+
 template <typename _TensorSrc, typename _TensorDst>
 static void BM_mem_copy(benchmark::State& state) {
 	_TensorSrc ts_src(state.range(0));
@@ -49,6 +51,9 @@ static void BM_mem_copy(benchmark::State& state) {
 	state.SetBytesProcessed(state.iterations() * bytes_size);
 }
 
+
+#ifdef USE_CUDA
+
 auto BM_host2host_mem_copy = BM_mem_copy<tensor<byte, 1>, tensor<byte, 1>>;
 BENCHMARK(BM_host2host_mem_copy)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
 
@@ -61,8 +66,14 @@ BENCHMARK(BM_device2device_mem_copy)->Range(1 << 10, 1 << (bm_config::max_host_m
 
 auto BM_each_copy_gold_byte = BM_each_copy_gold<cuda::tensor<byte, 1>>;
 BENCHMARK(BM_each_copy_gold_byte)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
-
 auto BM_each_copy_gold_float = BM_each_copy_gold<cuda::tensor<float, 1>>;
 BENCHMARK(BM_each_copy_gold_float)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
+
+#endif
+
+#ifdef USE_HOST
+
+auto BM_host2host_mem_copy = BM_mem_copy<tensor<byte, 1>, tensor<byte, 1>>;
+BENCHMARK(BM_host2host_mem_copy)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
 
 #endif
