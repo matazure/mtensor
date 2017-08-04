@@ -1,12 +1,8 @@
-#include <matazure/tensor>
+﻿#include <matazure/tensor>
 #include <gtest/gtest.h>
 
 using namespace matazure;
 using namespace testing;
-
-#ifndef GTEST_HAS_TYPED_TEST_P
-#error "not support"
-#endif
 
 template <typename _Type>
 class TensorTest: public testing::Test{
@@ -28,21 +24,21 @@ TYPED_TEST_CASE(TensorTest, ImplementTypes);
 
 TYPED_TEST(TensorTest, Construct){
 	{
-		pointi<tensor_type::rank> ext{};
+		pointi<TypeParam::rank> ext{};
 		fill(ext, -10);
-		tensor_type ts(ext);
+		TypeParam ts(ext);
 	}
 
 	{
-		pointi<tensor_type::rank> ext{};
+		pointi<TypeParam::rank> ext{};
 		fill(ext, 0);
-		tensor_type ts(ext);
+		TypeParam ts(ext);
 	}
 
 	{
-		pointi<tensor_type::rank> ext{};
+		pointi<TypeParam::rank> ext{};
 		fill(ext, 32);
-		tensor_type ts(ext);
+		TypeParam ts(ext);
 	}
 }
 
