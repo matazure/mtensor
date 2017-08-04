@@ -4,6 +4,10 @@
 using namespace matazure;
 using namespace testing;
 
+#ifndef GTEST_HAS_TYPED_TEST_P
+#error "not support"
+#endif
+
 template <typename _Type>
 class TensorTest: public testing::Test{
 protected:
@@ -49,6 +53,3 @@ TYPED_TEST(TensorTest, ShapeStrideSize) {
 TYPED_TEST(TensorTest, Access) {
 
 }
-
-
-

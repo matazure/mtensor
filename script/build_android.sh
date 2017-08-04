@@ -1,4 +1,4 @@
-export ANDROID_NDK=/home/zhimin/Works/android-ndk/linux-x86_64/android-ndk-r12b
+# export ANDROID_NDK=/mnt/d/android-ndk/linux-x86_64/android-ndk-r12b
 
 if [ -z "$ANDROID_NDK" ]; then
     echo "Did you set ANDROID_NDK variable?"

@@ -445,7 +445,11 @@ void bm_tn_nmk_prod_k4_sse(benchmark::State &state){
 
 				auto tmp0 = _mm_hadd_ps(re, re);
 				auto tmp1 = _mm_hadd_ps(tmp0, tmp0);
+			#ifdef __linux__
 				p_re[m + n * M] += tmp1[0];
+			#else
+				p_re[m + n * M] += tmp1.m128_f32[0];
+			#endif
 				// p_re[m + n * M] += re[0];
 				// p_re[m + n * M] += re[1];
 				// p_re[m + n * M] += re[3];

@@ -21,4 +21,11 @@ int main(){
 	return 0;
 }
 
+#else
+
+int main(){
+	//do none
+	return 0;
+}
+
 #endif
