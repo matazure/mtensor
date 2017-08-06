@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <matazure/config.hpp>
 
@@ -10,9 +10,7 @@ struct sequence_policy {};
 /// sequence execution policy with auto vectorization
 struct sequence_vectorized_policy {};
 
-#ifdef _OPENMP
-
-#define MATAZURE_OPENMP
+#ifdef MATAZURE_OPENMP
 
 /// openmp parallel execution policy
 struct omp_policy {};

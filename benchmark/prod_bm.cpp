@@ -14,7 +14,6 @@
 #error not defined sse2
 #endif
 
-
 using namespace matazure;
 
 void bm_tn_nmk_prod_simple_gold(benchmark::State &state){

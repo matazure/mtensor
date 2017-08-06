@@ -7,6 +7,13 @@ link_directories(${EXTERNAL_INSTALL_LOCATION}/lib)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/vendor/googletest/googletest/include)
 
+file(GLOB Files ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
+set_source_files_properties(${Files} PROPERTIES LANGUAGE CXX)
+add_executable(tensor_test ${Files})
+add_dependencies(tensor_test gtest)
+target_link_libraries(tensor_test gtest)
+set_target_properties(tensor_test PROPERTIES LINKER_LANGUAGE CXX)
+
 file(GLOB Files ${CMAKE_CURRENT_SOURCE_DIR}/heterogeneous/*.cu)
 set_source_files_properties(${Files} PROPERTIES LANGUAGE CXX)
 add_executable(hete_host_tensor_test ${Files})

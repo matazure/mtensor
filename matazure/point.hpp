@@ -67,7 +67,8 @@ public:
 
 static_assert(std::is_pod<point<byte, 1>>::value, "point should be pod");
 
-#define POINT_BINARY_OPERATOR(op) \
+//binary opertor
+#define MATAZURE_POINT_BINARY_OPERATOR(op) \
 template <typename _T, int_t _Rank> \
 inline MATAZURE_GENERAL auto operator op(const point<_T, _Rank> &lhs, const point<_T, _Rank> &rhs)->point<decltype(lhs[0] op rhs[0]), _Rank> { \
 	point<decltype(lhs[0] op rhs[0]), _Rank> re; \
@@ -75,9 +76,8 @@ inline MATAZURE_GENERAL auto operator op(const point<_T, _Rank> &lhs, const poin
 		re[i] = lhs[i] op rhs[i]; \
 	} \
 	return re; \
-}
-
-#define POINT_WITH_VALUE_BINARY_OPERATOR(op) \
+} \
+\
 template <typename _T, int_t _Rank>  \
 inline MATAZURE_GENERAL auto operator op(const point<_T, _Rank> &container, typename point<_T, _Rank>::value_type value)->point<decltype(container[0] op value), _Rank> { \
 	point<decltype(container[0] op value), _Rank> re; \
@@ -98,46 +98,57 @@ inline MATAZURE_GENERAL auto operator op(typename point<_T, _Rank>::value_type v
 return re; \
 }
 
+// assignment operators
+#define MATAZURE_POINT_ASSIGNMENT_OPERATOR(op) \
+template <typename _T, int_t _Rank> \
+inline MATAZURE_GENERAL auto operator op(point<_T, _Rank> &lhs, const point<_T, _Rank> &rhs)->point<_T, _Rank> { \
+	for (int_t i = 0; i < _Rank; ++i) { \
+		lhs[i] op rhs[i]; \
+	} \
+	return lhs; \
+}\
+\
+template <typename _T, int_t _Rank>  \
+inline MATAZURE_GENERAL auto operator op(point<_T, _Rank> &container, _T value)->point<_T, _Rank> { \
+	for (int_t i = 0; i < _Rank; ++i) { \
+		container[i] op value; \
+	} \
+\
+return container; \
+}
+
 //Arithmetic
-POINT_BINARY_OPERATOR(+)
-POINT_BINARY_OPERATOR(-)
-POINT_BINARY_OPERATOR(*)
-POINT_BINARY_OPERATOR(/)
-POINT_BINARY_OPERATOR(%)
-POINT_WITH_VALUE_BINARY_OPERATOR(+)
-POINT_WITH_VALUE_BINARY_OPERATOR(-)
-POINT_WITH_VALUE_BINARY_OPERATOR(*)
-POINT_WITH_VALUE_BINARY_OPERATOR(/)
-POINT_WITH_VALUE_BINARY_OPERATOR(%)
+MATAZURE_POINT_BINARY_OPERATOR(+)
+MATAZURE_POINT_BINARY_OPERATOR(-)
+MATAZURE_POINT_BINARY_OPERATOR(*)
+MATAZURE_POINT_BINARY_OPERATOR(/)
+MATAZURE_POINT_BINARY_OPERATOR(%)
+MATAZURE_POINT_ASSIGNMENT_OPERATOR(+=)
+MATAZURE_POINT_ASSIGNMENT_OPERATOR(-=)
+MATAZURE_POINT_ASSIGNMENT_OPERATOR(*=)
+MATAZURE_POINT_ASSIGNMENT_OPERATOR(/=)
+MATAZURE_POINT_ASSIGNMENT_OPERATOR(%=)
 //Bit
-POINT_BINARY_OPERATOR(<<)
-POINT_BINARY_OPERATOR(>>)
-POINT_BINARY_OPERATOR(|)
-POINT_BINARY_OPERATOR(&)
-POINT_BINARY_OPERATOR(^)
-POINT_WITH_VALUE_BINARY_OPERATOR(<<)
-POINT_WITH_VALUE_BINARY_OPERATOR(>>)
-POINT_WITH_VALUE_BINARY_OPERATOR(|)
-POINT_WITH_VALUE_BINARY_OPERATOR(&)
-POINT_WITH_VALUE_BINARY_OPERATOR(^)
+MATAZURE_POINT_BINARY_OPERATOR(<<)
+MATAZURE_POINT_BINARY_OPERATOR(>>)
+MATAZURE_POINT_BINARY_OPERATOR(|)
+MATAZURE_POINT_BINARY_OPERATOR(&)
+MATAZURE_POINT_BINARY_OPERATOR(^)
+MATAZURE_POINT_ASSIGNMENT_OPERATOR(<<=)
+MATAZURE_POINT_ASSIGNMENT_OPERATOR(>>=)
+MATAZURE_POINT_ASSIGNMENT_OPERATOR(|=)
+MATAZURE_POINT_ASSIGNMENT_OPERATOR(&=)
+MATAZURE_POINT_ASSIGNMENT_OPERATOR(^=)
 //Logic
-POINT_BINARY_OPERATOR(||)
-POINT_BINARY_OPERATOR(&&)
-POINT_WITH_VALUE_BINARY_OPERATOR(||)
-POINT_WITH_VALUE_BINARY_OPERATOR(&&)
+MATAZURE_POINT_BINARY_OPERATOR(||)
+MATAZURE_POINT_BINARY_OPERATOR(&&)
 //Compapre
-POINT_BINARY_OPERATOR(>)
-POINT_BINARY_OPERATOR(<)
-POINT_BINARY_OPERATOR(>=)
-POINT_BINARY_OPERATOR(<=)
-POINT_BINARY_OPERATOR(==)
-POINT_BINARY_OPERATOR(!=)
-POINT_WITH_VALUE_BINARY_OPERATOR(>)
-POINT_WITH_VALUE_BINARY_OPERATOR(<)
-POINT_WITH_VALUE_BINARY_OPERATOR(>=)
-POINT_WITH_VALUE_BINARY_OPERATOR(<=)
-POINT_WITH_VALUE_BINARY_OPERATOR(==)
-POINT_WITH_VALUE_BINARY_OPERATOR(!=)
+MATAZURE_POINT_BINARY_OPERATOR(>)
+MATAZURE_POINT_BINARY_OPERATOR(<)
+MATAZURE_POINT_BINARY_OPERATOR(>=)
+MATAZURE_POINT_BINARY_OPERATOR(<=)
+MATAZURE_POINT_BINARY_OPERATOR(==)
+MATAZURE_POINT_BINARY_OPERATOR(!=)
 
 template <typename _T, int_t _Rank>
 MATAZURE_GENERAL point<_T, _Rank> operator+(const point<_T, _Rank> &p) {

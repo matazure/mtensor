@@ -4,6 +4,7 @@ project(MatazureTensor CXX)
 
 option(WITH_CUDA "With CUDA" OFF)
 option(WITH_OPENMP "With OpenMP" OFF)
+option(WITH_SSE "With SSE" OFF) #default need SSE4.2 supported
 
 option(BUILD_EXAMPLE "Build Example" ON)
 option(BUILD_BENCHMARK "Build Benchmark" ON)

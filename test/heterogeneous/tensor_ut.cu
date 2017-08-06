@@ -14,8 +14,14 @@ public:
 
 #ifdef USE_CUDA
 #define TENSOR cuda::tensor
-#else
+#endif
+
+#ifdef USE_HOST
 #define TENSOR tensor
+#endif
+
+#ifdef USE_OPENCL
+#error "not support"
 #endif
 
 typedef Types<TENSOR<int, 1>, TENSOR<int, 2>, TENSOR<int, 3>, TENSOR<int, 4>> ImplementTypes;

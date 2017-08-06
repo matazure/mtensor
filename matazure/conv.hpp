@@ -2,7 +2,7 @@
 
 #include <matazure/tensor.hpp>
 
-namespace matazure { namespace puzzle{
+namespace matazure {
 
 namespace internal{
 
@@ -30,21 +30,6 @@ namespace internal{
  	return make_lambda(ts.shape(), internal::conv_op<_Tensor, _Kenel>(ts, kenel));
  }
 
- // template <typename _Tensor, typename _Kenel>
- // inline auto conv_general(_Tensor ts, _Kenel kenel){
- // 	auto kenel_radius = kenel.shape() / 2;
- // 	return make_lambda(ts.shape(), [=](const pointi<_Tensor::rank> &idx){
- // 		float sum = 0.0f;
- // 		for (int_t n = 0; n < kenel.shape()[1]; ++n) {
- // 			for (int_t m = 0; m < kenel.shape()[0]; ++m) {
- // 				sum += ts[idx +pointi<2>{m, n} -kenel_radius] * kenel[pointi<2>{m, n}];
- // 			}
- // 		}
- //
- // 		return sum;
- // 	});
- // }
-
 template <typename _Tensor, typename _Kenel, typename _TensorOut>
 inline void conv_direct(_Tensor ts, _Kenel kenel, _TensorOut ts_out) {
 	auto kenel_radius = kenel.shape() / 2;
@@ -62,6 +47,4 @@ inline void conv_direct(_Tensor ts, _Kenel kenel, _TensorOut ts_out) {
 	}
 }
 
-// template <typename _Tensor, typename _Kenel, typename _TensorOut>
-
-} }
+}

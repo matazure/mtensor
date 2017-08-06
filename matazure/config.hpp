@@ -9,6 +9,33 @@
 #include <memory>
 #include <tuple>
 
+//#ifdef
+
+#if defined(__x86_64__) || defined(_M_X64) || defined(__amd64) && !defined(MATAZURE_DISABLE_SSE)
+	#define MATAZURE_SSE
+#endif
+
+//for cuda
+#ifdef __CUDACC__
+	#define MATAZURE_CUDA
+#endif
+#ifdef MATAZURE_CUDA
+	#define MATAZURE_GENERAL __host__ __device__
+	#define MATAZURE_DEVICE __device__
+	#define MATAZURE_GLOBAL __global__
+	#define __matazure__ MATAZURE_GENERAL
+#else
+	#define MATAZURE_DEVICE
+	#define MATAZURE_GENERAL
+	#define MATAZURE_GLOBAL
+	#define __matazure__
+#endif
+
+#ifdef _OPENMP
+	#define MATAZURE_OPENMP
+#endif
+
+
 //for using
 namespace matazure {
 
@@ -116,27 +143,3 @@ inline void assertion_failed(char const * expr, char const * msg, char const * f
 
 #endif
 
-//for cuda
-#ifdef __CUDACC__
-
-#define MATAZURE_CUDA
-
-#endif
-
-#ifdef MATAZURE_CUDA
-
-#define MATAZURE_GENERAL __host__ __device__
-#define MATAZURE_DEVICE __device__
-#define MATAZURE_GLOBAL __global__
-
-#define __matazure__ MATAZURE_GENERAL
-
-#else
-
-#define MATAZURE_DEVICE
-#define MATAZURE_GENERAL
-#define MATAZURE_GLOBAL
-
-#define __matazure__
-
-#endif
