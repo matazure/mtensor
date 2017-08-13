@@ -347,7 +347,7 @@ void bm_nn_eigen_prod(benchmark::State &state){
 	mat_rhs.setRandom();
 
 	while (state.KeepRunning()){
-		mat_output = mat_lhs * mat_rhs;
+		mat_output.noalias() = mat_lhs * mat_rhs;
 	#ifdef __linux__
 		benchmark::ClobberMemory();
 	#endif
@@ -360,7 +360,7 @@ BENCHMARK(bm_nn_eigen_prod)
 	->Args({ 128, 128, 128 })
 	->Args({ 512, 512, 512 })
 	->Args({ 1024, 1024, 1024 })
-	///mobilenet_0.5
+	//mobilenet_0.5
 	//general conv
 	->Args({ 112 * 112, 9, 3})
 	//depthwise conv
@@ -391,7 +391,7 @@ void bm_tn_eigen_prod(benchmark::State &state){
 	mat_rhs.setRandom();
 
 	while (state.KeepRunning()){
-		mat_output = mat_lhs * mat_rhs;
+		mat_output.noalias() = mat_lhs * mat_rhs;
 	#ifdef __linux__
 		benchmark::ClobberMemory();
 	#endif
@@ -438,17 +438,27 @@ void bm_tn_nmk_prod_k4_sse(benchmark::State &state){
 	while (state.KeepRunning()){
 		for (int_t n = 0; n < N; ++n){
 			for (int_t m = 0; m < M; ++m){
-				__m128 re = _mm_setzero_ps();
-				for (int_t k = 0; k < K; k += 4){
-					re = _mm_add_ps(re, _mm_mul_ps(_mm_load_ps(p_lhs + m*K + k), _mm_load_ps(p_rhs + n * K + k)));
+				__m128 re0 = _mm_setzero_ps();
+				__m128 re1 = _mm_setzero_ps();
+				// __m128 re2 = _mm_setzero_ps();
+				// __m128 re3 = _mm_setzero_ps();
+				for (int_t k = 0; k < K; k += 8){
+					re0 = _mm_add_ps(re0, _mm_mul_ps(_mm_load_ps(p_lhs + m*K + k + 0), _mm_load_ps(p_rhs + n * K + k + 0)));
+					re1 = _mm_add_ps(re1, _mm_mul_ps(_mm_load_ps(p_lhs + m*K + k + 4), _mm_load_ps(p_rhs + n * K + k + 4)));
+					// re2 = _mm_add_ps(re2, _mm_mul_ps(_mm_load_ps(p_lhs + m*K + k + 8), _mm_load_ps(p_rhs + n * K + k + 8)));
+					// re3 = _mm_add_ps(re3, _mm_mul_ps(_mm_load_ps(p_lhs + m*K + k + 12), _mm_load_ps(p_rhs + n * K + k + 12)));
 				}
 
-				auto tmp0 = _mm_hadd_ps(re, re);
-				auto tmp1 = _mm_hadd_ps(tmp0, tmp0);
+				auto tmp = _mm_add_ps(re0, re1);
+				tmp = _mm_hadd_ps(tmp, tmp);
+				tmp = _mm_hadd_ps(tmp, tmp);
+				// auto tmp0 = _mm_hadd_ps(re0, re1);
+				//
+				// auto tmp1 = _mm_hadd_ps(tmp0, tmp0);
 			#ifdef __linux__
-				p_re[m + n * M] += tmp1[0];
+				p_re[m + n * M] += tmp[0];
 			#else
-				p_re[m + n * M] += tmp1.m128_f32[0];
+				p_re[m + n * M] += tmp.m128_f32[0];
 			#endif
 				// p_re[m + n * M] += re[0];
 				// p_re[m + n * M] += re[1];
@@ -507,19 +517,18 @@ void bm_nn_nkm_prod_n4k4m4_sse(benchmark::State &state){
 		for (int_t n = 0; n < N; n += 4){
 			for (int_t k = 0; k < K; k += 4){
 				for (int_t m = 0; m < M;  m += 4){
-					register auto re_v000 = _mm_setzero_ps();
-					register auto re_v010 = _mm_setzero_ps();
-					register auto re_v020 = _mm_setzero_ps();
-					register auto re_v030 = _mm_setzero_ps();
-
+					register auto re_v00None = _mm_setzero_ps();
+					register auto re_v01None = _mm_setzero_ps();
+					register auto re_v02None = _mm_setzero_ps();
+					register auto re_v03None = _mm_setzero_ps();
 
 				#define MULTIPLY_4x1(_m, _n, _k) \
 					register auto rhs_v##_m##_n##_k = _mm_set_ps(p_rhs[k + _k + K * (n + _n)], p_rhs[k + _k + K * (n + _n)], p_rhs[k + _k+ K * (n + _n)], p_rhs[k + _k + K * (n + _n)]); \
 					register auto lhs_v_p##_m##_n##_k =  _mm_load_ps(p_lhs + m + M * (k + _k) + _m * 4); \
-					re_v##_m##_n##0 = _mm_add_ps(re_v##_m##_n##0, _mm_mul_ps(lhs_v_p##_m##_n##_k, rhs_v##_m##_n##_k));
+					re_v##_m##_n##None = _mm_add_ps(re_v##_m##_n##None, _mm_mul_ps(lhs_v_p##_m##_n##_k, rhs_v##_m##_n##_k));
 
 				#define STORE_RE(_m, _n, _k) \
-					_mm_store_ps(p_re + m + 4 * _m + (n + _n) * M, _mm_add_ps(_mm_load_ps(p_re + m + 4 * _m + (n + _n) * M), re_v##_m##_n##0))
+					_mm_store_ps(p_re + m + 4 * _m + (n + _n) * M, _mm_add_ps(_mm_load_ps(p_re + m + 4 * _m + (n + _n) * M), re_v##_m##_n##None))
 
 					MULTIPLY_4x1(0, 0, 0);
 					MULTIPLY_4x1(0, 0, 1);
@@ -528,14 +537,12 @@ void bm_nn_nkm_prod_n4k4m4_sse(benchmark::State &state){
 
 					STORE_RE(0, 0, NONE);
 
-
 					MULTIPLY_4x1(0, 1, 0);
 					MULTIPLY_4x1(0, 1, 1);
 					MULTIPLY_4x1(0, 1, 2);
 					MULTIPLY_4x1(0, 1, 3);
 
 					STORE_RE(0, 1, NONE);
-
 
 					MULTIPLY_4x1(0, 2, 0);
 					MULTIPLY_4x1(0, 2, 1);
@@ -544,13 +551,15 @@ void bm_nn_nkm_prod_n4k4m4_sse(benchmark::State &state){
 
 					STORE_RE(0, 2, NONE);
 
-
 					MULTIPLY_4x1(0, 3, 0);
 					MULTIPLY_4x1(0, 3, 1);
 					MULTIPLY_4x1(0, 3, 2);
 					MULTIPLY_4x1(0, 3, 3);
 
 					STORE_RE(0, 3, NONE);
+
+				#undef MULTIPLY_4x1
+				#undef STORE_RE
 				}
 			}
 		}
@@ -591,7 +600,7 @@ BENCHMARK(bm_nn_nkm_prod_n4k4m4_sse)
 	// ->Args({ 14 * 14, 256, 256})
 	// ->Args({ 7 * 7, 256, 512})
 	// ->Args({ 7 * 7, 512, 512})
-	// ->Args({ 7 * 7, 512, 30})
+	->Args({ 8 * 8, 512, 32})
 	->UseRealTime();
 
 void bm_t4n_mnk_prod_m4n4k4_sse(benchmark::State &state){
@@ -605,49 +614,46 @@ void bm_t4n_mnk_prod_m4n4k4_sse(benchmark::State &state){
 	while (state.KeepRunning()){
 		for (int_t m = 0; m < M;  m += 4){
 			for (int_t n = 0; n < N; n += 4){
+				 auto re_v00None = _mm_setzero_ps();
+				 auto re_v01None = _mm_setzero_ps();
+				 auto re_v02None = _mm_setzero_ps();
+				 auto re_v03None = _mm_setzero_ps();
+
 				for (int_t k = 0; k < K; k += 4){
-					register auto re_v000 = _mm_setzero_ps();
-					register auto re_v010 = _mm_setzero_ps();
-					register auto re_v020 = _mm_setzero_ps();
-					register auto re_v030 = _mm_setzero_ps();
 
 				#define MULTIPLY_4x1(_m, _n, _k) \
-					register auto rhs_v##_m##_n##_k = _mm_set_ps(p_rhs[k + _k + K * (n + _n)], p_rhs[k + _k + K * (n + _n)], p_rhs[k + _k+ K * (n + _n)], p_rhs[k + _k + K * (n + _n)]); \
-					register auto lhs_v_p##_m##_n##_k =  _mm_load_ps(p_lhs + m + M * (k + _k) + _m * 4); \
-					re_v##_m##_n##0 = _mm_add_ps(re_v##_m##_n##0, _mm_mul_ps(lhs_v_p##_m##_n##_k, rhs_v##_m##_n##_k));
-
-				#define STORE_RE(_m, _n, _k) \
-					_mm_store_ps(p_re + m + 4 * _m + (n + _n) * M, _mm_add_ps(_mm_load_ps(p_re + m + 4 * _m + (n + _n) * M), re_v##_m##_n##0))
+					auto lhs_v_p##_m##_n##_k =  _mm_load_ps(p_lhs + (m + 4 * _m) * K + (k + _k) * 4); \
+					auto rhs_v##_m##_n##_k = _mm_set_ps(p_rhs[k + _k + K * (n + _n)], p_rhs[k + _k + K * (n + _n)], p_rhs[k + _k+ K * (n + _n)], p_rhs[k + _k + K * (n + _n)]); \
+					re_v##_m##_n##None = _mm_add_ps(re_v##_m##_n##None, _mm_mul_ps(lhs_v_p##_m##_n##_k, rhs_v##_m##_n##_k));
 
 					MULTIPLY_4x1(0, 0, 0);
 					MULTIPLY_4x1(0, 0, 1);
 					MULTIPLY_4x1(0, 0, 2);
 					MULTIPLY_4x1(0, 0, 3);
 
-					STORE_RE(0, 0, NONE);
-
 					MULTIPLY_4x1(0, 1, 0);
 					MULTIPLY_4x1(0, 1, 1);
 					MULTIPLY_4x1(0, 1, 2);
 					MULTIPLY_4x1(0, 1, 3);
-
-					STORE_RE(0, 1, NONE);
 
 					MULTIPLY_4x1(0, 2, 0);
 					MULTIPLY_4x1(0, 2, 1);
 					MULTIPLY_4x1(0, 2, 2);
 					MULTIPLY_4x1(0, 2, 3);
 
-					STORE_RE(0, 2, NONE);
-
-
 					MULTIPLY_4x1(0, 3, 0);
 					MULTIPLY_4x1(0, 3, 1);
 					MULTIPLY_4x1(0, 3, 2);
 					MULTIPLY_4x1(0, 3, 3);
-
-					STORE_RE(0, 3, NONE);
 				}
+
+				#define STORE_RE(_m, _n, _k) \
+					_mm_store_ps(p_re + m + 4 * _m + (n + _n) * M, re_v##_m##_n##None)
+
+				STORE_RE(0, 0, None);
+				STORE_RE(0, 1, None);
+				STORE_RE(0, 2, None);
+				STORE_RE(0, 3, None);
 			}
 		}
 	#ifdef __linux__
@@ -687,5 +693,79 @@ BENCHMARK(bm_t4n_mnk_prod_m4n4k4_sse)
 	// ->Args({ 14 * 14, 256, 256})
 	// ->Args({ 7 * 7, 256, 512})
 	// ->Args({ 7 * 7, 512, 512})
-	// ->Args({ 7 * 7, 512, 30})
+	->Args({ 8 * 8, 512, 32})
+	->UseRealTime();
+
+void bm_t4n_mnk_prod_asm(benchmark::State &state){
+	auto M = state.range(0);
+	auto K = state.range(1);
+	auto N = state.range(2);
+	auto p_lhs = new float[K * M];
+	auto p_rhs = new float[K * N];
+	auto p_re = new float[M * N];
+
+	p_re[0] =0;
+
+	auto tmp = new int[3];
+	tmp[0] = 0;
+
+	while (state.KeepRunning()){
+		for (int_t n = 0; n < N; n += 1){
+			for (int_t m = 0; m < M;  m += 4){
+				auto re_v00None = _mm_setzero_ps();
+
+				for (int_t k = 0; k < K; k += 1){
+
+					int src = 1;
+					int dst = 0;
+
+					asm volatile (
+						"movl %[k], (%[tmp])\n\t"
+						"movaps (%[tmp]), %%xmm0"
+						:[dst]"=r"(dst)
+						: [k]"r"(k), [tmp]"r"(tmp), "r"(p_lhs), "r"(p_rhs)
+					);
+
+					printf("this is value %d\n", tmp[0]);
+				}
+			}
+		}
+	#ifdef __linux__
+		benchmark::ClobberMemory();
+	#endif
+	}
+
+	delete[] p_lhs;
+	delete[] p_rhs;
+	delete[] p_re;
+
+	state.SetItemsProcessed(state.iterations() * M * K * N);
+}
+BENCHMARK(bm_t4n_mnk_prod_asm)
+	->Args({ 16, 16, 16 })
+	->Args({ 32, 32, 32 })
+	->Args({ 128, 128, 128 })
+	->Args({ 512, 512, 512 })
+	->Args({ 1024, 1024, 1024 })
+	///mobilenet_0.5
+	//general conv
+	// ->Args({ 112 * 112, 9, 3})
+	// //depthwise conv
+	// ->Args({ 112 * 112, 9 ,1})
+	// ->Args({ 56 * 56, 9, 1})
+	// ->Args({ 28 * 28, 9, 1})
+	// ->Args({ 14 * 14, 9, 1})
+	// ->Args({ 7 * 7, 9, 1})
+	//pointwise conv
+	->Args({ 112 * 112, 16, 32})
+	->Args({ 56 * 56, 32, 64})
+	->Args({ 56 * 56, 64, 64})
+	->Args({ 28 * 28, 64, 128})
+	->Args({ 28 * 28, 128, 128})
+	// ->Args({ 14 * 14, 128, 128})
+	// ->Args({ 14 * 14, 128, 256})
+	// ->Args({ 14 * 14, 256, 256})
+	// ->Args({ 7 * 7, 256, 512})
+	// ->Args({ 7 * 7, 512, 512})
+	->Args({ 8 * 8, 512, 32})
 	->UseRealTime();

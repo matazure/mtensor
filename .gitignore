@@ -42,6 +42,9 @@ build_android
 build_linux
 build_win
 build_bash
+build_icc
+build_android_icc
+tmp
 
 bin
 data

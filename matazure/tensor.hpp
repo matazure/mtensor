@@ -7,6 +7,7 @@
 #include <matazure/meta.hpp>
 #include <matazure/type_traits.hpp>
 #include <matazure/algorithm.hpp>
+#include <matazure/exception.hpp>
 
 #ifdef MATAZURE_CUDA
 #include <matazure/cuda/exception.hpp>
@@ -31,7 +32,12 @@ public:
 	first_major_layout(const pointi<rank> &shape) :
 		shape_(shape),
 		stride_(get_stride(shape))
-	{ }
+	{
+		auto tmp = shape_ >= 0;
+		for_each(tmp, [](bool b){
+			if (!b) throw invalid_shape{};
+		});
+	}
 
 	MATAZURE_GENERAL int_t index2offset(const pointi<rank> &id) const {
 		int_t offset = id[0];
@@ -73,8 +79,8 @@ private:
 	}
 
 private:
-	pointi<rank> shape_;
-	pointi<rank> stride_;
+	const pointi<rank> shape_;
+	const pointi<rank> stride_;
 };
 
 template <int_t _Rank>
@@ -645,20 +651,8 @@ private:
 			delete[] ptr;
 		});
 	}
-    // for (int i = 0; i < X.dim32(1); ++i){
-    //   const float * p_input = X.template data<float>() + X.dim32(3) * X.dim32(2) * i;
-    //   float * p_output = Y->template mutable_data<float>() + Y->dim32(3) * Y->dim32(2) * i;
-    //   const float * p_filter = filter.template data<float>();
-    //   auto sp_input = std::shared_ptr<const float>(p_input, [](const float *p){});
-    //   matazure::tensor<const float, 2> ts_input(pointi<2>{X.dim32(3), X.dim32(2)}, sp_input);
-    //   auto sp_output = std::shared_ptr<float>(p_output, [](const float *p){ });
-    //   matazure::tensor<float, 2> ts_output(pointi<2>{Y->dim32(3), Y->dim32(2)}, sp_output);
-    //   auto sp_filter = std::shared_ptr<const float>(p_filter, [](const float *p){});
-    //   static_tensor<float, dim<3,3>> ts_kenel;
-    //   fill(ts_kenel, 1.0f);
-    //   expr::conv_kenel3x3(ts_input, ts_kenel, ts_output);
-    // }
-	#ifdef MATAZURE_CUDA
+
+#ifdef MATAZURE_CUDA
 	shared_ptr<value_type> malloc_shared_memory(int_t size, pinned) {
 		decay_t<value_type> *data = nullptr;
 		cuda::assert_runtime_success(cudaMallocHost(&data, size * sizeof(value_type)));
@@ -666,7 +660,7 @@ private:
 			cuda::assert_runtime_success(cudaFreeHost(const_cast<decay_t<value_type> *>(ptr)));
 		});
 	}
-	#endif
+#endif
 
 public:
 	const pointi<rank>	extent_;
@@ -697,12 +691,16 @@ auto make_tensor(pointi<_Rank> ext, _Type *p_data)->tensor<_Type, _Rank, _Layout
 }
 
 template <typename _Type, int_t _Rank, typename _Layout = first_major_layout<_Rank>>
-auto make_tensor(pointi<_Rank> ext, aligned)->tensor<_Type, _Rank, _Layout>{
+auto make_tensor(pointi<_Rank> ext, _Type t, aligned, size_t alignment=16)->tensor<_Type, _Rank, _Layout>{
 	_Layout layout(ext);
 	auto ele_size = layout.stride()[_Rank - 1];
-	///TODO:
-	auto p_aligned = memalign(16, ele_size * sizeof(_Type));
-	std::shared_ptr<_Type> sp_data((_Type *)p_aligned, [](_Type *p){ free(p); });
+#ifdef __linux__
+	auto p_aligned = memalign(alignment, ele_size * sizeof(_Type));
+	std::shared_ptr<_Type> sp_data((_Type *)p_aligned, [](_Type *p) { free(p); });
+#else
+	auto p_aligned = _aligned_malloc(ele_size * sizeof(_Type), alignment);
+	std::shared_ptr<_Type> sp_data((_Type *)p_aligned, [](_Type *p) { _aligned_free(p); });
+#endif
 	return tensor<_Type, _Rank, _Layout>(ext, sp_data);
 }
 

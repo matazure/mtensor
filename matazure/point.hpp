@@ -227,7 +227,7 @@ template <int_t _Rank> using pointf = point<float, _Rank>;
 
 /// if two points are equal elementwise, return true, others false.
 template <typename _Ty, int_t _Rank>
-inline MATAZURE_GENERAL bool equal(point<_Ty, _Rank> lhs, point<_Ty, _Rank> rhs) {
+inline MATAZURE_GENERAL bool equal(const point<_Ty, _Rank> &lhs, const point<_Ty, _Rank> &rhs) {
 	for (int_t i = 0; i < lhs.size(); ++i) {
 		if ((lhs[i] != rhs[i])) return false;
 	}

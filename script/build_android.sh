@@ -1,7 +1,14 @@
-# export ANDROID_NDK=/mnt/d/android-ndk/linux-x86_64/android-ndk-r12b
+#!/bin/bash
 
 if [ -z "$ANDROID_NDK" ]; then
     echo "Did you set ANDROID_NDK variable?"
+    exit 1
+fi
+
+if [ -d "$ANDROID_NDK" ]; then
+    echo "Using Android ndk at $ANDROID_NDK"
+else
+    echo "Cannot find ndk: did you install it under $ANDROID_NDK?"
     exit 1
 fi
 

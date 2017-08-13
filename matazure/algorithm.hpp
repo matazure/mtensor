@@ -509,15 +509,16 @@ inline MATAZURE_GENERAL void copy(const _T1 &ts_src, _T2 &ts_dst, enable_if_t<no
 * @param init the initial value
 * @param binary_fun the reduce functor, must be (element, element)-> value pattern
 */
-template <typename _ExectutionPolicy, typename _Tensor, typename _VT, typename _BinaryFunc>
-inline MATAZURE_GENERAL _VT reduce(_ExectutionPolicy policy, _Tensor ts, _VT init, _BinaryFunc binary_fun, enable_if_t<none_device_memory<_Tensor>::value>* = 0) {
-	auto re = init;
-	for_each(ts, [&re, binary_fun](decltype(ts[0]) x) {
-		re = binary_fun(re, x);
-	});
-
-	return re;
-}
+///@todo
+// template <typename _ExectutionPolicy, typename _Tensor, typename _VT, typename _BinaryFunc>
+// inline MATAZURE_GENERAL _VT reduce(_ExectutionPolicy policy, _Tensor ts, _VT init, _BinaryFunc binary_fun, enable_if_t<none_device_memory<_Tensor>::value>* = 0) {
+// 	auto re = init;
+// 	for_each(policy, ts, [&re, binary_fun](decltype(ts[0]) x) {
+// 		re = binary_fun(re, x);
+// 	});
+//
+// 	return re;
+// }
 
 /**
 * @brief reduce the elements of a tensor by the sequence policy
@@ -526,7 +527,7 @@ inline MATAZURE_GENERAL _VT reduce(_ExectutionPolicy policy, _Tensor ts, _VT ini
 * @param binary_fun the reduce functor, must be (element, element)-> value pattern
 */
 template <typename _Tensor, typename _VT, typename _BinaryFunc>
-inline MATAZURE_GENERAL _VT reduce( _Tensor ts, _VT init, _BinaryFunc binary_fun) {
+inline MATAZURE_GENERAL _VT reduce(const _Tensor &ts, _VT init, _BinaryFunc binary_fun) {
 	sequence_policy policy{};
 	auto re = init;
 	for_each(policy, ts, [&re, binary_fun](decltype(ts[0]) x) {

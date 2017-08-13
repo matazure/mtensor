@@ -29,12 +29,14 @@ typedef Types<TENSOR<int, 1>, TENSOR<int, 2>, TENSOR<int, 3>, TENSOR<int, 4>> Im
 TYPED_TEST_CASE(TensorTest, ImplementTypes);
 
 TYPED_TEST(TensorTest, Construct){
-	{
+	//if the shape is less than zero, throw invalid_shape exception
+	EXPECT_THROW({
 		pointi<TypeParam::rank> ext{};
 		fill(ext, -10);
 		TypeParam ts(ext);
-	}
+	}, invalid_shape);	
 
+	//the zero shape is valid
 	{
 		pointi<TypeParam::rank> ext{};
 		fill(ext, 0);
@@ -43,12 +45,40 @@ TYPED_TEST(TensorTest, Construct){
 
 	{
 		pointi<TypeParam::rank> ext{};
-		fill(ext, 32);
+		fill(ext, 100);
 		TypeParam ts(ext);
+	}
+
+	{
+		pointi<TypeParam::rank> ext{};
+		fill(ext, 100);
+		auto ts = make_tensor(ext, typename TypeParam::value_type(0.0f),aligned{}, 16);
 	}
 }
 
-TYPED_TEST(TensorTest, ShapeStrideSize) {
+TYPED_TEST(TensorTest, ShapeSize) {
+	{
+		pointi<TypeParam::rank> ext{};
+		fill(ext, 0);
+		TypeParam ts(ext);
+		
+		EXPECT_EQ(0, ts.size());
+		for_each(ts.shape(), [](int_t dim) {
+			EXPECT_EQ(0, dim);
+		});
+	}
+
+	{
+		pointi<TypeParam::rank> ext{};
+		fill(ext, 10);
+		TypeParam ts(ext);
+
+		auto expect_size = reduce(ext, 1, [](int_t x1, int_t x2) { return x1*x2; });
+		EXPECT_EQ(expect_size, ts.size());
+		for_each(ts.shape(), [](int_t dim) {
+			EXPECT_EQ(10, dim);
+		});
+	}
 
 }
 

@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
 	//定义rbg图像
 	tensor<rgb, 2> ts_rgb(512, 512);
 	//将raw数据加载到ts_rgb中来
-	io::read_raw_data("data/lena_rgb888_512x512.raw_data", ts_rgb);
+	io::read_raw_data("lena_rgb888_512x512.raw_data", ts_rgb);
 	//选择是否使用CUDA
 #ifdef USE_CUDA
 	auto gts_rgb = mem_clone(ts_rgb, device{});
@@ -43,9 +43,9 @@ int main(int argc, char *argv[]) {
 	//拷贝结果到ts_red, ts_green, ts_blue中，因为ts_zip_point的元素是指向这三个通道的引用
 	copy(ts_rgb_normalized, ts_zip_point);
 	//保存raw数据
-	io::write_raw_data("data/lena_red_float_256x256.raw_data", ts_red);
-	io::write_raw_data("data/lena_green_float_256x256.raw_data", ts_green);
-	io::write_raw_data("data/lena_blue_float_256x256.raw_data", ts_blue);
+	io::write_raw_data("lena_red_float_256x256.raw_data", ts_red);
+	io::write_raw_data("lena_green_float_256x256.raw_data", ts_green);
+	io::write_raw_data("lena_blue_float_256x256.raw_data", ts_blue);
 
 	return 0;
 }

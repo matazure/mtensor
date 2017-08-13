@@ -117,7 +117,7 @@ struct blank_t {};
 
 #if defined(MATAZURE_DISABLE_ASSERTS)
 
-#define MATAZURE_ASSERT(expr) ((void)0)
+#define MATAZURE_ASSERT(expr, msg) ((void)0)
 
 #else
 
@@ -134,7 +134,7 @@ public:
 };
 
 inline void assertion_failed(char const * expr, char const * msg, char const * function, char const * file, long line) {
-	//throw assert_failed(std::string(msg));
+	throw assert_failed(std::string(msg));
 }
 
 }
@@ -142,4 +142,3 @@ inline void assertion_failed(char const * expr, char const * msg, char const * f
 #define MATAZURE_ASSERT(expr, msg) (MATAZURE_LIKELY(!!(expr))? ((void)0): ::matazure::assertion_failed(#expr, msg, MATAZURE_CURRENT_FUNCTION, __FILE__, __LINE__))
 
 #endif
-
