@@ -12,6 +12,8 @@ TEST(SSE, ArithmeticOperation){
 	lhs += rhs;
 	auto re = lhs + rhs;
 
+	auto p = new char[100];
+	_mm_prefetch(p, _MM_HINT_T0);
 	//_mm_add_ps
 
 	//pointi<2> p1{2, 3};

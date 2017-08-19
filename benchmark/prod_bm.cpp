@@ -9,6 +9,7 @@
 #include <Eigen/Dense>
 
 #include <cstdlib>
+#include <malloc.h>
 
 #ifndef EIGEN_VECTORIZE_SSE2
 #error not defined sse2
@@ -431,17 +432,18 @@ void bm_tn_nmk_prod_k4_sse(benchmark::State &state){
 	auto M = state.range(0);
 	auto K = state.range(1);
 	auto N = state.range(2);
+
 	auto p_lhs = new float[K * M];
 	auto p_rhs = new float[K * N];
 	auto p_re = new float[M * N];
 
 	while (state.KeepRunning()){
+
 		for (int_t n = 0; n < N; ++n){
 			for (int_t m = 0; m < M; ++m){
 				__m128 re0 = _mm_setzero_ps();
 				__m128 re1 = _mm_setzero_ps();
-				// __m128 re2 = _mm_setzero_ps();
-				// __m128 re3 = _mm_setzero_ps();
+
 				for (int_t k = 0; k < K; k += 8){
 					re0 = _mm_add_ps(re0, _mm_mul_ps(_mm_load_ps(p_lhs + m*K + k + 0), _mm_load_ps(p_rhs + n * K + k + 0)));
 					re1 = _mm_add_ps(re1, _mm_mul_ps(_mm_load_ps(p_lhs + m*K + k + 4), _mm_load_ps(p_rhs + n * K + k + 4)));
@@ -466,9 +468,11 @@ void bm_tn_nmk_prod_k4_sse(benchmark::State &state){
 				// p_re[m + n * M] += re[2];
 			}
 		}
+
 	#ifdef __linux__
 		benchmark::ClobberMemory();
 	#endif
+
 	}
 
 	delete[] p_lhs;
@@ -478,6 +482,7 @@ void bm_tn_nmk_prod_k4_sse(benchmark::State &state){
 	state.SetItemsProcessed(state.iterations() * M * K * N);
 }
 BENCHMARK(bm_tn_nmk_prod_k4_sse)
+	// ->Args({1, 1024 * 1024, 1})
 	->Args({ 32, 32, 32 })
 	->Args({ 128, 128, 128 })
 	->Args({ 512, 512, 512 })
@@ -509,9 +514,9 @@ void bm_nn_nkm_prod_n4k4m4_sse(benchmark::State &state){
 	auto M = state.range(0);
 	auto K = state.range(1);
 	auto N = state.range(2);
-	auto p_lhs = new float[K * M];
-	auto p_rhs = new float[K * N];
-	auto p_re = new float[M * N];
+	auto p_lhs = (float *)memalign(16, K * M * 4);
+	auto p_rhs = (float *)memalign(16, K * N * 4);
+	auto p_re = (float *)memalign(16, M * N * 4);
 
 	while (state.KeepRunning()){
 		for (int_t n = 0; n < N; n += 4){
@@ -568,9 +573,9 @@ void bm_nn_nkm_prod_n4k4m4_sse(benchmark::State &state){
 	#endif
 	}
 
-	delete[] p_lhs;
-	delete[] p_rhs;
-	delete[] p_re;
+	free(p_lhs);
+	free(p_rhs);
+	free(p_re);
 
 	state.SetItemsProcessed(state.iterations() * M * K * N);
 }
@@ -607,11 +612,17 @@ void bm_t4n_mnk_prod_m4n4k4_sse(benchmark::State &state){
 	auto M = state.range(0);
 	auto K = state.range(1);
 	auto N = state.range(2);
-	auto p_lhs = new float[K * M];
-	auto p_rhs = new float[K * N];
-	auto p_re = new float[M * N];
+
 
 	while (state.KeepRunning()){
+		auto p_lhs = new float[K * M];
+		auto p_rhs = new float[K * N];
+		auto p_re = new float[M * N];
+
+		for (auto  p_rhs_prefetch = p_rhs; p_rhs_prefetch < (p_rhs + N * K); p_rhs_prefetch += 16){
+			_mm_prefetch(p_rhs, _MM_HINT_NTA);
+		}
+
 		for (int_t m = 0; m < M;  m += 4){
 			for (int_t n = 0; n < N; n += 4){
 				 auto re_v00None = _mm_setzero_ps();
@@ -619,7 +630,17 @@ void bm_t4n_mnk_prod_m4n4k4_sse(benchmark::State &state){
 				 auto re_v02None = _mm_setzero_ps();
 				 auto re_v03None = _mm_setzero_ps();
 
+				//  auto p_lhs_tmp = p_lhs + 0 * 4 + m * K;
+				//  auto p_rhs_tmp = p_rhs + 0 * 4 + K * n;
+				//  _mm_prefetch(p_lhs_tmp + 16, _MM_HINT_T1);
+				//  _mm_prefetch(p_rhs_tmp + K, _MM_HINT_T1);
+
+
 				for (int_t k = 0; k < K; k += 4){
+					// auto p_lhs_tmp = p_lhs + k * 4 + m * K;
+					// auto p_rhs_tmp = p_rhs + k * 4 + K * n;
+					//  _mm_prefetch(p_lhs_tmp + 16, _MM_HINT_T0);
+					//  _mm_prefetch(p_lhs_tmp + 16, _MM_HINT_T0);
 
 				#define MULTIPLY_4x1(_m, _n, _k) \
 					auto lhs_v_p##_m##_n##_k =  _mm_load_ps(p_lhs + (m + 4 * _m) * K + (k + _k) * 4); \
@@ -656,14 +677,17 @@ void bm_t4n_mnk_prod_m4n4k4_sse(benchmark::State &state){
 				STORE_RE(0, 3, None);
 			}
 		}
+
+		delete[] p_lhs;
+		delete[] p_rhs;
+		delete[] p_re;
+
 	#ifdef __linux__
 		benchmark::ClobberMemory();
 	#endif
 	}
 
-	delete[] p_lhs;
-	delete[] p_rhs;
-	delete[] p_re;
+
 
 	state.SetItemsProcessed(state.iterations() * M * K * N);
 }
@@ -696,13 +720,158 @@ BENCHMARK(bm_t4n_mnk_prod_m4n4k4_sse)
 	->Args({ 8 * 8, 512, 32})
 	->UseRealTime();
 
-void bm_t4n_mnk_prod_asm(benchmark::State &state){
+void bm_t4n_mnk_prod_m4n4k4_sse_seq(benchmark::State &state){
 	auto M = state.range(0);
 	auto K = state.range(1);
 	auto N = state.range(2);
-	auto p_lhs = new float[K * M];
-	auto p_rhs = new float[K * N];
-	auto p_re = new float[M * N];
+
+
+	while (state.KeepRunning()){
+		auto p_lhs = new float[K * M];
+		auto p_rhs = new float[K * N];
+		auto p_re = new float[M * N];
+
+		for (auto  p_rhs_prefetch = p_rhs; p_rhs_prefetch < (p_rhs + N * K); p_rhs_prefetch += 16){
+			_mm_prefetch(p_rhs, _MM_HINT_NTA);
+		}
+
+		for (int_t m = 0; m < M;  m += 4){
+			for (int_t n = 0; n < N; n += 4){
+				auto re_0 = _mm_setzero_ps();
+				auto re_1 = _mm_setzero_ps();
+				auto re_2 = _mm_setzero_ps();
+				auto re_3 = _mm_setzero_ps();
+
+				auto p_lhs_tmp = p_lhs + m * K;
+				auto p_rhs_tmp = p_rhs + n * K;
+				auto p_re_tmp = p_re + n * 4 + m * N;
+
+				for (int_t k = 0; k < K; k += 4){
+					auto lhs0 = _mm_load_ps(p_lhs_tmp);
+					p_lhs_tmp += 4;
+					auto lhs1 = _mm_load_ps(p_lhs_tmp);
+					p_lhs_tmp += 4;
+					auto lhs2 = _mm_load_ps(p_lhs_tmp);
+					p_lhs_tmp += 4;
+					auto lhs3 = _mm_load_ps(p_lhs_tmp);
+					p_lhs_tmp += 4;
+
+					auto rhs00 = _mm_load_ps1(p_rhs_tmp);
+					p_rhs_tmp += 1;
+					re_0 += lhs0 * rhs00;
+					auto rhs10 = _mm_load_ps1(p_rhs_tmp);
+					p_rhs_tmp += 1;
+					re_0 += lhs1 * rhs10;
+					auto rhs20 = _mm_load_ps1(p_rhs_tmp);
+					p_rhs_tmp += 1;
+					re_0 += lhs2 * rhs20;
+					auto rhs30 = _mm_load_ps1(p_rhs_tmp);
+					p_rhs_tmp += 1;
+					re_0 += lhs3 * rhs30;
+
+					auto rhs01 = _mm_load_ps1(p_rhs_tmp);
+					p_rhs_tmp += 1;
+					re_1 += lhs0 * rhs01;
+					auto rhs11 = _mm_load_ps1(p_rhs_tmp);
+					p_rhs_tmp += 1;
+					re_1 += lhs1 * rhs11;
+					auto rhs21 = _mm_load_ps1(p_rhs_tmp);
+					p_rhs_tmp += 1;
+					re_1 += lhs2 * rhs21;
+					auto rhs31 = _mm_load_ps1(p_rhs_tmp);
+					p_rhs_tmp += 1;
+					re_1 += lhs3 * rhs31;
+
+					auto rhs02 = _mm_load_ps1(p_rhs_tmp);
+					p_rhs_tmp += 1;
+					re_2 += lhs0 * rhs02;
+					auto rhs12 = _mm_load_ps1(p_rhs_tmp);
+					p_rhs_tmp += 1;
+					re_2 += lhs1 * rhs12;
+					auto rhs22 = _mm_load_ps1(p_rhs_tmp);
+					p_rhs_tmp += 1;
+					re_2 += lhs2 * rhs22;
+					auto rhs32 = _mm_load_ps1(p_rhs_tmp);
+					p_rhs_tmp += 1;
+					re_2 += lhs3 * rhs32;
+
+					auto rhs03 = _mm_load_ps1(p_rhs_tmp);
+					p_rhs_tmp += 1;
+					re_3 += lhs0 * rhs03;
+					auto rhs13 = _mm_load_ps1(p_rhs_tmp);
+					p_rhs_tmp += 1;
+					re_3 += lhs1 * rhs13;
+					auto rhs23 = _mm_load_ps1(p_rhs_tmp);
+					p_rhs_tmp += 1;
+					re_3 += lhs2 * rhs23;
+					auto rhs33 = _mm_load_ps1(p_rhs_tmp);
+					p_rhs_tmp += 1;
+					re_3 += lhs3 * rhs33;
+				}
+
+				_mm_store_ps(p_re_tmp, re_0);
+				p_re_tmp += 4;
+				_mm_store_ps(p_re_tmp, re_1);
+				p_re_tmp += 4;
+				_mm_store_ps(p_re_tmp, re_2);
+				p_re_tmp += 4;
+				_mm_store_ps(p_re_tmp, re_3);
+				p_re_tmp += 4;
+			}
+		}
+
+		delete[] p_lhs;
+		delete[] p_rhs;
+		delete[] p_re;
+
+	#ifdef __linux__
+		benchmark::ClobberMemory();
+	#endif
+	}
+
+
+
+	state.SetItemsProcessed(state.iterations() * M * K * N);
+}
+BENCHMARK(bm_t4n_mnk_prod_m4n4k4_sse_seq)
+	->Args({ 16, 16, 16 })
+	->Args({ 32, 32, 32 })
+	->Args({ 128, 128, 128 })
+	->Args({ 512, 512, 512 })
+	->Args({ 1024, 1024, 1024 })
+	///mobilenet_0.5
+	//general conv
+	// ->Args({ 112 * 112, 9, 3})
+	// //depthwise conv
+	// ->Args({ 112 * 112, 9 ,1})
+	// ->Args({ 56 * 56, 9, 1})
+	// ->Args({ 28 * 28, 9, 1})
+	// ->Args({ 14 * 14, 9, 1})
+	// ->Args({ 7 * 7, 9, 1})
+	//pointwise conv
+	->Args({ 112 * 112, 16, 32})
+	->Args({ 56 * 56, 32, 64})
+	->Args({ 56 * 56, 64, 64})
+	->Args({ 28 * 28, 64, 128})
+	->Args({ 28 * 28, 128, 128})
+	// ->Args({ 14 * 14, 128, 128})
+	// ->Args({ 14 * 14, 128, 256})
+	// ->Args({ 14 * 14, 256, 256})
+	// ->Args({ 7 * 7, 256, 512})
+	// ->Args({ 7 * 7, 512, 512})
+	->Args({ 8 * 8, 512, 32})
+	->UseRealTime();
+
+void bm_t4n_mnk_prod_asm(benchmark::State &state){
+	size_t M = state.range(0);
+	size_t K = state.range(1);
+	size_t N = state.range(2);
+	// auto p_lhs = new float[K * M];
+	// auto p_rhs = new float[K * N];
+	// auto p_re = new float[M * N];
+	auto p_lhs = (float *)memalign(16, K * M * 4);
+	auto p_rhs = (float *)memalign(16, K * N * 4);
+	auto p_re = (float *)memalign(16, M * N * 4);
 
 	p_re[0] =0;
 
@@ -710,23 +879,50 @@ void bm_t4n_mnk_prod_asm(benchmark::State &state){
 	tmp[0] = 0;
 
 	while (state.KeepRunning()){
-		for (int_t n = 0; n < N; n += 1){
-			for (int_t m = 0; m < M;  m += 4){
-				auto re_v00None = _mm_setzero_ps();
+		for (int_t m = 0; m < M;  m += 4){
+			for (int_t n = 0; n < N; n += 4){
+					auto p_re_tmp = p_re + n * 4 + m * N;
+					auto p_lhs_tmp = p_lhs + 0 * 4 + m * K;
+					auto p_rhs_tmp = p_rhs + 0 * 4 + K * n;
+					_mm_prefetch(p_lhs_tmp + K, _MM_HINT_T1);
+					_mm_prefetch(p_rhs_tmp + K, _MM_HINT_T1);
+					_mm_prefetch(p_re_tmp, _MM_HINT_T1);
 
-				for (int_t k = 0; k < K; k += 1){
-
-					int src = 1;
-					int dst = 0;
-
+				for (int_t k = 0; k < K; k += 4){
+				#ifdef __linux__
 					asm volatile (
-						"movl %[k], (%[tmp])\n\t"
-						"movaps (%[tmp]), %%xmm0"
-						:[dst]"=r"(dst)
-						: [k]"r"(k), [tmp]"r"(tmp), "r"(p_lhs), "r"(p_rhs)
+						"movaps (%[p_lhs_tmp]), %%xmm0\n\t"
+						"movaps 16(%[p_lhs_tmp]), %%xmm1\n\t"
+						"movaps 32(%[p_lhs_tmp]), %%xmm2\n\t"
+						"movaps 48(%[p_lhs_tmp]), %%xmm3\n\t"
+						"movq $48, %%rcx\n\t"
+						"1:\n\t"
+						"movss (%[p_rhs_tmp], %%rcx), %%xmm4\n\t"
+						"shufps $0, %%xmm4, %%xmm4\n\t"
+						"mulps %%xmm0, %%xmm4\n\t"
+						"movaps %%xmm4, %%xmm5\n\t"
+						"movss 4(%[p_rhs_tmp], %%rcx), %%xmm4\n\t"
+						"shufps $0, %%xmm4, %%xmm4\n\t"
+						"mulps %%xmm1, %%xmm4\n\t"
+						"addps %%xmm4, %%xmm5\n\t"
+						"movss 8(%[p_rhs_tmp], %%rcx), %%xmm4\n\t"
+						"shufps $0, %%xmm4, %%xmm4\n\t"
+						"mulps %%xmm2, %%xmm4\n\t"
+						"addps %%xmm4, %%xmm5\n\t"
+						"movss 12(%[p_rhs_tmp], %%rcx), %%xmm4\n\t"
+						"shufps $0, %%xmm4, %%xmm4\n\t"
+						"mulps %%xmm3, %%xmm4\n\t"
+						"addps %%xmm4, %%xmm5\n\t"
+						"movaps %%xmm5, (%[p_re_tmp], %%rcx)\n\t"
+						"subq $16, %%rcx\n\t"
+						"jge 1b\n\t"
+						:
+						: [p_lhs_tmp]"r"(p_lhs_tmp), [p_rhs_tmp]"r"(p_rhs_tmp), [p_re_tmp]"r"(p_re_tmp)
+						: "rcx", "memory", "cc"
 					);
-
-					printf("this is value %d\n", tmp[0]);
+				#endif
+					p_lhs_tmp += 4;
+					p_rhs_tmp += 4;
 				}
 			}
 		}
@@ -735,9 +931,12 @@ void bm_t4n_mnk_prod_asm(benchmark::State &state){
 	#endif
 	}
 
-	delete[] p_lhs;
-	delete[] p_rhs;
-	delete[] p_re;
+	// delete[] p_lhs;
+	// delete[] p_rhs;
+	// delete[] p_re;
+	free(p_lhs);
+	free(p_rhs);
+	free(p_re);
 
 	state.SetItemsProcessed(state.iterations() * M * K * N);
 }
@@ -747,6 +946,7 @@ BENCHMARK(bm_t4n_mnk_prod_asm)
 	->Args({ 128, 128, 128 })
 	->Args({ 512, 512, 512 })
 	->Args({ 1024, 1024, 1024 })
+	->Args({ 2048, 2048, 2048 })
 	///mobilenet_0.5
 	//general conv
 	// ->Args({ 112 * 112, 9, 3})
