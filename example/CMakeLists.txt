@@ -1,4 +1,7 @@
 #add host example
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/vendor/stb)
+
 file(GLOB Files ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 foreach(File ${Files})
 	set_source_files_properties(${File} PROPERTIES LANGUAGE CXX)

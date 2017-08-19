@@ -1,5 +1,8 @@
 ﻿#include <matazure/tensor>
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION /
+#include <stb_image_write.h>
+
 using namespace matazure;
 
 #ifdef USE_CUDA
@@ -57,8 +60,8 @@ int main() {
 	auto ts_mandelbrot_rgb = make_lambda(shape, mandelbrot_fun, host{}).persist();
 #endif
 #endif
-	//将结果写入raw数据了，可以使用ImageMagick等工具查看
-	io::write_raw_data("mandelbrot_rgb888_2048x2048.raw_data", ts_mandelbrot_rgb);
+
+	stbi_write_png("mandelbrot.png", shape[0], shape[1], 3, ts_mandelbrot_rgb.data(), shape[0] * 3);
 
 	return 0;
 }

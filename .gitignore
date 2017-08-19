@@ -47,7 +47,6 @@ build_android_icc
 tmp
 
 bin
-data
 doc
 log
 x64

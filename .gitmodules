@@ -10,3 +10,6 @@
 [submodule "benchmark/vendor/eigen"]
 	path = benchmark/vendor/eigen
 	url = git@github.com:Matazure/eigen.git
+[submodule "example/vendor/stb"]
+	path = example/vendor/stb
+	url = git@github.com:Matazure/stb.git
