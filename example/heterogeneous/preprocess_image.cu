@@ -1,4 +1,10 @@
 ﻿#include <matazure/tensor>
+
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <stb_image_write.h>
+
 using namespace matazure;
 
 #ifdef USE_CUDA
@@ -8,15 +14,22 @@ using namespace matazure;
 #endif
 
 int main(int argc, char *argv[]) {
-	//定义3个字节的rgb类型
+	//加载图像
+	pointi<3> shape{};
+	auto data = stbi_load("data/Lenna.png", &shape[1], &shape[2], &shape[0], false);
+	if (shape[0] != 3) {
+		printf("need a 3 channel image");
+		return -1;
+	}
+
 	typedef point<byte, 3> rgb;
-	//定义rbg图像
-	tensor<rgb, 2> ts_rgb(512, 512);
-	//将raw数据加载到ts_rgb中来
-	io::read_raw_data("lena_rgb888_512x512.raw_data", ts_rgb);
+	tensor<rgb, 2> ts_rgb(pointi<2>{shape[1], shape[2]}, shared_ptr<rgb>(reinterpret_cast<rgb *>(data), [ ](rgb *p) {
+		stbi_image_free(p);
+	}));
+
 	//选择是否使用CUDA
 #ifdef USE_CUDA
-	auto gts_rgb = mem_clone(ts_rgb, device{});
+	auto gts_rgb = mem_clone(ts_rgb, device_tag{});
 #else
 	auto &gts_rgb = ts_rgb;
 #endif
@@ -28,7 +41,7 @@ int main(int argc, char *argv[]) {
 	auto gts_rgb_normalized = glts_rgb_normalized.persist();
 #ifdef USE_CUDA
 	cuda::device_synchronize();
-	auto ts_rgb_normalized = mem_clone(gts_rgb_normalized, host{});
+	auto ts_rgb_normalized = mem_clone(gts_rgb_normalized, host_tag{});
 #else
 	auto &ts_rgb_normalized = gts_rgb_normalized;
 #endif
@@ -43,9 +56,9 @@ int main(int argc, char *argv[]) {
 	//拷贝结果到ts_red, ts_green, ts_blue中，因为ts_zip_point的元素是指向这三个通道的引用
 	copy(ts_rgb_normalized, ts_zip_point);
 	//保存raw数据
-	io::write_raw_data("lena_red_float_256x256.raw_data", ts_red);
-	io::write_raw_data("lena_green_float_256x256.raw_data", ts_green);
-	io::write_raw_data("lena_blue_float_256x256.raw_data", ts_blue);
+	io::write_raw_data("Lenna_red_float_" + std::to_string(shape[1]) + "x" + std::to_string(shape[2]) + ".raw_data", ts_red);
+	io::write_raw_data("Lenna_green_float_" + std::to_string(shape[1]) + "x" + std::to_string(shape[2]) + ".raw_data", ts_green);
+	io::write_raw_data("Lenna_blue_float_" + std::to_string(shape[1]) + "x" + std::to_string(shape[2]) + ".raw_data", ts_blue);
 
 	return 0;
 }

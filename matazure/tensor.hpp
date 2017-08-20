@@ -325,7 +325,7 @@ public:
 	typedef value_type &			reference;
 	typedef const value_type &		const_reference;
 	typedef linear_index			index_type;
-	typedef local					memory_type;
+	typedef local_tag				memory_type;
 
 	/**
 	* @brief accesses element by linear access mode
@@ -469,7 +469,7 @@ public:
 	/// primitive linear access mode
 	typedef linear_index					index_type;
 	/// host memory type
-	typedef host							memory_type;
+	typedef host_tag						memory_type;
 
 public:
 	/// default constructor
@@ -747,7 +747,7 @@ public:
 	typedef typename internal::get_functor_accessor_type<_Rank, _Func>::type	index_type;
 
 	typedef _Layout											layout_type;
-	typedef host											memory_type;
+	typedef host_tag										memory_type;
 
 public:
 	/**
@@ -869,7 +869,7 @@ inline void mem_copy(_TensorSrc ts_src, _TensorDst ts_dst, enable_if_t<are_host_
 * @return a new tensor which clones source tensor
 */
 template <typename _ValueType, int_t _Rank, typename _Layout>
-inline tensor<_ValueType, _Rank, _Layout> mem_clone(tensor<_ValueType, _Rank, _Layout> ts, host) {
+inline tensor<_ValueType, _Rank, _Layout> mem_clone(tensor<_ValueType, _Rank, _Layout> ts, host_tag) {
 	tensor<_ValueType, _Rank, _Layout> ts_re(ts.shape());
 	mem_copy(ts, ts_re);
 	return ts_re;
@@ -881,8 +881,8 @@ inline tensor<_ValueType, _Rank, _Layout> mem_clone(tensor<_ValueType, _Rank, _L
 * @return a new tensor which clones source tensor
 */
 template <typename _ValueType, int_t _Rank, typename _Layout>
-inline auto mem_clone(tensor<_ValueType, _Rank, _Layout> ts)->decltype(mem_clone(ts, host{})) {
-	return mem_clone(ts, host{});
+inline auto mem_clone(tensor<_ValueType, _Rank, _Layout> ts)->decltype(mem_clone(ts, host_tag{})) {
+	return mem_clone(ts, host_tag{});
 }
 
 /**

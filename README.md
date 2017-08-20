@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
     io::read_raw_data("data/lena_rgb888_512x512.raw_data", ts_rgb);
     //选择是否使用CUDA
 #ifdef WITH_CUDA
-    auto gts_rgb = mem_clone(ts_rgb, device{});
+    auto gts_rgb = mem_clone(ts_rgb, device_tag{});
 #else
     auto &gts_rgb = ts_rgb;
 #endif
@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
     auto gts_rgb_normalized = glts_rgb_normalized.persist();
 #ifdef WITH_CUDA
     cuda::device_synchronize();
-    auto ts_rgb_normalized = mem_clone(gts_rgb_normalized, host{});
+    auto ts_rgb_normalized = mem_clone(gts_rgb_normalized, host_tag{});
 #else
     auto &ts_rgb_normalized = gts_rgb_normalized;
 #endif

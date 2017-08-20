@@ -22,7 +22,7 @@ public:
 	typedef value_type *					pointer;
 	typedef linear_index					index_type;
 	typedef _Layout							layout_type;
-	typedef device						memory_type;
+	typedef device_tag						memory_type;
 
 	tensor() :
 		tensor(pointi<rank>::zeros())
@@ -128,7 +128,7 @@ public:
 	typedef _Reference									reference;
 	typedef remove_reference_t<reference>				value_type;
 	typedef _AccessMode									index_type;
-	typedef device									memory_type;
+	typedef device_tag									memory_type;
 	typedef _Layout										layout_type;
 
 public:
@@ -213,7 +213,7 @@ public:
 	typedef typename functor_traits::result_type			reference;
 	typedef remove_reference_t<reference>					value_type;
 	typedef typename matazure::internal::get_functor_accessor_type<_Rank, _Func>::type		index_type;
-	typedef device										memory_type;
+	typedef device_tag										memory_type;
 	typedef _Layout											layout_type;
 
 public:
@@ -307,7 +307,7 @@ inline void MATAZURE_DEVICE barrier() {
 } //device
 
 template <typename _Type, int_t _Rank, typename _Layout>
-inline tensor<_Type, _Rank, _Layout> mem_clone(tensor<_Type, _Rank, _Layout> ts, device) {
+inline tensor<_Type, _Rank, _Layout> mem_clone(tensor<_Type, _Rank, _Layout> ts, device_tag) {
 	tensor<_Type, _Rank, _Layout> ts_re(ts.shape());
 	mem_copy(ts, ts_re);
 	return ts_re;
@@ -315,18 +315,18 @@ inline tensor<_Type, _Rank, _Layout> mem_clone(tensor<_Type, _Rank, _Layout> ts,
 
 template <typename _Type, int_t _Rank, typename _Layout>
 inline tensor<_Type, _Rank, _Layout> mem_clone(tensor<_Type, _Rank, _Layout> ts) {
-	return mem_clone(ts, device{});
+	return mem_clone(ts, device_tag{});
 }
 
 template <typename _Type, int_t _Rank, typename _Layout>
-inline tensor<_Type, _Rank, _Layout> mem_clone(matazure::tensor<_Type, _Rank, _Layout> ts, device) {
+inline tensor<_Type, _Rank, _Layout> mem_clone(matazure::tensor<_Type, _Rank, _Layout> ts, device_tag) {
 	tensor<_Type, _Rank, _Layout> ts_re(ts.shape());
 	mem_copy(ts, ts_re);
 	return ts_re;
 }
 
 template <typename _Type, int_t _Rank, typename _Layout>
-inline matazure::tensor<_Type, _Rank, _Layout> mem_clone(tensor<_Type, _Rank, _Layout> ts, host) {
+inline matazure::tensor<_Type, _Rank, _Layout> mem_clone(tensor<_Type, _Rank, _Layout> ts, host_tag) {
 	matazure::tensor<_Type, _Rank, _Layout> ts_re(ts.shape());
 	mem_copy(ts, ts_re);
 	return ts_re;

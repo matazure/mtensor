@@ -17,6 +17,10 @@
 
 //for cuda
 #ifdef __CUDACC__
+	#if __CUDACC_VER_MAJOR__ < 8
+		#error CUDA minimum version is 8.0
+	#endif
+
 	#define MATAZURE_CUDA
 #endif
 #ifdef MATAZURE_CUDA

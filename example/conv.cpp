@@ -5,7 +5,7 @@ using namespace matazure;
 
 int main(){
 
-	tensor<float, 2> ts_input(224, 224);
+	tensor<float, 2> ts_input(pointi<2>{224, 224});
 	tensor<float, 2> ts_output(ts_input.shape());
 	//static_tensor<float, dim<112, 112>> ts_input{};
 	static_tensor<float, dim<3, 3>> sts_kenel{};

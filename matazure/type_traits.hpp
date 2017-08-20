@@ -12,9 +12,9 @@ typedef last_major row_major_t;
 struct linear_index {};
 struct array_index {};
 
-struct host {};
-struct device {};
-struct local {};
+struct host_tag {};
+struct device_tag {};
+struct local_tag {};
 
 struct pinned {};
 struct unpinned {};
@@ -78,8 +78,8 @@ struct name<_Tensor, _OtherTensors...> : bool_constant<						\
 	is_same<typename _Tensor::tag_name, tag>::value							\
 	&& name<_OtherTensors...>::value> {};
 
-MATAZURE_DEFINE_ARE_TAG(are_host_memory, memory_type, host)
-MATAZURE_DEFINE_ARE_TAG(are_device_memory, memory_type, device)
+MATAZURE_DEFINE_ARE_TAG(are_host_memory, memory_type, host_tag)
+MATAZURE_DEFINE_ARE_TAG(are_device_memory, memory_type, device_tag)
 MATAZURE_DEFINE_ARE_TAG(are_linear_access, index_type, linear_index)
 MATAZURE_DEFINE_ARE_TAG(are_array_access, index_type, array_index)
 
@@ -96,8 +96,8 @@ struct name<_Tensor, _OtherTensors...> : bool_constant<		\
 	!is_same<typename _Tensor::tag_name, tag>::value		\
 	&& name<_OtherTensors...>::value> {};
 
-MATAZURE_DEFINE_NONE_TAG(none_host_memory, memory_type, host)
-MATAZURE_DEFINE_NONE_TAG(none_device_memory, memory_type, device)
+MATAZURE_DEFINE_NONE_TAG(none_host_memory, memory_type, host_tag)
+MATAZURE_DEFINE_NONE_TAG(none_device_memory, memory_type, device_tag)
 MATAZURE_DEFINE_NONE_TAG(none_linear_access, index_type, linear_index)
 MATAZURE_DEFINE_NONE_TAG(none_array_access, index_type, array_index)
 

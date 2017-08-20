@@ -27,7 +27,7 @@ inline auto make_lambda(pointi<_Rank> extent, _Func fun)->lambda_tensor<_Rank, _
 * @param the functor, a index -> value pattern
 */
 template <int_t _Rank, typename _Func>
-inline auto make_lambda(pointi<_Rank> extent, _Func fun, host)->lambda_tensor<_Rank, _Func>{
+inline auto make_lambda(pointi<_Rank> extent, _Func fun, host_tag)->lambda_tensor<_Rank, _Func>{
 	return lambda_tensor<_Rank, _Func>(extent, fun);
 }
 
@@ -64,7 +64,7 @@ inline auto make_lambda(pointi<_Rank> ext, _Func fun, enable_if_t<!MATAZURE_IS_D
 }
 
 template <int_t _Rank, typename _Func>
-inline auto make_lambda(pointi<_Rank> ext, _Func fun, host, enable_if_t<!MATAZURE_IS_D_LAMBDA(_Func) && !MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)->decltype(make_host_lambda(ext, fun)) {
+inline auto make_lambda(pointi<_Rank> ext, _Func fun, host_tag, enable_if_t<!MATAZURE_IS_D_LAMBDA(_Func) && !MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)->decltype(make_host_lambda(ext, fun)) {
 	return make_host_lambda(ext, fun);
 }
 
@@ -72,7 +72,7 @@ inline auto make_lambda(pointi<_Rank> ext, _Func fun, host, enable_if_t<!MATAZUR
 * @todo: not support device struct operator, it's diffcult to do this.
 */
 template <int_t _Rank, typename _Func>
-inline auto make_lambda(pointi<_Rank> ext, _Func fun, device, enable_if_t<!MATAZURE_IS_D_LAMBDA(_Func) && !MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)->decltype(cuda::make_general_lambda(ext, fun)) {
+inline auto make_lambda(pointi<_Rank> ext, _Func fun, device_tag, enable_if_t<!MATAZURE_IS_D_LAMBDA(_Func) && !MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)->decltype(cuda::make_general_lambda(ext, fun)) {
 	return cuda::make_general_lambda(ext, fun);
 }
 
@@ -82,12 +82,12 @@ inline auto make_lambda(pointi<_Rank> ext, _Func fun, enable_if_t<MATAZURE_IS_HD
 }
 
 template <int_t _Rank, typename _Func>
-inline auto make_lambda(pointi<_Rank> ext, _Func fun, device, enable_if_t<MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)->decltype(cuda::make_general_lambda(ext, fun)) {
+inline auto make_lambda(pointi<_Rank> ext, _Func fun, device_tag, enable_if_t<MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)->decltype(cuda::make_general_lambda(ext, fun)) {
 	return cuda::make_general_lambda(ext, fun);
 }
 
 template <int_t _Rank, typename _Func>
-inline auto make_lambda(pointi<_Rank> ext, _Func fun, host, enable_if_t<MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)->decltype(make_host_lambda(ext, fun)) {
+inline auto make_lambda(pointi<_Rank> ext, _Func fun, host_tag, enable_if_t<MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)->decltype(make_host_lambda(ext, fun)) {
 	return make_host_lambda(ext, fun);
 }
 
@@ -97,7 +97,7 @@ inline auto make_lambda(pointi<_Rank> ext, _Func fun, enable_if_t<MATAZURE_IS_D_
 }
 
 template <typename _ValueType, typename _Access, int_t _Rank, typename _Func>
-inline auto make_lambda(pointi<_Rank> ext, _Func fun, device, enable_if_t<MATAZURE_IS_D_LAMBDA(_Func)>* = nullptr)->decltype(cuda::make_device_lambda<_ValueType, _Access>(ext, fun)) {
+inline auto make_lambda(pointi<_Rank> ext, _Func fun, device_tag, enable_if_t<MATAZURE_IS_D_LAMBDA(_Func)>* = nullptr)->decltype(cuda::make_device_lambda<_ValueType, _Access>(ext, fun)) {
 	return cuda::make_device_lambda<_ValueType, _Access>(ext, fun);
 }
 

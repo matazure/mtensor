@@ -514,9 +514,9 @@ void bm_nn_nkm_prod_n4k4m4_sse(benchmark::State &state){
 	auto M = state.range(0);
 	auto K = state.range(1);
 	auto N = state.range(2);
-	auto p_lhs = (float *)memalign(16, K * M * 4);
-	auto p_rhs = (float *)memalign(16, K * N * 4);
-	auto p_re = (float *)memalign(16, M * N * 4);
+	auto p_lhs = new float[K * M];
+	auto p_rhs = new float[K * N];
+	auto p_re = new float[M * N];
 
 	while (state.KeepRunning()){
 		for (int_t n = 0; n < N; n += 4){
@@ -573,9 +573,9 @@ void bm_nn_nkm_prod_n4k4m4_sse(benchmark::State &state){
 	#endif
 	}
 
-	free(p_lhs);
-	free(p_rhs);
-	free(p_re);
+	delete[] p_lhs;
+	delete[] p_rhs;
+	delete[] p_re;
 
 	state.SetItemsProcessed(state.iterations() * M * K * N);
 }
@@ -620,7 +620,7 @@ void bm_t4n_mnk_prod_m4n4k4_sse(benchmark::State &state){
 		auto p_re = new float[M * N];
 
 		for (auto  p_rhs_prefetch = p_rhs; p_rhs_prefetch < (p_rhs + N * K); p_rhs_prefetch += 16){
-			_mm_prefetch(p_rhs, _MM_HINT_NTA);
+			_mm_prefetch((char *)p_rhs, _MM_HINT_NTA);
 		}
 
 		for (int_t m = 0; m < M;  m += 4){
@@ -732,7 +732,7 @@ void bm_t4n_mnk_prod_m4n4k4_sse_seq(benchmark::State &state){
 		auto p_re = new float[M * N];
 
 		for (auto  p_rhs_prefetch = p_rhs; p_rhs_prefetch < (p_rhs + N * K); p_rhs_prefetch += 16){
-			_mm_prefetch(p_rhs, _MM_HINT_NTA);
+			_mm_prefetch((char *)p_rhs, _MM_HINT_NTA);
 		}
 
 		for (int_t m = 0; m < M;  m += 4){
@@ -866,12 +866,9 @@ void bm_t4n_mnk_prod_asm(benchmark::State &state){
 	size_t M = state.range(0);
 	size_t K = state.range(1);
 	size_t N = state.range(2);
-	// auto p_lhs = new float[K * M];
-	// auto p_rhs = new float[K * N];
-	// auto p_re = new float[M * N];
-	auto p_lhs = (float *)memalign(16, K * M * 4);
-	auto p_rhs = (float *)memalign(16, K * N * 4);
-	auto p_re = (float *)memalign(16, M * N * 4);
+	 auto p_lhs = new float[K * M];
+	 auto p_rhs = new float[K * N];
+	 auto p_re = new float[M * N];
 
 	p_re[0] =0;
 
@@ -884,9 +881,9 @@ void bm_t4n_mnk_prod_asm(benchmark::State &state){
 					auto p_re_tmp = p_re + n * 4 + m * N;
 					auto p_lhs_tmp = p_lhs + 0 * 4 + m * K;
 					auto p_rhs_tmp = p_rhs + 0 * 4 + K * n;
-					_mm_prefetch(p_lhs_tmp + K, _MM_HINT_T1);
-					_mm_prefetch(p_rhs_tmp + K, _MM_HINT_T1);
-					_mm_prefetch(p_re_tmp, _MM_HINT_T1);
+					_mm_prefetch((char *)p_lhs_tmp + K, _MM_HINT_T1);
+					_mm_prefetch((char *)p_rhs_tmp + K, _MM_HINT_T1);
+					_mm_prefetch((char *)p_re_tmp, _MM_HINT_T1);
 
 				for (int_t k = 0; k < K; k += 4){
 				#ifdef __linux__
@@ -931,12 +928,9 @@ void bm_t4n_mnk_prod_asm(benchmark::State &state){
 	#endif
 	}
 
-	// delete[] p_lhs;
-	// delete[] p_rhs;
-	// delete[] p_re;
-	free(p_lhs);
-	free(p_rhs);
-	free(p_re);
+	 delete[] p_lhs;
+	 delete[] p_rhs;
+	 delete[] p_re;
 
 	state.SetItemsProcessed(state.iterations() * M * K * N);
 }

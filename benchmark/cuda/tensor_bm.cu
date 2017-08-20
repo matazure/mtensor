@@ -8,9 +8,9 @@ template <typename _ValueType>
 void BM_cu_tensor_construct_and_destruct(benchmark::State& state) {
 	int_t size = 0;
 	while (state.KeepRunning()) {
-		DoNotOptimize(cuda::tensor<_ValueType,1> ts(state.range(0)));
-		size = ts.size();
-		//benchmark::ClobberMemory();
+		//DoNotOptimize(cuda::tensor<_ValueType,1> ts(state.range(0)));
+		//size = ts.size();
+		benchmark::ClobberMemory();
 	}
 
 	auto bytes_size = static_cast<size_t>(size) * sizeof(_ValueType);

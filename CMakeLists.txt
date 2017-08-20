@@ -2,9 +2,19 @@ cmake_minimum_required(VERSION 3.1)
 
 project(MatazureTensor CXX)
 
-option(WITH_CUDA "With CUDA" OFF)
-option(WITH_OPENMP "With OpenMP" OFF)
-option(WITH_SSE "With SSE" OFF) #default need SSE4.2 supported
+find_package(CUDA 8.0)
+if(CUDA_FOUND)
+	option(WITH_CUDA "With CUDA" ON)
+else()
+	option(WITH_CUDA "With CUDA" OFF)
+endif()
+
+find_package(OpenMP)
+if(OPENMP_FOUND)
+	option(WITH_OPENMP "With OpenMP" ON)
+else()
+	option(WITH_OPENMP "With OpenMP" OFF)
+endif()
 
 option(BUILD_EXAMPLE "Build Example" ON)
 option(BUILD_BENCHMARK "Build Benchmark" ON)
@@ -41,7 +51,7 @@ endif()
 
 if (WITH_OPENMP)
 	find_package(OpenMP REQUIRED)
-	set(CMAKE_CXX_FLAGS "${OpenMP_CXX_FLAGS}")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
 if (UNIX)
@@ -55,11 +65,12 @@ if (UNIX)
 endif()
 
 if (WITH_CUDA)
+	find_package(CUDA 8.0 REQUIRED)
+
 	if(NOT(CMAKE_SIZEOF_VOID_P EQUAL 8))
 		message(FATAL_ERROR "Matazure Tensor with CUDA Only support 64 bit platform")
 	endif()
 
-	find_package(CUDA 8.0 REQUIRED)
 	set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} --expt-extended-lambda  -Wno-deprecated-gpu-targets")
 	if (UNIX)
 		set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} --std=c++11")
