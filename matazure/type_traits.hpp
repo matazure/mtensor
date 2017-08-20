@@ -61,9 +61,16 @@ struct function_traits<_ReturnType(_ClassType::*)(_Args...) const> {
 template <typename _Type>
 struct is_tensor : bool_constant<std::is_base_of<tensor_expression<_Type>, _Type>::value> {};
 
+template <typename _Type>
+struct _Is_linear_array;
+
+///
+template <typename _Type>
+struct is_linear_array : public _Is_linear_array<remove_cv_t<_Type>> {};
+
 /// specail for the tensor liked type, they are linear array tensor.
 template <typename _Type>
-struct is_linear_array : bool_constant<is_tensor<_Type>::value> {};
+struct _Is_linear_array : bool_constant<is_tensor<_Type>::value> {};
 
 //are tag
 #define MATAZURE_DEFINE_ARE_TAG(name, tag_name, tag)						\

@@ -34,7 +34,7 @@ TYPED_TEST(TensorTest, Construct){
 		pointi<TypeParam::rank> ext{};
 		fill(ext, -10);
 		TypeParam ts(ext);
-	}, invalid_shape);	
+	}, invalid_shape);
 
 	//the zero shape is valid
 	{
@@ -61,7 +61,7 @@ TYPED_TEST(TensorTest, ShapeSize) {
 		pointi<TypeParam::rank> ext{};
 		fill(ext, 0);
 		TypeParam ts(ext);
-		
+
 		EXPECT_EQ(0, ts.size());
 		for_each(ts.shape(), [](int_t dim) {
 			EXPECT_EQ(0, dim);

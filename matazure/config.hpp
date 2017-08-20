@@ -55,6 +55,7 @@ typedef unsigned char byte;
 using std::decay;
 using std::remove_const;
 using std::remove_reference;
+using std::remove_cv;
 using std::remove_all_extents;
 using std::forward;
 
@@ -89,6 +90,9 @@ using conditional_t = typename conditional<_Test, _Ty1, _Ty2>::type;
 
 template<typename _Ty>
 using remove_const_t = typename remove_const<_Ty>::type;
+
+template <typename _Ty>
+using remove_cv_t = typename remove_cv<_Ty>::type;
 
 struct blank_t {};
 

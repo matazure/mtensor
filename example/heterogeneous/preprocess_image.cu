@@ -56,9 +56,9 @@ int main(int argc, char *argv[]) {
 	//拷贝结果到ts_red, ts_green, ts_blue中，因为ts_zip_point的元素是指向这三个通道的引用
 	copy(ts_rgb_normalized, ts_zip_point);
 	//保存raw数据
-	io::write_raw_data("Lenna_red_float_" + std::to_string(shape[1]) + "x" + std::to_string(shape[2]) + ".raw_data", ts_red);
-	io::write_raw_data("Lenna_green_float_" + std::to_string(shape[1]) + "x" + std::to_string(shape[2]) + ".raw_data", ts_green);
-	io::write_raw_data("Lenna_blue_float_" + std::to_string(shape[1]) + "x" + std::to_string(shape[2]) + ".raw_data", ts_blue);
+	io::write_raw_data("red.raw_data", ts_red);
+	io::write_raw_data("green.raw_data", ts_green);
+	io::write_raw_data("blue.raw_data", ts_blue);
 
 	return 0;
 }

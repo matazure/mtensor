@@ -33,9 +33,8 @@ public:
 		shape_(shape),
 		stride_(get_stride(shape))
 	{
-		auto tmp = shape_ >= 0;
-		for_each(tmp, [](bool b){
-			if (!b) throw invalid_shape{};
+		for_each(shape_, [](int_t b){
+			if (b < 0) throw invalid_shape{};
 		});
 	}
 

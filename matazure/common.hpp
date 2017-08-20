@@ -470,8 +470,8 @@ inline auto tensor_cast(_Tensor tensor)->decltype(apply(tensor, internal::cast_o
 * @return a lambda_tensor with offset indexing
 */
 template <typename _Tensor>
-inline auto shift(_Tensor ts, pointi<_Tensor::rank> offset)->decltype(make_lambda(ts.shape(), internal::shift_op<_Tensor>(ts, offset), typename _Tensor::memory_type{})) {
-	return make_lambda(ts.shape(), internal::shift_op<_Tensor>(ts, offset), typename _Tensor::memory_type{});
+inline auto shift(_Tensor ts, pointi<_Tensor::rank> offset)->decltype(make_lambda(ts.shape(), internal::shift_op<decay_t<_Tensor>>(ts, offset), typename _Tensor::memory_type{})) {
+	return make_lambda(ts.shape(), internal::shift_op<decay_t<_Tensor>>(ts, offset), typename _Tensor::memory_type{});
 }
 
 /**
@@ -482,8 +482,8 @@ inline auto shift(_Tensor ts, pointi<_Tensor::rank> offset)->decltype(make_lambd
 * @return a subsection lambda_tensor
 */
 template <typename _Tensor>
-inline auto section(_Tensor ts, pointi<_Tensor::rank> origin, pointi<_Tensor::rank> ext)->decltype(make_lambda(ext, internal::shift_op<_Tensor>(ts, origin), typename _Tensor::memory_type{})) {
-	return make_lambda(ext, internal::shift_op<_Tensor>(ts, origin), typename _Tensor::memory_type{});
+inline auto section(_Tensor ts, pointi<_Tensor::rank> origin, pointi<_Tensor::rank> ext)->decltype(make_lambda(ext, internal::shift_op<decay_t<_Tensor>>(ts, origin), typename _Tensor::memory_type{})) {
+	return make_lambda(ext, internal::shift_op<decay_t<_Tensor>>(ts, origin), typename _Tensor::memory_type{});
 }
 
 /**
@@ -504,8 +504,8 @@ inline auto stride(_Tensor ts, _StrideType stride)->decltype(make_lambda(ts.shap
 * @return a resized lambda_tensor
 */
 template <typename _Tensor>
-inline auto resize(_Tensor ts, const pointi<_Tensor::rank> &resize_ext)->decltype(make_lambda(resize_ext, internal::resize_op<_Tensor>(ts, resize_ext), typename _Tensor::memory_type{})) {
-	return make_lambda(resize_ext, internal::resize_op<_Tensor>(ts, resize_ext), typename _Tensor::memory_type{});
+inline auto resize(_Tensor ts, const pointi<_Tensor::rank> &resize_ext)->decltype(make_lambda(resize_ext, internal::resize_op<decay_t<_Tensor>>(ts, resize_ext), typename _Tensor::memory_type{})) {
+	return make_lambda(resize_ext, internal::resize_op<decay_t<_Tensor>>(ts, resize_ext), typename _Tensor::memory_type{});
 }
 
 /**
@@ -544,8 +544,8 @@ inline auto slice(cuda::tensor<_T, _Rank, _Layout> ts, int_t positon_index, enab
 
 /// @todo is neccessery?
 template <typename _Tensor>
-inline auto padding_zero(_Tensor ts, pointi<_Tensor::rank> padding0, pointi<_Tensor::rank> padding1)->decltype(make_lambda(ts.shape() + padding0 + padding1, internal::padding_zero_op<_Tensor>(ts, padding0, padding1), typename _Tensor::memory_type{})) {
-	return make_lambda(ts.shape() + padding0 + padding1, internal::padding_zero_op<_Tensor>(ts, padding0, padding1), typename _Tensor::memory_type{});
+inline auto padding_zero(_Tensor ts, pointi<_Tensor::rank> padding0, pointi<_Tensor::rank> padding1)->decltype(make_lambda(ts.shape() + padding0 + padding1, internal::padding_zero_op<decay_t<_Tensor>>(ts, padding0, padding1), typename _Tensor::memory_type{})) {
+	return make_lambda(ts.shape() + padding0 + padding1, internal::padding_zero_op<decay_t<_Tensor>>(ts, padding0, padding1), typename _Tensor::memory_type{});
 }
 
 /**
@@ -554,17 +554,17 @@ inline auto padding_zero(_Tensor ts, pointi<_Tensor::rank> padding0, pointi<_Ten
 * @return a clamped indexing lambda_tensor
 */
 template <typename _Tensor>
-inline auto clamp_zero(_Tensor ts)->decltype(make_lambda(ts.shape(), internal::clamp_zero_op<_Tensor>(ts), typename _Tensor::memory_type{})) {
-	return make_lambda(ts.shape(), internal::clamp_zero_op<_Tensor>(ts), typename _Tensor::memory_type{});
+inline auto clamp_zero(_Tensor ts)->decltype(make_lambda(ts.shape(), internal::clamp_zero_op<decay_t<_Tensor>>(ts), typename _Tensor::memory_type{})) {
+	return make_lambda(ts.shape(), internal::clamp_zero_op<decay_t<_Tensor>>(ts), typename _Tensor::memory_type{});
 }
 
 /**
 * @todo
 */
 template <typename _Tensor>
-inline auto global_view(_Tensor ts)->decltype(make_lambda(ts.shape() * ts[0].shape(), internal::global_view_op<_Tensor>(ts), typename _Tensor::memory_type{})){
+inline auto global_view(_Tensor ts)->decltype(make_lambda(ts.shape() * ts[0].shape(), internal::global_view_op<decay_t<_Tensor>>(ts), typename _Tensor::memory_type{})){
 	auto block_dim = meta::array_to_pointi(_Tensor::value_type::meta_shape());
-	return make_lambda(ts.shape() * block_dim, internal::global_view_op<_Tensor>(ts), typename _Tensor::memory_type{});
+	return make_lambda(ts.shape() * block_dim, internal::global_view_op<decay_t<_Tensor>>(ts), typename _Tensor::memory_type{});
 }
 
 /**

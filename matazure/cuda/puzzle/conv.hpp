@@ -86,8 +86,8 @@ public:																										\
 																											\
 template <typename _Tensor>																					\
 inline auto conv_global(_Tensor ts)																			\
-->decltype(make_lambda(ts.shape(), internal::conv_op<_Tensor>(ts), typename _Tensor::memory_type{})) {		\
-	return make_lambda(ts.shape(), internal::conv_op<_Tensor>(ts), typename _Tensor::memory_type{});		\
+->decltype(make_lambda(ts.shape(), internal::conv_op<decay_t<_Tensor>>(ts), typename _Tensor::memory_type{})) {		\
+	return make_lambda(ts.shape(), internal::conv_op<decay_t<_Tensor>>(ts), typename _Tensor::memory_type{});		\
 }																											\
 																											\
 }}} //matazure/cuda/puzzle
