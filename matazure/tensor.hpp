@@ -4,11 +4,11 @@
 
 #pragma once
 
+#include <malloc.h>
 #include <matazure/meta.hpp>
 #include <matazure/type_traits.hpp>
 #include <matazure/algorithm.hpp>
 #include <matazure/exception.hpp>
-
 #ifdef MATAZURE_CUDA
 #include <matazure/cuda/exception.hpp>
 #endif

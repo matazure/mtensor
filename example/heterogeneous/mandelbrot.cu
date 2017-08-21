@@ -17,7 +17,9 @@ using namespace matazure;
 
 typedef point<byte, 3> rgb;
 
-int main() {
+int main(int argc, char *argv[]) {
+	auto output_mandelbrot_path = argc > 1 ? argv[1] : "mandelbrot.png";
+
 	//设置最大迭代次数， 超过max_iteration认为不收敛
 	int_t max_iteration = 256 * 16;
 	//颜色映射函数
@@ -61,7 +63,7 @@ int main() {
 #endif
 #endif
 
-	stbi_write_png("mandelbrot.png", shape[0], shape[1], 3, ts_mandelbrot_rgb.data(), shape[0] * 3);
+	stbi_write_png(output_mandelbrot_path, shape[0], shape[1], 3, ts_mandelbrot_rgb.data(), shape[0] * 3);
 
 	return 0;
 }

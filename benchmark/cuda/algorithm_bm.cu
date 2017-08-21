@@ -36,7 +36,7 @@ void BM_cu_for_each(benchmark::State& state) {
 	cuda::tensor<_ValueType, 1> ts_src(state.range(0));
 
 	while (state.KeepRunning()) {
-		for_each(ts_src, [] __matazure__ (_ValueType &e) {
+		cuda::for_each(ts_src, [] __matazure__ (_ValueType &e) {
 			e = 1.0f;
 		});
 

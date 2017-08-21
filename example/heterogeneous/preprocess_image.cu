@@ -15,8 +15,13 @@ using namespace matazure;
 
 int main(int argc, char *argv[]) {
 	//加载图像
+	if (argc < 2){
+		printf("please input a image path");
+		return -1;
+	}
+	auto input_image_path = argv[1];
 	pointi<3> shape{};
-	auto data = stbi_load("data/Lenna.png", &shape[1], &shape[2], &shape[0], false);
+	auto data = stbi_load(input_image_path, &shape[1], &shape[2], &shape[0], false);
 	if (shape[0] != 3) {
 		printf("need a 3 channel image");
 		return -1;
@@ -55,10 +60,14 @@ int main(int argc, char *argv[]) {
 	auto ts_zip_point = point_view(ts_zip_rgb);
 	//拷贝结果到ts_red, ts_green, ts_blue中，因为ts_zip_point的元素是指向这三个通道的引用
 	copy(ts_rgb_normalized, ts_zip_point);
+
 	//保存raw数据
-	io::write_raw_data("red.raw_data", ts_red);
-	io::write_raw_data("green.raw_data", ts_green);
-	io::write_raw_data("blue.raw_data", ts_blue);
+	auto output_red_path = argc < 3 ? "red.raw_data" : argv[2];
+	auto output_green_path = argc < 4 ? "green.raw_data" : argv[3];
+	auto output_blue_path = argc < 5 ? "blue.raw_data" : argv[4];
+	io::write_raw_data(output_red_path, ts_red);
+	io::write_raw_data(output_green_path, ts_green);
+	io::write_raw_data(output_blue_path, ts_blue);
 
 	return 0;
 }

@@ -228,7 +228,7 @@ inline void for_each(_ExecutionPolicy policy, _Tensor ts, _Fun fun, enable_if_t<
 }
 
 template <typename _Tensor, typename _Fun>
-inline void for_each(_Tensor &&ts, _Fun fun, enable_if_t<are_device_memory<enable_if_t<is_tensor<decay_t<_Tensor>>::value, _Tensor>>::value>* = 0) {
+inline void for_each(_Tensor ts, _Fun fun, enable_if_t<are_device_memory<enable_if_t<is_tensor<decay_t<_Tensor>>::value, _Tensor>>::value>* = 0) {
 	parallel_execution_policy policy;
 	policy.total_size(ts.size());
 	for_each(policy, ts, fun);
