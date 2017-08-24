@@ -942,9 +942,9 @@ using tensor3f = tensor<float, 3>;
 using tensor4f = tensor<float, 4>;
 
 using tensor1d = tensor<double, 1>;
-using tensor2d = tensor<double, 1>;
-using tensor3d = tensor<double, 1>;
-using tensor4d = tensor<double, 1>;
+using tensor2d = tensor<double, 2>;
+using tensor3d = tensor<double, 3>;
+using tensor4d = tensor<double, 4>;
 
 }
 

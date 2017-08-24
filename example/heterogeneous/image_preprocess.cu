@@ -1,9 +1,6 @@
 ﻿#include <matazure/tensor>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include <stb_image_write.h>
+#include <image_utility.hpp>
 
 using namespace matazure;
 
@@ -13,24 +10,16 @@ using namespace matazure;
 #endif
 #endif
 
+typedef pointb<3> rgb;
+
 int main(int argc, char *argv[]) {
 	//加载图像
 	if (argc < 2){
-		printf("please input a image path");
-		return -1;
-	}
-	auto input_image_path = argv[1];
-	pointi<3> shape{};
-	auto data = stbi_load(input_image_path, &shape[1], &shape[2], &shape[0], false);
-	if (shape[0] != 3) {
-		printf("need a 3 channel image");
+		printf("please input a 3 channel(rbg) image path");
 		return -1;
 	}
 
-	typedef point<byte, 3> rgb;
-	tensor<rgb, 2> ts_rgb(pointi<2>{shape[1], shape[2]}, shared_ptr<rgb>(reinterpret_cast<rgb *>(data), [ ](rgb *p) {
-		stbi_image_free(p);
-	}));
+	auto ts_rgb = read_rgb_image(argv[1]);
 
 	//选择是否使用CUDA
 #ifdef USE_CUDA

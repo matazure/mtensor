@@ -1,7 +1,5 @@
 ﻿#include <matazure/tensor>
-
-#define STB_IMAGE_WRITE_IMPLEMENTATION /
-#include <stb_image_write.h>
+#include <image_utility.hpp>
 
 using namespace matazure;
 
@@ -63,7 +61,7 @@ int main(int argc, char *argv[]) {
 #endif
 #endif
 
-	stbi_write_png(output_mandelbrot_path, shape[0], shape[1], 3, ts_mandelbrot_rgb.data(), shape[0] * 3);
+	write_rgb_png(output_mandelbrot_path, ts_mandelbrot_rgb);
 
 	return 0;
 }

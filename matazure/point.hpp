@@ -224,6 +224,7 @@ template <int_t _Rank> using pointb = point<byte, _Rank>;
 template <int_t _Rank> using points = point<short, _Rank>;
 template <int_t _Rank> using pointi = point<int_t, _Rank>;
 template <int_t _Rank> using pointf = point<float, _Rank>;
+template <int_t _Rank> using pointd = point<float, _Rank>;
 
 /// if two points are equal elementwise, return true, others false.
 template <typename _Ty, int_t _Rank>
@@ -237,7 +238,7 @@ inline MATAZURE_GENERAL bool equal(const point<_Ty, _Rank> &lhs, const point<_Ty
 /// special zero for point
 template <typename _T, int_t _Rank>
 struct zero<point<_T, _Rank>>{
-	static constexpr point<_T, _Rank> value(){
+	MATAZURE_GENERAL static constexpr point<_T, _Rank> value(){
 		return {0};
 	};
 };
