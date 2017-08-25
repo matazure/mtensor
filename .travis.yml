@@ -9,7 +9,10 @@ addons:
       packages:
       - gcc-4.9
       - g++-4.9
+git:
+    submodules: true
 before_install:
+  - git fetch --recurse-submodules
   - travis_retry wget http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1404/x86_64/cuda-repo-ubuntu1404_8.0.44-1_amd64.deb
   - travis_retry sudo dpkg -i cuda-repo-ubuntu1404_8.0.44-1_amd64.deb
   - travis_retry sudo apt-get update -qq

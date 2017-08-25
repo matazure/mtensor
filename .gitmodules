@@ -1,15 +1,15 @@
 [submodule "benchmark/vendor/benchmark"]
 	path = benchmark/vendor/benchmark
-	url = git@github.com:Matazure/benchmark.git
+	url = https://github.com/Matazure/benchmark.git
 [submodule "test/vendor/googletest"]
 	path = test/vendor/googletest
-	url = git@github.com:Matazure/googletest.git
+	url = https://github.com/Matazure/googletest.git
 [submodule "vendor/android-cmake"]
 	path = vendor/android-cmake
-	url = git@github.com:Matazure/android-cmake.git
+	url = https://github.com/Matazure/android-cmake.git
 [submodule "benchmark/vendor/eigen"]
 	path = benchmark/vendor/eigen
-	url = git@github.com:Matazure/eigen.git
+	url = https://github.com/Matazure/eigen.git
 [submodule "example/vendor/stb"]
 	path = example/vendor/stb
-	url = git@github.com:Matazure/stb.git
+	url = https://github.com/Matazure/stb.git
