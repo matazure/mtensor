@@ -5,7 +5,7 @@
 #include <matazure/type_traits.hpp>
 
 #if defined(_MSC_VER)
-#define MATAZURE_AUTO_VECTORISED __pragma("loop(ivdep)");
+#define MATAZURE_AUTO_VECTORISED __pragma(loop(ivdep))
 #elif defined(__GNUC__)
 #define MATAZURE_AUTO_VECTORISED _Pragma("GCC ivdep")
 #else
