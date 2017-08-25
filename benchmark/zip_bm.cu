@@ -1,4 +1,5 @@
 #include <benchmark/benchmark.h>
+#include <bm_config.hpp>
 #include <matazure/tensor>
 
 using namespace matazure;
@@ -83,9 +84,9 @@ void BM_zip(benchmark::State &state) {
 //}
 
 
-BENCHMARK_TEMPLATE(BM_host_zip_gold, float)->UseRealTime()->Range(1 << 16, 1 << 28);
+BENCHMARK_TEMPLATE(BM_host_zip_gold, float)->UseRealTime()->Range(1 << 16, 1 << (bm_config::max_host_memory_exponent() - 2));
 
 auto BM_host_zip_byte = BM_zip<tensor<float, 1>>;
-BENCHMARK(BM_host_zip_byte)->UseRealTime()->Range(1 << 16, 1 << 28);
+BENCHMARK(BM_host_zip_byte)->UseRealTime()->Range(1 << 16, 1 << (bm_config::max_host_memory_exponent() - 2));
 
-BENCHMARK_TEMPLATE(BM_host_zip_gold, float)->UseRealTime()->Range(1 << 16, 1 << 28);
+BENCHMARK_TEMPLATE(BM_host_zip_gold, float)->UseRealTime()->Range(1 << 16, 1 << (bm_config::max_host_memory_exponent() - 2));

@@ -5,9 +5,12 @@
 #include <matazure/operation.hpp>
 #include <matazure/meta.hpp>
 
-#include <matazure/numeric/prod.hpp>
+#include <matazure/prod.hpp>
+#include <matazure/conv.hpp>
 
 #ifdef MATAZURE_CUDA
 #include <matazure/cuda/numeric/prod.hpp>
 #include <matazure/cuda/puzzle/conv.hpp>
 #endif
+
+#include <matazure/simd.hpp>

@@ -27,7 +27,7 @@ inline auto make_lambda(pointi<_Rank> extent, _Func fun)->lambda_tensor<_Rank, _
 * @param the functor, a index -> value pattern
 */
 template <int_t _Rank, typename _Func>
-inline auto make_lambda(pointi<_Rank> extent, _Func fun, host_t)->lambda_tensor<_Rank, _Func>{
+inline auto make_lambda(pointi<_Rank> extent, _Func fun, host_tag)->lambda_tensor<_Rank, _Func>{
 	return lambda_tensor<_Rank, _Func>(extent, fun);
 }
 
@@ -64,7 +64,7 @@ inline auto make_lambda(pointi<_Rank> ext, _Func fun, enable_if_t<!MATAZURE_IS_D
 }
 
 template <int_t _Rank, typename _Func>
-inline auto make_lambda(pointi<_Rank> ext, _Func fun, host_t, enable_if_t<!MATAZURE_IS_D_LAMBDA(_Func) && !MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)->decltype(make_host_lambda(ext, fun)) {
+inline auto make_lambda(pointi<_Rank> ext, _Func fun, host_tag, enable_if_t<!MATAZURE_IS_D_LAMBDA(_Func) && !MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)->decltype(make_host_lambda(ext, fun)) {
 	return make_host_lambda(ext, fun);
 }
 
@@ -72,7 +72,7 @@ inline auto make_lambda(pointi<_Rank> ext, _Func fun, host_t, enable_if_t<!MATAZ
 * @todo: not support device struct operator, it's diffcult to do this.
 */
 template <int_t _Rank, typename _Func>
-inline auto make_lambda(pointi<_Rank> ext, _Func fun, device_t, enable_if_t<!MATAZURE_IS_D_LAMBDA(_Func) && !MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)->decltype(cuda::make_general_lambda(ext, fun)) {
+inline auto make_lambda(pointi<_Rank> ext, _Func fun, device_tag, enable_if_t<!MATAZURE_IS_D_LAMBDA(_Func) && !MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)->decltype(cuda::make_general_lambda(ext, fun)) {
 	return cuda::make_general_lambda(ext, fun);
 }
 
@@ -82,12 +82,12 @@ inline auto make_lambda(pointi<_Rank> ext, _Func fun, enable_if_t<MATAZURE_IS_HD
 }
 
 template <int_t _Rank, typename _Func>
-inline auto make_lambda(pointi<_Rank> ext, _Func fun, device_t, enable_if_t<MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)->decltype(cuda::make_general_lambda(ext, fun)) {
+inline auto make_lambda(pointi<_Rank> ext, _Func fun, device_tag, enable_if_t<MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)->decltype(cuda::make_general_lambda(ext, fun)) {
 	return cuda::make_general_lambda(ext, fun);
 }
 
 template <int_t _Rank, typename _Func>
-inline auto make_lambda(pointi<_Rank> ext, _Func fun, host_t, enable_if_t<MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)->decltype(make_host_lambda(ext, fun)) {
+inline auto make_lambda(pointi<_Rank> ext, _Func fun, host_tag, enable_if_t<MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)->decltype(make_host_lambda(ext, fun)) {
 	return make_host_lambda(ext, fun);
 }
 
@@ -97,7 +97,7 @@ inline auto make_lambda(pointi<_Rank> ext, _Func fun, enable_if_t<MATAZURE_IS_D_
 }
 
 template <typename _ValueType, typename _Access, int_t _Rank, typename _Func>
-inline auto make_lambda(pointi<_Rank> ext, _Func fun, device_t, enable_if_t<MATAZURE_IS_D_LAMBDA(_Func)>* = nullptr)->decltype(cuda::make_device_lambda<_ValueType, _Access>(ext, fun)) {
+inline auto make_lambda(pointi<_Rank> ext, _Func fun, device_tag, enable_if_t<MATAZURE_IS_D_LAMBDA(_Func)>* = nullptr)->decltype(cuda::make_device_lambda<_ValueType, _Access>(ext, fun)) {
 	return cuda::make_device_lambda<_ValueType, _Access>(ext, fun);
 }
 
@@ -405,7 +405,7 @@ public:
 * @param fun the functor, element -> value  pattern
 */
 template <typename _Tensor, typename _Func>
-inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<linear_access_t, typename _Tensor::access_type>::value>* = 0)->decltype(make_lambda(ts.shape(), internal::linear_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{}))
+inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<linear_index, typename _Tensor::index_type>::value>* = 0)->decltype(make_lambda(ts.shape(), internal::linear_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{}))
 {
 	return make_lambda(ts.shape(), internal::linear_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{});
 }
@@ -416,7 +416,7 @@ inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<linear_access_t, ty
 * @param fun the functor, element -> value  pattern
 */
 template <typename _Tensor, typename _Func>
-inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<array_access_t, typename _Tensor::access_type>::value>* = 0)->decltype(make_lambda(ts.shape(), internal::array_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{}))
+inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<array_index, typename _Tensor::index_type>::value>* = 0)->decltype(make_lambda(ts.shape(), internal::array_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{}))
 {
 	return make_lambda(ts.shape(), internal::array_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{});
 }
@@ -424,25 +424,25 @@ inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<array_access_t, typ
 #else
 
 template <typename _Tensor, typename _Func>
-inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<linear_access_t, typename _Tensor::access_type>::value>* = 0, enable_if_t<!MATAZURE_IS_D_LAMBDA(_Func)>* = nullptr)->decltype(make_lambda(ts.shape(), internal::linear_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{}))
+inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<linear_index, typename _Tensor::index_type>::value>* = 0, enable_if_t<!MATAZURE_IS_D_LAMBDA(_Func)>* = nullptr)->decltype(make_lambda(ts.shape(), internal::linear_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{}))
 {
 	return make_lambda(ts.shape(), internal::linear_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{});
 }
 
 template <typename _Tensor, typename _Func>
-inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<array_access_t, typename _Tensor::access_type>::value>* = 0, enable_if_t<!MATAZURE_IS_D_LAMBDA(_Func)>* = nullptr)->decltype(make_lambda(ts.shape(), internal::array_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{}))
+inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<array_index, typename _Tensor::index_type>::value>* = 0, enable_if_t<!MATAZURE_IS_D_LAMBDA(_Func)>* = nullptr)->decltype(make_lambda(ts.shape(), internal::array_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{}))
 {
 	return make_lambda(ts.shape(), internal::array_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{});
 }
 
 template <typename _Tensor, typename _Func>
-inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<linear_access_t, typename _Tensor::access_type>::value>* = 0, enable_if_t<MATAZURE_IS_D_LAMBDA(_Func)>* = nullptr)->decltype(make_lambda(ts.shape(), internal::device_linear_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{}))
+inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<linear_index, typename _Tensor::index_type>::value>* = 0, enable_if_t<MATAZURE_IS_D_LAMBDA(_Func)>* = nullptr)->decltype(make_lambda(ts.shape(), internal::device_linear_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{}))
 {
 	return make_lambda(ts.shape(), internal::device_linear_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{});
 }
 
 template <typename _Tensor, typename _Func>
-inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<array_access_t, typename _Tensor::access_type>::value>* = 0, enable_if_t<MATAZURE_IS_D_LAMBDA(_Func)>* = nullptr)->decltype(make_lambda(ts.shape(), internal::device_array_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{}))
+inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<array_index, typename _Tensor::index_type>::value>* = 0, enable_if_t<MATAZURE_IS_D_LAMBDA(_Func)>* = nullptr)->decltype(make_lambda(ts.shape(), internal::device_array_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{}))
 {
 	return make_lambda(ts.shape(), internal::device_array_map_op<_Tensor, _Func>(ts, fun), typename _Tensor::memory_type{});
 }
@@ -470,8 +470,8 @@ inline auto tensor_cast(_Tensor tensor)->decltype(apply(tensor, internal::cast_o
 * @return a lambda_tensor with offset indexing
 */
 template <typename _Tensor>
-inline auto shift(_Tensor ts, pointi<_Tensor::rank> offset)->decltype(make_lambda(ts.shape(), internal::shift_op<_Tensor>(ts, offset), typename _Tensor::memory_type{})) {
-	return make_lambda(ts.shape(), internal::shift_op<_Tensor>(ts, offset), typename _Tensor::memory_type{});
+inline auto shift(_Tensor ts, pointi<_Tensor::rank> offset)->decltype(make_lambda(ts.shape(), internal::shift_op<decay_t<_Tensor>>(ts, offset), typename _Tensor::memory_type{})) {
+	return make_lambda(ts.shape(), internal::shift_op<decay_t<_Tensor>>(ts, offset), typename _Tensor::memory_type{});
 }
 
 /**
@@ -482,8 +482,8 @@ inline auto shift(_Tensor ts, pointi<_Tensor::rank> offset)->decltype(make_lambd
 * @return a subsection lambda_tensor
 */
 template <typename _Tensor>
-inline auto section(_Tensor ts, pointi<_Tensor::rank> origin, pointi<_Tensor::rank> ext)->decltype(make_lambda(ext, internal::shift_op<_Tensor>(ts, origin), typename _Tensor::memory_type{})) {
-	return make_lambda(ext, internal::shift_op<_Tensor>(ts, origin), typename _Tensor::memory_type{});
+inline auto section(_Tensor ts, pointi<_Tensor::rank> origin, pointi<_Tensor::rank> ext)->decltype(make_lambda(ext, internal::shift_op<decay_t<_Tensor>>(ts, origin), typename _Tensor::memory_type{})) {
+	return make_lambda(ext, internal::shift_op<decay_t<_Tensor>>(ts, origin), typename _Tensor::memory_type{});
 }
 
 /**
@@ -504,8 +504,8 @@ inline auto stride(_Tensor ts, _StrideType stride)->decltype(make_lambda(ts.shap
 * @return a resized lambda_tensor
 */
 template <typename _Tensor>
-inline auto resize(_Tensor ts, const pointi<_Tensor::rank> &resize_ext)->decltype(make_lambda(resize_ext, internal::resize_op<_Tensor>(ts, resize_ext), typename _Tensor::memory_type{})) {
-	return make_lambda(resize_ext, internal::resize_op<_Tensor>(ts, resize_ext), typename _Tensor::memory_type{});
+inline auto resize(_Tensor ts, const pointi<_Tensor::rank> &resize_ext)->decltype(make_lambda(resize_ext, internal::resize_op<decay_t<_Tensor>>(ts, resize_ext), typename _Tensor::memory_type{})) {
+	return make_lambda(resize_ext, internal::resize_op<decay_t<_Tensor>>(ts, resize_ext), typename _Tensor::memory_type{});
 }
 
 /**
@@ -523,8 +523,8 @@ inline auto slice(_Tensor ts, int_t positon_index)->decltype(make_lambda(interna
 /// special for slice<rank-1>(tensor<_T, rank>, position_index), it produces a tensor<_T, rank-1>
 template <int_t _DimIdx, typename _T, int_t _Rank, typename _Layout>
 inline auto slice(tensor<_T, _Rank, _Layout> ts, int_t positon_index, enable_if_t<_DimIdx == _Rank-1>* = nullptr)->tensor<_T, _Rank-1, _Layout>{
-	auto slice_ext = internal::slice_point<_DimIdx>(ts.shape());
-	auto slice_size = prod(slice_ext);
+	const auto slice_ext = internal::slice_point<_DimIdx>(ts.shape());
+	auto slice_size = cumulative_prod(slice_ext)[_Rank-1];
 	tensor<_T, _Rank-1, _Layout> ts_re(slice_ext, shared_ptr<_T>(ts.shared_data().get() + positon_index * slice_size, [ts](_T *){ }));
 	return ts_re;
 }
@@ -535,7 +535,7 @@ inline auto slice(tensor<_T, _Rank, _Layout> ts, int_t positon_index, enable_if_
 template <int_t _DimIdx, typename _T, int_t _Rank, typename _Layout>
 inline auto slice(cuda::tensor<_T, _Rank, _Layout> ts, int_t positon_index, enable_if_t<_DimIdx == _Rank-1>* = nullptr)->cuda::tensor<_T, _Rank-1, _Layout>{
 	auto slice_ext = internal::slice_point<_DimIdx>(ts.shape());
-	auto slice_size = prod(slice_ext);
+	auto slice_size = cumulative_prod(slice_ext)[_Rank-1];
 	cuda::tensor<_T, _Rank-1, _Layout> ts_re(slice_ext, shared_ptr<_T>(ts.shared_data().get() + positon_index * slice_size, [ts](_T *){ }));
 	return ts_re;
 }
@@ -544,8 +544,8 @@ inline auto slice(cuda::tensor<_T, _Rank, _Layout> ts, int_t positon_index, enab
 
 /// @todo is neccessery?
 template <typename _Tensor>
-inline auto padding_zero(_Tensor ts, pointi<_Tensor::rank> padding0, pointi<_Tensor::rank> padding1)->decltype(make_lambda(ts.shape() + padding0 + padding1, internal::padding_zero_op<_Tensor>(ts, padding0, padding1), typename _Tensor::memory_type{})) {
-	return make_lambda(ts.shape() + padding0 + padding1, internal::padding_zero_op<_Tensor>(ts, padding0, padding1), typename _Tensor::memory_type{});
+inline auto padding_zero(_Tensor ts, pointi<_Tensor::rank> padding0, pointi<_Tensor::rank> padding1)->decltype(make_lambda(ts.shape() + padding0 + padding1, internal::padding_zero_op<decay_t<_Tensor>>(ts, padding0, padding1), typename _Tensor::memory_type{})) {
+	return make_lambda(ts.shape() + padding0 + padding1, internal::padding_zero_op<decay_t<_Tensor>>(ts, padding0, padding1), typename _Tensor::memory_type{});
 }
 
 /**
@@ -554,17 +554,17 @@ inline auto padding_zero(_Tensor ts, pointi<_Tensor::rank> padding0, pointi<_Ten
 * @return a clamped indexing lambda_tensor
 */
 template <typename _Tensor>
-inline auto clamp_zero(_Tensor ts)->decltype(make_lambda(ts.shape(), internal::clamp_zero_op<_Tensor>(ts), typename _Tensor::memory_type{})) {
-	return make_lambda(ts.shape(), internal::clamp_zero_op<_Tensor>(ts), typename _Tensor::memory_type{});
+inline auto clamp_zero(_Tensor ts)->decltype(make_lambda(ts.shape(), internal::clamp_zero_op<decay_t<_Tensor>>(ts), typename _Tensor::memory_type{})) {
+	return make_lambda(ts.shape(), internal::clamp_zero_op<decay_t<_Tensor>>(ts), typename _Tensor::memory_type{});
 }
 
 /**
 * @todo
 */
 template <typename _Tensor>
-inline auto global_view(_Tensor ts)->decltype(make_lambda(ts.shape() * ts[0].shape(), internal::global_view_op<_Tensor>(ts), typename _Tensor::memory_type{})){
+inline auto global_view(_Tensor ts)->decltype(make_lambda(ts.shape() * ts[0].shape(), internal::global_view_op<decay_t<_Tensor>>(ts), typename _Tensor::memory_type{})){
 	auto block_dim = meta::array_to_pointi(_Tensor::value_type::meta_shape());
-	return make_lambda(ts.shape() * block_dim, internal::global_view_op<_Tensor>(ts), typename _Tensor::memory_type{});
+	return make_lambda(ts.shape() * block_dim, internal::global_view_op<decay_t<_Tensor>>(ts), typename _Tensor::memory_type{});
 }
 
 /**

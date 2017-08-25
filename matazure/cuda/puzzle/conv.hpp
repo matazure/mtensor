@@ -86,8 +86,8 @@ public:																										\
 																											\
 template <typename _Tensor>																					\
 inline auto conv_global(_Tensor ts)																			\
-->decltype(make_lambda(ts.shape(), internal::conv_op<_Tensor>(ts), typename _Tensor::memory_type{})) {		\
-	return make_lambda(ts.shape(), internal::conv_op<_Tensor>(ts), typename _Tensor::memory_type{});		\
+->decltype(make_lambda(ts.shape(), internal::conv_op<decay_t<_Tensor>>(ts), typename _Tensor::memory_type{})) {		\
+	return make_lambda(ts.shape(), internal::conv_op<decay_t<_Tensor>>(ts), typename _Tensor::memory_type{});		\
 }																											\
 																											\
 }}} //matazure/cuda/puzzle
@@ -164,12 +164,10 @@ inline void conv_block_crack(_Tensor ts, _TensorRe &ts_re) {												\
 		auto mask_radius = mask.shape() / 2;																\
 		if (inside(block_idx.local, mask_radius, block_idx.block_dim - mask_radius) 						\
 			&& inside(block_idx.global, mask_radius, ts.shape() - mask_radius)) {							\
-			value_type sum = 0;																				\
-																											\
+			auto sum = zero<value_type>::value();															\
 			device::for_index(pointi<_Tensor::rank>::zeros(), mask.shape(), [&](const pointi<2> &idx) {		\
 				sum += sh_ts_block[block_idx.local + idx - mask_radius] * mask[idx];						\
 			});																								\
-																											\
 			ts_re[block_idx.global] = sum;																	\
 		}																									\
 	});																										\
@@ -210,12 +208,10 @@ inline void conv_block_overlap(_Tensor ts, _TensorRe &ts_re) {												\
 																											\
 		if (inside(block_idx.local, mask_radius, block_idx.block_dim - mask_radius)							\
 			&& inside(valid_global_idx, pointi<_Tensor::rank>::zeros(), ts.shape())) {						\
-			value_type sum = 0;																				\
-																											\
+			auto sum = zero<value_type>::value();															\
 			device::for_index(pointi<_Tensor::rank>::zeros(), mask.shape(), [&](const pointi<2> &idx) {		\
 				sum += sh_ts_block[block_idx.local + idx - mask_radius] * mask[idx];						\
 			});																								\
-																											\
 			ts_re[valid_global_idx] = sum;																	\
 		}																									\
 	});																										\
@@ -288,12 +284,10 @@ inline void conv_block_crack_aligned(_Tensor ts, _TensorRe &ts_re) {										\
 																											\
 		auto mask_radius = mask.shape() / 2;																\
 		if (inside(block_idx.local, mask_radius, block_idx.block_dim - mask_radius)) {						\
-			value_type sum = 0;																				\
-																											\
+			auto sum = zero<value_type>::value();															\
 			device::for_index(pointi<_Tensor::rank>::zeros(), mask.shape(), [&](const pointi<2> &idx) {		\
 				sum += sh_ts_block[block_idx.local + idx - mask_radius] * mask[idx];						\
 			});																								\
-																											\
 			ts_re[block_idx.global] = sum;																	\
 		}																									\
 	});																										\
@@ -331,12 +325,10 @@ inline void conv_block_overlap_aligned(_Tensor ts, _TensorRe &ts_re) {										
 		device::barrier();																					\
 																											\
 		if (inside(block_idx.local, mask_radius, block_idx.block_dim - mask_radius)) {						\
-			value_type sum = 0;																				\
-																											\
+			auto sum = zero<value_type>::value();															\
 			device::for_index(pointi<_Tensor::rank>::zeros(), mask.shape(), [&](const pointi<2> &idx) {		\
 				sum += sh_ts_block[block_idx.local + idx - mask_radius] * mask[idx];						\
 			});																								\
-																											\
 			ts_re[valid_global_idx] = sum;																	\
 		}																									\
 	});																										\
