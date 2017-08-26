@@ -4,12 +4,39 @@
 #include <matazure/execution.hpp>
 #include <matazure/type_traits.hpp>
 
+#define MATAZURE_STRINGIFY(a) #a
+
 #if defined(_MSC_VER)
-#define MATAZURE_AUTO_VECTORISED __pragma(loop(ivdep))
+	#define MATAZURE_AUTO_VECTORISED __pragma(loop(ivdep))
 #elif defined(__GNUC__)
-#define MATAZURE_AUTO_VECTORISED _Pragma("GCC ivdep")
+	#define MATAZURE_AUTO_VECTORISED /*_Pragma("ivdep")*/
 #else
-#define MATAZURE_AUTO_VECTORISED _Pragma("ivdep")
+	#define MATAZURE_AUTO_VECTORISED _Pragma("ivdep")
+#endif
+
+#ifdef MATAZURE_OPENMP
+	#if defined(_MSC_VER)
+		#define MATAZURE_OPENMP_PARALLEL_FOR(n) __pragma(omp parallel for)
+	#else
+		#if _OPENMP >= 200805
+			// #define PRIVATE_MATAZURE_PARALLEL_FOR(n) "omp parallel for schedule(dynamic, 1) collapse(" #n ")"
+		 	#define MATAZURE_OPENMP_PARALLEL_FOR(n) _Pragma(MATAZURE_STRINGIFY(omp parallel for schedule(dynamic, 1) collapse(n)))
+		#else
+		 	#define MATAZURE_OPENMP_PARALLEL_FOR(n) _Pragma("omp parallel for")
+		#endif
+	#endif
+
+	#if defined(_MSC_VER)
+		#define MATAZURE_OPENMP_PARALLEL_FOR_VECTORISED(n) \
+		 	MATAZURE_AUTO_VECTORISED \
+		 	__pragma(omp parallel for)
+	#else
+		 #if _OPENMP >= 200805
+		 	#define MATAZURE_OPENMP_PARALLEL_FOR_VECTORISED(n) _Pragma(MATAZURE_STRINGIFY(omp parallel for schedule(dynamic, 1) collapse(n)))
+		 #else
+		 	#define MATAZURE_OPENMP_PARALLEL_FOR_VECTORISED(n) _Pragma("omp parallel for simd")
+		#endif
+	#endif
 #endif
 
 namespace matazure {
@@ -55,7 +82,7 @@ inline MATAZURE_GENERAL void for_index(sequence_vectorized_policy policy, int_t 
 */
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(omp_policy policy, int_t first, int_t last, _Func fun){
-	#pragma omp parallel for
+	MATAZURE_OPENMP_PARALLEL_FOR(1)
 	for (int_t i = first; i < last; ++i) {
 		fun(i);
 	}
@@ -69,11 +96,7 @@ inline MATAZURE_GENERAL void for_index(omp_policy policy, int_t first, int_t las
 */
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(omp_vectorized_policy policy, int_t first, int_t last, _Func fun){
-#if _OPENMP >= 201307
-	#pragma omp parallel for simd
-#else
 	#pragma omp parallel for
-#endif
 	for (int_t i = first; i < last; ++i) {
 		fun(i);
 	}
@@ -235,7 +258,7 @@ inline MATAZURE_GENERAL void for_index(sequence_vectorized_policy, pointi<4> ori
 */
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(omp_policy, pointi<1> origin, pointi<1> extent, _Func fun) {
-	#pragma omp parallel for
+	MATAZURE_OPENMP_PARALLEL_FOR(1)
 	for (int_t i = origin[0]; i < extent[0]; ++i) {
 		fun(pointi<1>{ { i } });
 	}
@@ -249,11 +272,7 @@ inline MATAZURE_GENERAL void for_index(omp_policy, pointi<1> origin, pointi<1> e
 */
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(omp_policy, pointi<2> origin, pointi<2> extent, _Func fun) {
-#if  _OPENMP >= 200805
-	#pragma omp parallel for schedule(dynamic,1) collapse(2)
-#else
-	#pragma omp parallel for
-#endif
+	MATAZURE_OPENMP_PARALLEL_FOR(2)
 	for (int_t j = origin[1]; j < extent[1]; ++j) {
 		for (int_t i = origin[0]; i < extent[0]; ++i) {
 			fun(pointi<2>{ { i, j } });
@@ -269,11 +288,7 @@ inline MATAZURE_GENERAL void for_index(omp_policy, pointi<2> origin, pointi<2> e
 */
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(omp_policy, pointi<3> origin, pointi<3> extent, _Func fun) {
-#if  _OPENMP >= 200805
-	#pragma omp parallel for schedule(dynamic,1) collapse(2)
-#else
-	#pragma omp parallel for
-#endif
+	MATAZURE_OPENMP_PARALLEL_FOR(3)
 	for (int_t k = origin[2]; k < extent[2]; ++k) {
 		for (int_t j = origin[1]; j < extent[1]; ++j) {
 			for (int_t i = origin[0]; i < extent[0]; ++i) {
@@ -291,11 +306,7 @@ inline MATAZURE_GENERAL void for_index(omp_policy, pointi<3> origin, pointi<3> e
 */
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(omp_policy, pointi<4> origin, pointi<4> extent, _Func fun) {
-#if  _OPENMP >= 200805
-	#pragma omp parallel for schedule(dynamic,1) collapse(2)
-#else
-	#pragma omp parallel for
-#endif
+	MATAZURE_OPENMP_PARALLEL_FOR(4)
 	for (int_t l = origin[3]; l < extent[3]; ++l) {
 		for (int_t k = origin[2]; k < extent[2]; ++k) {
 			for (int_t j = origin[1]; j < extent[1]; ++j) {
@@ -315,11 +326,7 @@ inline MATAZURE_GENERAL void for_index(omp_policy, pointi<4> origin, pointi<4> e
 */
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(omp_vectorized_policy, pointi<1> origin, pointi<1> extent, _Func fun) {
-#if _OPENMP >= 201307
-	#pragma omp parallel for simd
-#else
-	#pragma omp parallel for
-#endif
+	MATAZURE_OPENMP_PARALLEL_FOR_VECTORISED(1)
 	for (int_t i = origin[0]; i < extent[0]; ++i) {
 		fun(pointi<1>{ { i } });
 	}
@@ -333,13 +340,8 @@ inline MATAZURE_GENERAL void for_index(omp_vectorized_policy, pointi<1> origin, 
 */
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(omp_vectorized_policy, pointi<2> origin, pointi<2> extent, _Func fun) {
-#if  _OPENMP >= 200805
-	#pragma omp parallel for schedule(dynamic,1) collapse(2)
-#else
-	#pragma omp parallel for
-#endif
+	MATAZURE_OPENMP_PARALLEL_FOR_VECTORISED(2)
 	for (int_t j = origin[1]; j < extent[1]; ++j) {
-		MATAZURE_AUTO_VECTORISED
 		for (int_t i = origin[0]; i < extent[0]; ++i) {
 			fun(pointi<2>{ { i, j } });
 		}
@@ -354,14 +356,9 @@ inline MATAZURE_GENERAL void for_index(omp_vectorized_policy, pointi<2> origin, 
 */
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(omp_vectorized_policy, pointi<3> origin, pointi<3> extent, _Func fun) {
-#if  _OPENMP >= 200805
-	#pragma omp parallel for schedule(dynamic,1) collapse(3)
-#else
-	#pragma omp parallel for
-#endif
+	MATAZURE_OPENMP_PARALLEL_FOR_VECTORISED(3)
 	for (int_t k = origin[2]; k < extent[2]; ++k) {
 		for (int_t j = origin[1]; j < extent[1]; ++j) {
-			MATAZURE_AUTO_VECTORISED
 			for (int_t i = origin[0]; i < extent[0]; ++i) {
 				fun(pointi<3>{ { i, j, k } });
 			}
@@ -377,15 +374,10 @@ inline MATAZURE_GENERAL void for_index(omp_vectorized_policy, pointi<3> origin, 
 */
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(omp_vectorized_policy, pointi<4> origin, pointi<4> extent, _Func fun) {
-#if  _OPENMP >= 200805
-	#pragma omp parallel for schedule(dynamic,1) collapse(4)
-#else
-	#pragma omp parallel for
-#endif
+	MATAZURE_OPENMP_PARALLEL_FOR_VECTORISED(4)
 	for (int_t l = origin[3]; l < extent[3]; ++l) {
 		for (int_t k = origin[2]; k < extent[2]; ++k) {
 			for (int_t j = origin[1]; j < extent[1]; ++j) {
-				MATAZURE_AUTO_VECTORISED
 				for (int_t i = origin[0]; i < extent[0]; ++i) {
 					fun(pointi<4>{ {i, j, k, l} });
 				}

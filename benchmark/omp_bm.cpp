@@ -23,10 +23,8 @@ void BM_omp_for_index(benchmark::State& state) {
 BENCHMARK_TEMPLATE1(BM_omp_for_index, sequence_policy)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
 BENCHMARK_TEMPLATE1(BM_omp_for_index, sequence_vectorized_policy)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
 
-#ifdef USE_OMP
 BENCHMARK_TEMPLATE1(BM_omp_for_index, omp_policy)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
 BENCHMARK_TEMPLATE1(BM_omp_for_index, omp_vectorized_policy)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
-#endif
 
 template <typename _ExecutionPolicy, int_t _Rank>
 void BM_omp_for_index_array(benchmark::State& state) {
