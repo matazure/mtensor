@@ -2,37 +2,79 @@ cmake_minimum_required(VERSION 3.1)
 
 project(MatazureTensor CXX)
 
-option(WITH_CUDA "With CUDA" ON)
-option(WITH_BENCHMARK "With Benchmark" ON)
-option(WITH_OPENMP "With OpenMP" ON)
+set(CMAKE_CXX_STANDARD 11)
+
+find_package(CUDA 8.0)
+if(CUDA_FOUND)
+	option(WITH_CUDA "With CUDA" ON)
+else()
+	option(WITH_CUDA "With CUDA" OFF)
+endif()
+
+find_package(OpenMP)
+if(OPENMP_FOUND)
+	option(WITH_OPENMP "With OpenMP" ON)
+else()
+	option(WITH_OPENMP "With OpenMP" OFF)
+endif()
+
+option(BUILD_EXAMPLE "Build Example" ON)
+option(BUILD_BENCHMARK "Build Benchmark" ON)
+option(BUILD_TEST "Build Test" ON)
 
 message("current compiler is ${CMAKE_CXX_COMPILER}")
 
 include_directories(.)
 set_property( GLOBAL PROPERTY USE_FOLDERS ON)
 
-if (WIN32)
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  # using Clang
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  # using GCC
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -xSSE3_ATOM -static-intel")
+  # using Intel C++
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  # using Visual Studio C++
+endif()
+
+set(BUILD_SHARED_LIBS OFF)
+if (MSVC)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+
+	foreach (flag_var
+					 CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
+					 CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+		if (NOT BUILD_SHARED_LIBS AND NOT gtest_force_shared_crt)
+			string(REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
+		endif()
+	endforeach()
 endif()
 
 if (WITH_OPENMP)
 	find_package(OpenMP REQUIRED)
-	set(CMAKE_CXX_FLAGS "${OpenMP_CXX_FLAGS}")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
 if (UNIX)
 	add_definitions("-x c++")
-	# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11") #conflict with  CUDA_NVCC_FLAGS, so use target_compile_features
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}-s -O3 -Wall")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.2")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s -O3 -Wall -funroll-loops -ffast-math  ")
+
+	if (ANDROID)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=atom -mtune=atom")
+	endif()
 endif()
 
 if (WITH_CUDA)
+	find_package(CUDA 8.0 REQUIRED)
+
 	if(NOT(CMAKE_SIZEOF_VOID_P EQUAL 8))
 		message(FATAL_ERROR "Matazure Tensor with CUDA Only support 64 bit platform")
 	endif()
 
-	find_package(CUDA 8.0 REQUIRED)
-	set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} --expt-extended-lambda  -Wno-deprecated-gpu-targets")
+	#--expt-relaxed-constexpr  (don't use this)
+	set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} --expt-extended-lambda -Wno-deprecated-gpu-targets")
 	if (UNIX)
 		set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} --std=c++11")
 	endif()
@@ -41,45 +83,17 @@ if (WITH_CUDA)
 	endif()
 endif()
 
-#add host examples
-file(GLOB Files ${CMAKE_CURRENT_SOURCE_DIR}/examples/*.cpp)
-foreach(File ${Files})
-	set_source_files_properties(${File} PROPERTIES LANGUAGE CXX)
-	get_filename_component(FileName ${File} NAME_WE)
-	add_executable(${FileName} ${File})
-	set_target_properties(${FileName} PROPERTIES LINKER_LANGUAGE CXX)
-	target_compile_features(${FileName} PRIVATE cxx_constexpr cxx_deleted_functions cxx_lambdas cxx_rvalue_references cxx_variadic_templates)
-endforeach()
+message("CXX Compiler: ${CMAKE_CXX_COMPILER}")
+message("CC Compiler: ${CMAKE_C_COMPILER}")
 
-#add heterogeneous examples
-if (WITH_CUDA)
-	file(GLOB Files ${CMAKE_CURRENT_SOURCE_DIR}/examples/*.cu)
-	foreach(File ${Files})
-		get_filename_component(FileName ${File} NAME_WE)
-		CUDA_ADD_EXECUTABLE(hete_${FileName} ${File})
-	endforeach()
-else()
-	file(GLOB Files ${CMAKE_CURRENT_SOURCE_DIR}/examples/*.cu)
-	foreach(File ${Files})
-		set_source_files_properties(${File} PROPERTIES LANGUAGE CXX)
-		get_filename_component(FileName ${File} NAME_WE)
-		set(TargetName hete_${FileName})
-		add_executable(${TargetName} ${File})
-		set_target_properties(${TargetName} PROPERTIES LINKER_LANGUAGE CXX)
-		target_compile_features(${TargetName} PRIVATE cxx_constexpr cxx_deleted_functions cxx_lambdas cxx_rvalue_references cxx_variadic_templates)
-	endforeach()
+if (BUILD_EXAMPLE)
+	add_subdirectory(example)
 endif()
 
-#add cuda examples
-if (WITH_CUDA)
-	file(GLOB Files ${CMAKE_CURRENT_SOURCE_DIR}/examples/cuda/*.cu)
-	foreach(File ${Files})
-		get_filename_component(FileName ${File} NAME_WE)
-		CUDA_ADD_EXECUTABLE(cu_${FileName} ${File})
-	endforeach()
-endif()
-
-#add benchmark
-if (WITH_BENCHMARK)
+if (BUILD_BENCHMARK)
 	add_subdirectory(benchmark)
+endif()
+
+if (BUILD_TEST)
+	add_subdirectory(test)
 endif()

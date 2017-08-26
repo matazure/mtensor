@@ -4,20 +4,22 @@
 
 namespace matazure {
 
-struct first_major_t {};
-struct last_major_t {};
-typedef first_major_t col_major_t;
-typedef last_major_t row_major_t;
+struct first_major {};
+struct last_major {};
+typedef first_major col_major_t;
+typedef last_major row_major_t;
 
-struct linear_access_t {};
-struct array_access_t {};
+struct linear_index {};
+struct array_index {};
 
-struct host_t {};
-struct device_t {};
-struct local_t {};
+struct host_tag {};
+struct device_tag {};
+struct local_tag {};
 
-struct pinned_t {};
-struct unpinned_t {};
+struct pinned {};
+struct unpinned {};
+
+struct aligned{};
 
 /// define a generical compile time zero
 template <typename _T>
@@ -59,9 +61,16 @@ struct function_traits<_ReturnType(_ClassType::*)(_Args...) const> {
 template <typename _Type>
 struct is_tensor : bool_constant<std::is_base_of<tensor_expression<_Type>, _Type>::value> {};
 
+template <typename _Type>
+struct _Is_linear_array;
+
+///
+template <typename _Type>
+struct is_linear_array : public _Is_linear_array<remove_cv_t<_Type>> {};
+
 /// specail for the tensor liked type, they are linear array tensor.
 template <typename _Type>
-struct is_linear_array : bool_constant<is_tensor<_Type>::value> {};
+struct _Is_linear_array : bool_constant<is_tensor<_Type>::value> {};
 
 //are tag
 #define MATAZURE_DEFINE_ARE_TAG(name, tag_name, tag)						\
@@ -76,10 +85,10 @@ struct name<_Tensor, _OtherTensors...> : bool_constant<						\
 	is_same<typename _Tensor::tag_name, tag>::value							\
 	&& name<_OtherTensors...>::value> {};
 
-MATAZURE_DEFINE_ARE_TAG(are_host_memory, memory_type, host_t)
-MATAZURE_DEFINE_ARE_TAG(are_device_memory, memory_type, device_t)
-MATAZURE_DEFINE_ARE_TAG(are_linear_access, access_type, linear_access_t)
-MATAZURE_DEFINE_ARE_TAG(are_array_access, access_type, array_access_t)
+MATAZURE_DEFINE_ARE_TAG(are_host_memory, memory_type, host_tag)
+MATAZURE_DEFINE_ARE_TAG(are_device_memory, memory_type, device_tag)
+MATAZURE_DEFINE_ARE_TAG(are_linear_access, index_type, linear_index)
+MATAZURE_DEFINE_ARE_TAG(are_array_access, index_type, array_index)
 
 //none tag
 #define MATAZURE_DEFINE_NONE_TAG(name, tag_name, tag)		\
@@ -94,9 +103,9 @@ struct name<_Tensor, _OtherTensors...> : bool_constant<		\
 	!is_same<typename _Tensor::tag_name, tag>::value		\
 	&& name<_OtherTensors...>::value> {};
 
-MATAZURE_DEFINE_NONE_TAG(none_host_memory, memory_type, host_t)
-MATAZURE_DEFINE_NONE_TAG(none_device_memory, memory_type, device_t)
-MATAZURE_DEFINE_NONE_TAG(none_linear_access, access_type, linear_access_t)
-MATAZURE_DEFINE_NONE_TAG(none_array_access, access_type, array_access_t)
+MATAZURE_DEFINE_NONE_TAG(none_host_memory, memory_type, host_tag)
+MATAZURE_DEFINE_NONE_TAG(none_device_memory, memory_type, device_tag)
+MATAZURE_DEFINE_NONE_TAG(none_linear_access, index_type, linear_index)
+MATAZURE_DEFINE_NONE_TAG(none_array_access, index_type, array_index)
 
 }

@@ -21,8 +21,8 @@ public:
 	typedef _ValueType				value_type;
 	typedef value_type &			reference;
 	typedef const value_type &		const_reference;
-	typedef linear_access_t			access_type;
-	typedef local_t					memory_type;
+	typedef linear_index			index_type;
+	typedef local_tag					memory_type;
 
 	/**
 	* @brief accesses element by index
@@ -67,7 +67,8 @@ public:
 
 static_assert(std::is_pod<point<byte, 1>>::value, "point should be pod");
 
-#define POINT_BINARY_OPERATOR(op) \
+//binary opertor
+#define MATAZURE_POINT_BINARY_OPERATOR(op) \
 template <typename _T, int_t _Rank> \
 inline MATAZURE_GENERAL auto operator op(const point<_T, _Rank> &lhs, const point<_T, _Rank> &rhs)->point<decltype(lhs[0] op rhs[0]), _Rank> { \
 	point<decltype(lhs[0] op rhs[0]), _Rank> re; \
@@ -75,9 +76,8 @@ inline MATAZURE_GENERAL auto operator op(const point<_T, _Rank> &lhs, const poin
 		re[i] = lhs[i] op rhs[i]; \
 	} \
 	return re; \
-}
-
-#define POINT_WITH_VALUE_BINARY_OPERATOR(op) \
+} \
+\
 template <typename _T, int_t _Rank>  \
 inline MATAZURE_GENERAL auto operator op(const point<_T, _Rank> &container, typename point<_T, _Rank>::value_type value)->point<decltype(container[0] op value), _Rank> { \
 	point<decltype(container[0] op value), _Rank> re; \
@@ -98,46 +98,57 @@ inline MATAZURE_GENERAL auto operator op(typename point<_T, _Rank>::value_type v
 return re; \
 }
 
+// assignment operators
+#define MATAZURE_POINT_ASSIGNMENT_OPERATOR(op) \
+template <typename _T, int_t _Rank> \
+inline MATAZURE_GENERAL auto operator op(point<_T, _Rank> &lhs, const point<_T, _Rank> &rhs)->point<_T, _Rank> { \
+	for (int_t i = 0; i < _Rank; ++i) { \
+		lhs[i] op rhs[i]; \
+	} \
+	return lhs; \
+}\
+\
+template <typename _T, int_t _Rank>  \
+inline MATAZURE_GENERAL auto operator op(point<_T, _Rank> &container, _T value)->point<_T, _Rank> { \
+	for (int_t i = 0; i < _Rank; ++i) { \
+		container[i] op value; \
+	} \
+\
+return container; \
+}
+
 //Arithmetic
-POINT_BINARY_OPERATOR(+)
-POINT_BINARY_OPERATOR(-)
-POINT_BINARY_OPERATOR(*)
-POINT_BINARY_OPERATOR(/)
-POINT_BINARY_OPERATOR(%)
-POINT_WITH_VALUE_BINARY_OPERATOR(+)
-POINT_WITH_VALUE_BINARY_OPERATOR(-)
-POINT_WITH_VALUE_BINARY_OPERATOR(*)
-POINT_WITH_VALUE_BINARY_OPERATOR(/)
-POINT_WITH_VALUE_BINARY_OPERATOR(%)
+MATAZURE_POINT_BINARY_OPERATOR(+)
+MATAZURE_POINT_BINARY_OPERATOR(-)
+MATAZURE_POINT_BINARY_OPERATOR(*)
+MATAZURE_POINT_BINARY_OPERATOR(/)
+MATAZURE_POINT_BINARY_OPERATOR(%)
+MATAZURE_POINT_ASSIGNMENT_OPERATOR(+=)
+MATAZURE_POINT_ASSIGNMENT_OPERATOR(-=)
+MATAZURE_POINT_ASSIGNMENT_OPERATOR(*=)
+MATAZURE_POINT_ASSIGNMENT_OPERATOR(/=)
+MATAZURE_POINT_ASSIGNMENT_OPERATOR(%=)
 //Bit
-POINT_BINARY_OPERATOR(<<)
-POINT_BINARY_OPERATOR(>>)
-POINT_BINARY_OPERATOR(|)
-POINT_BINARY_OPERATOR(&)
-POINT_BINARY_OPERATOR(^)
-POINT_WITH_VALUE_BINARY_OPERATOR(<<)
-POINT_WITH_VALUE_BINARY_OPERATOR(>>)
-POINT_WITH_VALUE_BINARY_OPERATOR(|)
-POINT_WITH_VALUE_BINARY_OPERATOR(&)
-POINT_WITH_VALUE_BINARY_OPERATOR(^)
+MATAZURE_POINT_BINARY_OPERATOR(<<)
+MATAZURE_POINT_BINARY_OPERATOR(>>)
+MATAZURE_POINT_BINARY_OPERATOR(|)
+MATAZURE_POINT_BINARY_OPERATOR(&)
+MATAZURE_POINT_BINARY_OPERATOR(^)
+MATAZURE_POINT_ASSIGNMENT_OPERATOR(<<=)
+MATAZURE_POINT_ASSIGNMENT_OPERATOR(>>=)
+MATAZURE_POINT_ASSIGNMENT_OPERATOR(|=)
+MATAZURE_POINT_ASSIGNMENT_OPERATOR(&=)
+MATAZURE_POINT_ASSIGNMENT_OPERATOR(^=)
 //Logic
-POINT_BINARY_OPERATOR(||)
-POINT_BINARY_OPERATOR(&&)
-POINT_WITH_VALUE_BINARY_OPERATOR(||)
-POINT_WITH_VALUE_BINARY_OPERATOR(&&)
+MATAZURE_POINT_BINARY_OPERATOR(||)
+MATAZURE_POINT_BINARY_OPERATOR(&&)
 //Compapre
-POINT_BINARY_OPERATOR(>)
-POINT_BINARY_OPERATOR(<)
-POINT_BINARY_OPERATOR(>=)
-POINT_BINARY_OPERATOR(<=)
-POINT_BINARY_OPERATOR(==)
-POINT_BINARY_OPERATOR(!=)
-POINT_WITH_VALUE_BINARY_OPERATOR(>)
-POINT_WITH_VALUE_BINARY_OPERATOR(<)
-POINT_WITH_VALUE_BINARY_OPERATOR(>=)
-POINT_WITH_VALUE_BINARY_OPERATOR(<=)
-POINT_WITH_VALUE_BINARY_OPERATOR(==)
-POINT_WITH_VALUE_BINARY_OPERATOR(!=)
+MATAZURE_POINT_BINARY_OPERATOR(>)
+MATAZURE_POINT_BINARY_OPERATOR(<)
+MATAZURE_POINT_BINARY_OPERATOR(>=)
+MATAZURE_POINT_BINARY_OPERATOR(<=)
+MATAZURE_POINT_BINARY_OPERATOR(==)
+MATAZURE_POINT_BINARY_OPERATOR(!=)
 
 template <typename _T, int_t _Rank>
 MATAZURE_GENERAL point<_T, _Rank> operator+(const point<_T, _Rank> &p) {
@@ -213,10 +224,11 @@ template <int_t _Rank> using pointb = point<byte, _Rank>;
 template <int_t _Rank> using points = point<short, _Rank>;
 template <int_t _Rank> using pointi = point<int_t, _Rank>;
 template <int_t _Rank> using pointf = point<float, _Rank>;
+template <int_t _Rank> using pointd = point<float, _Rank>;
 
 /// if two points are equal elementwise, return true, others false.
 template <typename _Ty, int_t _Rank>
-inline MATAZURE_GENERAL bool equal(point<_Ty, _Rank> lhs, point<_Ty, _Rank> rhs) {
+inline MATAZURE_GENERAL bool equal(const point<_Ty, _Rank> &lhs, const point<_Ty, _Rank> &rhs) {
 	for (int_t i = 0; i < lhs.size(); ++i) {
 		if ((lhs[i] != rhs[i])) return false;
 	}
@@ -226,7 +238,7 @@ inline MATAZURE_GENERAL bool equal(point<_Ty, _Rank> lhs, point<_Ty, _Rank> rhs)
 /// special zero for point
 template <typename _T, int_t _Rank>
 struct zero<point<_T, _Rank>>{
-	static constexpr point<_T, _Rank> value(){
+	MATAZURE_GENERAL static constexpr point<_T, _Rank> value(){
 		return {0};
 	};
 };
@@ -245,35 +257,107 @@ inline MATAZURE_GENERAL pointi<_Rank> cumulative_prod(pointi<_Rank> ex) {
 /**
 * @brief detect whether a point is inside of a rect (left close, right open)
 * @param idx point position
-* @param origin the lef top position of the rect
-* @param extent the extent of the rect
+* @param left_top the lef top index of the rect
+* @param right_bottom the right bottom index of the rect
 * @return returns true if the point is inside of the rect
 */
 template <typename _ValueType, int_t _Rank>
-inline MATAZURE_GENERAL bool inside(point<_ValueType, _Rank> idx, point<_ValueType, _Rank> origin, point<_ValueType, _Rank> extent) {
+inline MATAZURE_GENERAL bool inside(point<_ValueType, _Rank> idx, point<_ValueType, _Rank> left_top, point<_ValueType, _Rank> right_bottom) {
 	for (int_t i = 0; i < _Rank; ++i) {
-		if (MATAZURE_LIKELY(idx[i] < origin[i] || idx[i] >= extent[i] ))
+		if ((idx[i] < left_top[i] || idx[i] >= right_bottom[i]))
 			return false;
 	}
 
 	return true;
 }
 
+inline MATAZURE_GENERAL bool inside(pointi<1> idx, pointi<1> left_top, pointi<1> right_bottom) {
+	if ((idx[0] >= left_top[0] && idx[0] < right_bottom[0])){
+		return true;
+	} else {
+		return false;
+	}
+}
+
+inline MATAZURE_GENERAL bool inside(pointi<2> idx, pointi<2> left_top, pointi<2> right_bottom) {
+	if (idx[0] >= left_top[0] && idx[0] < right_bottom[0] &&
+		idx[1] >= left_top[1] && idx[1] < right_bottom[1])
+		return true;
+	else
+		return false;
+}
+
+inline MATAZURE_GENERAL bool inside(pointi<3> idx, pointi<3> left_top, pointi<3> right_bottom) {
+	if (idx[0] >= left_top[0] && idx[0] < right_bottom[0] &&
+		idx[1] >= left_top[1] && idx[1] < right_bottom[1] &&
+		idx[2] >= left_top[2] && idx[2] < right_bottom[2])
+		return true;
+	else
+		return false;
+}
+
+inline MATAZURE_GENERAL bool inside(pointi<4> idx, pointi<4> left_top, pointi<4> right_bottom) {
+	if (idx[0] >= left_top[0] && idx[0] < right_bottom[0] &&
+		idx[1] >= left_top[1] && idx[1] < right_bottom[1] &&
+		idx[2] >= left_top[2] && idx[2] < right_bottom[2] &&
+		idx[3] >= left_top[3] && idx[3] < right_bottom[3]){
+		return true;
+	} else{
+		return false;
+	}
+}
+
 /**
 * @brief detect whether a point is outside of a rect (left close, right open)
 * @param idx point position
-* @param origin the lef top index of the rect
-* @param extent the extent of the rect
+* @param left_top the lef top index of the rect
+* @param right_bottom the right bottom index of the rect
 * @return true if the point is outside of the rect
 */
 template <typename _ValueType, int_t _Rank>
-inline MATAZURE_GENERAL bool outside(point<_ValueType, _Rank> idx, point<_ValueType, _Rank> origin, point<_ValueType, _Rank> extent) {
+inline MATAZURE_GENERAL bool outside(point<_ValueType, _Rank> idx, point<_ValueType, _Rank> left_top, point<_ValueType, _Rank> right_bottom) {
 	for (int_t i = 0; i < _Rank; ++i) {
-		if (MATAZURE_LIKELY(idx[i] < origin[i] || idx[i] >= extent[i] ))
+		if ((idx[i] < left_top[i] || idx[i] >= right_bottom[i]))
 			return true;
 	}
 
 	return false;
+}
+
+inline MATAZURE_GENERAL bool outside(pointi<1> idx, pointi<1> left_top, pointi<1> right_bottom) {
+	if ((idx[0] >= left_top[0] && idx[0] < right_bottom[0])){
+		return true;
+	} else {
+		return false;
+	}
+}
+
+inline MATAZURE_GENERAL bool outside(pointi<2> idx, pointi<2> left_top, pointi<2> right_bottom) {
+	if (idx[0] >= left_top[0] && idx[0] < right_bottom[0] &&
+		idx[1] >= left_top[1] && idx[1] < right_bottom[1])
+		return true;
+	else
+		return false;
+}
+
+inline MATAZURE_GENERAL bool outside(pointi<3> idx, pointi<3> left_top, pointi<3> right_bottom) {
+	if (idx[0] >= left_top[0] && idx[0] < right_bottom[0] &&
+		idx[1] >= left_top[1] && idx[1] < right_bottom[1] &&
+		idx[2] >= left_top[2] && idx[2] < right_bottom[2])
+		return true;
+	else
+		return false;
+}
+
+inline MATAZURE_GENERAL bool outside(pointi<4> idx, pointi<4> left_top, pointi<4> right_bottom) {
+	if (idx[0] >= left_top[0] && idx[0] < right_bottom[0] &&
+		idx[1] >= left_top[1] && idx[1] < right_bottom[1] &&
+		idx[2] >= left_top[2] && idx[2] < right_bottom[2] &&
+		idx[3] >= left_top[3] && idx[3] < right_bottom[3]){
+		return true;
+	} else{
+		return false;
+	}
 }
 
 /**
