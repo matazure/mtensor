@@ -1,6 +1,6 @@
 mkdir -p build
 cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release -DWITH_CUDA=OFF
+cmake .. -DCMAKE_BUILD_TYPE=Release
 
 # Cross-platform parallel build
 if [ "$(uname)" = 'Darwin' ]; then
