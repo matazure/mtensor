@@ -24,5 +24,14 @@ before_install:
   - sudo rm /usr/bin/g++ /usr/bin/gcc
   - sudo ln -s /usr/bin/g++-4.9 /usr/bin/g++
   - sudo ln -s /usr/bin/gcc-4.9 /usr/bin/gcc
+  # install ndk
+  - travis_retry wget -L http://dl.google.com/android/ndk/android-ndk-r10e-linux-x86_64.bin -O
+  - chmod u+x android-ndk-r10e-linux-x86_64.bin
+  - ./android-ndk-r10e-linux-x86_64.bin > /dev/null
+  - export ANDROID_NDK=`pwd`/android-ndk-r10e
+  - export ANDROID_NDK_HOME="$ANDROID_NDK_HOME"
+  - export PATH=$PATH:${ANDROID_NDK_HOME}
 script:
   - mkdir build && cd build && cmake .. -DWITH_CUDA=ON -DWITH_BENCHMARK=ON && make
+  - cd ..
+  - ./script/build_android.sh
