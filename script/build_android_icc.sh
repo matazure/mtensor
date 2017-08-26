@@ -12,6 +12,12 @@ else
     exit 1
 fi
 
+if [ -z "$ANDROID_ABI" ]; then
+    echo "Set ANDROID_ABI armv7"
+    export ANDROID_ABI=armv7
+    exit 1
+fi
+
 source  /opt/intel/compilers_and_libraries/linux/bin/compilervars.sh -arch intel64 -platform android
 source  /opt/intel/compilers_and_libraries/linux/bin/compilervars.sh -arch intel64 -platform android
 
@@ -25,7 +31,7 @@ cmake .. \
     -DCMAKE_TOOLCHAIN_FILE=../vendor/android-cmake/android.toolchain.cmake \
     -DANDROID_NDK=$ANDROID_NDK \
     -DCMAKE_BUILD_TYPE=Release \
-    -DANDROID_ABI="x86_64" \
+    -DANDROID_ABI=$ANDROID_ABI \
     -DANDROID_NATIVE_API_LEVEL=21 \
     -DWITH_CUDA=OFF \
     $@ \
