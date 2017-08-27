@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
 	};
 
 #ifdef USE_CUDA
-	//通过shape和mandelbrot_fun构造lambda tensor并直接把结果固化的内存（显存）里
+	//通过shape和mandelbrot_fun构造lambda tensor
 	auto cts_mandelbrot_rgb = make_lambda(shape, mandelbrot_fun, device_tag{}).persist();
 	auto ts_mandelbrot_rgb = mem_clone(cts_mandelbrot_rgb, host_tag{});
 #else

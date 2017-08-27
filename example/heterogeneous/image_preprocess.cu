@@ -1,14 +1,7 @@
 ﻿#include <matazure/tensor>
-
 #include <image_utility.hpp>
 
 using namespace matazure;
-
-#ifdef USE_CUDA
-#ifndef MATAZURE_CUDA
-#error "does not support cuda"
-#endif
-#endif
 
 typedef pointb<3> rgb;
 

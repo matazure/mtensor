@@ -1,5 +1,5 @@
 # [Tensor](https://github.com/Matazure/tensor) [![Build Status](https://travis-ci.org/Matazure/tensor.svg?branch=master)](https://travis-ci.org/Matazure/tensor)  [![AppVeyor](https://img.shields.io/appveyor/ci/zhangzhimin/tensor.svg)](https://ci.appveyor.com/project/zhangzhimin/tensor)
-Tensor是一个基于C++, CUDA的异构计算库，其上层接口极大地提高了高性能异构程序的开发效率。Tensor采用C++ AMP，Thrust的异构接口设计；具备类似Matlab的基本矩阵操作；将Eigen的延迟计算推广到GPU端；使用元编程技术追求扩展性和性能的极致。Tensor将致力于为众多异构应用提供底层支持。
+Tensor是一个C++实现的异构计算库，其上层接口极大地提高了高性能异构程序的开发效率。Tensor采用C++ AMP，Thrust的异构接口设计；具备类似Matlab的基本矩阵操作；将Eigen的延迟计算推广到GPU端；使用元编程技术追求扩展性和性能的极致。Tensor将致力于为众多异构应用提供底层支持。
 
 ## 特点
 * 统一的异构编程接口
@@ -43,54 +43,59 @@ float main(){
 可以看出，使用Tensor库，异构程序的开发效率可以获得极大的提升。下面的异构程序用于rgb图像归一化并分离三个通道的数据
 ``` cpp
 #include <matazure/tensor>
+#include <image_utility.hpp>
+
 using namespace matazure;
 
-//若支持CUDA则使用
-#ifdef MATAZURE_CUDA
-#define WITH_CUDA
-#endif
+typedef pointb<3> rgb;
 
 int main(int argc, char *argv[]) {
-    //定义3个字节的rgb类型
-    typedef point<byte, 3> rgb;
-    //定义rbg图像
-    tensor<rgb, 2> ts_rgb(512, 512);
-    //将raw数据加载到ts_rgb中来
-    io::read_raw_data("data/lena_rgb888_512x512.raw_data", ts_rgb);
-    //选择是否使用CUDA
-#ifdef WITH_CUDA
-    auto gts_rgb = mem_clone(ts_rgb, device_tag{});
-#else
-    auto &gts_rgb = ts_rgb;
-#endif
-    //图像像素归一化
-    auto glts_rgb_shift_zero = gts_rgb - rgb::all(128);
-    auto glts_rgb_stride = stride(glts_rgb_shift_zero, 2);
-    auto glts_rgb_normalized = tensor_cast<pointf<3>>(glts_rgb_stride) / pointf<3>::all(128.0f);
-    //前面并未进行实质的计算，这一步将上面的运算合并处理并把结果写入到memory中, 避免了额外的内存开销
-    auto gts_rgb_normalized = glts_rgb_normalized.persist();
-#ifdef WITH_CUDA
-    cuda::device_synchronize();
-    auto ts_rgb_normalized = mem_clone(gts_rgb_normalized, host_tag{});
-#else
-    auto &ts_rgb_normalized = gts_rgb_normalized;
-#endif
-    //定义三个通道的图像数据
-    tensor<float, 2> ts_red(ts_rgb_normalized.shape());
-    tensor<float, 2> ts_green(ts_rgb_normalized.shape());
-    tensor<float, 2> ts_blue(ts_rgb_normalized.shape());
-    //zip操作，就返回tuple数据，tuple的元素为上面三个通道对应元素的引用
-    auto ts_zip_rgb = zip(ts_red, ts_green, ts_blue);
-    //让tuple元素可以和point<byte, 3>可以相互转换
-    auto ts_zip_point = point_view(ts_zip_rgb);
-    //拷贝结果到ts_red, ts_green, ts_blue中，因为ts_zip_point的元素是指向这三个通道的引用
-    copy(ts_rgb_normalized, ts_zip_point);
-    //保存raw数据
-    io::write_raw_data("data/lena_red_float_256x256.raw_data", ts_red);
-    io::write_raw_data("data/lena_green_float_256x256.raw_data", ts_green);
-    io::write_raw_data("data/lena_blue_float_256x256.raw_data", ts_blue);
+	//加载图像
+	if (argc < 2){
+		printf("please input a 3 channel(rbg) image path");
+		return -1;
+	}
 
-    return 0;
+	auto ts_rgb = read_rgb_image(argv[1]);
+
+	//选择是否使用CUDA
+#ifdef USE_CUDA
+	auto gts_rgb = mem_clone(ts_rgb, device_tag{});
+#else
+	auto &gts_rgb = ts_rgb;
+#endif
+	//图像像素归一化
+	auto glts_rgb_shift_zero = gts_rgb - rgb::all(128);
+	auto glts_rgb_stride = stride(glts_rgb_shift_zero, 2);
+	auto glts_rgb_normalized = tensor_cast<pointf<3>>(glts_rgb_stride) / pointf<3>::all(128.0f);
+	//前面并未进行实质的计算，这一步将上面的运算合并处理并把结果写入到memory中, 避免了额外的内存开销
+	auto gts_rgb_normalized = glts_rgb_normalized.persist();
+#ifdef USE_CUDA
+	cuda::device_synchronize();
+	auto ts_rgb_normalized = mem_clone(gts_rgb_normalized, host_tag{});
+#else
+	auto &ts_rgb_normalized = gts_rgb_normalized;
+#endif
+	//定义三个通道的图像数据
+	tensor<float, 2> ts_red(ts_rgb_normalized.shape());
+	tensor<float, 2> ts_green(ts_rgb_normalized.shape());
+	tensor<float, 2> ts_blue(ts_rgb_normalized.shape());
+	//zip操作，就返回tuple数据，tuple的元素为上面三个通道对应元素的引用
+	auto ts_zip_rgb = zip(ts_red, ts_green, ts_blue);
+	//让tuple元素可以和point<byte, 3>可以相互转换
+	auto ts_zip_point = point_view(ts_zip_rgb);
+	//拷贝结果到ts_red, ts_green, ts_blue中，因为ts_zip_point的元素是指向这三个通道的引用
+	copy(ts_rgb_normalized, ts_zip_point);
+
+	//保存raw数据
+	auto output_red_path = argc < 3 ? "red.raw_data" : argv[2];
+	auto output_green_path = argc < 4 ? "green.raw_data" : argv[3];
+	auto output_blue_path = argc < 5 ? "blue.raw_data" : argv[4];
+	io::write_raw_data(output_red_path, ts_red);
+	io::write_raw_data(output_green_path, ts_green);
+	io::write_raw_data(output_blue_path, ts_blue);
+
+	return 0;
 }
 ```
 丰富的tensor操作，向量化的接口使代码看起来清晰整洁，延迟计算的使用，避免了额外的内存读写，让程序拥有极佳的性能。
@@ -116,25 +121,24 @@ mkdir build
 cd build
 cmake .. -G "Visual Studio 14 2015 Win64"
 ```
-
+挑选example下的简单示例查看会是一个很好的开始。
 ## 使用
 ```
 git clone https://github.com/Matazure/tensor.git
 ```
-使用上面指令获取tensor项目后，将根目录（默认是tensor）加入到目标项目的头文件路径即可，无需其他库文件依赖。有关C++项目，或者CUDA项目的创建，可自行查阅网上众多的资源。
+使用上面指令获取tensor项目后，将根目录（默认是tensor）加入到目标项目的头文件路径即可，无需编译和其他第三方库依赖。有关C++项目，或者CUDA项目的创建，可自行查阅网上众多的资源。
 
-## 工具
-为了尽可能的减少第三方库的依赖，示例会直接使用raw数据，我们可以借助[ImageMagic](http://www.imagemagick.org/)来转换图像和raw数据  
-将图像转换为raw数据
-```
-convert   lena_rgb888_512x512.jpg  -depth 8 rgb:lena_rgb888_512x512.raw_data
-convert   lena_rgb888_512x512.jpg  -depth 8 gray:lena_gray8_512x512.raw_data
-```
-将raw数据转换为图像
-```
-convert  -size 512x512 -depth 8 rgb:lena_rgb888_512x512.raw_data lena_rgb888_512x512.jpg
-convert  -size 512x512 -depth 8 gray:lena_gray8_512x512.raw_data lena_gray8_512x512.jpg
-```
+## 性能
+Tensor编写了大量性能测试用例来确保其优异的性能，可以在目标平台上运行生成的benchmark程来评估性能情况。 直接运行tensor_benchmark, hete_host_tensor_benchmark或者hete_cu_tensor_benchmark.
+
+## 平台支持情况
+|设备  | Windows | Linux | OSX | Android | IOS |
+|---|---|---|
+|C++|支持|支持|支持|支持|支持
+|CUDA|支持|支持|支持|||
+|OpenMP|支持|支持|支持|支持|支持|
+<!-- |向量化|SSE|SSE|SSE|SSE| | -->
+
 ## 许可证书
 该项目使用MIT证书授权，具体可查看LICENSE文件
 
