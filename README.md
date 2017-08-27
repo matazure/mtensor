@@ -132,11 +132,11 @@ git clone https://github.com/Matazure/tensor.git
 Tensor编写了大量性能测试用例来确保其优异的性能，可以在目标平台上运行生成的benchmark程来评估性能情况。 直接运行tensor_benchmark, hete_host_tensor_benchmark或者hete_cu_tensor_benchmark.
 
 ## 平台支持情况
-|设备  | Windows | Linux | OSX | Android | IOS |
-|---|---|---|
-|C++|支持|支持|支持|支持|支持
-|CUDA|支持|支持|支持|||
-|OpenMP|支持|支持|支持|支持|支持|
+| 设备  | Windows | Linux | OSX | Android | IOS |
+| --- | --- | --- | --- | --- | --- |
+| C++ | 支持 | 支持 | 支持 | 支持 | 支持
+| CUDA | 支持 | 支持 | 支持 |  |  |
+| OpenMP | 支持 | 支持 | 支持 | 支持 | 支持 |
 <!-- |向量化|SSE|SSE|SSE|SSE| | -->
 
 ## 许可证书
