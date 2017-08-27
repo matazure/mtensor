@@ -28,8 +28,7 @@
 
 	#if defined(_MSC_VER)
 		#define MATAZURE_OPENMP_PARALLEL_FOR_VECTORISED(n) \
-		 	MATAZURE_AUTO_VECTORISED \
-		 	__pragma(omp parallel for)
+		 	__pragma(omp parallel for) 
 	#else
 		 #if _OPENMP >= 200805
 		 	#define MATAZURE_OPENMP_PARALLEL_FOR_VECTORISED(n) _Pragma(MATAZURE_STRINGIFY(omp parallel for schedule(dynamic, 1) collapse(n)))

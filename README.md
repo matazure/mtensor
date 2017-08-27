@@ -1,4 +1,4 @@
-# [Tensor](https://github.com/Matazure/tensor) [![Build Status](https://travis-ci.org/Matazure/tensor.svg?branch=master)](https://travis-ci.org/Matazure/tensor)
+# [Tensor](https://github.com/Matazure/tensor) [![Build Status](https://travis-ci.org/Matazure/tensor.svg?branch=master)](https://travis-ci.org/Matazure/tensor)  [![AppVeyor](https://img.shields.io/appveyor/ci/zhangzhimin/tensor.svg)](https://ci.appveyor.com/project/zhangzhimin/tensor)
 Tensor是一个基于C++, CUDA的异构计算库，其上层接口极大地提高了高性能异构程序的开发效率。Tensor采用C++ AMP，Thrust的异构接口设计；具备类似Matlab的基本矩阵操作；将Eigen的延迟计算推广到GPU端；使用元编程技术追求扩展性和性能的极致。Tensor将致力于为众多异构应用提供底层支持。
 
 ## 特点
@@ -19,13 +19,13 @@ using namespace matazure;
 float main(){
     //申请设备端tensor
     cuda::tensor<float, 1> ts0(5);
-    cuda::tensor<float, 1> ts1(ts0.shape());	
+    cuda::tensor<float, 1> ts1(ts0.shape());
     //为tensor赋值
     //__matazure__关键字用于声明此lambda算子可以在cuda中运行
     cuda::for_index(0, ts0.size(), [=] __matazure__ (int_t i){
         ts0[i] = static_cast<float>(i);
         ts1[i] = i * 0.1f;
-    });	
+    });
     //将ts0加ts1的结果存入ts2中
     cuda::tensor<float, 1> ts2(ts0.shape());
     cuda::for_index(0, ts0.size(), [=] __matazure__ (int_t i){
@@ -34,7 +34,7 @@ float main(){
     //打印结果
     cuda::for_index(0, ts2.size(), [=] __matazure__ (int_t i){
         printf("%d : %f\n", i, ts2[i]);
-    });	
+    });
     //等待设备端的任务执行完毕
     cuda::device_synchronize();
     return 0;
