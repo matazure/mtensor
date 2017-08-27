@@ -1,4 +1,6 @@
-﻿#include <matazure/tensor>
+﻿///tensor自带的多个不同版本的卷积运算， 适用于不同类型的，不同维度（最大四维， 可以自己拓展)的卷积运算
+
+#include <matazure/tensor>
 #include <image_utility.hpp>
 
 using namespace matazure;
