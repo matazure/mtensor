@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
 	write_rgb_png( conv_global_image_path, ts_conv);
 
 	cuda::tensor<pointf<3>, 2> cts_conv_block(cts_rgb.shape());
-	cuda::puzzle::conv_block<dim<16, 16>>(tensor_cast<pointf<3>>(cts_rgb), cts_conv_block);
+	cuda::puzzle::conv_block<dim<16, 16>>(tensor_cast<pointf<3>>(clamp_zero(cts_rgb)), cts_conv_block);
 	auto cts_pointb3_conv_block = apply(cts_conv_block, pointf3_to_pointb3).persist();
 	cuda::device_synchronize();
 	auto ts_conv_block = mem_clone(cts_pointb3_conv_block, host_tag{});
