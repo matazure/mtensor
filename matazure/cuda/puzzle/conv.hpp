@@ -119,7 +119,8 @@ inline void conv_block(_Tensor ts, _TensorRe &ts_re) {														\
 		if (is_valid) {																						\
 			corner_index(pointi<_Tensor::rank>::zeros(), mask.shape(),										\
 				[&](pointi<_Tensor::rank> corner_idx) {														\
-				sh_ts_block[block_idx.local + corner_idx] = ts[block_idx.global - corner_idx / 2];			\
+					sh_ts_block[block_idx.local + corner_idx] = 											\
+						ts[block_idx.global + corner_idx - mask.shape() / 2];								\
 			}																								\
 			);																								\
 		}																									\
@@ -245,7 +246,8 @@ inline void conv_block_aligned(_Tensor ts, _TensorRe &ts_re) {												\
 																											\
 		corner_index(pointi<_Tensor::rank>::zeros(), mask.shape(),											\
 			[&](pointi<_Tensor::rank> corner_idx){															\
-				sh_ts_block[block_idx.local + corner_idx] = ts[block_idx.global - corner_idx / 2];			\
+				sh_ts_block[block_idx.local + corner_idx] = 												\
+					ts[block_idx.global + corner_idx - mask.shape() / 2];									\
 			}																								\
 		);																									\
 		device::barrier();																					\
