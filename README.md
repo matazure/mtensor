@@ -109,19 +109,22 @@ Tensor的代码规范遵循C++11标准， 所以只需编译器支持C++11即可
 先安装[git](https://git-scm.com/)和[CMake](https://cmake.org/),然后在命令行里执行
 ### Linux
 ``` sh
-git clone --recursive https://github.com/Matazure/tensor.git
+git clone --recursive https://github.com/Matazure/tensor.git --shallow-submodules
+cd tensor
 mkdir build
 cd build
 cmake ..
 ```
 ### Windows
 ``` sh
-git clone --recursive https://github.com/Matazure/tensor.git
+git clone --recursive https://github.com/Matazure/tensor.git  --shallow-submodules
+cd tensor
 mkdir build
 cd build
 cmake .. -G "Visual Studio 14 2015 Win64"
 ```
-挑选example下的简单示例查看会是一个很好的开始。
+查看example下的简单示例会是一个很好的开始。  
+--shallow-submodules参数是为了加快下载速度，若git版本太低，可以不要加该参数。
 ## 使用
 ```
 git clone https://github.com/Matazure/tensor.git
@@ -143,6 +146,6 @@ Tensor编写了大量性能测试用例来确保其优异的性能，可以在�
 该项目使用MIT证书授权，具体可查看LICENSE文件
 
 ## 联系方式
-原作者希望更多的人加入到Tensor的使用开发中来，若在使用上有迷惑的地方，可直接通过邮件联系，周末可加QQ沟通  
+原作者希望更多的人加入到Tensor的使用开发中来，若在使用上有迷惑的地方，可直接通过邮件, QQ沟通  
 邮箱： p3.1415@qq.com  
 QQ： 417083997
