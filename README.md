@@ -80,7 +80,7 @@ Tensor的代码规范遵循C++11标准， 所以只需编译器支持C++11即可
 先安装[git](https://git-scm.com/)和[CMake](https://cmake.org/),然后在命令行里执行
 ### Linux
 ``` sh
-git clone --recursive https://github.com/Matazure/tensor.git --shallow-submodules
+git clone https://github.com/Matazure/tensor.git
 cd tensor
 mkdir build
 cd build
@@ -88,7 +88,7 @@ cmake ..
 ```
 ### Windows
 ``` sh
-git clone --recursive https://github.com/Matazure/tensor.git  --shallow-submodules
+git clone https://github.com/Matazure/tensor.git
 cd tensor
 mkdir build
 cd build
@@ -100,7 +100,7 @@ cmake .. -G "Visual Studio 14 2015 Win64"
 ```
 git clone https://github.com/Matazure/tensor.git
 ```
-使用上面指令获取tensor项目后，将根目录（默认是tensor）加入到目标项目的头文件路径即可，无需编译和其他第三方库依赖。有关C++项目，或者CUDA项目的创建，可自行查阅网上众多的资源。
+使用上面指令获取tensor项目后，将根目录（默认是tensor）加入到目标项目的头文件路径即可，无需编译和其他第三方库依赖，nvcc的编译参数需要加入"--expt-extended-lambda -std=c++11"。 CUDA的官方文档有nvcc编译参数设置，CUDA项目创建等的详细说明，也可参考项目的CMakeLists.txt。
 
 ## 性能
 Tensor编写了大量性能测试用例来确保其优异的性能，可以在目标平台上运行生成的benchmark程来评估性能情况。 直接运行tensor_benchmark, hete_host_tensor_benchmark或者hete_cu_tensor_benchmark.

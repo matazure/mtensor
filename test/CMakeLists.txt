@@ -1,3 +1,5 @@
+execute_process(COMMAND git submodule update --init ${CMAKE_CURRENT_SOURCE_DIR})
+
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/vendor/googletest/googletest)
 set_property(TARGET gtest PROPERTY FOLDER "vendors")
 set_property(TARGET gtest_main PROPERTY FOLDER "vendors")
