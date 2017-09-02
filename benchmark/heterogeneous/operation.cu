@@ -79,8 +79,9 @@ template <typename _ValueType>
 void BM_host_tensor_operation(benchmark::State &st) {
 	tensor<_ValueType, 1> ts1(st.range(0));
 	tensor<_ValueType, 1> ts2(st.range(0));
-	fill(ts1, _ValueType(1));
-	fill(ts2, _ValueType(1));
+	
+	fill(ts1, zero<_ValueType>::value());
+	fill(ts2, zero<_ValueType>::value());
 
 	while (st.KeepRunning()) {
 		auto tsf_re = (ts1 * ts2 / ts1 + ts2).persist();
@@ -95,6 +96,7 @@ void BM_host_tensor_operation(benchmark::State &st) {
 #ifdef USE_HOST
 BENCHMARK_TEMPLATE(BM_host_tensor_operation_gold, float)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
 BENCHMARK_TEMPLATE(BM_host_tensor_operation, float)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
+BENCHMARK_TEMPLATE(BM_host_tensor_operation, __m128)->Range(1 << 8, 1 << (bm_config::max_host_memory_exponent() - 4))->UseRealTime();
 #endif
 
 #ifdef USE_CUDA

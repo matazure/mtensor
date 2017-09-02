@@ -1,13 +1,7 @@
 ﻿#pragma once
 
 #include <matazure/config.hpp>
-
-#ifdef MATAZURE_SSE
-
-//SSE
 #include <emmintrin.h>
-
-#ifdef _MSC_VER
 
 #define MATAZURE_SSE_FLOAT_BINARY_OPERATOR(op, tag) \
 inline __m128 operator op(const __m128 &lhs, const __m128 &rhs){ \
@@ -23,6 +17,7 @@ inline __m128 operator op (__m128 &lhs, const __m128 &rhs){ \
 namespace matazure{
 inline namespace sse{
 
+#ifdef _MSC_VER
 MATAZURE_SSE_FLOAT_BINARY_OPERATOR(+, add)
 MATAZURE_SSE_FLOAT_BINARY_OPERATOR(-, sub)
 MATAZURE_SSE_FLOAT_BINARY_OPERATOR(*, mul)
@@ -31,10 +26,15 @@ MATAZURE_SSE_FLOAT_ASSIGNMENT_OPERATOR(+=, add)
 MATAZURE_SSE_FLOAT_ASSIGNMENT_OPERATOR(-=, sub)
 MATAZURE_SSE_FLOAT_ASSIGNMENT_OPERATOR(*=, mul)
 MATAZURE_SSE_FLOAT_ASSIGNMENT_OPERATOR(/=, div)
-
-}
-}
-
 #endif
 
-#endif
+}
+
+template <>
+struct zero<__m128>{
+	static __m128 value() {
+		return _mm_setzero_ps();
+	}
+};
+
+}
