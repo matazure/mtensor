@@ -11,36 +11,7 @@ Tensor是一个C++实现的异构计算库，其上层接口极大地提高了�
 * 多平台支持
 
 ## 示例
- 下面的程序演示如何使用Tensor库对两个tensor进行相加
-``` cpp
-#include <matazure/tensor>
-using namespace matazure;
-
-float main(){
-    //申请设备端tensor
-    cuda::tensor<float, 1> ts0(5);
-    cuda::tensor<float, 1> ts1(ts0.shape());
-    //为tensor赋值
-    //__matazure__关键字用于声明此lambda算子可以在cuda中运行
-    cuda::for_index(0, ts0.size(), [=] __matazure__ (int_t i){
-        ts0[i] = static_cast<float>(i);
-        ts1[i] = i * 0.1f;
-    });
-    //将ts0加ts1的结果存入ts2中
-    cuda::tensor<float, 1> ts2(ts0.shape());
-    cuda::for_index(0, ts0.size(), [=] __matazure__ (int_t i){
-        ts2[i] = ts0[i] + ts1[i];
-    });
-    //打印结果
-    cuda::for_index(0, ts2.size(), [=] __matazure__ (int_t i){
-        printf("%d : %f\n", i, ts2[i]);
-    });
-    //等待设备端的任务执行完毕
-    cuda::device_synchronize();
-    return 0;
-}
-```
-可以看出，使用Tensor库，异构程序的开发效率可以获得极大的提升。下面的异构程序用于rgb图像归一化并分离三个通道的数据
+下面的程序用于rgb图像归一化和通道分离，可兼容CPU和GPU。
 ``` cpp
 #include <matazure/tensor>
 #include <image_utility.hpp>
