@@ -1,19 +1,7 @@
-﻿#include <benchmark/benchmark.h>
 #include <bm_config.hpp>
-
 #include <matazure/tensor>
-#include <emmintrin.h>
-#include <immintrin.h>
-
 #include <Eigen/Core>
 #include <Eigen/Dense>
-
-#include <cstdlib>
-#include <malloc.h>
-
-#ifndef EIGEN_VECTORIZE_SSE2
-#error not defined sse2
-#endif
 
 using namespace matazure;
 
@@ -428,6 +416,8 @@ BENCHMARK(bm_tn_eigen_prod)
 	->Args({ 7 * 7, 512, 30})
 	->UseRealTime();
 
+#ifdef MATAZURE_SSE
+
 void bm_tn_nmk_prod_k4_sse(benchmark::State &state){
 	auto M = state.range(0);
 	auto K = state.range(1);
@@ -452,12 +442,12 @@ void bm_tn_nmk_prod_k4_sse(benchmark::State &state){
 				}
 
 				auto tmp = _mm_add_ps(re0, re1);
-				tmp = _mm_hadd_ps(tmp, tmp);
-				tmp = _mm_hadd_ps(tmp, tmp);
+				//tmp = _mm_hadd_ps(tmp, tmp);
+				//tmp = _mm_hadd_ps(tmp, tmp);
 				// auto tmp0 = _mm_hadd_ps(re0, re1);
 				//
 				// auto tmp1 = _mm_hadd_ps(tmp0, tmp0);
-			#ifdef __linux__
+			#if defined(__clang__) || defined(__GNUC__)
 				p_re[m + n * M] += tmp[0];
 			#else
 				p_re[m + n * M] += tmp.m128_f32[0];
@@ -862,6 +852,10 @@ BENCHMARK(bm_t4n_mnk_prod_m4n4k4_sse_seq)
 	->Args({ 8 * 8, 512, 32})
 	->UseRealTime();
 
+#endif
+
+#if defined(__GNUC__) &&  defined(MATAZURE_SSE)
+
 void bm_t4n_mnk_prod_asm(benchmark::State &state){
 	size_t M = state.range(0);
 	size_t K = state.range(1);
@@ -878,15 +872,11 @@ void bm_t4n_mnk_prod_asm(benchmark::State &state){
 	while (state.KeepRunning()){
 		for (int_t m = 0; m < M;  m += 4){
 			for (int_t n = 0; n < N; n += 4){
-					auto p_re_tmp = p_re + n * 4 + m * N;
-					auto p_lhs_tmp = p_lhs + 0 * 4 + m * K;
-					auto p_rhs_tmp = p_rhs + 0 * 4 + K * n;
-					_mm_prefetch((char *)p_lhs_tmp + K, _MM_HINT_T1);
-					_mm_prefetch((char *)p_rhs_tmp + K, _MM_HINT_T1);
-					_mm_prefetch((char *)p_re_tmp, _MM_HINT_T1);
+				auto p_re_tmp = p_re + n * 4 + m * N;
+				auto p_lhs_tmp = p_lhs + 0 * 4 + m * K;
+				auto p_rhs_tmp = p_rhs + 0 * 4 + K * n;
 
 				for (int_t k = 0; k < K; k += 4){
-				#ifdef __linux__
 					asm volatile (
 						"movaps (%[p_lhs_tmp]), %%xmm0\n\t"
 						"movaps 16(%[p_lhs_tmp]), %%xmm1\n\t"
@@ -917,15 +907,14 @@ void bm_t4n_mnk_prod_asm(benchmark::State &state){
 						: [p_lhs_tmp]"r"(p_lhs_tmp), [p_rhs_tmp]"r"(p_rhs_tmp), [p_re_tmp]"r"(p_re_tmp)
 						: "rcx", "memory", "cc"
 					);
-				#endif
+
 					p_lhs_tmp += 4;
 					p_rhs_tmp += 4;
 				}
 			}
 		}
-	#ifdef __linux__
+
 		benchmark::ClobberMemory();
-	#endif
 	}
 
 	 delete[] p_lhs;
@@ -963,3 +952,5 @@ BENCHMARK(bm_t4n_mnk_prod_asm)
 	// ->Args({ 7 * 7, 512, 512})
 	->Args({ 8 * 8, 512, 32})
 	->UseRealTime();
+
+#endif

@@ -1,15 +1,19 @@
 #!/bin/bash
 
+git submodule update --init vendor/android-cmake
+
 if [ -z "$ANDROID_NDK" ]; then
     echo "Did you set ANDROID_NDK variable?"
     exit 1
 fi
 
-if [ -d "$ANDROID_NDK" ]; then
-    echo "Using Android ndk at $ANDROID_NDK"
-else
-    echo "Cannot find ndk: did you install it under $ANDROID_NDK?"
+if [ -z "$ANDROID_NDK" ]; then
+    echo "Did you set ANDROID_NDK variable?"
     exit 1
+fi
+
+if [ -d "$ANDROID_ABI" ]; then
+    export ANDROID_ABI="arm64-v8a"
 fi
 
 mkdir -p build_android
@@ -18,8 +22,8 @@ cd build_android
 cmake .. \
     -DCMAKE_TOOLCHAIN_FILE=../vendor/android-cmake/android.toolchain.cmake \
     -DANDROID_NDK=$ANDROID_NDK \
+    -DANDROID_ABI=$ANDROID_ABI \
     -DCMAKE_BUILD_TYPE=Release \
-    -DANDROID_ABI="x86_64" \
     -DANDROID_NATIVE_API_LEVEL=21 \
     -DWITH_CUDA=OFF \
     $@ \

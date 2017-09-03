@@ -9,12 +9,6 @@
 #include <memory>
 #include <tuple>
 
-//#ifdef
-
-#if defined(__x86_64__) || defined(_M_X64) || defined(__amd64) && !defined(MATAZURE_DISABLE_SSE)
-	#define MATAZURE_SSE
-#endif
-
 //for cuda
 #ifdef __CUDACC__
 	#if __CUDACC_VER_MAJOR__ < 8

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <benchmark/benchmark.h>
+
 struct bm_config{
 	constexpr static int max_host_memory_exponent(){
 		return 30;

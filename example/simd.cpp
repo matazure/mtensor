@@ -3,6 +3,9 @@
 using namespace matazure;
 
 int main(){
+
+#ifdef MATAZURE_SSE
+
 	tensor<__m128, 1> ts0(100);
 	tensor<__m128, 1> ts1(100);
 
@@ -16,8 +19,10 @@ int main(){
 	auto re = (ts0 + ts1).persist();
 
 	for_each(re, [](__m128 e){
-		printf("value : %f, %f, %f, %f \n", e.m128_f32[0], e.m128_f32[1], e.m128_f32[2], e.m128_f32[3]);
+		// printf("value : %f, %f, %f, %f \n", e.m128_f32[0], e.m128_f32[1], e.m128_f32[2], e.m128_f32[3]);
 	});
+
+#endif
 
 	return 0;
 }

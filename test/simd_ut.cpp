@@ -4,6 +4,7 @@
 using namespace matazure;
 using namespace testing;
 
+#ifdef MATAZURE_SSE
 
 TEST(SSE, ArithmeticOperation){
 	__m128 lhs{1.0f, 1.0f, 1.0f, 1.0f};
@@ -14,9 +15,6 @@ TEST(SSE, ArithmeticOperation){
 
 	auto p = new char[100];
 	_mm_prefetch(p, _MM_HINT_T0);
-	//_mm_add_ps
-
-	//pointi<2> p1{2, 3};
-	//pointi<2> p2{1, 1};
-	//p1 += 10;
 }
+
+#endif

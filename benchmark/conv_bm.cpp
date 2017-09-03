@@ -1,9 +1,6 @@
 ﻿#include <benchmark/benchmark.h>
 #include <bm_config.hpp>
-#include <bm_config.hpp>
 #include <matazure/tensor>
-#include <emmintrin.h>
-#include <immintrin.h>
 
 using namespace matazure;
 
@@ -31,9 +28,7 @@ void bm_conv_3x3_gold(benchmark::State &state){
 			}
 		}
 
-		#ifdef __linux__
-			benchmark::ClobberMemory();
-		#endif
+		benchmark::ClobberMemory();
 	}
 
 	auto valid_shape = ts_output.shape() - 1;
@@ -43,47 +38,7 @@ void bm_conv_3x3_gold(benchmark::State &state){
 }
 BENCHMARK(bm_conv_3x3_gold)->Arg(7)->Arg(14)->Arg(28)->Arg(56)->Arg(112)->Arg(224)->UseRealTime();
 
-void bm_conv_3x3_expand(benchmark::State &state){
-	pointi<2> ext;
-	fill(ext, state.range(0));
-	tensor<float, 2> ts_input(ext);
-	tensor<float, 2> ts_output(ts_input.shape());
-	static_tensor<float, dim<3,3>> kenel;
-	fill(ts_input, 1.0f);
-	fill(kenel, 1.0f);
-
-	while (state.KeepRunning()){
-		auto kenel_radius = kenel.shape() / 2;
-		for(int_t j = 1; j < ts_input.shape()[1] - 1; ++j) {
-			for (int_t i = 1; i < ts_input.shape()[0] - 1; ++i) {
-				float sum = 0.0f;
-				sum += ts_input[pointi<2>{i, j} +pointi<2>{0, 0} -kenel_radius] * kenel[pointi<2>{0, 0}];
-				sum += ts_input[pointi<2>{i, j} +pointi<2>{1, 0} -kenel_radius] * kenel[pointi<2>{1, 0}];
-				sum += ts_input[pointi<2>{i, j} +pointi<2>{2, 0} -kenel_radius] * kenel[pointi<2>{2, 0}];
-				sum += ts_input[pointi<2>{i, j} +pointi<2>{0, 1} -kenel_radius] * kenel[pointi<2>{0, 1}];
-				sum += ts_input[pointi<2>{i, j} +pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
-				sum += ts_input[pointi<2>{i, j} +pointi<2>{2, 1} -kenel_radius] * kenel[pointi<2>{2, 1}];
-				sum += ts_input[pointi<2>{i, j} +pointi<2>{0, 2} -kenel_radius] * kenel[pointi<2>{0, 2}];
-				sum += ts_input[pointi<2>{i, j} +pointi<2>{1, 2} -kenel_radius] * kenel[pointi<2>{1, 2}];
-				sum += ts_input[pointi<2>{i, j} +pointi<2>{2, 2} -kenel_radius] * kenel[pointi<2>{2, 2}];
-
-				ts_output[pointi<2>{i, j}] = sum;
-			}
-		}
-
-		#ifdef __linux__
-			benchmark::ClobberMemory();
-		#endif
-	}
-
-	auto valid_shape = ts_output.shape() - 1;
-	auto valid_size = reduce(valid_shape, 1, [](int_t x, int_t y){ return x * y; });
-	state.SetBytesProcessed(state.iterations() * valid_size * sizeof(float));
-	state.SetItemsProcessed(state.iterations() * valid_size * kenel.size());
-}
-BENCHMARK(bm_conv_3x3_expand)->Arg(7)->Arg(14)->Arg(28)->Arg(56)->Arg(112)->Arg(224)->UseRealTime();
-
-void bm_conv_inside_check(benchmark::State &state){
+void bm_conv_3x3_inside_check(benchmark::State &state){
 	pointi<2> ext;
 	fill(ext, state.range(0));
 	tensor<float, 2> ts_input(ext);
@@ -113,9 +68,7 @@ void bm_conv_inside_check(benchmark::State &state){
 			}
 		}
 
-		#ifdef __linux__
-			benchmark::ClobberMemory();
-		#endif
+		benchmark::ClobberMemory();
 	}
 
 	auto valid_shape = ts_output.shape() - 1;
@@ -123,9 +76,170 @@ void bm_conv_inside_check(benchmark::State &state){
 	state.SetBytesProcessed(state.iterations() * ts_output.size() * sizeof(float));
 	state.SetItemsProcessed(state.iterations() * valid_size * kenel.size());
 }
-BENCHMARK(bm_conv_inside_check)->Arg(7)->Arg(14)->Arg(28)->Arg(56)->Arg(112)->Arg(224)->UseRealTime();
+BENCHMARK(bm_conv_3x3_inside_check)->Arg(7)->Arg(14)->Arg(28)->Arg(56)->Arg(112)->Arg(224)->UseRealTime();
 
-void bm_conv_expand_inside_check(benchmark::State &state){
+void bm_conv_3x3_outside_check(benchmark::State &state){
+	pointi<2> ext;
+	fill(ext, state.range(0));
+	tensor<float, 2> ts_input(ext);
+	tensor<float, 2> ts_output(ts_input.shape());
+	static_tensor<float, dim<3,3>> kenel{};
+	fill(ts_input, 1.0f);
+	fill(kenel, 1.0f);
+
+	while (state.KeepRunning()){
+		auto kenel_radius = kenel.shape() / 2;
+		for (int_t j = 1; j < ts_input.shape()[1] - 1; ++j) {
+			for (int_t i = 1; i < ts_input.shape()[0] - 1; ++i) {
+				float sum = 0.0f;
+				for (int_t n = 0; n < kenel.shape()[1]; ++n) {
+					for (int_t m = 0; m < kenel.shape()[0]; ++m) {
+						sum += ts_input[pointi<2>{i, j} +pointi<2>{m, n} -kenel_radius] * kenel[pointi<2>{m, n}];
+					}
+				}
+
+				ts_output[pointi<2>{i, }] = sum;
+			}
+		}
+
+		auto last_row_pos = ts_input.shape()[1] - 1;
+		auto last_col_pos = ts_input.shape()[0] - 1;
+
+		//left top corner
+		{
+			float sum = 0.0f;
+			sum += ts_input[pointi<2>{0, 0} + pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
+			sum += ts_input[pointi<2>{0, 0} + pointi<2>{2, 1} -kenel_radius] * kenel[pointi<2>{2, 1}];
+			sum += ts_input[pointi<2>{0, 0} + pointi<2>{1, 2} -kenel_radius] * kenel[pointi<2>{1, 2}];
+			sum += ts_input[pointi<2>{0, 0} + pointi<2>{2, 2} -kenel_radius] * kenel[pointi<2>{2, 2}];
+			ts_output[pointi<2>{0, 0}] = sum;
+		}
+
+		// top right corner
+		{
+			float sum = 0.0f;
+			sum += ts_input[pointi<2>{last_row_pos, 0} + pointi<2>{0, 1} -kenel_radius] * kenel[pointi<2>{0, 1}];
+			sum += ts_input[pointi<2>{last_row_pos, 0} + pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
+			sum += ts_input[pointi<2>{last_row_pos, 0} + pointi<2>{0, 2} -kenel_radius] * kenel[pointi<2>{0, 2}];
+			sum += ts_input[pointi<2>{last_row_pos, 0} + pointi<2>{1, 2} -kenel_radius] * kenel[pointi<2>{1, 2}];
+			ts_output[pointi<2>{last_row_pos, 0}] = sum;
+		}
+
+		//left  bottom
+		{
+			float sum = 0.0f;
+			sum += ts_input[pointi<2>{0, last_row_pos} + pointi<2>{1, 0} -kenel_radius] * kenel[pointi<2>{1, 0}];
+			sum += ts_input[pointi<2>{0, last_row_pos} + pointi<2>{2, 0} -kenel_radius] * kenel[pointi<2>{2, 0}];
+			sum += ts_input[pointi<2>{0, last_row_pos} + pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
+			sum += ts_input[pointi<2>{0, last_row_pos} + pointi<2>{2, 1} -kenel_radius] * kenel[pointi<2>{2, 1}];
+			ts_output[pointi<2>{0, last_row_pos}] = sum;
+
+		}
+
+		//right bottom
+		{
+			float sum = 0.0f;
+			sum += ts_input[pointi<2>{last_col_pos, last_row_pos} + pointi<2>{0, 0} -kenel_radius] * kenel[pointi<2>{0, 0}];
+			sum += ts_input[pointi<2>{last_col_pos, last_row_pos} + pointi<2>{1, 0} -kenel_radius] * kenel[pointi<2>{1, 0}];
+			sum += ts_input[pointi<2>{last_col_pos, last_row_pos} + pointi<2>{0, 1} -kenel_radius] * kenel[pointi<2>{0, 1}];
+			sum += ts_input[pointi<2>{last_col_pos, last_row_pos} + pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
+			ts_output[pointi<2>{last_col_pos, last_row_pos}] = sum;
+		}
+
+		//top
+		for (int_t i = 1; i < ts_input.shape()[0] - 1; ++i){
+			float sum = 0.0f;
+			sum += ts_input[pointi<2>{i, 0} + pointi<2>{0, 1} -kenel_radius] * kenel[pointi<2>{0, 1}];
+			sum += ts_input[pointi<2>{i, 0} + pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
+			sum += ts_input[pointi<2>{i, 0} + pointi<2>{2, 1} -kenel_radius] * kenel[pointi<2>{2, 1}];
+			sum += ts_input[pointi<2>{i, 0} + pointi<2>{0, 2} -kenel_radius] * kenel[pointi<2>{0, 2}];
+			sum += ts_input[pointi<2>{i, 0} + pointi<2>{1, 2} -kenel_radius] * kenel[pointi<2>{1, 2}];
+			sum += ts_input[pointi<2>{i, 0} + pointi<2>{2, 2} -kenel_radius] * kenel[pointi<2>{2, 2}];
+			ts_output[pointi<2>{i, 0}] = sum;
+		}
+
+		// //left
+		for (int_t j = 1; j < ts_input.shape()[1] - 1; ++j){
+			float sum = 0.0f;
+			sum += ts_input[pointi<2>{0, j} + pointi<2>{1, 0} -kenel_radius] * kenel[pointi<2>{1, 0}];
+			sum += ts_input[pointi<2>{0, j} + pointi<2>{2, 0} -kenel_radius] * kenel[pointi<2>{2, 0}];
+			sum += ts_input[pointi<2>{0, j} + pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
+			sum += ts_input[pointi<2>{0, j} + pointi<2>{2, 1} -kenel_radius] * kenel[pointi<2>{2, 1}];
+			sum += ts_input[pointi<2>{0, j} + pointi<2>{1, 2} -kenel_radius] * kenel[pointi<2>{1, 2}];
+			sum += ts_input[pointi<2>{0, j} + pointi<2>{2, 2} -kenel_radius] * kenel[pointi<2>{2, 2}];
+		}
+
+		//right
+		for (int_t j = 1; j < ts_input.shape()[1] - 1; ++j){
+			float sum = 0.0f;
+			sum += ts_input[pointi<2>{last_col_pos, j} + pointi<2>{0, 0} -kenel_radius] * kenel[pointi<2>{0, 0}];
+			sum += ts_input[pointi<2>{last_col_pos, j} + pointi<2>{1, 0} -kenel_radius] * kenel[pointi<2>{1, 0}];
+			sum += ts_input[pointi<2>{last_col_pos, j} + pointi<2>{0, 1} -kenel_radius] * kenel[pointi<2>{0, 1}];
+			sum += ts_input[pointi<2>{last_col_pos, j} + pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
+			sum += ts_input[pointi<2>{last_col_pos, j} + pointi<2>{0, 2} -kenel_radius] * kenel[pointi<2>{0, 2}];
+			sum += ts_input[pointi<2>{last_col_pos, j} + pointi<2>{1, 2} -kenel_radius] * kenel[pointi<2>{1, 2}];
+			ts_output[pointi<2>{last_col_pos, j}] = sum;
+		}
+
+		//bottom
+		for (int_t i = 1; i < ts_input.shape()[0] - 1; ++i){
+			float sum = 0.0f;
+			sum += ts_input[pointi<2>{i, last_row_pos} + pointi<2>{0, 0} -kenel_radius] * kenel[pointi<2>{0, 0}];
+			sum += ts_input[pointi<2>{i, last_row_pos} + pointi<2>{1, 0} -kenel_radius] * kenel[pointi<2>{1, 0}];
+			sum += ts_input[pointi<2>{i, last_row_pos} + pointi<2>{2, 0} -kenel_radius] * kenel[pointi<2>{2, 0}];
+			sum += ts_input[pointi<2>{i, last_row_pos} + pointi<2>{0, 1} -kenel_radius] * kenel[pointi<2>{0, 1}];
+			sum += ts_input[pointi<2>{i, last_row_pos} + pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
+			sum += ts_input[pointi<2>{i, last_row_pos} + pointi<2>{2, 1} -kenel_radius] * kenel[pointi<2>{2, 1}];
+			ts_output[pointi<2>{i, last_row_pos}] = sum;
+		}
+
+		benchmark::ClobberMemory();
+	}
+
+	state.SetBytesProcessed(state.iterations() * ts_output.size() * sizeof(float));
+	state.SetItemsProcessed(state.iterations() * ts_output.size() * kenel.size());
+}
+BENCHMARK(bm_conv_3x3_outside_check)->Arg(7)->Arg(14)->Arg(28)->Arg(56)->Arg(112)->Arg(224)->UseRealTime();
+
+void bm_conv_3x3_expand(benchmark::State &state){
+	pointi<2> ext;
+	fill(ext, state.range(0));
+	tensor<float, 2> ts_input(ext);
+	tensor<float, 2> ts_output(ts_input.shape());
+	static_tensor<float, dim<3,3>> kenel;
+	fill(ts_input, 1.0f);
+	fill(kenel, 1.0f);
+
+	while (state.KeepRunning()){
+		auto kenel_radius = kenel.shape() / 2;
+		for(int_t j = 1; j < ts_input.shape()[1] - 1; ++j) {
+			for (int_t i = 1; i < ts_input.shape()[0] - 1; ++i) {
+				float sum = 0.0f;
+				sum += ts_input[pointi<2>{i, j} +pointi<2>{0, 0} -kenel_radius] * kenel[pointi<2>{0, 0}];
+				sum += ts_input[pointi<2>{i, j} +pointi<2>{1, 0} -kenel_radius] * kenel[pointi<2>{1, 0}];
+				sum += ts_input[pointi<2>{i, j} +pointi<2>{2, 0} -kenel_radius] * kenel[pointi<2>{2, 0}];
+				sum += ts_input[pointi<2>{i, j} +pointi<2>{0, 1} -kenel_radius] * kenel[pointi<2>{0, 1}];
+				sum += ts_input[pointi<2>{i, j} +pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
+				sum += ts_input[pointi<2>{i, j} +pointi<2>{2, 1} -kenel_radius] * kenel[pointi<2>{2, 1}];
+				sum += ts_input[pointi<2>{i, j} +pointi<2>{0, 2} -kenel_radius] * kenel[pointi<2>{0, 2}];
+				sum += ts_input[pointi<2>{i, j} +pointi<2>{1, 2} -kenel_radius] * kenel[pointi<2>{1, 2}];
+				sum += ts_input[pointi<2>{i, j} +pointi<2>{2, 2} -kenel_radius] * kenel[pointi<2>{2, 2}];
+
+				ts_output[pointi<2>{i, j}] = sum;
+			}
+		}
+
+		benchmark::ClobberMemory();
+	}
+
+	auto valid_shape = ts_output.shape() - 1;
+	auto valid_size = reduce(valid_shape, 1, [](int_t x, int_t y){ return x * y; });
+	state.SetBytesProcessed(state.iterations() * valid_size * sizeof(float));
+	state.SetItemsProcessed(state.iterations() * valid_size * kenel.size());
+}
+BENCHMARK(bm_conv_3x3_expand)->Arg(7)->Arg(14)->Arg(28)->Arg(56)->Arg(112)->Arg(224)->UseRealTime();
+
+void bm_conv_3x3_expand_inside_check(benchmark::State &state){
 	pointi<2> ext;
 	fill(ext, state.range(0));
 	tensor<float, 2> ts_input(ext);
@@ -160,9 +274,7 @@ void bm_conv_expand_inside_check(benchmark::State &state){
 			}
 		}
 
-		#ifdef __linux__
-			benchmark::ClobberMemory();
-		#endif
+		benchmark::ClobberMemory();
 	}
 
 	auto valid_shape = ts_output.shape() - 1;
@@ -170,165 +282,9 @@ void bm_conv_expand_inside_check(benchmark::State &state){
 	state.SetBytesProcessed(state.iterations() * ts_output.size() * sizeof(float));
 	state.SetItemsProcessed(state.iterations() * valid_size * kenel.size());
 }
-BENCHMARK(bm_conv_expand_inside_check)->Arg(7)->Arg(14)->Arg(28)->Arg(56)->Arg(112)->Arg(224)->UseRealTime();
+BENCHMARK(bm_conv_3x3_expand_inside_check)->Arg(7)->Arg(14)->Arg(28)->Arg(56)->Arg(112)->Arg(224)->UseRealTime();
 
-void bm_conv_outside_check(benchmark::State &state){
-	pointi<2> ext;
-	fill(ext, state.range(0));
-	tensor<float, 2> ts_input(ext);
-	tensor<float, 2> ts_output(ts_input.shape());
-	static_tensor<float, dim<3,3>> kenel{};
-	fill(ts_input, 1.0f);
-	fill(kenel, 1.0f);
-
-	while (state.KeepRunning()){
-		auto kenel_radius = kenel.shape() / 2;
-	#ifdef __LOCAL_USE_OMP
-		#pragma omp parallel for collapse(2)
-	#endif
-		for (int_t j = 1; j < ts_input.shape()[1] - 1; ++j) {
-			for (int_t i = 1; i < ts_input.shape()[0] - 1; ++i) {
-				float sum = 0.0f;
-				for (int_t n = 0; n < kenel.shape()[1]; ++n) {
-					for (int_t m = 0; m < kenel.shape()[0]; ++m) {
-						sum += ts_input[pointi<2>{i, j} +pointi<2>{m, n} -kenel_radius] * kenel[pointi<2>{m, n}];
-					}
-				}
-
-				ts_output[pointi<2>{i, }] = sum;
-			}
-		}
-
-		auto last_row_pos = ts_input.shape()[1] - 1;
-		auto last_col_pos = ts_input.shape()[0] - 1;
-
-		//left top corner
-		{
-			float sum = 0.0f;
-			// sum += ts_input[pointi<2>{0, 0} + pointi<2>{0, 0} -kenel_radius] * kenel[pointi<2>{0, 0}];
-			// sum += ts_input[pointi<2>{0, 0} + pointi<2>{1, 0} -kenel_radius] * kenel[pointi<2>{1, 0}];
-			// sum += ts_input[pointi<2>{0, 0} + pointi<2>{2, 0} -kenel_radius] * kenel[pointi<2>{2, 0}];
-			// sum += ts_input[pointi<2>{0, 0} + pointi<2>{0, 1} -kenel_radius] * kenel[pointi<2>{0, 1}];
-			sum += ts_input[pointi<2>{0, 0} + pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
-			sum += ts_input[pointi<2>{0, 0} + pointi<2>{2, 1} -kenel_radius] * kenel[pointi<2>{2, 1}];
-			// sum += ts_input[pointi<2>{0, 0} + pointi<2>{0, 2} -kenel_radius] * kenel[pointi<2>{0, 2}];
-			sum += ts_input[pointi<2>{0, 0} + pointi<2>{1, 2} -kenel_radius] * kenel[pointi<2>{1, 2}];
-			sum += ts_input[pointi<2>{0, 0} + pointi<2>{2, 2} -kenel_radius] * kenel[pointi<2>{2, 2}];
-			ts_output[pointi<2>{0, 0}] = sum;
-		}
-
-		// top right corner
-		{
-			float sum = 0.0f;
-			// sum += ts_input[pointi<2>{last_row_pos, 0} + pointi<2>{0, 0} -kenel_radius] * kenel[pointi<2>{0, 0}];
-			// sum += ts_input[pointi<2>{last_row_pos, 0} + pointi<2>{1, 0} -kenel_radius] * kenel[pointi<2>{1, 0}];
-			// sum += ts_input[pointi<2>{last_row_pos, 0} + pointi<2>{2, 0} -kenel_radius] * kenel[pointi<2>{2, 0}];
-			sum += ts_input[pointi<2>{last_row_pos, 0} + pointi<2>{0, 1} -kenel_radius] * kenel[pointi<2>{0, 1}];
-			sum += ts_input[pointi<2>{last_row_pos, 0} + pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
-			// sum += ts_input[pointi<2>{last_row_pos, 0} + pointi<2>{2, 1} -kenel_radius] * kenel[pointi<2>{2, 1}];
-			sum += ts_input[pointi<2>{last_row_pos, 0} + pointi<2>{0, 2} -kenel_radius] * kenel[pointi<2>{0, 2}];
-			sum += ts_input[pointi<2>{last_row_pos, 0} + pointi<2>{1, 2} -kenel_radius] * kenel[pointi<2>{1, 2}];
-			// sum += ts_input[pointi<2>{last_row_pos, 0} + pointi<2>{2, 2} -kenel_radius] * kenel[pointi<2>{2, 2}];
-			ts_output[pointi<2>{last_row_pos, 0}] = sum;
-		}
-
-		//left  bottom
-		{
-			float sum = 0.0f;
-			// sum += ts_input[pointi<2>{0, last_row_pos} + pointi<2>{0, 0} -kenel_radius] * kenel[pointi<2>{0, 0}];
-			sum += ts_input[pointi<2>{0, last_row_pos} + pointi<2>{1, 0} -kenel_radius] * kenel[pointi<2>{1, 0}];
-			sum += ts_input[pointi<2>{0, last_row_pos} + pointi<2>{2, 0} -kenel_radius] * kenel[pointi<2>{2, 0}];
-			// sum += ts_input[pointi<2>{0, last_row_pos} + pointi<2>{0, 1} -kenel_radius] * kenel[pointi<2>{0, 1}];
-			sum += ts_input[pointi<2>{0, last_row_pos} + pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
-			sum += ts_input[pointi<2>{0, last_row_pos} + pointi<2>{2, 1} -kenel_radius] * kenel[pointi<2>{2, 1}];
-			// sum += ts_input[pointi<2>{0, last_row_pos} + pointi<2>{0, 2} -kenel_radius] * kenel[pointi<2>{0, 2}];
-			// sum += ts_input[pointi<2>{0, last_row_pos} + pointi<2>{1, 2} -kenel_radius] * kenel[pointi<2>{1, 2}];
-			// sum += ts_input[pointi<2>{0, last_row_pos} + pointi<2>{2, 2} -kenel_radius] * kenel[pointi<2>{2, 2}];
-			ts_output[pointi<2>{0, last_row_pos}] = sum;
-
-		}
-
-		//right bottom
-		{
-			float sum = 0.0f;
-			sum += ts_input[pointi<2>{last_col_pos, last_row_pos} + pointi<2>{0, 0} -kenel_radius] * kenel[pointi<2>{0, 0}];
-			sum += ts_input[pointi<2>{last_col_pos, last_row_pos} + pointi<2>{1, 0} -kenel_radius] * kenel[pointi<2>{1, 0}];
-			// sum += ts_input[pointi<2>{last_col_pos, last_row_pos} + pointi<2>{2, 0} -kenel_radius] * kenel[pointi<2>{2, 0}];
-			sum += ts_input[pointi<2>{last_col_pos, last_row_pos} + pointi<2>{0, 1} -kenel_radius] * kenel[pointi<2>{0, 1}];
-			sum += ts_input[pointi<2>{last_col_pos, last_row_pos} + pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
-			// sum += ts_input[pointi<2>{last_col_pos, last_row_pos} + pointi<2>{2, 1} -kenel_radius] * kenel[pointi<2>{2, 1}];
-			// sum += ts_input[pointi<2>{last_col_pos, last_row_pos} + pointi<2>{0, 2} -kenel_radius] * kenel[pointi<2>{0, 2}];
-			// sum += ts_input[pointi<2>{last_col_pos, last_row_pos} + pointi<2>{1, 2} -kenel_radius] * kenel[pointi<2>{1, 2}];
-			// sum += ts_input[pointi<2>{last_col_pos, last_row_pos} + pointi<2>{2, 2} -kenel_radius] * kenel[pointi<2>{2, 2}];
-			ts_output[pointi<2>{last_col_pos, last_row_pos}] = sum;
-		}
-
-		//top
-		for (int_t i = 1; i < ts_input.shape()[0] - 1; ++i){
-			float sum = 0.0f;
-			// sum += ts_input[pointi<2>{i, 0} + pointi<2>{0, 0} -kenel_radius] * kenel[pointi<2>{0, 0}];
-			// sum += ts_input[pointi<2>{i, 0} + pointi<2>{1, 0} -kenel_radius] * kenel[pointi<2>{1, 0}];
-			// sum += ts_input[pointi<2>{i, 0} + pointi<2>{2, 0} -kenel_radius] * kenel[pointi<2>{2, 0}];
-			sum += ts_input[pointi<2>{i, 0} + pointi<2>{0, 1} -kenel_radius] * kenel[pointi<2>{0, 1}];
-			sum += ts_input[pointi<2>{i, 0} + pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
-			sum += ts_input[pointi<2>{i, 0} + pointi<2>{2, 1} -kenel_radius] * kenel[pointi<2>{2, 1}];
-			sum += ts_input[pointi<2>{i, 0} + pointi<2>{0, 2} -kenel_radius] * kenel[pointi<2>{0, 2}];
-			sum += ts_input[pointi<2>{i, 0} + pointi<2>{1, 2} -kenel_radius] * kenel[pointi<2>{1, 2}];
-			sum += ts_input[pointi<2>{i, 0} + pointi<2>{2, 2} -kenel_radius] * kenel[pointi<2>{2, 2}];
-			ts_output[pointi<2>{i, 0}] = sum;
-		}
-
-		// //left
-		for (int_t j = 1; j < ts_input.shape()[1] - 1; ++j){
-			float sum = 0.0f;
-			// sum += ts_input[pointi<2>{0, j} + pointi<2>{0, 0} -kenel_radius] * kenel[pointi<2>{0, 0}];
-			sum += ts_input[pointi<2>{0, j} + pointi<2>{1, 0} -kenel_radius] * kenel[pointi<2>{1, 0}];
-			sum += ts_input[pointi<2>{0, j} + pointi<2>{2, 0} -kenel_radius] * kenel[pointi<2>{2, 0}];
-			// sum += ts_input[pointi<2>{0, j} + pointi<2>{0, 1} -kenel_radius] * kenel[pointi<2>{0, 1}];
-			sum += ts_input[pointi<2>{0, j} + pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
-			sum += ts_input[pointi<2>{0, j} + pointi<2>{2, 1} -kenel_radius] * kenel[pointi<2>{2, 1}];
-			// sum += ts_input[pointi<2>{0, j} + pointi<2>{0, 2} -kenel_radius] * kenel[pointi<2>{0, 2}];
-			sum += ts_input[pointi<2>{0, j} + pointi<2>{1, 2} -kenel_radius] * kenel[pointi<2>{1, 2}];
-			sum += ts_input[pointi<2>{0, j} + pointi<2>{2, 2} -kenel_radius] * kenel[pointi<2>{2, 2}];
-		}
-
-		//right
-		for (int_t j = 1; j < ts_input.shape()[1] - 1; ++j){
-			float sum = 0.0f;
-			sum += ts_input[pointi<2>{last_col_pos, j} + pointi<2>{0, 0} -kenel_radius] * kenel[pointi<2>{0, 0}];
-			sum += ts_input[pointi<2>{last_col_pos, j} + pointi<2>{1, 0} -kenel_radius] * kenel[pointi<2>{1, 0}];
-			// sum += ts_input[pointi<2>{last_col_pos, j} + pointi<2>{2, 0} -kenel_radius] * kenel[pointi<2>{2, 0}];
-			sum += ts_input[pointi<2>{last_col_pos, j} + pointi<2>{0, 1} -kenel_radius] * kenel[pointi<2>{0, 1}];
-			sum += ts_input[pointi<2>{last_col_pos, j} + pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
-			// sum += ts_input[pointi<2>{last_col_pos, j} + pointi<2>{2, 1} -kenel_radius] * kenel[pointi<2>{2, 1}];
-			sum += ts_input[pointi<2>{last_col_pos, j} + pointi<2>{0, 2} -kenel_radius] * kenel[pointi<2>{0, 2}];
-			sum += ts_input[pointi<2>{last_col_pos, j} + pointi<2>{1, 2} -kenel_radius] * kenel[pointi<2>{1, 2}];
-			// sum += ts_input[pointi<2>{last_col_pos, j} + pointi<2>{2, 2} -kenel_radius] * kenel[pointi<2>{2, 2}];
-			ts_output[pointi<2>{last_col_pos, j}] = sum;
-		}
-
-		//bottom
-		for (int_t i = 1; i < ts_input.shape()[0] - 1; ++i){
-			float sum = 0.0f;
-			sum += ts_input[pointi<2>{i, last_row_pos} + pointi<2>{0, 0} -kenel_radius] * kenel[pointi<2>{0, 0}];
-			sum += ts_input[pointi<2>{i, last_row_pos} + pointi<2>{1, 0} -kenel_radius] * kenel[pointi<2>{1, 0}];
-			sum += ts_input[pointi<2>{i, last_row_pos} + pointi<2>{2, 0} -kenel_radius] * kenel[pointi<2>{2, 0}];
-			sum += ts_input[pointi<2>{i, last_row_pos} + pointi<2>{0, 1} -kenel_radius] * kenel[pointi<2>{0, 1}];
-			sum += ts_input[pointi<2>{i, last_row_pos} + pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
-			sum += ts_input[pointi<2>{i, last_row_pos} + pointi<2>{2, 1} -kenel_radius] * kenel[pointi<2>{2, 1}];
-			// sum += ts_input[pointi<2>{i, last_row_pos} + pointi<2>{0, 2} -kenel_radius] * kenel[pointi<2>{0, 2}];
-			// sum += ts_input[pointi<2>{i, last_row_pos} + pointi<2>{1, 2} -kenel_radius] * kenel[pointi<2>{1, 2}];
-			// sum += ts_input[pointi<2>{i, last_row_pos} + pointi<2>{2, 2} -kenel_radius] * kenel[pointi<2>{2, 2}];
-			ts_output[pointi<2>{i, last_row_pos}] = sum;
-		}
-	}
-
-	state.SetBytesProcessed(state.iterations() * ts_output.size() * sizeof(float));
-	state.SetItemsProcessed(state.iterations() * ts_output.size() * kenel.size());
-}
-BENCHMARK(bm_conv_outside_check)->Arg(7)->Arg(14)->Arg(28)->Arg(56)->Arg(112)->Arg(224)->UseRealTime();
-
-void bm_conv_linear(benchmark::State &state){
+void bm_conv_3x3_linear_check(benchmark::State &state){
 	pointi<2> ext;
 	fill(ext, state.range(0));
 	tensor<float, 2> ts_input(ext);
@@ -351,9 +307,6 @@ void bm_conv_linear(benchmark::State &state){
 	fill(weights, 1.0f);
 
 	while (state.KeepRunning()){
-	#ifdef __LOCAL_USE_OMP
-		#pragma omp parallel for
-	#endif
 		for (int_t i = 0; i < ts_input.size(); ++i){
 			float sum = 0.0f;
 			for (int_t j = 0; j < poses.size(); ++j){
@@ -369,13 +322,8 @@ void bm_conv_linear(benchmark::State &state){
 		//left top corner
 		{
 			float sum = 0.0f;
-			// sum += ts_input[pointi<2>{0, 0} + pointi<2>{0, 0} -kenel_radius] * kenel[pointi<2>{0, 0}];
-			// sum += ts_input[pointi<2>{0, 0} + pointi<2>{1, 0} -kenel_radius] * kenel[pointi<2>{1, 0}];
-			// sum += ts_input[pointi<2>{0, 0} + pointi<2>{2, 0} -kenel_radius] * kenel[pointi<2>{2, 0}];
-			// sum += ts_input[pointi<2>{0, 0} + pointi<2>{0, 1} -kenel_radius] * kenel[pointi<2>{0, 1}];
 			sum += ts_input[pointi<2>{0, 0} + pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
 			sum += ts_input[pointi<2>{0, 0} + pointi<2>{2, 1} -kenel_radius] * kenel[pointi<2>{2, 1}];
-			// sum += ts_input[pointi<2>{0, 0} + pointi<2>{0, 2} -kenel_radius] * kenel[pointi<2>{0, 2}];
 			sum += ts_input[pointi<2>{0, 0} + pointi<2>{1, 2} -kenel_radius] * kenel[pointi<2>{1, 2}];
 			sum += ts_input[pointi<2>{0, 0} + pointi<2>{2, 2} -kenel_radius] * kenel[pointi<2>{2, 2}];
 			ts_output[pointi<2>{0, 0}] = sum;
@@ -384,30 +332,20 @@ void bm_conv_linear(benchmark::State &state){
 		// top right corner
 		{
 			float sum = 0.0f;
-			// sum += ts_input[pointi<2>{last_row_pos, 0} + pointi<2>{0, 0} -kenel_radius] * kenel[pointi<2>{0, 0}];
-			// sum += ts_input[pointi<2>{last_row_pos, 0} + pointi<2>{1, 0} -kenel_radius] * kenel[pointi<2>{1, 0}];
-			// sum += ts_input[pointi<2>{last_row_pos, 0} + pointi<2>{2, 0} -kenel_radius] * kenel[pointi<2>{2, 0}];
 			sum += ts_input[pointi<2>{last_row_pos, 0} + pointi<2>{0, 1} -kenel_radius] * kenel[pointi<2>{0, 1}];
 			sum += ts_input[pointi<2>{last_row_pos, 0} + pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
-			// sum += ts_input[pointi<2>{last_row_pos, 0} + pointi<2>{2, 1} -kenel_radius] * kenel[pointi<2>{2, 1}];
 			sum += ts_input[pointi<2>{last_row_pos, 0} + pointi<2>{0, 2} -kenel_radius] * kenel[pointi<2>{0, 2}];
 			sum += ts_input[pointi<2>{last_row_pos, 0} + pointi<2>{1, 2} -kenel_radius] * kenel[pointi<2>{1, 2}];
-			// sum += ts_input[pointi<2>{last_row_pos, 0} + pointi<2>{2, 2} -kenel_radius] * kenel[pointi<2>{2, 2}];
 			ts_output[pointi<2>{last_row_pos, 0}] = sum;
 		}
 
 		//left  bottom
 		{
 			float sum = 0.0f;
-			// sum += ts_input[pointi<2>{0, last_row_pos} + pointi<2>{0, 0} -kenel_radius] * kenel[pointi<2>{0, 0}];
 			sum += ts_input[pointi<2>{0, last_row_pos} + pointi<2>{1, 0} -kenel_radius] * kenel[pointi<2>{1, 0}];
 			sum += ts_input[pointi<2>{0, last_row_pos} + pointi<2>{2, 0} -kenel_radius] * kenel[pointi<2>{2, 0}];
-			// sum += ts_input[pointi<2>{0, last_row_pos} + pointi<2>{0, 1} -kenel_radius] * kenel[pointi<2>{0, 1}];
 			sum += ts_input[pointi<2>{0, last_row_pos} + pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
 			sum += ts_input[pointi<2>{0, last_row_pos} + pointi<2>{2, 1} -kenel_radius] * kenel[pointi<2>{2, 1}];
-			// sum += ts_input[pointi<2>{0, last_row_pos} + pointi<2>{0, 2} -kenel_radius] * kenel[pointi<2>{0, 2}];
-			// sum += ts_input[pointi<2>{0, last_row_pos} + pointi<2>{1, 2} -kenel_radius] * kenel[pointi<2>{1, 2}];
-			// sum += ts_input[pointi<2>{0, last_row_pos} + pointi<2>{2, 2} -kenel_radius] * kenel[pointi<2>{2, 2}];
 			ts_output[pointi<2>{0, last_row_pos}] = sum;
 
 		}
@@ -417,22 +355,14 @@ void bm_conv_linear(benchmark::State &state){
 			float sum = 0.0f;
 			sum += ts_input[pointi<2>{last_col_pos, last_row_pos} + pointi<2>{0, 0} -kenel_radius] * kenel[pointi<2>{0, 0}];
 			sum += ts_input[pointi<2>{last_col_pos, last_row_pos} + pointi<2>{1, 0} -kenel_radius] * kenel[pointi<2>{1, 0}];
-			// sum += ts_input[pointi<2>{last_col_pos, last_row_pos} + pointi<2>{2, 0} -kenel_radius] * kenel[pointi<2>{2, 0}];
 			sum += ts_input[pointi<2>{last_col_pos, last_row_pos} + pointi<2>{0, 1} -kenel_radius] * kenel[pointi<2>{0, 1}];
 			sum += ts_input[pointi<2>{last_col_pos, last_row_pos} + pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
-			// sum += ts_input[pointi<2>{last_col_pos, last_row_pos} + pointi<2>{2, 1} -kenel_radius] * kenel[pointi<2>{2, 1}];
-			// sum += ts_input[pointi<2>{last_col_pos, last_row_pos} + pointi<2>{0, 2} -kenel_radius] * kenel[pointi<2>{0, 2}];
-			// sum += ts_input[pointi<2>{last_col_pos, last_row_pos} + pointi<2>{1, 2} -kenel_radius] * kenel[pointi<2>{1, 2}];
-			// sum += ts_input[pointi<2>{last_col_pos, last_row_pos} + pointi<2>{2, 2} -kenel_radius] * kenel[pointi<2>{2, 2}];
 			ts_output[pointi<2>{last_col_pos, last_row_pos}] = sum;
 		}
 
 		//top
 		for (int_t i = 1; i < ts_input.shape()[0] - 1; ++i){
 			float sum = 0.0f;
-			// sum += ts_input[pointi<2>{i, 0} + pointi<2>{0, 0} -kenel_radius] * kenel[pointi<2>{0, 0}];
-			// sum += ts_input[pointi<2>{i, 0} + pointi<2>{1, 0} -kenel_radius] * kenel[pointi<2>{1, 0}];
-			// sum += ts_input[pointi<2>{i, 0} + pointi<2>{2, 0} -kenel_radius] * kenel[pointi<2>{2, 0}];
 			sum += ts_input[pointi<2>{i, 0} + pointi<2>{0, 1} -kenel_radius] * kenel[pointi<2>{0, 1}];
 			sum += ts_input[pointi<2>{i, 0} + pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
 			sum += ts_input[pointi<2>{i, 0} + pointi<2>{2, 1} -kenel_radius] * kenel[pointi<2>{2, 1}];
@@ -445,13 +375,10 @@ void bm_conv_linear(benchmark::State &state){
 		// //left
 		for (int_t j = 1; j < ts_input.shape()[1] - 1; ++j){
 			float sum = 0.0f;
-			// sum += ts_input[pointi<2>{0, j} + pointi<2>{0, 0} -kenel_radius] * kenel[pointi<2>{0, 0}];
 			sum += ts_input[pointi<2>{0, j} + pointi<2>{1, 0} -kenel_radius] * kenel[pointi<2>{1, 0}];
 			sum += ts_input[pointi<2>{0, j} + pointi<2>{2, 0} -kenel_radius] * kenel[pointi<2>{2, 0}];
-			// sum += ts_input[pointi<2>{0, j} + pointi<2>{0, 1} -kenel_radius] * kenel[pointi<2>{0, 1}];
 			sum += ts_input[pointi<2>{0, j} + pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
 			sum += ts_input[pointi<2>{0, j} + pointi<2>{2, 1} -kenel_radius] * kenel[pointi<2>{2, 1}];
-			// sum += ts_input[pointi<2>{0, j} + pointi<2>{0, 2} -kenel_radius] * kenel[pointi<2>{0, 2}];
 			sum += ts_input[pointi<2>{0, j} + pointi<2>{1, 2} -kenel_radius] * kenel[pointi<2>{1, 2}];
 			sum += ts_input[pointi<2>{0, j} + pointi<2>{2, 2} -kenel_radius] * kenel[pointi<2>{2, 2}];
 			ts_output[pointi<2>{0, j}] = sum;
@@ -462,13 +389,10 @@ void bm_conv_linear(benchmark::State &state){
 			float sum = 0.0f;
 			sum += ts_input[pointi<2>{last_col_pos, j} + pointi<2>{0, 0} -kenel_radius] * kenel[pointi<2>{0, 0}];
 			sum += ts_input[pointi<2>{last_col_pos, j} + pointi<2>{1, 0} -kenel_radius] * kenel[pointi<2>{1, 0}];
-			// sum += ts_input[pointi<2>{last_col_pos, j} + pointi<2>{2, 0} -kenel_radius] * kenel[pointi<2>{2, 0}];
 			sum += ts_input[pointi<2>{last_col_pos, j} + pointi<2>{0, 1} -kenel_radius] * kenel[pointi<2>{0, 1}];
 			sum += ts_input[pointi<2>{last_col_pos, j} + pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
-			// sum += ts_input[pointi<2>{last_col_pos, j} + pointi<2>{2, 1} -kenel_radius] * kenel[pointi<2>{2, 1}];
 			sum += ts_input[pointi<2>{last_col_pos, j} + pointi<2>{0, 2} -kenel_radius] * kenel[pointi<2>{0, 2}];
 			sum += ts_input[pointi<2>{last_col_pos, j} + pointi<2>{1, 2} -kenel_radius] * kenel[pointi<2>{1, 2}];
-			// sum += ts_input[pointi<2>{last_col_pos, j} + pointi<2>{2, 2} -kenel_radius] * kenel[pointi<2>{2, 2}];
 			ts_output[pointi<2>{last_col_pos, j}] = sum;
 		}
 
@@ -481,188 +405,16 @@ void bm_conv_linear(benchmark::State &state){
 			sum += ts_input[pointi<2>{i, last_row_pos} + pointi<2>{0, 1} -kenel_radius] * kenel[pointi<2>{0, 1}];
 			sum += ts_input[pointi<2>{i, last_row_pos} + pointi<2>{1, 1} -kenel_radius] * kenel[pointi<2>{1, 1}];
 			sum += ts_input[pointi<2>{i, last_row_pos} + pointi<2>{2, 1} -kenel_radius] * kenel[pointi<2>{2, 1}];
-			// sum += ts_input[pointi<2>{i, last_row_pos} + pointi<2>{0, 2} -kenel_radius] * kenel[pointi<2>{0, 2}];
-			// sum += ts_input[pointi<2>{i, last_row_pos} + pointi<2>{1, 2} -kenel_radius] * kenel[pointi<2>{1, 2}];
-			// sum += ts_input[pointi<2>{i, last_row_pos} + pointi<2>{2, 2} -kenel_radius] * kenel[pointi<2>{2, 2}];
 			ts_output[pointi<2>{i, last_row_pos}] = sum;
 		}
+
+		benchmark::ClobberMemory();
 	}
 
 	state.SetBytesProcessed(state.iterations() * ts_output.size() * sizeof(float));
 	state.SetItemsProcessed(state.iterations() * ts_output.size() * kenel.size());
 }
-BENCHMARK(bm_conv_linear)->Arg(7)->Arg(14)->Arg(28)->Arg(56)->Arg(112)->Arg(224)->UseRealTime();
-
-void bm_conv_sse2_expand(benchmark::State &state){
-	pointi<2> ext;
-	fill(ext, state.range(0));
-	tensor<__m128, 2> ts_input(ext);
-	tensor<__m128, 2> ts_output(ts_input.shape());
-	static_tensor<__m128, dim<3,3>> kenel;
-	for_each(ts_input, [](__m128 &e){
-		e = _mm_set_ps(1.1f, 1.2f, 1.2f, 1.3f);
-	});
-	for_each(ts_output, [](__m128 &e){
-		e = _mm_set_ps(1.1f, 1.2f, 1.2f, 1.3f);
-	});
-	for_each(kenel, [](__m128 &e){
-		e = _mm_set_ps(1.1f, 1.2f, 1.2f, 1.3f);
-	});
-
-	while (state.KeepRunning()){
-		auto kenel_radius = kenel.shape() / 2;
-	#ifdef __LOCAL_USE_OMP
-		#pragma omp parallel for collapse(2)
-	#endif
-		for(int_t j = 1; j < ts_input.shape()[1] - 1; ++j) {
-			for (int_t i = 1; i < ts_input.shape()[0] - 1; ++i) {
-				__m128 sum = _mm_setzero_ps();
-
-				sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{0, 0} -kenel_radius], kenel[pointi<2>{0, 0}]));
-				sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{1, 0} -kenel_radius], kenel[pointi<2>{1, 0}]));
-				sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{2, 0} -kenel_radius], kenel[pointi<2>{2, 0}]));
-				sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{0, 1} -kenel_radius], kenel[pointi<2>{0, 1}]));
-				sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{1, 1} -kenel_radius], kenel[pointi<2>{1, 1}]));
-				sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{2, 1} -kenel_radius], kenel[pointi<2>{2, 1}]));
-				sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{0, 2} -kenel_radius], kenel[pointi<2>{0, 2}]));
-				sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{1, 2} -kenel_radius], kenel[pointi<2>{1, 2}]));
-				sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{2, 2} -kenel_radius], kenel[pointi<2>{2, 2}]));
-
-				ts_output[pointi<2>{i, j}] = sum;
-			}
-		}
-
-	#ifdef __linux__
-		benchmark::ClobberMemory();
-	#endif
-	}
-
-	auto valid_shape = ts_output.shape() - 1;
-	auto valid_size = reduce(valid_shape, 1, [](int_t x, int_t y){ return x * y; });
-	state.SetBytesProcessed(state.iterations() * valid_size * sizeof(__m128));
-	state.SetItemsProcessed(state.iterations() * valid_size * kenel.size() * sizeof(__m128) / sizeof(float));
-}
-BENCHMARK(bm_conv_sse2_expand)->Arg(7)->Arg(14)->Arg(28)->Arg(56)->Arg(112)->Arg(224)->UseRealTime();
-
-void bm_conv_sse2_expand_inside_check(benchmark::State &state){
-	pointi<2> ext;
-	fill(ext, state.range(0));
-	tensor<__m128, 2> ts_input(ext);
-	tensor<__m128, 2> ts_output(ts_input.shape());
-	static_tensor<__m128, dim<3,3>> kenel;
-	for_each(ts_input, [](__m128 &e){
-		e = _mm_set_ps(1.1f, 1.2f, 1.2f, 1.3f);
-	});
-	for_each(ts_output, [](__m128 &e){
-		e = _mm_set_ps(1.1f, 1.2f, 1.2f, 1.3f);
-	});
-	for_each(kenel, [](__m128 &e){
-		e = _mm_set_ps(1.1f, 1.2f, 1.2f, 1.3f);
-	});
-
-	auto width = ts_input.shape()[0];
-	auto height = ts_input.shape()[1];
-	const auto shape = ts_input.shape();
-
-	while (state.KeepRunning()){
-		auto kenel_radius = kenel.shape() / 2;
-	#ifdef __LOCAL_USE_OMP
-		#pragma omp parallel for collapse(2)
-	#endif
-		for(int_t j = 0; j < ts_input.shape()[1] ; ++j) {
-			for (int_t i = 0; i < ts_input.shape()[0] ; ++i) {
-
-				__m128 sum = _mm_setzero_ps();
-
-				// if (i > 1 && j > 1 && i < width - 1 && i < height - 1){
-				if (MATAZURE_LIKELY(inside(pointi<2>{i, j}, pointi<2>{1,1}, ts_input.shape()))){
-					sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{0, 0} -kenel_radius], kenel[pointi<2>{0, 0}]));
-					sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{1, 0} -kenel_radius], kenel[pointi<2>{1, 0}]));
-					sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{2, 0} -kenel_radius], kenel[pointi<2>{2, 0}]));
-					sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{0, 1} -kenel_radius], kenel[pointi<2>{0, 1}]));
-					sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{1, 1} -kenel_radius], kenel[pointi<2>{1, 1}]));
-					sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{2, 1} -kenel_radius], kenel[pointi<2>{2, 1}]));
-					sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{0, 2} -kenel_radius], kenel[pointi<2>{0, 2}]));
-					sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{1, 2} -kenel_radius], kenel[pointi<2>{1, 2}]));
-					sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{2, 2} -kenel_radius], kenel[pointi<2>{2, 2}]));
-				}
-
-				ts_output[pointi<2>{i, j}] = sum;
-			}
-		}
-
-	#ifdef __linux__
-		benchmark::ClobberMemory();
-	#endif
-	}
-
-	auto valid_shape = ts_output.shape() - 1;
-	auto valid_size = reduce(valid_shape, 1, [](int_t x, int_t y){ return x * y; });
-	state.SetBytesProcessed(state.iterations() * valid_size * sizeof(__m128));
-	state.SetItemsProcessed(state.iterations() * valid_size * kenel.size() * sizeof(__m128) / sizeof(float));
-}
-BENCHMARK(bm_conv_sse2_expand_inside_check)->Arg(7)->Arg(14)->Arg(28)->Arg(56)->Arg(112)->Arg(224)->UseRealTime();
-
-void bm_conv_sse2_inside_check_fixed(benchmark::State &state){
-	pointi<2> ext;
-	fill(ext, state.range(0));
-	tensor<__m128, 2> ts_input(ext);
-	tensor<__m128, 2> ts_output(ts_input.shape());
-	static_tensor<__m128, dim<3,3>> kenel;
-	for_each(ts_input, [](__m128 &e){
-		e = _mm_set_ps(1.1f, 1.2f, 1.2f, 1.3f);
-	});
-	for_each(ts_output, [](__m128 &e){
-		e = _mm_set_ps(1.1f, 1.2f, 1.2f, 1.3f);
-	});
-	for_each(kenel, [](__m128 &e){
-		e = _mm_set_ps(1.1f, 1.2f, 1.2f, 1.3f);
-	});
-
-	auto width = ts_input.shape()[0];
-	auto height = ts_input.shape()[1];
-	const auto shape = ts_input.shape();
-
-	while (state.KeepRunning()){
-		auto kenel_radius = kenel.shape() / 2;
-	#ifdef __LOCAL_USE_OMP
-		#pragma omp parallel for collapse(2)
-	#endif
-		for(int_t j = 0; j < ts_input.shape()[1] ; ++j) {
-			for (int_t i = 0; i < ts_input.shape()[0] ; ++i) {
-
-				__m128 sum = _mm_setzero_ps();
-
-				if (MATAZURE_LIKELY(inside(pointi<2>{i, j}, pointi<2>{1,1}, ts_input.shape() - 2))){
-					for_index(pointi<2>{0,0}, kenel.shape(), [&](pointi<2> kenel_idx){
- 						sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} + kenel_idx -kenel_radius], kenel[kenel_idx]));
-					});
-				}else{
-					for_index(pointi<2>{0,0}, kenel.shape(), [&](pointi<2> kenel_idx){
-						__m128 value = _mm_setzero_ps();
-						auto value_index = pointi<2>{i, j} + kenel_idx - kenel_radius;
-						if (MATAZURE_LIKELY(inside(value_index, pointi<2>{1,1}, ts_input.shape() - 2))){
-							value = ts_input[value_index];
-						}
- 						sum = _mm_add_ps(sum, _mm_mul_ps(value, kenel[kenel_idx]));
-					});
-				}
-
-				ts_output[pointi<2>{i, j}] = sum;
-			}
-		}
-
-	#ifdef __linux__
-		benchmark::ClobberMemory();
-	#endif
-	}
-
-	auto valid_shape = ts_output.shape() - 1;
-	auto valid_size = reduce(valid_shape, 1, [](int_t x, int_t y){ return x * y; });
-	state.SetBytesProcessed(state.iterations() * valid_size * sizeof(__m128));
-	state.SetItemsProcessed(state.iterations() * valid_size * kenel.size() * sizeof(__m128) / sizeof(float));
-}
-BENCHMARK(bm_conv_sse2_inside_check_fixed)->Arg(7)->Arg(14)->Arg(28)->Arg(56)->Arg(112)->Arg(224)->UseRealTime();
+BENCHMARK(bm_conv_3x3_linear_check)->Arg(7)->Arg(14)->Arg(28)->Arg(56)->Arg(112)->Arg(224)->UseRealTime();
 
 inline bool is_a_ge_zero_and_a_lt_b(int a, int b) {
   return static_cast<unsigned>(a) < static_cast<unsigned>(b);
@@ -719,9 +471,7 @@ void bm_img2col(benchmark::State &state){
 			}
 		}
 
-	#ifdef __linux__
 		benchmark::ClobberMemory();
-	#endif
 	}
 
 	state.SetBytesProcessed(state.iterations() * mat_re.size() * sizeof(float));
@@ -729,7 +479,7 @@ void bm_img2col(benchmark::State &state){
 }
 BENCHMARK(bm_img2col)->Arg(7)->Arg(14)->Arg(28)->Arg(56)->Arg(112)->Arg(224)->UseRealTime();
 
-void bm_img2col_conv(benchmark::State &state){
+void bm_conv_3x3_img2col(benchmark::State &state){
 	pointi<2> ext{};
 	fill(ext, state.range(0));
 	tensor<float, 2> mat_input(ext);
@@ -782,12 +532,169 @@ void bm_img2col_conv(benchmark::State &state){
 			}
 		}
 
-	#ifdef __linux__
 		benchmark::ClobberMemory();
-	#endif
 	}
 
 	state.SetBytesProcessed(state.iterations() * mat_re.size() * sizeof(float));
 	state.SetItemsProcessed(state.iterations() * mat_re.size() * 9);
 }
-BENCHMARK(bm_img2col_conv)->Arg(7)->Arg(14)->Arg(28)->Arg(56)->Arg(112)->Arg(224)->UseRealTime();
+BENCHMARK(bm_conv_3x3_img2col)->Arg(7)->Arg(14)->Arg(28)->Arg(56)->Arg(112)->Arg(224)->UseRealTime();
+
+#ifdef MATAZURE_SSE
+
+void bm_conv_3x3_sse2_expand(benchmark::State &state){
+	pointi<2> ext;
+	fill(ext, state.range(0));
+	tensor<__m128, 2> ts_input(ext);
+	tensor<__m128, 2> ts_output(ts_input.shape());
+	static_tensor<__m128, dim<3,3>> kenel;
+	for_each(ts_input, [](__m128 &e){
+		e = _mm_set_ps(1.1f, 1.2f, 1.2f, 1.3f);
+	});
+	for_each(ts_output, [](__m128 &e){
+		e = _mm_set_ps(1.1f, 1.2f, 1.2f, 1.3f);
+	});
+	for_each(kenel, [](__m128 &e){
+		e = _mm_set_ps(1.1f, 1.2f, 1.2f, 1.3f);
+	});
+
+	while (state.KeepRunning()){
+		auto kenel_radius = kenel.shape() / 2;
+		for(int_t j = 1; j < ts_input.shape()[1] - 1; ++j) {
+			for (int_t i = 1; i < ts_input.shape()[0] - 1; ++i) {
+				__m128 sum = _mm_setzero_ps();
+
+				sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{0, 0} -kenel_radius], kenel[pointi<2>{0, 0}]));
+				sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{1, 0} -kenel_radius], kenel[pointi<2>{1, 0}]));
+				sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{2, 0} -kenel_radius], kenel[pointi<2>{2, 0}]));
+				sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{0, 1} -kenel_radius], kenel[pointi<2>{0, 1}]));
+				sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{1, 1} -kenel_radius], kenel[pointi<2>{1, 1}]));
+				sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{2, 1} -kenel_radius], kenel[pointi<2>{2, 1}]));
+				sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{0, 2} -kenel_radius], kenel[pointi<2>{0, 2}]));
+				sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{1, 2} -kenel_radius], kenel[pointi<2>{1, 2}]));
+				sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{2, 2} -kenel_radius], kenel[pointi<2>{2, 2}]));
+
+				ts_output[pointi<2>{i, j}] = sum;
+			}
+		}
+
+		benchmark::ClobberMemory();
+	}
+
+	auto valid_shape = ts_output.shape() - 1;
+	auto valid_size = reduce(valid_shape, 1, [](int_t x, int_t y){ return x * y; });
+	state.SetBytesProcessed(state.iterations() * valid_size * sizeof(__m128));
+	state.SetItemsProcessed(state.iterations() * valid_size * kenel.size() * sizeof(__m128) / sizeof(float));
+}
+BENCHMARK(bm_conv_3x3_sse2_expand)->Arg(7)->Arg(14)->Arg(28)->Arg(56)->Arg(112)->Arg(224)->UseRealTime();
+
+void bm_conv_3x3_sse2_expand_inside_check(benchmark::State &state){
+	pointi<2> ext;
+	fill(ext, state.range(0));
+	tensor<__m128, 2> ts_input(ext);
+	tensor<__m128, 2> ts_output(ts_input.shape());
+	static_tensor<__m128, dim<3,3>> kenel;
+	for_each(ts_input, [](__m128 &e){
+		e = _mm_set_ps(1.1f, 1.2f, 1.2f, 1.3f);
+	});
+	for_each(ts_output, [](__m128 &e){
+		e = _mm_set_ps(1.1f, 1.2f, 1.2f, 1.3f);
+	});
+	for_each(kenel, [](__m128 &e){
+		e = _mm_set_ps(1.1f, 1.2f, 1.2f, 1.3f);
+	});
+
+	auto width = ts_input.shape()[0];
+	auto height = ts_input.shape()[1];
+	const auto shape = ts_input.shape();
+
+	while (state.KeepRunning()){
+		auto kenel_radius = kenel.shape() / 2;
+		for(int_t j = 0; j < ts_input.shape()[1] ; ++j) {
+			for (int_t i = 0; i < ts_input.shape()[0] ; ++i) {
+
+				__m128 sum = _mm_setzero_ps();
+
+				if (MATAZURE_LIKELY(inside(pointi<2>{i, j}, pointi<2>{1,1}, ts_input.shape()))){
+					sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{0, 0} -kenel_radius], kenel[pointi<2>{0, 0}]));
+					sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{1, 0} -kenel_radius], kenel[pointi<2>{1, 0}]));
+					sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{2, 0} -kenel_radius], kenel[pointi<2>{2, 0}]));
+					sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{0, 1} -kenel_radius], kenel[pointi<2>{0, 1}]));
+					sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{1, 1} -kenel_radius], kenel[pointi<2>{1, 1}]));
+					sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{2, 1} -kenel_radius], kenel[pointi<2>{2, 1}]));
+					sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{0, 2} -kenel_radius], kenel[pointi<2>{0, 2}]));
+					sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{1, 2} -kenel_radius], kenel[pointi<2>{1, 2}]));
+					sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{2, 2} -kenel_radius], kenel[pointi<2>{2, 2}]));
+				}
+
+				ts_output[pointi<2>{i, j}] = sum;
+			}
+		}
+
+		benchmark::ClobberMemory();
+	}
+
+	auto valid_shape = ts_output.shape() - 1;
+	auto valid_size = reduce(valid_shape, 1, [](int_t x, int_t y){ return x * y; });
+	state.SetBytesProcessed(state.iterations() * valid_size * sizeof(__m128));
+	state.SetItemsProcessed(state.iterations() * valid_size * kenel.size() * sizeof(__m128) / sizeof(float));
+}
+BENCHMARK(bm_conv_3x3_sse2_expand_inside_check)->Arg(7)->Arg(14)->Arg(28)->Arg(56)->Arg(112)->Arg(224)->UseRealTime();
+
+void bm_conv_3x3_sse2_inside_check(benchmark::State &state){
+	pointi<2> ext;
+	fill(ext, state.range(0));
+	tensor<__m128, 2> ts_input(ext);
+	tensor<__m128, 2> ts_output(ts_input.shape());
+	static_tensor<__m128, dim<3,3>> kenel;
+	for_each(ts_input, [](__m128 &e){
+		e = _mm_set_ps(1.1f, 1.2f, 1.2f, 1.3f);
+	});
+	for_each(ts_output, [](__m128 &e){
+		e = _mm_set_ps(1.1f, 1.2f, 1.2f, 1.3f);
+	});
+	for_each(kenel, [](__m128 &e){
+		e = _mm_set_ps(1.1f, 1.2f, 1.2f, 1.3f);
+	});
+
+	auto width = ts_input.shape()[0];
+	auto height = ts_input.shape()[1];
+	const auto shape = ts_input.shape();
+
+	while (state.KeepRunning()){
+		auto kenel_radius = kenel.shape() / 2;
+		for(int_t j = 0; j < ts_input.shape()[1] ; ++j) {
+			for (int_t i = 0; i < ts_input.shape()[0] ; ++i) {
+
+				__m128 sum = _mm_setzero_ps();
+
+				if (MATAZURE_LIKELY(inside(pointi<2>{i, j}, pointi<2>{1,1}, ts_input.shape() - 2))){
+					for_index(pointi<2>{0,0}, kenel.shape(), [&](pointi<2> kenel_idx){
+ 						sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} + kenel_idx -kenel_radius], kenel[kenel_idx]));
+					});
+				}else{
+					for_index(pointi<2>{0,0}, kenel.shape(), [&](pointi<2> kenel_idx){
+						__m128 value = _mm_setzero_ps();
+						auto value_index = pointi<2>{i, j} + kenel_idx - kenel_radius;
+						if (MATAZURE_LIKELY(inside(value_index, pointi<2>{1,1}, ts_input.shape() - 2))){
+							value = ts_input[value_index];
+						}
+ 						sum = _mm_add_ps(sum, _mm_mul_ps(value, kenel[kenel_idx]));
+					});
+				}
+
+				ts_output[pointi<2>{i, j}] = sum;
+			}
+		}
+
+		benchmark::ClobberMemory();
+	}
+
+	auto valid_shape = ts_output.shape() - 1;
+	auto valid_size = reduce(valid_shape, 1, [](int_t x, int_t y){ return x * y; });
+	state.SetBytesProcessed(state.iterations() * valid_size * sizeof(__m128));
+	state.SetItemsProcessed(state.iterations() * valid_size * kenel.size() * sizeof(__m128) / sizeof(float));
+}
+BENCHMARK(bm_conv_3x3_sse2_inside_check)->Arg(7)->Arg(14)->Arg(28)->Arg(56)->Arg(112)->Arg(224)->UseRealTime();
+
+#endif
