@@ -899,6 +899,7 @@ inline auto reshape(tensor<_ValueType, _Rank, _Layout> ts, pointi<_OutDim> ext, 
 
 #ifdef MATAZURE_CUDA
 
+///@todo nvcc bug, should forward declaration
 namespace __walkaround {
 
 using tensor1b = tensor<byte, 1>;
