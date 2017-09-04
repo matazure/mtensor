@@ -5,7 +5,7 @@
 
 using namespace matazure;
 
-void bm_tn_nmk_prod_simple_gold(benchmark::State &state){
+void bm_gold_tn_nmk_prod_simple(benchmark::State &state){
 	auto M = state.range(0);
 	auto K = state.range(1);
 	auto N = state.range(2);
@@ -35,7 +35,7 @@ void bm_tn_nmk_prod_simple_gold(benchmark::State &state){
 
 	state.SetItemsProcessed(state.iterations() * M * K * N);
 }
-BENCHMARK(bm_tn_nmk_prod_simple_gold)
+BENCHMARK(bm_gold_tn_nmk_prod_simple)
 	->Args({ 32, 32, 32 })
 	->Args({ 128, 128, 128 })
 	->Args({ 512, 512, 512 })
@@ -233,7 +233,7 @@ BENCHMARK(bm_nn_nkm_prod_simple)
 	->Args({ 7 * 7, 512, 30})
 	->UseRealTime();
 
-void bm_tn_nmk_block_nmk_prod_gold(benchmark::State &state) {
+void bm_gold_tn_nmk_block_nmk_prod(benchmark::State &state) {
 	auto M = state.range(0);
 	auto K = state.range(1);
 	auto N = state.range(2);
@@ -275,7 +275,7 @@ void bm_tn_nmk_block_nmk_prod_gold(benchmark::State &state) {
 
 	state.SetItemsProcessed(state.iterations() * M * K * N);
 }
-BENCHMARK(bm_tn_nmk_block_nmk_prod_gold)
+BENCHMARK(bm_gold_tn_nmk_block_nmk_prod)
 	->Args({ 32, 32, 32 })
 	->Args({ 128, 128, 128 })
 	->Args({ 512, 512, 512 })

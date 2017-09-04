@@ -6,7 +6,7 @@ using namespace matazure;
 
 #ifdef USE_CUDA
 
-static void BM_linear_lambda_tensor_persist_gold(benchmark::State &st) {
+static void bm_gold_linear_lambda_tensor_persist(benchmark::State &st) {
 	tensor<float, 1> tsf1(st.range(0));
 	while (st.KeepRunning()) {
 		tensor<float, 1> ts_re(tsf1.shape());
@@ -19,7 +19,7 @@ static void BM_linear_lambda_tensor_persist_gold(benchmark::State &st) {
 	st.SetBytesProcessed(st.iterations() * bytes_size);
 }
 
-static void BM_linear_lambda_tensor_persist(benchmark::State &st) {
+static void bm_linear_lambda_tensor_persist(benchmark::State &st) {
 	tensor<float, 1> tsf1(st.range(0));
 	while (st.KeepRunning()) {
 		auto tsf1_re = make_lambda(tsf1.shape(), [tsf1](int_t i) {
@@ -31,7 +31,7 @@ static void BM_linear_lambda_tensor_persist(benchmark::State &st) {
 	st.SetBytesProcessed(st.iterations() * bytes_size);
 }
 
-BENCHMARK(BM_linear_lambda_tensor_persist_gold)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
-BENCHMARK(BM_linear_lambda_tensor_persist)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
+BENCHMARK(bm_gold_linear_lambda_tensor_persist)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
+BENCHMARK(bm_linear_lambda_tensor_persist)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
 
 #endif

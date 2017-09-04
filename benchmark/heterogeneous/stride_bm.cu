@@ -7,7 +7,7 @@ using namespace matazure;
 //stride benchmark
 
 //template <typename _ValueType>
-//void BM_host_stride_dim2_gold(benchmark::State &state) {
+//void bm_host_stride_dim2_gold(benchmark::State &state) {
 //	tensor<_ValueType, 2> ts(state.range(1), state.range(1));
 //	int_t stride = state.range(0);
 //	int_t phase = stride / 2;
@@ -29,7 +29,7 @@ using namespace matazure;
 //}
 
 template <typename _ValueType>
-void BM_host_stride_dim2_gold(benchmark::State &state) {
+void bm_host_stride_dim2_gold(benchmark::State &state) {
 	tensor<_ValueType, 2> ts(state.range(1), state.range(1));
 	int_t stride = state.range(0);
 	int_t phase = stride / 2;
@@ -54,7 +54,7 @@ void BM_host_stride_dim2_gold(benchmark::State &state) {
 }
 
 template <typename _Tensor>
-void BM_stride(benchmark::State &state) {
+void bm_stride(benchmark::State &state) {
 	auto ext = pointi<_Tensor::rank>::zeros();
 	fill(ext, state.range(1));
 	_Tensor ts(ext);
@@ -84,7 +84,7 @@ void BM_stride(benchmark::State &state) {
 //}
 
 //template <typename _ValueType>
-//void BM_cu_stride_gold(benchmark::State& state) {
+//void bm_gold_cu_stride(benchmark::State& state) {
 //	cuda::tensor<_ValueType, 1> ts(state.range(0));
 //
 //	while (state.KeepRunning()) {
@@ -102,7 +102,7 @@ void BM_stride(benchmark::State &state) {
 //}
 //
 //template <typename _ValueType>
-//void BM_stride_operation(benchmark::State &state) {
+//void bm_stride_operation(benchmark::State &state) {
 //	cuda::tensor<_ValueType, 1> ts1(state.range(0));
 //	cuda::tensor<_ValueType, 1> ts2(state.range(0));
 //	fill(ts1, _ValueType(1));
@@ -123,27 +123,27 @@ static void custom_arguments(benchmark::internal::Benchmark* b) {
 	});
 }
 
-BENCHMARK_TEMPLATE(BM_host_stride_dim2_gold, byte)->UseRealTime()->Apply(custom_arguments);
-//BENCHMARK_TEMPLATE(BM_host_stride_dim2_gold, int16_t)->UseRealTime()->Apply(custom_arguments);
-//BENCHMARK_TEMPLATE(BM_host_stride_dim2_gold, int32_t)->UseRealTime()->Apply(custom_arguments);
-//BENCHMARK_TEMPLATE(BM_host_stride_dim2_gold, int64_t)->UseRealTime()->Apply(custom_arguments);
-//BENCHMARK_TEMPLATE(BM_host_stride_dim2_gold, float)->UseRealTime()->Apply(custom_arguments);
-//BENCHMARK_TEMPLATE(BM_host_stride_dim2_gold, double)->UseRealTime()->Apply(custom_arguments);
+BENCHMARK_TEMPLATE(bm_host_stride_dim2_gold, byte)->UseRealTime()->Apply(custom_arguments);
+//BENCHMARK_TEMPLATE(bm_host_stride_dim2_gold, int16_t)->UseRealTime()->Apply(custom_arguments);
+//BENCHMARK_TEMPLATE(bm_host_stride_dim2_gold, int32_t)->UseRealTime()->Apply(custom_arguments);
+//BENCHMARK_TEMPLATE(bm_host_stride_dim2_gold, int64_t)->UseRealTime()->Apply(custom_arguments);
+//BENCHMARK_TEMPLATE(bm_host_stride_dim2_gold, float)->UseRealTime()->Apply(custom_arguments);
+//BENCHMARK_TEMPLATE(bm_host_stride_dim2_gold, double)->UseRealTime()->Apply(custom_arguments);
 
 #ifdef USE_HOST
-auto BM_stride_tensor_byte_dim2 = BM_stride<tensor<byte, 2>>;
-BENCHMARK(BM_stride_tensor_byte_dim2)->UseRealTime()->Apply(custom_arguments);
+auto bm_stride_tensor_byte_dim2 = bm_stride<tensor<byte, 2>>;
+BENCHMARK(bm_stride_tensor_byte_dim2)->UseRealTime()->Apply(custom_arguments);
 #endif
 
 #ifdef USE_CUDA
-auto BM_stride_cu_tensor_byte_dim2 = BM_stride<cuda::tensor<byte, 2>>;
-BENCHMARK(BM_stride_cu_tensor_byte_dim2)->UseRealTime()->Apply(custom_arguments);
+auto bm_stride_cu_tensor_byte_dim2 = bm_stride<cuda::tensor<byte, 2>>;
+BENCHMARK(bm_stride_cu_tensor_byte_dim2)->UseRealTime()->Apply(custom_arguments);
 #endif
-//auto BM_stride_cu_tensor_byte_dim1 = BM_stride<cuda::tensor<byte, 1>>;
-//BENCHMARK(BM_stride_cu_tensor_byte_dim1)->UseRealTime()->Apply(custom_arguments);
+//auto bm_stride_cu_tensor_byte_dim1 = bm_stride<cuda::tensor<byte, 1>>;
+//BENCHMARK(bm_stride_cu_tensor_byte_dim1)->UseRealTime()->Apply(custom_arguments);
 
 
-//BENCHMARK_TEMPLATE(BM_host_stride, float)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
+//BENCHMARK_TEMPLATE(bm_host_stride, float)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
 //
-//BENCHMARK_TEMPLATE(BM_cu_stride_gold, float)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
-//BENCHMARK_TEMPLATE(BM_hcu_stride, float)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
+//BENCHMARK_TEMPLATE(bm_gold_cu_stride, float)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
+//BENCHMARK_TEMPLATE(bm_hcu_stride, float)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();

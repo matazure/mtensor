@@ -5,7 +5,7 @@
 using namespace matazure;
 
 template <typename _ValueType>
-void BM_tensor_construct_and_destruct(benchmark::State& state) {
+void bm_tensor_construct_and_destruct(benchmark::State& state) {
 	int_t size = 0;
 	while (state.KeepRunning()) {
 		tensor<_ValueType,1> ts(state.range(0));
@@ -21,13 +21,13 @@ void BM_tensor_construct_and_destruct(benchmark::State& state) {
 	state.SetBytesProcessed(state.iterations() * bytes_size);
 }
 
-BENCHMARK_TEMPLATE1(BM_tensor_construct_and_destruct, byte)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
-// BENCHMARK_TEMPLATE1(BM_tensor_construct_and_destruct, int32_t)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
-// BENCHMARK_TEMPLATE1(BM_tensor_construct_and_destruct, float)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
-// BENCHMARK_TEMPLATE1(BM_tensor_construct_and_destruct, double)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
+BENCHMARK_TEMPLATE1(bm_tensor_construct_and_destruct, byte)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
+// BENCHMARK_TEMPLATE1(bm_tensor_construct_and_destruct, int32_t)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
+// BENCHMARK_TEMPLATE1(bm_tensor_construct_and_destruct, float)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
+// BENCHMARK_TEMPLATE1(bm_tensor_construct_and_destruct, double)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
 
 template <typename _ValueType>
-void BM_tensor_linear_index_glod0(benchmark::State& state){
+void bm_tensor_linear_index_glod0(benchmark::State& state){
 	auto size = state.range(0);
 	auto p_data = new _ValueType[size];
 	while (state.KeepRunning()) {
@@ -44,12 +44,12 @@ void BM_tensor_linear_index_glod0(benchmark::State& state){
 	delete[] p_data;
 	state.SetBytesProcessed(state.iterations() * static_cast<size_t>(size) * sizeof(_ValueType));
 }
-BENCHMARK_TEMPLATE(BM_tensor_linear_index_glod0, byte)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent()))->UseRealTime();
-BENCHMARK_TEMPLATE(BM_tensor_linear_index_glod0, int)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2 ))->UseRealTime();
-BENCHMARK_TEMPLATE(BM_tensor_linear_index_glod0, float)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
+BENCHMARK_TEMPLATE(bm_tensor_linear_index_glod0, byte)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent()))->UseRealTime();
+BENCHMARK_TEMPLATE(bm_tensor_linear_index_glod0, int)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2 ))->UseRealTime();
+BENCHMARK_TEMPLATE(bm_tensor_linear_index_glod0, float)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
 
 template <typename _ValueType>
-void BM_tensor_linear_index_glod(benchmark::State& state){
+void bm_tensor_linear_index_glod(benchmark::State& state){
 	auto size = state.range(0);
 	auto p_data = new _ValueType[size];
 	while (state.KeepRunning()) {
@@ -62,12 +62,12 @@ void BM_tensor_linear_index_glod(benchmark::State& state){
 	delete[] p_data;
 	state.SetBytesProcessed(state.iterations() * static_cast<size_t>(size) * sizeof(_ValueType));
 }
-BENCHMARK_TEMPLATE(BM_tensor_linear_index_glod, byte)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent()))->UseRealTime();
-BENCHMARK_TEMPLATE(BM_tensor_linear_index_glod, int)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2 ))->UseRealTime();
-BENCHMARK_TEMPLATE(BM_tensor_linear_index_glod, float)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
+BENCHMARK_TEMPLATE(bm_tensor_linear_index_glod, byte)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent()))->UseRealTime();
+BENCHMARK_TEMPLATE(bm_tensor_linear_index_glod, int)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2 ))->UseRealTime();
+BENCHMARK_TEMPLATE(bm_tensor_linear_index_glod, float)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
 
 template <typename _TensorType>
-void BM_tensor_linear_index(benchmark::State& state) {
+void bm_tensor_linear_index(benchmark::State& state) {
 	pointi<_TensorType::rank> ext{};
 	fill(ext, state.range(0));
 	_TensorType ts(ext);
@@ -82,15 +82,15 @@ void BM_tensor_linear_index(benchmark::State& state) {
 
 	state.SetBytesProcessed(state.iterations() * static_cast<size_t>(ts.size()) * sizeof(typename _TensorType::value_type));
 }
-auto BM_tensor_byte_1d_linear_index = BM_tensor_linear_index<tensor<byte, 1>>;
-BENCHMARK(BM_tensor_byte_1d_linear_index)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent()))->UseRealTime();
-auto BM_tensor_int_1d_linear_index = BM_tensor_linear_index<tensor<int, 1>>;
-BENCHMARK(BM_tensor_int_1d_linear_index)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
-auto BM_tensor_float_1d_linear_index = BM_tensor_linear_index<tensor<float, 1>>;
-BENCHMARK(BM_tensor_float_1d_linear_index)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
+auto bm_tensor_byte_1d_linear_index = bm_tensor_linear_index<tensor<byte, 1>>;
+BENCHMARK(bm_tensor_byte_1d_linear_index)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent()))->UseRealTime();
+auto bm_tensor_int_1d_linear_index = bm_tensor_linear_index<tensor<int, 1>>;
+BENCHMARK(bm_tensor_int_1d_linear_index)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
+auto bm_tensor_float_1d_linear_index = bm_tensor_linear_index<tensor<float, 1>>;
+BENCHMARK(bm_tensor_float_1d_linear_index)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
 
 template <typename _ValueType>
-void BM_tensor_1d_array_index(benchmark::State& state) {
+void bm_tensor_1d_array_index(benchmark::State& state) {
 	pointi<1> ext{};
 	fill(ext, state.range(0));
 	tensor<_ValueType, 1> ts(ext);
@@ -105,12 +105,12 @@ void BM_tensor_1d_array_index(benchmark::State& state) {
 
 	state.SetBytesProcessed(state.iterations() * static_cast<size_t>(ts.size()) * sizeof(_ValueType));
 }
-BENCHMARK_TEMPLATE(BM_tensor_1d_array_index, byte)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent()))->UseRealTime();
-BENCHMARK_TEMPLATE(BM_tensor_1d_array_index, int)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent()))->UseRealTime();
-BENCHMARK_TEMPLATE(BM_tensor_1d_array_index, float)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent()))->UseRealTime();
+BENCHMARK_TEMPLATE(bm_tensor_1d_array_index, byte)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent()))->UseRealTime();
+BENCHMARK_TEMPLATE(bm_tensor_1d_array_index, int)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent()))->UseRealTime();
+BENCHMARK_TEMPLATE(bm_tensor_1d_array_index, float)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent()))->UseRealTime();
 
 template <typename _ValueType>
-void BM_tensor_2d_array_index_gold(benchmark::State& state) {
+void bm_tensor_2d_array_index_gold(benchmark::State& state) {
 	pointi<2> ext{};
 	fill(ext, state.range(0));
 	tensor<_ValueType, 2> ts(ext);
@@ -129,12 +129,12 @@ void BM_tensor_2d_array_index_gold(benchmark::State& state) {
 
 	state.SetBytesProcessed(state.iterations() * static_cast<size_t>(ts.size()) * sizeof(_ValueType));
 }
-BENCHMARK_TEMPLATE(BM_tensor_2d_array_index_gold, byte)->RangeMultiplier(4)->Range(1<<5, 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
-BENCHMARK_TEMPLATE(BM_tensor_2d_array_index_gold, int)->RangeMultiplier(4)->Range(1<<5, 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
-BENCHMARK_TEMPLATE(BM_tensor_2d_array_index_gold, float)->RangeMultiplier(4)->Range(1<<5, 1 << ((bm_config::max_host_memory_exponent() -2 ) / 2))->UseRealTime();
+BENCHMARK_TEMPLATE(bm_tensor_2d_array_index_gold, byte)->RangeMultiplier(4)->Range(1<<5, 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
+BENCHMARK_TEMPLATE(bm_tensor_2d_array_index_gold, int)->RangeMultiplier(4)->Range(1<<5, 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
+BENCHMARK_TEMPLATE(bm_tensor_2d_array_index_gold, float)->RangeMultiplier(4)->Range(1<<5, 1 << ((bm_config::max_host_memory_exponent() -2 ) / 2))->UseRealTime();
 
 template <typename _ValueType>
-void BM_tensor_2d_array_index(benchmark::State& state) {
+void bm_tensor_2d_array_index(benchmark::State& state) {
 	pointi<2> ext{};
 	fill(ext, state.range(0));
 	tensor<_ValueType, 2> ts(ext);
@@ -151,12 +151,12 @@ void BM_tensor_2d_array_index(benchmark::State& state) {
 
 	state.SetBytesProcessed(state.iterations() * static_cast<size_t>(ts.size()) * sizeof(_ValueType));
 }
-BENCHMARK_TEMPLATE(BM_tensor_2d_array_index, byte)->RangeMultiplier(4)->Range(1<<5, 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
-BENCHMARK_TEMPLATE(BM_tensor_2d_array_index, int)->RangeMultiplier(4)->Range(1<<5, 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
-BENCHMARK_TEMPLATE(BM_tensor_2d_array_index, float)->RangeMultiplier(4)->Range(1<<5, 1 << ((bm_config::max_host_memory_exponent() -2 ) / 2))->UseRealTime();
+BENCHMARK_TEMPLATE(bm_tensor_2d_array_index, byte)->RangeMultiplier(4)->Range(1<<5, 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
+BENCHMARK_TEMPLATE(bm_tensor_2d_array_index, int)->RangeMultiplier(4)->Range(1<<5, 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
+BENCHMARK_TEMPLATE(bm_tensor_2d_array_index, float)->RangeMultiplier(4)->Range(1<<5, 1 << ((bm_config::max_host_memory_exponent() -2 ) / 2))->UseRealTime();
 
 template <typename _ValueType>
-void BM_tensor_2d_last_marjor_array_index(benchmark::State& state) {
+void bm_tensor_2d_last_marjor_array_index(benchmark::State& state) {
 	pointi<2> ext{};
 	fill(ext, state.range(0));
 	tensor<_ValueType, 2, last_major_layout<2>> ts(ext);
@@ -173,12 +173,12 @@ void BM_tensor_2d_last_marjor_array_index(benchmark::State& state) {
 
 	state.SetBytesProcessed(state.iterations() * static_cast<size_t>(ts.size()) * sizeof(_ValueType));
 }
-BENCHMARK_TEMPLATE(BM_tensor_2d_last_marjor_array_index, byte)->RangeMultiplier(4)->Range(1<<5, 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
-BENCHMARK_TEMPLATE(BM_tensor_2d_last_marjor_array_index, int)->RangeMultiplier(4)->Range(1<<5, 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
-BENCHMARK_TEMPLATE(BM_tensor_2d_last_marjor_array_index, float)->RangeMultiplier(4)->Range(1<<5, 1 << ((bm_config::max_host_memory_exponent() -2 ) / 2))->UseRealTime();
+BENCHMARK_TEMPLATE(bm_tensor_2d_last_marjor_array_index, byte)->RangeMultiplier(4)->Range(1<<5, 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
+BENCHMARK_TEMPLATE(bm_tensor_2d_last_marjor_array_index, int)->RangeMultiplier(4)->Range(1<<5, 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
+BENCHMARK_TEMPLATE(bm_tensor_2d_last_marjor_array_index, float)->RangeMultiplier(4)->Range(1<<5, 1 << ((bm_config::max_host_memory_exponent() -2 ) / 2))->UseRealTime();
 
 template <typename _ValueType>
-void BM_tensor_3d_array_index(benchmark::State& state) {
+void bm_tensor_3d_array_index(benchmark::State& state) {
 	pointi<3> ext{};
 	fill(ext, state.range(0));
 	tensor<_ValueType, 3> ts(ext);
@@ -197,6 +197,6 @@ void BM_tensor_3d_array_index(benchmark::State& state) {
 
 	state.SetBytesProcessed(state.iterations() * static_cast<size_t>(ts.size()) * sizeof(_ValueType));
 }
-BENCHMARK_TEMPLATE(BM_tensor_3d_array_index, byte)->RangeMultiplier(2)->Range(1<<4, 1 << ((bm_config::max_host_memory_exponent() - 2) / 3))->UseRealTime();
-BENCHMARK_TEMPLATE(BM_tensor_3d_array_index, int)->RangeMultiplier(2)->Range(1<<4, 1 << ((bm_config::max_host_memory_exponent() - 2) / 3))->UseRealTime();
-BENCHMARK_TEMPLATE(BM_tensor_3d_array_index, float)->RangeMultiplier(2)->Range(1<<4, 1 << ((bm_config::max_host_memory_exponent() -2 ) / 3))->UseRealTime();
+BENCHMARK_TEMPLATE(bm_tensor_3d_array_index, byte)->RangeMultiplier(2)->Range(1<<4, 1 << ((bm_config::max_host_memory_exponent() - 2) / 3))->UseRealTime();
+BENCHMARK_TEMPLATE(bm_tensor_3d_array_index, int)->RangeMultiplier(2)->Range(1<<4, 1 << ((bm_config::max_host_memory_exponent() - 2) / 3))->UseRealTime();
+BENCHMARK_TEMPLATE(bm_tensor_3d_array_index, float)->RangeMultiplier(2)->Range(1<<4, 1 << ((bm_config::max_host_memory_exponent() -2 ) / 3))->UseRealTime();

@@ -15,7 +15,7 @@ __global__ void tensor_operation_gold_kenel(_ValueType *p_dst, _ValueType *p1, _
 }
 
 template <typename _ValueType>
-void BM_cu_tensor_operation_gold(benchmark::State& state) {
+void bm_gold_cu_tensor_operation(benchmark::State& state) {
 	cuda::tensor<_ValueType, 1> ts1(state.range(0));
 	cuda::tensor<_ValueType, 1> ts2(state.range(0));
 	fill(ts1, _ValueType(1));
@@ -38,7 +38,7 @@ void BM_cu_tensor_operation_gold(benchmark::State& state) {
 }
 
 template <typename _ValueType>
-void BM_cu_tensor_operation(benchmark::State &st) {
+void bm_cu_tensor_operation(benchmark::State &st) {
 	cuda::tensor<_ValueType, 1> ts1(st.range(0));
 	cuda::tensor<_ValueType, 1> ts2(st.range(0));
 	fill(ts1, _ValueType(1));
@@ -58,7 +58,7 @@ void BM_cu_tensor_operation(benchmark::State &st) {
 #ifdef USE_HOST
 
 template <typename _ValueType>
-void BM_host_tensor_operation_gold(benchmark::State &st) {
+void bm_gold_host_tensor_operation(benchmark::State &st) {
 	tensor<_ValueType, 1> ts1(st.range(0));
 	tensor<_ValueType, 1> ts2(st.range(0));
 	fill(ts1, _ValueType(1));
@@ -76,7 +76,7 @@ void BM_host_tensor_operation_gold(benchmark::State &st) {
 }
 
 template <typename _ValueType>
-void BM_host_tensor_operation(benchmark::State &st) {
+void bm_host_tensor_operation(benchmark::State &st) {
 	tensor<_ValueType, 1> ts1(st.range(0));
 	tensor<_ValueType, 1> ts2(st.range(0));
 
@@ -94,14 +94,14 @@ void BM_host_tensor_operation(benchmark::State &st) {
 #endif
 
 #ifdef USE_HOST
-BENCHMARK_TEMPLATE(BM_host_tensor_operation_gold, float)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
-BENCHMARK_TEMPLATE(BM_host_tensor_operation, float)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
+BENCHMARK_TEMPLATE(bm_gold_host_tensor_operation, float)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
+BENCHMARK_TEMPLATE(bm_host_tensor_operation, float)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
 #ifdef MATAZURE_SSE
-BENCHMARK_TEMPLATE(BM_host_tensor_operation, __m128)->Range(1 << 8, 1 << (bm_config::max_host_memory_exponent() - 4))->UseRealTime();
+BENCHMARK_TEMPLATE(bm_host_tensor_operation, __m128)->Range(1 << 8, 1 << (bm_config::max_host_memory_exponent() - 4))->UseRealTime();
 #endif
 #endif
 
 #ifdef USE_CUDA
-BENCHMARK_TEMPLATE(BM_cu_tensor_operation_gold, float)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
-BENCHMARK_TEMPLATE(BM_cu_tensor_operation, float)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
+BENCHMARK_TEMPLATE(bm_gold_cu_tensor_operation, float)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
+BENCHMARK_TEMPLATE(bm_cu_tensor_operation, float)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
 #endif

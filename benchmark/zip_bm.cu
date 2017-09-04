@@ -6,7 +6,7 @@ using namespace matazure;
 
 
 template <typename _ValueType>
-void BM_host_zip_gold(benchmark::State &state) {
+void bm_gold_host_zip(benchmark::State &state) {
 	tensor<_ValueType, 1> ts0(state.range(0));
 	tensor<_ValueType, 1> ts1(ts0.shape());
 	tensor<_ValueType, 1> ts_re0(ts0.shape());
@@ -24,7 +24,7 @@ void BM_host_zip_gold(benchmark::State &state) {
 }
 
 template <typename _Tensor>
-void BM_zip(benchmark::State &state) {
+void bm_zip(benchmark::State &state) {
 	_Tensor ts0(state.range(0));
 	_Tensor ts1(ts0.shape());
 	_Tensor ts_re0(ts0.shape());
@@ -48,7 +48,7 @@ void BM_zip(benchmark::State &state) {
 //}
 //
 //template <typename _ValueType>
-//void BM_cu_zip_gold(benchmark::State& state) {
+//void bm_gold_cu_zip(benchmark::State& state) {
 //	cuda::tensor<_ValueType, 1> ts1(state.range(0));
 //	cuda::tensor<_ValueType, 1> ts2(state.range(0));
 //	fill(ts1, _ValueType(1));
@@ -69,7 +69,7 @@ void BM_zip(benchmark::State &state) {
 //}
 //
 //template <typename _ValueType>
-//void BM_zip_operation(benchmark::State &state) {
+//void bm_zip_operation(benchmark::State &state) {
 //	cuda::tensor<_ValueType, 1> ts1(state.range(0));
 //	cuda::tensor<_ValueType, 1> ts2(state.range(0));
 //	fill(ts1, _ValueType(1));
@@ -84,9 +84,9 @@ void BM_zip(benchmark::State &state) {
 //}
 
 
-BENCHMARK_TEMPLATE(BM_host_zip_gold, float)->UseRealTime()->Range(1 << 16, 1 << (bm_config::max_host_memory_exponent() - 2));
+BENCHMARK_TEMPLATE(bm_gold_host_zip, float)->UseRealTime()->Range(1 << 16, 1 << (bm_config::max_host_memory_exponent() - 2));
 
-auto BM_host_zip_byte = BM_zip<tensor<float, 1>>;
-BENCHMARK(BM_host_zip_byte)->UseRealTime()->Range(1 << 16, 1 << (bm_config::max_host_memory_exponent() - 2));
+auto bm_host_zip_byte = bm_zip<tensor<float, 1>>;
+BENCHMARK(bm_host_zip_byte)->UseRealTime()->Range(1 << 16, 1 << (bm_config::max_host_memory_exponent() - 2));
 
-BENCHMARK_TEMPLATE(BM_host_zip_gold, float)->UseRealTime()->Range(1 << 16, 1 << (bm_config::max_host_memory_exponent() - 2));
+BENCHMARK_TEMPLATE(bm_gold_host_zip, float)->UseRealTime()->Range(1 << 16, 1 << (bm_config::max_host_memory_exponent() - 2));
