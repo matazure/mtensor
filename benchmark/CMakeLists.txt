@@ -2,7 +2,7 @@ execute_process(COMMAND git submodule update --init ${CMAKE_CURRENT_SOURCE_DIR})
 
 set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Build gtest's sample programs." FORCE)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/vendor/benchmark)
-set_property(TARGET benchmark PROPERTY FOLDER "vendors")
+set_property(TARGET benchmark PROPERTY FOLDER "vendor")
 
 include_directories(${EXTERNAL_INSTALL_LOCATION}/include)
 link_directories(${EXTERNAL_INSTALL_LOCATION}/lib)
