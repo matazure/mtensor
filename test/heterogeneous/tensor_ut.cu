@@ -4,20 +4,22 @@
 using namespace matazure;
 using namespace testing;
 
+///don't anythiny in the TensorTest, it's just a helper class
 template <typename _Type>
-class TensorTest: public testing::Test{
-protected:
-
+class TensorTest: public testing::Test { 
 public:
-	typedef _Type tensor_type;
+
+	int a;
 };
 
 #ifdef USE_CUDA
 #define TENSOR cuda::tensor
+#define TAG device_tag
 #endif
 
 #ifdef USE_HOST
 #define TENSOR tensor
+#define TAG host_tag
 #endif
 
 #ifdef USE_OPENCL
@@ -99,3 +101,5 @@ TYPED_TEST(TensorTest, TestAccess) {
 		EXPECT_TRUE(e == zero);
 	});
 }
+
+

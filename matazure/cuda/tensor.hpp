@@ -308,7 +308,7 @@ inline void MATAZURE_DEVICE barrier() {
 
 template <typename _Type, int_t _Rank, typename _Layout>
 inline tensor<_Type, _Rank, _Layout> mem_clone(tensor<_Type, _Rank, _Layout> ts, device_tag) {
-	tensor<_Type, _Rank, _Layout> ts_re(ts.shape());
+	tensor<decay_t<_Type>, _Rank, _Layout> ts_re(ts.shape());
 	mem_copy(ts, ts_re);
 	return ts_re;
 }
@@ -320,14 +320,14 @@ inline tensor<_Type, _Rank, _Layout> mem_clone(tensor<_Type, _Rank, _Layout> ts)
 
 template <typename _Type, int_t _Rank, typename _Layout>
 inline tensor<_Type, _Rank, _Layout> mem_clone(matazure::tensor<_Type, _Rank, _Layout> ts, device_tag) {
-	tensor<_Type, _Rank, _Layout> ts_re(ts.shape());
+	tensor<decay_t<_Type>, _Rank, _Layout> ts_re(ts.shape());
 	mem_copy(ts, ts_re);
 	return ts_re;
 }
 
 template <typename _Type, int_t _Rank, typename _Layout>
 inline matazure::tensor<_Type, _Rank, _Layout> mem_clone(tensor<_Type, _Rank, _Layout> ts, host_tag) {
-	matazure::tensor<_Type, _Rank, _Layout> ts_re(ts.shape());
+	matazure::tensor<decay_t<_Type>, _Rank, _Layout> ts_re(ts.shape());
 	mem_copy(ts, ts_re);
 	return ts_re;
 }

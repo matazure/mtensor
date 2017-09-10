@@ -869,7 +869,7 @@ inline void mem_copy(_TensorSrc ts_src, _TensorDst ts_dst, enable_if_t<are_host_
 */
 template <typename _ValueType, int_t _Rank, typename _Layout>
 inline tensor<_ValueType, _Rank, _Layout> mem_clone(tensor<_ValueType, _Rank, _Layout> ts, host_tag) {
-	tensor<_ValueType, _Rank, _Layout> ts_re(ts.shape());
+	tensor<decay_t<_ValueType>, _Rank, _Layout> ts_re(ts.shape());
 	mem_copy(ts, ts_re);
 	return ts_re;
 }
