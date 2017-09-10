@@ -6,11 +6,7 @@ using namespace testing;
 
 ///don't anythiny in the TensorTest, it's just a helper class
 template <typename _Type>
-class TensorTest: public testing::Test { 
-public:
-
-	int a;
-};
+class TensorTest: public testing::Test { };
 
 #ifdef USE_CUDA
 #define TENSOR cuda::tensor
@@ -101,5 +97,3 @@ TYPED_TEST(TensorTest, TestAccess) {
 		EXPECT_TRUE(e == zero);
 	});
 }
-
-
