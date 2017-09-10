@@ -47,3 +47,14 @@ struct zero<__m128>{
 }
 
 #endif
+
+#if defined(__ARM_NEON) && !defined(MATAZURE_DISABLE_NEON)
+
+#include <arm_neon.h>
+#define MATAZURE_NEON
+
+#endif
+
+//#if
+//
+//#endif

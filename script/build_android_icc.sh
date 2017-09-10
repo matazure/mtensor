@@ -1,21 +1,20 @@
 #!/bin/bash
 
-if [ -z "$ANDROID_NDK" ]; then
-    echo "Did you set ANDROID_NDK variable?"
-    exit 1
-fi
-
-if [ -d "$ANDROID_NDK" ]; then
-    echo "Using Android ndk at $ANDROID_NDK"
-else
-    echo "Cannot find ndk: did you install it under $ANDROID_NDK?"
-    exit 1
-fi
+# if [ -z "$ANDROID_NDK" ]; then
+#     echo "Did you set ANDROID_NDK variable?"
+#     exit 1
+# fi
+# 
+# if [ -d "$ANDROID_NDK" ]; then
+#     echo "Using Android ndk at $ANDROID_NDK"
+# else
+#     echo "Cannot find ndk: did you install it under $ANDROID_NDK?"
+#     exit 1
+# fi
 
 if [ -z "$ANDROID_ABI" ]; then
-    echo "Set ANDROID_ABI armv7"
-    export ANDROID_ABI=armv7
-    exit 1
+    export ANDROID_ABI="arm64-v8a with NEON"
+    echo "Set ANDROID_ABI $ANDROID_ABI"
 fi
 
 source  /opt/intel/compilers_and_libraries/linux/bin/compilervars.sh -arch intel64 -platform android
