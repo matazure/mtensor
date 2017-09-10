@@ -28,7 +28,7 @@ typedef Types<TENSOR<int, 1>, TENSOR<int, 2>, TENSOR<int, 3>, TENSOR<int, 4>> Im
 
 TYPED_TEST_CASE(TensorTest, ImplementTypes);
 
-TYPED_TEST(TensorTest, Construct){
+TYPED_TEST(TensorTest, TestConstruct){
 	//if the shape is less than zero, throw invalid_shape exception
 	EXPECT_THROW({
 		pointi<TypeParam::rank> ext{};
@@ -56,7 +56,7 @@ TYPED_TEST(TensorTest, Construct){
 	}
 }
 
-TYPED_TEST(TensorTest, ShapeSize) {
+TYPED_TEST(TensorTest, TestShapeAndSize) {
 	{
 		pointi<TypeParam::rank> ext{};
 		fill(ext, 0);
@@ -82,6 +82,20 @@ TYPED_TEST(TensorTest, ShapeSize) {
 
 }
 
-TYPED_TEST(TensorTest, Access) {
+TYPED_TEST(TensorTest, TestAccess) {
+	pointi<TypeParam::rank> ext{};
+	fill(ext, 10);
+	TypeParam ts(ext);
+	auto zero = matazure::zero<typename TypeParam::value_type>::value();
+	fill(ts, zero);
 
+#ifdef USE_HOST
+	auto ts_check = ts;
+#else
+	auto ts_check = mem_clone(ts, host_tag{});
+#endif
+
+	for_each(ts_check, [zero] (const typename TypeParam::value_type &e) {
+		EXPECT_TRUE(e == zero);
+	});
 }
