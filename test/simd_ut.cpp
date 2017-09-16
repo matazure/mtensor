@@ -25,7 +25,7 @@ TEST(TestNEON, TestArithmeticOperation){
 	float32x4_t rhs{0.0f, 0.1f, 0.2f, 0.3f};
 
 	lhs += rhs;
-	auto re = slhs + rhs;
+	auto re = lhs + rhs;
 }
 
 #endif

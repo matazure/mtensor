@@ -23,7 +23,7 @@ mkdir -p build_android
 cd build_android
 
 cmake .. \
-    -DCMAKE_TOOLCHAIN_FILE=../vendor/android-cmake/android.toolchain.cmake \
+    -DCMAKE_TOOLCHAIN_FILE=../cmake/android-cmake/android.toolchain.cmake \
     -DANDROID_NDK=$ANDROID_NDK \
     -DANDROID_ABI="$ANDROID_ABI" \
     -DCMAKE_BUILD_TYPE=Release \

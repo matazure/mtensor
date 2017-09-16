@@ -7,7 +7,7 @@
 	url = https://github.com/Matazure/googletest.git
 	shallow = true
 [submodule "vendor/android-cmake"]
-	path = vendor/android-cmake
+	path = cmake/android-cmake
 	url = https://github.com/Matazure/android-cmake.git
 	shallow = true
 [submodule "benchmark/vendor/eigen"]
