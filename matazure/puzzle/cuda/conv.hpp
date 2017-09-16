@@ -1,62 +1,7 @@
 ﻿#pragma once
 
 #include <matazure/cuda/tensor.hpp>
-
-namespace matazure {
-namespace cuda {
-
-namespace puzzle {
-
-template <typename _Func>
-inline __device__ void corner_index(pointi<1> origin, pointi<1> extent, _Func func) {
-	func(origin);
-	func(extent-1);
-}
-
-template <typename _Func>
-inline __device__ void corner_index(pointi<2> origin, pointi<2> extent, _Func func) {
-	func(pointi<2>{origin[0], origin[1]});
-	func(pointi<2>{origin[0], extent[1]-1});
-	func(pointi<2>{extent[0]-1, origin[1]});
-	func(pointi<2>{extent[0]-1, extent[1]-1});
-}
-
-template <typename _Func>
-inline __device__ void corner_index(pointi<3> origin, pointi<3> extent, _Func func) {
-	func(pointi<3>{origin[0], origin[1], origin[2]});
-	func(pointi<3>{origin[0], origin[1], extent[2]-1});
-	func(pointi<3>{origin[0], extent[1]-1, origin[2]});
-	func(pointi<3>{origin[0], extent[1]-1, extent[2]-1});
-	func(pointi<3>{extent[0]-1, origin[1], origin[2]});
-	func(pointi<3>{extent[0]-1, origin[1], extent[2]-1});
-	func(pointi<3>{extent[0]-1, extent[1]-1, origin[2]});
-	func(pointi<3>{extent[0]-1, extent[1]-1, extent[2]-1});
-}
-
-template <typename _Func>
-inline __device__ void corner_index(pointi<4> origin, pointi<4> extent, _Func func) {
-	func(pointi<4>{origin[0], origin[1], origin[2], origin[3]});
-	func(pointi<4>{origin[0], origin[1], origin[2], extent[3]-1});
-	func(pointi<4>{origin[0], origin[1], extent[2]-1, origin[3]});
-	func(pointi<4>{origin[0], origin[1], extent[2]-1, extent[3]-1});
-	func(pointi<4>{origin[0], extent[1]-1, origin[2], origin[3]});
-	func(pointi<4>{origin[0], extent[1]-1, origin[2], extent[3]-1});
-	func(pointi<4>{origin[0], extent[1]-1, extent[2]-1, origin[3]});
-	func(pointi<4>{origin[0], extent[1]-1, extent[2]-1, extent[3]-1});
-	func(pointi<4>{extent[0]-1, origin[1], origin[2], origin[3]});
-	func(pointi<4>{extent[0]-1, origin[1], origin[2], extent[3]-1});
-	func(pointi<4>{extent[0]-1, origin[1], extent[2]-1, origin[3]});
-	func(pointi<4>{extent[0]-1, origin[1], extent[2]-1, extent[3]-1});
-	func(pointi<4>{extent[0]-1, extent[1]-1, origin[2], origin[3]});
-	func(pointi<4>{extent[0]-1, extent[1]-1, origin[2], extent[3]-1});
-	func(pointi<4>{extent[0]-1, extent[1]-1, extent[2]-1, origin[3]});
-	func(pointi<4>{extent[0]-1, extent[1]-1, extent[2]-1, extent[3]-1});
-}
-
-} //puzzle
-
-} //cuda
-} //matazure
+#include <matazure/puzzle/cuda/algorithm.hpp>
 
 #define MATAZURE_CUDA_PUZZEL_CONV_GLOBAL(conv_global, mask)													\
 namespace matazure{namespace cuda{ namespace puzzle {														\
@@ -117,7 +62,7 @@ inline void conv_block(_Tensor ts, _TensorRe &ts_re) {														\
 																											\
 		auto is_valid = inside(block_idx.global, pointi<_Tensor::rank>::zeros(), ts.shape());				\
 		if (is_valid) {																						\
-			corner_index(pointi<_Tensor::rank>::zeros(), mask.shape(),										\
+			device::puzzle::corner_index(pointi<_Tensor::rank>::zeros(), mask.shape(),						\
 				[&](pointi<_Tensor::rank> corner_idx) {														\
 					sh_ts_block[block_idx.local + corner_idx] = 											\
 						ts[block_idx.global + corner_idx - mask.shape() / 2];								\
@@ -244,7 +189,7 @@ inline void conv_block_aligned(_Tensor ts, _TensorRe &ts_re) {												\
 			meta::sub_c(meta::add_c(_BlockDim{}, decltype(mask)::meta_shape()), meta::int_t_c<1>{});		\
 		__shared__ static_tensor<value_type, decltype(tmp_shape)> sh_ts_block;								\
 																											\
-		corner_index(pointi<_Tensor::rank>::zeros(), mask.shape(),											\
+		device::puzzle::corner_index(pointi<_Tensor::rank>::zeros(), mask.shape(),							\
 			[&](pointi<_Tensor::rank> corner_idx){															\
 				sh_ts_block[block_idx.local + corner_idx] = 												\
 					ts[block_idx.global + corner_idx - mask.shape() / 2];									\
