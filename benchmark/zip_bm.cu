@@ -84,9 +84,9 @@ void bm_zip(benchmark::State &state) {
 //}
 
 
-BENCHMARK_TEMPLATE(bm_gold_host_zip, float)->UseRealTime()->Range(1 << 16, 1 << (bm_config::max_host_memory_exponent() - 2));
+BENCHMARK_TEMPLATE(bm_gold_host_zip, float)->UseRealTime()->Range(1 << 16, bm_config::max_shape<float, 1>());
 
 auto bm_host_zip_byte = bm_zip<tensor<float, 1>>;
-BENCHMARK(bm_host_zip_byte)->UseRealTime()->Range(1 << 16, 1 << (bm_config::max_host_memory_exponent() - 2));
+BENCHMARK(bm_host_zip_byte)->UseRealTime()->Range(1 << 16, bm_config::max_shape<float, 1>());
 
-BENCHMARK_TEMPLATE(bm_gold_host_zip, float)->UseRealTime()->Range(1 << 16, 1 << (bm_config::max_host_memory_exponent() - 2));
+BENCHMARK_TEMPLATE(bm_gold_host_zip, float)->UseRealTime()->Range(1 << 16, bm_config::max_shape<float, 1>());

@@ -55,25 +55,25 @@ static void bm_mem_copy(benchmark::State& state) {
 #ifdef USE_CUDA
 
 auto bm_host2host_mem_copy = bm_mem_copy<tensor<byte, 1>, tensor<byte, 1>>;
-BENCHMARK(bm_host2host_mem_copy)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
+BENCHMARK(bm_host2host_mem_copy)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();
 
 auto bm_device2host_mem_copy = bm_mem_copy<cuda::tensor<byte, 1>, tensor<byte, 1>>;
-BENCHMARK(bm_device2host_mem_copy)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
+BENCHMARK(bm_device2host_mem_copy)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();
 auto bm_host2device_mem_copy = bm_mem_copy<tensor<byte, 1>, cuda::tensor<byte, 1>>;
-BENCHMARK(bm_host2device_mem_copy)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
+BENCHMARK(bm_host2device_mem_copy)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();
 auto bm_device2device_mem_copy = bm_mem_copy<cuda::tensor<byte, 1>, cuda::tensor<byte, 1>>;
-BENCHMARK(bm_device2device_mem_copy)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
+BENCHMARK(bm_device2device_mem_copy)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();
 
 auto bm_gold_each_copy_byte = bm_gold_each_copy<cuda::tensor<byte, 1>>;
-BENCHMARK(bm_gold_each_copy_byte)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
+BENCHMARK(bm_gold_each_copy_byte)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();
 auto bm_gold_each_copy_float = bm_gold_each_copy<cuda::tensor<float, 1>>;
-BENCHMARK(bm_gold_each_copy_float)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
+BENCHMARK(bm_gold_each_copy_float)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();
 
 #endif
 
 #ifdef USE_HOST
 
 auto bm_host2host_mem_copy = bm_mem_copy<tensor<byte, 1>, tensor<byte, 1>>;
-BENCHMARK(bm_host2host_mem_copy)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
+BENCHMARK(bm_host2host_mem_copy)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();
 
 #endif

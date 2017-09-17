@@ -3,7 +3,7 @@
 #include <matazure/tensor>
 
 int main(int argc, char** argv) {
-	matazure::cuda::set_device(0);
+	//auto id = matazure::cuda::get_device();
 	::benchmark::Initialize(&argc, argv);
 	::benchmark::RunSpecifiedBenchmarks();
 }

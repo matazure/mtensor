@@ -31,7 +31,7 @@ static void bm_linear_lambda_tensor_persist(benchmark::State &st) {
 	st.SetBytesProcessed(st.iterations() * bytes_size);
 }
 
-BENCHMARK(bm_gold_linear_lambda_tensor_persist)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
-BENCHMARK(bm_linear_lambda_tensor_persist)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
+BENCHMARK(bm_gold_linear_lambda_tensor_persist)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();
+BENCHMARK(bm_linear_lambda_tensor_persist)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();
 
 #endif

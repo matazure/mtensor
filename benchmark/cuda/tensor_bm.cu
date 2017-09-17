@@ -17,7 +17,7 @@ void bm_cu_tensor_construct_and_destruct(benchmark::State& state) {
 	state.SetBytesProcessed(state.iterations() * bytes_size);
 }
 
-BENCHMARK_TEMPLATE1(bm_cu_tensor_construct_and_destruct, byte)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
-BENCHMARK_TEMPLATE1(bm_cu_tensor_construct_and_destruct, int32_t)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
-BENCHMARK_TEMPLATE1(bm_cu_tensor_construct_and_destruct, float)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
-BENCHMARK_TEMPLATE1(bm_cu_tensor_construct_and_destruct, double)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
+BENCHMARK_TEMPLATE1(bm_cu_tensor_construct_and_destruct, byte)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();
+BENCHMARK_TEMPLATE1(bm_cu_tensor_construct_and_destruct, int32_t)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();
+BENCHMARK_TEMPLATE1(bm_cu_tensor_construct_and_destruct, float)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();
+BENCHMARK_TEMPLATE1(bm_cu_tensor_construct_and_destruct, double)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();

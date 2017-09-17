@@ -94,14 +94,14 @@ void bm_host_tensor_operation(benchmark::State &st) {
 #endif
 
 #ifdef USE_HOST
-BENCHMARK_TEMPLATE(bm_gold_host_tensor_operation, float)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
-BENCHMARK_TEMPLATE(bm_host_tensor_operation, float)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
+BENCHMARK_TEMPLATE(bm_gold_host_tensor_operation, float)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();
+BENCHMARK_TEMPLATE(bm_host_tensor_operation, float)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();
 #ifdef MATAZURE_SSE
 BENCHMARK_TEMPLATE(bm_host_tensor_operation, __m128)->Range(1 << 8, 1 << (bm_config::max_host_memory_exponent() - 4))->UseRealTime();
 #endif
 #endif
 
 #ifdef USE_CUDA
-BENCHMARK_TEMPLATE(bm_gold_cu_tensor_operation, float)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
-BENCHMARK_TEMPLATE(bm_cu_tensor_operation, float)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
+BENCHMARK_TEMPLATE(bm_gold_cu_tensor_operation, float)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();
+BENCHMARK_TEMPLATE(bm_cu_tensor_operation, float)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();
 #endif

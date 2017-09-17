@@ -143,7 +143,7 @@ BENCHMARK(bm_stride_cu_tensor_byte_dim2)->UseRealTime()->Apply(custom_arguments)
 //BENCHMARK(bm_stride_cu_tensor_byte_dim1)->UseRealTime()->Apply(custom_arguments);
 
 
-//BENCHMARK_TEMPLATE(bm_host_stride, float)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
+//BENCHMARK_TEMPLATE(bm_host_stride, float)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();
 //
-//BENCHMARK_TEMPLATE(bm_gold_cu_stride, float)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
-//BENCHMARK_TEMPLATE(bm_hcu_stride, float)->Range(1 << 10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
+//BENCHMARK_TEMPLATE(bm_gold_cu_stride, float)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();
+//BENCHMARK_TEMPLATE(bm_hcu_stride, float)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();

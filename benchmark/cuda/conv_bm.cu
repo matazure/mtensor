@@ -35,7 +35,7 @@ void bm_cu_conv_global(benchmark::State& state) {
 	auto bytes_size = static_cast<size_t>(ts_src.size()) * sizeof(_ValueType);
 	state.SetBytesProcessed(state.iterations() * bytes_size * 2);
 }
-BENCHMARK_TEMPLATE1(bm_cu_conv_global, float)->RangeMultiplier(2)->Range(1 << 10, 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
+BENCHMARK_TEMPLATE1(bm_cu_conv_global, float)->RangeMultiplier(2)->Range(bm_config::min_shape<float, 1>(), 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
 
 typedef dim<16, 16> block_16x16;
 typedef dim<32, 32> block_32x32;
@@ -58,7 +58,7 @@ void bm_cu_conv_block(benchmark::State& state) {
 	auto bytes_size = static_cast<size_t>(ts_src.size()) * sizeof(_ValueType);
 	state.SetBytesProcessed(state.iterations() * bytes_size * 2);
 }
-BENCHMARK_TEMPLATE2(bm_cu_conv_block, float, block_16x16)->RangeMultiplier(2)->Range(1 << 10, 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
+BENCHMARK_TEMPLATE2(bm_cu_conv_block, float, block_16x16)->RangeMultiplier(2)->Range(bm_config::min_shape<float, 1>(), 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
 
 template <typename _ValueType, typename _BlockDim>
 void bm_cu_conv_block_crack(benchmark::State& state) {
@@ -78,8 +78,8 @@ void bm_cu_conv_block_crack(benchmark::State& state) {
 	auto bytes_size = static_cast<size_t>(ts_src.size()) * sizeof(_ValueType);
 	state.SetBytesProcessed(state.iterations() * bytes_size * 2);
 }
-BENCHMARK_TEMPLATE2(bm_cu_conv_block_crack, float, block_16x16)->RangeMultiplier(2)->Range(1 << 10, 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
-BENCHMARK_TEMPLATE2(bm_cu_conv_block_crack, float, block_32x32)->RangeMultiplier(2)->Range(1 << 10, 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
+BENCHMARK_TEMPLATE2(bm_cu_conv_block_crack, float, block_16x16)->RangeMultiplier(2)->Range(bm_config::min_shape<float, 1>(), 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
+BENCHMARK_TEMPLATE2(bm_cu_conv_block_crack, float, block_32x32)->RangeMultiplier(2)->Range(bm_config::min_shape<float, 1>(), 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
 
 template <typename _ValueType, typename _BlockDim>
 void bm_cu_conv_block_crack_with_block_tensor(benchmark::State& state) {
@@ -103,8 +103,8 @@ void bm_cu_conv_block_crack_with_block_tensor(benchmark::State& state) {
 	auto bytes_size = static_cast<size_t>(ts_src.size()) * sizeof(decltype(ts_src[0]));
 	state.SetBytesProcessed(state.iterations() * bytes_size * 2);
 }
-BENCHMARK_TEMPLATE2(bm_cu_conv_block_crack_with_block_tensor, float, block_16x16)->RangeMultiplier(2)->Range(1 << 10, 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
-BENCHMARK_TEMPLATE2(bm_cu_conv_block_crack_with_block_tensor, float, block_32x32)->RangeMultiplier(2)->Range(1 << 10, 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
+BENCHMARK_TEMPLATE2(bm_cu_conv_block_crack_with_block_tensor, float, block_16x16)->RangeMultiplier(2)->Range(bm_config::min_shape<float, 1>(), 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
+BENCHMARK_TEMPLATE2(bm_cu_conv_block_crack_with_block_tensor, float, block_32x32)->RangeMultiplier(2)->Range(bm_config::min_shape<float, 1>(), 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
 
 template <typename _ValueType, typename _BlockDim>
 void bm_cu_conv_block_overlap(benchmark::State& state) {
@@ -124,8 +124,8 @@ void bm_cu_conv_block_overlap(benchmark::State& state) {
 	auto bytes_size = static_cast<size_t>(ts_src.size()) * sizeof(_ValueType);
 	state.SetBytesProcessed(state.iterations() * bytes_size * 2);
 }
-BENCHMARK_TEMPLATE2(bm_cu_conv_block_overlap, float, block_16x16)->RangeMultiplier(2)->Range(1 << 10, 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
-BENCHMARK_TEMPLATE2(bm_cu_conv_block_overlap, float, block_32x32)->RangeMultiplier(2)->Range(1 << 10, 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
+BENCHMARK_TEMPLATE2(bm_cu_conv_block_overlap, float, block_16x16)->RangeMultiplier(2)->Range(bm_config::min_shape<float, 1>(), 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
+BENCHMARK_TEMPLATE2(bm_cu_conv_block_overlap, float, block_32x32)->RangeMultiplier(2)->Range(bm_config::min_shape<float, 1>(), 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
 
 template <typename _ValueType, typename _BlockDim>
 void bm_cu_conv_block_overlap_with_block_tensor(benchmark::State& state) {
@@ -149,8 +149,8 @@ void bm_cu_conv_block_overlap_with_block_tensor(benchmark::State& state) {
 	auto bytes_size = static_cast<size_t>(ts_src.size()) * sizeof(decltype(ts_src[0]));
 	state.SetBytesProcessed(state.iterations() * bytes_size * 2);
 }
-BENCHMARK_TEMPLATE2(bm_cu_conv_block_overlap_with_block_tensor, float, block_16x16)->RangeMultiplier(2)->Range(1 << 10, 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
-BENCHMARK_TEMPLATE2(bm_cu_conv_block_overlap_with_block_tensor, float, block_32x32)->RangeMultiplier(2)->Range(1 << 10, 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
+BENCHMARK_TEMPLATE2(bm_cu_conv_block_overlap_with_block_tensor, float, block_16x16)->RangeMultiplier(2)->Range(bm_config::min_shape<float, 1>(), 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
+BENCHMARK_TEMPLATE2(bm_cu_conv_block_overlap_with_block_tensor, float, block_32x32)->RangeMultiplier(2)->Range(bm_config::min_shape<float, 1>(), 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
 
 template <typename _ValueType, typename _BlockDim>
 void bm_cu_conv_block_aligned(benchmark::State& state) {
@@ -170,7 +170,7 @@ void bm_cu_conv_block_aligned(benchmark::State& state) {
 	auto bytes_size = static_cast<size_t>(ts_src.size()) * sizeof(_ValueType);
 	state.SetBytesProcessed(state.iterations() * bytes_size * 2);
 }
-BENCHMARK_TEMPLATE2(bm_cu_conv_block_aligned, float, block_16x16)->RangeMultiplier(2)->Range(1 << 10, 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
+BENCHMARK_TEMPLATE2(bm_cu_conv_block_aligned, float, block_16x16)->RangeMultiplier(2)->Range(bm_config::min_shape<float, 1>(), 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
 
 template <typename _ValueType, typename _BlockDim>
 void bm_cu_conv_block_crack_aligned(benchmark::State& state) {
@@ -190,8 +190,8 @@ void bm_cu_conv_block_crack_aligned(benchmark::State& state) {
 	auto bytes_size = static_cast<size_t>(ts_src.size()) * sizeof(_ValueType);
 	state.SetBytesProcessed(state.iterations() * bytes_size * 2);
 }
-BENCHMARK_TEMPLATE2(bm_cu_conv_block_crack_aligned, float, block_16x16)->RangeMultiplier(2)->Range(1 << 10, 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
-BENCHMARK_TEMPLATE2(bm_cu_conv_block_crack_aligned, float, block_32x32)->RangeMultiplier(2)->Range(1 << 10, 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
+BENCHMARK_TEMPLATE2(bm_cu_conv_block_crack_aligned, float, block_16x16)->RangeMultiplier(2)->Range(bm_config::min_shape<float, 1>(), 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
+BENCHMARK_TEMPLATE2(bm_cu_conv_block_crack_aligned, float, block_32x32)->RangeMultiplier(2)->Range(bm_config::min_shape<float, 1>(), 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
 
 template <typename _ValueType, typename _BlockDim>
 void bm_cu_conv_block_crack_aligned_with_block_tensor(benchmark::State& state) {
@@ -215,8 +215,8 @@ void bm_cu_conv_block_crack_aligned_with_block_tensor(benchmark::State& state) {
 	auto bytes_size = static_cast<size_t>(ts_src.size()) * sizeof(decltype(ts_src[0]));
 	state.SetBytesProcessed(state.iterations() * bytes_size * 2);
 }
-BENCHMARK_TEMPLATE2(bm_cu_conv_block_crack_aligned_with_block_tensor, float, block_16x16)->RangeMultiplier(2)->Range(1 << 10, 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
-BENCHMARK_TEMPLATE2(bm_cu_conv_block_crack_aligned_with_block_tensor, float, block_32x32)->RangeMultiplier(2)->Range(1 << 10, 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
+BENCHMARK_TEMPLATE2(bm_cu_conv_block_crack_aligned_with_block_tensor, float, block_16x16)->RangeMultiplier(2)->Range(bm_config::min_shape<float, 1>(), 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
+BENCHMARK_TEMPLATE2(bm_cu_conv_block_crack_aligned_with_block_tensor, float, block_32x32)->RangeMultiplier(2)->Range(bm_config::min_shape<float, 1>(), 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
 
 template <typename _ValueType, typename _BlockDim>
 void bm_cu_conv_block_overlap_aligned(benchmark::State& state) {
@@ -240,8 +240,8 @@ void bm_cu_conv_block_overlap_aligned(benchmark::State& state) {
 	auto bytes_size = static_cast<size_t>(ts_src.size()) * sizeof(_ValueType);
 	state.SetBytesProcessed(state.iterations() * bytes_size * 2);
 }
-BENCHMARK_TEMPLATE2(bm_cu_conv_block_overlap_aligned, float, block_16x16)->RangeMultiplier(2)->Range(1 << 10, 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
-BENCHMARK_TEMPLATE2(bm_cu_conv_block_overlap_aligned, float, block_32x32)->RangeMultiplier(2)->Range(1 << 10, 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
+BENCHMARK_TEMPLATE2(bm_cu_conv_block_overlap_aligned, float, block_16x16)->RangeMultiplier(2)->Range(bm_config::min_shape<float, 1>(), 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
+BENCHMARK_TEMPLATE2(bm_cu_conv_block_overlap_aligned, float, block_32x32)->RangeMultiplier(2)->Range(bm_config::min_shape<float, 1>(), 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
 
 template <typename _ValueType, typename _BlockDim>
 void bm_cu_conv_block_overlap_aligned_with_block_tensor(benchmark::State& state) {
@@ -266,5 +266,5 @@ void bm_cu_conv_block_overlap_aligned_with_block_tensor(benchmark::State& state)
 	auto bytes_size = static_cast<size_t>(ts_src.size()) * sizeof(decltype(ts_src[0]));
 	state.SetBytesProcessed(state.iterations() * bytes_size * 2);
 }
-BENCHMARK_TEMPLATE2(bm_cu_conv_block_overlap_aligned_with_block_tensor, float, block_16x16)->RangeMultiplier(2)->Range(1 << 10, 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
-BENCHMARK_TEMPLATE2(bm_cu_conv_block_overlap_aligned_with_block_tensor, float, block_32x32)->RangeMultiplier(2)->Range(1 << 10, 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
+BENCHMARK_TEMPLATE2(bm_cu_conv_block_overlap_aligned_with_block_tensor, float, block_16x16)->RangeMultiplier(2)->Range(bm_config::min_shape<float, 1>(), 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();
+BENCHMARK_TEMPLATE2(bm_cu_conv_block_overlap_aligned_with_block_tensor, float, block_32x32)->RangeMultiplier(2)->Range(bm_config::min_shape<float, 1>(), 1 << ((bm_config::max_host_memory_exponent() - 2) / 2))->UseRealTime();

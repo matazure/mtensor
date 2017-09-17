@@ -47,15 +47,15 @@ void bm_cu_for_each(benchmark::State& state) {
 	state.SetBytesProcessed(state.iterations() * bytes_size);
 }
 
-BENCHMARK_TEMPLATE1(bm_gold_cu_for_each, byte)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
-// BENCHMARK_TEMPLATE1(bm_gold_cu_for_each, int16_t)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
-// BENCHMARK_TEMPLATE1(bm_gold_cu_for_each, int32_t)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
-// BENCHMARK_TEMPLATE1(bm_gold_cu_for_each, int64_t)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
-// BENCHMARK_TEMPLATE1(bm_gold_cu_for_each, float)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
-// BENCHMARK_TEMPLATE1(bm_gold_cu_for_each, double)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
-BENCHMARK_TEMPLATE1(bm_cu_for_each, byte)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
-BENCHMARK_TEMPLATE1(bm_cu_for_each, int16_t)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
-BENCHMARK_TEMPLATE1(bm_cu_for_each, int32_t)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
-BENCHMARK_TEMPLATE1(bm_cu_for_each, int64_t)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
-BENCHMARK_TEMPLATE1(bm_cu_for_each, float)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
-BENCHMARK_TEMPLATE1(bm_cu_for_each, double)->Range(1<<10, 1 << (bm_config::max_host_memory_exponent() - 2))->UseRealTime();
+BENCHMARK_TEMPLATE1(bm_gold_cu_for_each, byte)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();
+// BENCHMARK_TEMPLATE1(bm_gold_cu_for_each, int16_t)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();
+// BENCHMARK_TEMPLATE1(bm_gold_cu_for_each, int32_t)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();
+// BENCHMARK_TEMPLATE1(bm_gold_cu_for_each, int64_t)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();
+// BENCHMARK_TEMPLATE1(bm_gold_cu_for_each, float)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();
+// BENCHMARK_TEMPLATE1(bm_gold_cu_for_each, double)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();
+BENCHMARK_TEMPLATE1(bm_cu_for_each, byte)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();
+BENCHMARK_TEMPLATE1(bm_cu_for_each, int16_t)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();
+BENCHMARK_TEMPLATE1(bm_cu_for_each, int32_t)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();
+BENCHMARK_TEMPLATE1(bm_cu_for_each, int64_t)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();
+BENCHMARK_TEMPLATE1(bm_cu_for_each, float)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();
+BENCHMARK_TEMPLATE1(bm_cu_for_each, double)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();
