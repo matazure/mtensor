@@ -97,7 +97,7 @@ void bm_host_tensor_operation(benchmark::State &st) {
 BENCHMARK_TEMPLATE(bm_gold_host_tensor_operation, float)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();
 BENCHMARK_TEMPLATE(bm_host_tensor_operation, float)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();
 #ifdef MATAZURE_SSE
-BENCHMARK_TEMPLATE(bm_host_tensor_operation, __m128)->Range(1 << 8, 1 << (bm_config::max_host_memory_exponent() - 4))->UseRealTime();
+BENCHMARK_TEMPLATE(bm_host_tensor_operation, __m128)->Range(1 << 8, 1 << (bm_config::max_memory_exponent() - 4))->UseRealTime();
 #endif
 #endif
 

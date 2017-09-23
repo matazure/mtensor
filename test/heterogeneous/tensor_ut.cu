@@ -9,12 +9,12 @@ template <typename _Type>
 class TensorTest: public testing::Test { };
 
 #ifdef USE_CUDA
-#define TENSOR cuda::tensor
+#define HETE_TENSOR cuda::tensor
 #define TAG device_tag
 #endif
 
 #ifdef USE_HOST
-#define TENSOR tensor
+#define HETE_TENSOR tensor
 #define TAG host_tag
 #endif
 
@@ -22,7 +22,7 @@ class TensorTest: public testing::Test { };
 #error "not support"
 #endif
 
-typedef Types<TENSOR<int, 1>, TENSOR<int, 2>, TENSOR<int, 3>, TENSOR<int, 4>> ImplementTypes;
+typedef Types<HETE_TENSOR<int, 1>, HETE_TENSOR<int, 2>, HETE_TENSOR<int, 3>, HETE_TENSOR<int, 4>> ImplementTypes;
 
 TYPED_TEST_CASE(TensorTest, ImplementTypes);
 
