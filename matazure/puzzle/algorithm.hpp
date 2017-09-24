@@ -1,6 +1,6 @@
 #pragma once
 
-namespace matazure { namespace cuda {
+namespace matazure {
 
 namespace puzzle{
 
@@ -52,4 +52,4 @@ inline MATAZURE_GENENRAL void corner_index(pointi<4> origin, pointi<4> extent, _
 
 }
 
-}}
+}

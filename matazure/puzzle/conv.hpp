@@ -2,7 +2,7 @@
 
 #include <matazure/tensor.hpp>
 
-namespace matazure {
+namespace matazure { namespace puzzle {
 
 namespace internal{
 
@@ -65,4 +65,4 @@ inline auto conv_general(_Tensor ts, _Kenel kenel)->decltype(make_lambda(ts.shap
 
 // template <typename _Tensor, typename
 
-}
+} }

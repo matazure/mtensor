@@ -989,7 +989,7 @@ void bm_conv_genneral_3x3(benchmark::State &state){
 	fill(kenel, 1.0f);
 
 	while (state.KeepRunning()){
-		auto ts_tmp = conv_general(ts_input, kenel);
+		auto ts_tmp = puzzle::conv_general(ts_input, kenel);
 		copy(ts_tmp, ts_output);
 
 		benchmark::ClobberMemory();
