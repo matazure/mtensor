@@ -8,6 +8,7 @@
 #include <limits>
 #include <memory>
 #include <tuple>
+#include <algorithm>
 
 //for cuda
 #ifdef __CUDACC__
