@@ -39,7 +39,6 @@ configuration:
   # #- type msiexec2.log
 
 install:
-  - git submodule update --init --recursive
 
 build_script:
   - ./script/build_win.bat
