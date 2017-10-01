@@ -112,7 +112,7 @@ inline MATAZURE_GENERAL void for_index(omp_vectorized_policy policy, int_t first
 */
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(int_t first, int_t last, _Func fun) {
-	sequence_policy seq{};
+	sequence_vectorized_policy seq{};
 	for_index(seq, first, last, fun);
 }
 
@@ -404,7 +404,7 @@ inline MATAZURE_GENERAL void for_index(omp_vectorized_policy, pointi<4> origin, 
 */
 template <typename _Func, int_t _Rank>
 inline MATAZURE_GENERAL void for_index(pointi<_Rank> origin, pointi<_Rank> end, _Func fun) {
-	sequence_policy policy{};
+	sequence_vectorized_policy policy{};
 	for_index(policy, origin, end, fun);
 }
 
