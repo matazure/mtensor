@@ -4,6 +4,10 @@
 
 using namespace matazure;
 
+
+
+//
+
 template <typename _ValueType>
 void bm_host_stride_dim2_gold(benchmark::State &state) {
 	tensor<_ValueType, 2> ts(state.range(1), state.range(1));

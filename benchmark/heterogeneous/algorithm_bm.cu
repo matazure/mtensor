@@ -223,3 +223,5 @@ BENCHMARK(bm_hete_tensor_copy_float_rank4)->RangeMultiplier(bm_config::range_mul
 
 auto bm_hete_tensor_copy_float_rank2_last_major_layout = bm_hete_tensor_copy<HETE_TENSOR<float, 2, last_major_layout<2>>>;
 BENCHMARK(bm_hete_tensor_copy_float_rank2_last_major_layout)->RangeMultiplier(bm_config::range_multiplier<byte, 2, HETE_TAG>())->Range(bm_config::min_shape<float, 2, HETE_TAG>(), bm_config::max_shape<float, 2, HETE_TAG>())->UseRealTime();
+
+//

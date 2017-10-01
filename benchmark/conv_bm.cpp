@@ -983,19 +983,19 @@ void bm_conv_lazy_array_none_check_3x3(benchmark::State &state){
 	pointi<2> ext;
 	fill(ext, state.range(0));
 	tensor<float, 2> ts_input(ext);
-	tensor<float, 2> ts_output(ts_input.shape());
+	tensor<float, 2> ts_output(ts_input.shape() - pointi<2>::all(2));
 	static_tensor<float, dim<3,3>> kenel;
 	fill(ts_input, 1.0f);
 	fill(kenel, 1.0f);
 
 	while (state.KeepRunning()){
-		auto ts_tmp = puzzle::conv_lazy_array_none_check(ts_input, kenel);
+		auto ts_tmp = section(puzzle::conv_lazy_array_none_check(ts_input, kenel), pointi<2>::all(1), ts_input.shape() - pointi<2>::all(2));
 		copy(ts_tmp, ts_output);
 
 		benchmark::ClobberMemory();
 	}
 
-	auto valid_shape = ts_output.shape() - 1;
+	auto valid_shape = ts_output.shape();
 	auto valid_size = reduce(valid_shape, 1, [](int_t x, int_t y){ return x * y; });
 	state.SetBytesProcessed(state.iterations() * valid_size * sizeof(float));
 	state.SetItemsProcessed(state.iterations() * valid_size * kenel.size());
