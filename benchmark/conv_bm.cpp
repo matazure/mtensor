@@ -979,7 +979,7 @@ BENCHMARK(bm_gold_conv_3x3_sse2_op_inside_check)->Arg(7)->Arg(14)->Arg(28)->Arg(
 
 #endif
 
-void bm_conv_genneral_3x3(benchmark::State &state){
+void bm_conv_lazy_array_none_check_3x3(benchmark::State &state){
 	pointi<2> ext;
 	fill(ext, state.range(0));
 	tensor<float, 2> ts_input(ext);
@@ -989,7 +989,7 @@ void bm_conv_genneral_3x3(benchmark::State &state){
 	fill(kenel, 1.0f);
 
 	while (state.KeepRunning()){
-		auto ts_tmp = puzzle::conv_general(ts_input, kenel);
+		auto ts_tmp = puzzle::conv_lazy_array_none_check(ts_input, kenel);
 		copy(ts_tmp, ts_output);
 
 		benchmark::ClobberMemory();
@@ -1000,4 +1000,4 @@ void bm_conv_genneral_3x3(benchmark::State &state){
 	state.SetBytesProcessed(state.iterations() * valid_size * sizeof(float));
 	state.SetItemsProcessed(state.iterations() * valid_size * kenel.size());
 }
-BENCHMARK(bm_conv_genneral_3x3)->Arg(7)->Arg(14)->Arg(28)->Arg(56)->Arg(112)->Arg(224)->UseRealTime();
+BENCHMARK(bm_conv_lazy_array_none_check_3x3)->Arg(7)->Arg(14)->Arg(28)->Arg(56)->Arg(112)->Arg(224)->UseRealTime();

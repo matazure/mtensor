@@ -4,30 +4,6 @@
 
 using namespace matazure;
 
-//stride benchmark
-
-//template <typename _ValueType>
-//void bm_host_stride_dim2_gold(benchmark::State &state) {
-//	tensor<_ValueType, 2> ts(state.range(1), state.range(1));
-//	int_t stride = state.range(0);
-//	int_t phase = stride / 2;
-//	auto ts_re_ext = ts.shape() / stride;
-//
-//	while (state.KeepRunning()) {
-//		tensor<_ValueType, 2> ts_re(ts_re_ext);
-//		auto ts_ext = ts.shape();
-//		for (int_t j = 0; j < ts_re_ext[1]; ++j) {
-//			for (int_t i = 0; i < ts_re_ext[0]; ++i) {
-//				pointi<2> idx = { i,j };
-//				ts_re[idx] = ts(idx * stride + phase);
-//			}
-//		}
-//	}
-//
-//	auto bytes_size = static_cast<size_t>(prod(ts_re_ext)) * sizeof(_ValueType);
-//	state.SetBytesProcessed(state.iterations() * bytes_size);
-//}
-
 template <typename _ValueType>
 void bm_host_stride_dim2_gold(benchmark::State &state) {
 	tensor<_ValueType, 2> ts(state.range(1), state.range(1));
@@ -70,6 +46,7 @@ void bm_stride(benchmark::State &state) {
 		cuda::device_synchronize();
 	#endif
 
+		benchmark::ClobberMemory();
 	}
 
 	auto bytes_size = static_cast<size_t>(ts_re.size()) * sizeof(decltype(ts[0]));

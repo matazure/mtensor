@@ -95,6 +95,7 @@ void bm_gold_host_fill_rank1(benchmark::State& state) {
 		for (int_t i = 0; i < size; ++i){
 			p_data[i] = zero<_ValueType>::value();
 		}
+
 		benchmark::ClobberMemory();
 	}
 
@@ -122,6 +123,7 @@ void bm_gold_host_copy_rank1(benchmark::State& state) {
 		for (int_t i = 0; i < size; ++i){
 			p_dst[i] = p_src[i];
 		}
+
 		benchmark::ClobberMemory();
 	}
 
@@ -148,6 +150,8 @@ void bm_hete_tensor_fill(benchmark::State& state) {
 	#ifdef USE_CUDA
 		cuda::device_synchronize();
 	#endif
+
+		benchmark::ClobberMemory();
 	}
 
 	auto bytes_size = static_cast<size_t>(ts_src.size()) * sizeof(decltype(ts_src[0]));
@@ -189,6 +193,8 @@ void bm_hete_tensor_copy(benchmark::State& state) {
 	#ifdef USE_CUDA
 		cuda::device_synchronize();
 	#endif
+
+		benchmark::ClobberMemory();
 	}
 
 	auto bytes_size = static_cast<size_t>(ts_src.size()) * sizeof(decltype(ts_src[0]));

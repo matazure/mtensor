@@ -27,15 +27,10 @@ namespace internal{
 
 
 template <typename _Tensor, typename _Kenel>
-inline auto conv_general(_Tensor ts, _Kenel kenel)->decltype(make_lambda(ts.shape(), internal::conv_op<_Tensor, _Kenel>(ts, kenel))){
+inline auto conv_lazy_array_none_check(_Tensor ts, _Kenel kenel)->decltype(make_lambda(ts.shape(), internal::conv_op<_Tensor, _Kenel>(ts, kenel))){
 	return make_lambda(ts.shape(), internal::conv_op<_Tensor, _Kenel>(ts, kenel));
 }
 
-//
-// template <typename _Tensor, typename _Kenel>
-// inline auto conv_lazy_array_none_check(_Tensor ts, _Kenel kenel)->decltype(make_lambda(ts.shape(), internal::conv_op<_Tensor, _Kenel>(ts, kenel))){
-// 	return make_lambda(ts.shape(), internal::conv_op<_Tensor, _Kenel>(ts, kenel));
-// }
 //
 // template <typename _Tensor, typename _Kenel>
 // inline auto conv_lazy_array_inside_check(_Tensor ts, _Kenel kenel)->decltype
