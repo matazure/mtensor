@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
 	};
 
 	auto cts_rgb = mem_clone(ts_rgb, device_tag{});
-	auto lcts_conv = cuda::puzzle::conv_global(tensor_cast<pointf<3>>(clamp_zero(cts_rgb)));
+	auto lcts_conv = cuda::puzzle::conv_global(cast<pointf<3>>(clamp_zero(cts_rgb)));
 	auto cts_conv = apply(lcts_conv, pointf3_to_pointb3).persist();
 	cuda::device_synchronize();
 	auto ts_conv = mem_clone(cts_conv, host_tag{});
@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
 	write_rgb_png( conv_global_image_path, ts_conv);
 
 	cuda::tensor<pointf<3>, 2> cts_conv_block(cts_rgb.shape());
-	cuda::puzzle::conv_block<dim<16, 16>>(tensor_cast<pointf<3>>(clamp_zero(cts_rgb)), cts_conv_block);
+	cuda::puzzle::conv_block<dim<16, 16>>(cast<pointf<3>>(clamp_zero(cts_rgb)), cts_conv_block);
 	auto cts_pointb3_conv_block = apply(cts_conv_block, pointf3_to_pointb3).persist();
 	cuda::device_synchronize();
 	auto ts_conv_block = mem_clone(cts_pointb3_conv_block, host_tag{});
@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
 	write_rgb_png(conv_block_image_path, ts_conv_block);
 
 	cuda::tensor<pointf<3>, 2> cts_conv_block_crack(cts_rgb.shape());
-	cuda::puzzle::conv_block_crack<dim<32, 32>>(tensor_cast<pointf<3>>(clamp_zero(cts_rgb)), cts_conv_block_crack);
+	cuda::puzzle::conv_block_crack<dim<32, 32>>(cast<pointf<3>>(clamp_zero(cts_rgb)), cts_conv_block_crack);
 	auto cts_pointb3_conv_block_crack = apply(cts_conv_block_crack, pointf3_to_pointb3).persist();
 	cuda::device_synchronize();
 	auto ts_conv_block_crack = mem_clone(cts_pointb3_conv_block_crack, host_tag{});
@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
 	write_rgb_png(conv_block_crack_image_path, ts_conv_block_crack);
 
 	cuda::tensor<pointf<3>, 2> cts_conv_block_overlap(cts_rgb.shape());
-	cuda::puzzle::conv_block_overlap<dim<16, 16>>(tensor_cast<pointf<3>>(clamp_zero(cts_rgb)), cts_conv_block_overlap);
+	cuda::puzzle::conv_block_overlap<dim<16, 16>>(cast<pointf<3>>(clamp_zero(cts_rgb)), cts_conv_block_overlap);
 	auto cts_pointb3_conv_block_overlap = apply(cts_conv_block_overlap,pointf3_to_pointb3).persist();
 	cuda::device_synchronize();
 	auto ts_conv_block_overlap = mem_clone(cts_pointb3_conv_block_overlap, host_tag{});

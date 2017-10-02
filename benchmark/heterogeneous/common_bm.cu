@@ -4,9 +4,12 @@
 
 using namespace matazure;
 
-
-
-//
+// template <typename _ValueType>
+// __global__ void gold_fill_rank1_kernel(_ValueType *p_dst, int_t count, _ValueType v){
+// 	for (int_t i = threadIdx.x + blockIdx.x * blockDim.x; i < count; i += blockDim.x * gridDim.x) {
+// 		p_dst[i] = v;
+// 	}
+// }
 
 template <typename _ValueType>
 void bm_host_stride_dim2_gold(benchmark::State &state) {

@@ -178,13 +178,13 @@ struct cast_op<point<_OutPointValueType, _Rank>>{
 };
 
 template <typename _Tensor>
-struct shift_op {
+struct section_op {
 private:
 	_Tensor ts_;
 	pointi<_Tensor::rank> offset_;
 
 public:
-	shift_op(_Tensor ts, pointi<_Tensor::rank> offset):
+	section_op(_Tensor ts, pointi<_Tensor::rank> offset) :
 		ts_(ts), offset_(offset)
 	{}
 
@@ -192,6 +192,7 @@ public:
 		return ts_[idx + offset_];
 	}
 };
+
 
 template <typename _Tensor, typename _StrideType>
 struct stride_op {
@@ -336,30 +337,6 @@ public:
 };
 
 template <typename _Tensor>
-struct padding_zero_op {
-private:
-	_Tensor ts_;
-	pointi<_Tensor::rank> padding0_;
-	pointi<_Tensor::rank> padding1_;
-
-public:
-	padding_zero_op(_Tensor ts, pointi<_Tensor::rank> padding0, pointi<_Tensor::rank> padding1) :
-		ts_(ts),
-		padding0_(padding0),
-		padding1_(padding1)
-	{}
-
-	MATAZURE_GENERAL auto operator()(pointi<_Tensor::rank> idx) const->decltype(zero<typename _Tensor::value_type>::value()) {
-		if (MATAZURE_LIKELY(inside(idx, padding0_, ts_.shape()))) {
-			return ts_[idx - padding0_];
-		}
-		else {
-			return zero<typename _Tensor::value_type>::value();
-		}
-	}
-};
-
-template <typename _Tensor>
 struct clamp_zero_op {
 private:
 	_Tensor ts_;
@@ -459,19 +436,8 @@ inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<array_index, typena
 * @return a lambda_tensor whose value_type is _ValueType
 */
 template <typename _ValueType, typename _Tensor>
-inline auto tensor_cast(_Tensor tensor)->decltype(apply(tensor, internal::cast_op<_ValueType>())) {
+inline auto cast(_Tensor tensor)->decltype(apply(tensor, internal::cast_op<_ValueType>())) {
 	return apply(tensor, internal::cast_op<_ValueType>());
-}
-
-/**
-* @brief produces a offset indexing lambda_tensor of the source tensor
-* @param ts the source tensor
-* @param offset  the indexing offset
-* @return a lambda_tensor with offset indexing
-*/
-template <typename _Tensor>
-inline auto shift(_Tensor ts, pointi<_Tensor::rank> offset)->decltype(make_lambda(ts.shape(), internal::shift_op<decay_t<_Tensor>>(ts, offset), typename _Tensor::memory_type{})) {
-	return make_lambda(ts.shape(), internal::shift_op<decay_t<_Tensor>>(ts, offset), typename _Tensor::memory_type{});
 }
 
 /**
@@ -482,8 +448,8 @@ inline auto shift(_Tensor ts, pointi<_Tensor::rank> offset)->decltype(make_lambd
 * @return a subsection lambda_tensor
 */
 template <typename _Tensor>
-inline auto section(_Tensor ts, pointi<_Tensor::rank> origin, pointi<_Tensor::rank> ext)->decltype(make_lambda(ext, internal::shift_op<decay_t<_Tensor>>(ts, origin), typename _Tensor::memory_type{})) {
-	return make_lambda(ext, internal::shift_op<decay_t<_Tensor>>(ts, origin), typename _Tensor::memory_type{});
+inline auto section(_Tensor ts, pointi<_Tensor::rank> origin, pointi<_Tensor::rank> ext)->decltype(make_lambda(ext, internal::section_op<decay_t<_Tensor>>(ts, origin), typename _Tensor::memory_type{})) {
+	return make_lambda(ext, internal::section_op<decay_t<_Tensor>>(ts, origin), typename _Tensor::memory_type{});
 }
 
 /**
@@ -541,12 +507,6 @@ inline auto slice(cuda::tensor<_T, _Rank, _Layout> ts, int_t positon_index, enab
 }
 
 #endif
-
-/// @todo is neccessery?
-template <typename _Tensor>
-inline auto padding_zero(_Tensor ts, pointi<_Tensor::rank> padding0, pointi<_Tensor::rank> padding1)->decltype(make_lambda(ts.shape() + padding0 + padding1, internal::padding_zero_op<decay_t<_Tensor>>(ts, padding0, padding1), typename _Tensor::memory_type{})) {
-	return make_lambda(ts.shape() + padding0 + padding1, internal::padding_zero_op<decay_t<_Tensor>>(ts, padding0, padding1), typename _Tensor::memory_type{});
-}
 
 /**
 * @brief procudes a clamped indexing lambda_tensor from the source tensor.
@@ -606,8 +566,8 @@ inline auto zip(_Tensor0 ts0, _Tensor1 ts1, _Tensor2 ts2)->decltype(make_lambda(
 * @returns  a lambda_tensor whose value_type is point_viewer
 */
 template <typename _Tensor>
-inline auto point_view(_Tensor ts)->decltype(tensor_cast<point_viewer<decltype(ts[0])>>(ts)){
-	return tensor_cast<point_viewer<decltype(ts[0])>>(ts);
+inline auto point_view(_Tensor ts)->decltype(cast<point_viewer<decltype(ts[0])>>(ts)){
+	return cast<point_viewer<decltype(ts[0])>>(ts);
 }
 
 }

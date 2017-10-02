@@ -23,7 +23,7 @@ int main(int argc, char *argv[]) {
 	//图像像素归一化
 	auto glts_rgb_shift_zero = gts_rgb - rgb::all(128);
 	auto glts_rgb_stride = stride(glts_rgb_shift_zero, 2);
-	auto glts_rgb_normalized = tensor_cast<pointf<3>>(glts_rgb_stride) / pointf<3>::all(128.0f);
+	auto glts_rgb_normalized = cast<pointf<3>>(glts_rgb_stride) / pointf<3>::all(128.0f);
 	//前面并未进行实质的计算，这一步将上面的运算合并处理并把结果写入到memory中, 避免了额外的内存开销
 	auto gts_rgb_normalized = glts_rgb_normalized.persist();
 #ifdef USE_CUDA
