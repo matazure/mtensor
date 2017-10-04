@@ -1,8 +1,4 @@
-#include <benchmark/benchmark.h>
 #include <bm_config.hpp>
-#include <matazure/tensor>
-
-using namespace matazure;
 
 #ifdef USE_CUDA
 

@@ -4,6 +4,8 @@
 #include <benchmark/benchmark.h>
 #include <cmath>
 
+using namespace matazure;
+
 using matazure::host_tag;
 using matazure::device_tag;
 
