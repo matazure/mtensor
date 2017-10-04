@@ -32,11 +32,11 @@ void bm_gold_cu_fill_rank1(benchmark::State& state) {
 }
 
 BENCHMARK_TEMPLATE1(bm_gold_cu_fill_rank1, byte)->RangeMultiplier(bm_config::range_multiplier<byte, 1, device_tag>())->Range(bm_config::min_shape<byte, 1, device_tag>(), bm_config::max_shape<byte, 1, device_tag>())->UseRealTime();
-BENCHMARK_TEMPLATE1(bm_gold_cu_fill_rank1, int16_t)->RangeMultiplier(bm_config::range_multiplier<byte, 1, device_tag>())->Range(bm_config::min_shape<int16_t, 1, device_tag>(), bm_config::max_shape<int16_t, 1, device_tag>())->UseRealTime();
-BENCHMARK_TEMPLATE1(bm_gold_cu_fill_rank1, int32_t)->RangeMultiplier(bm_config::range_multiplier<byte, 1, device_tag>())->Range(bm_config::min_shape<int32_t, 1, device_tag>(), bm_config::max_shape<int32_t, 1, device_tag>())->UseRealTime();
-BENCHMARK_TEMPLATE1(bm_gold_cu_fill_rank1, int64_t)->RangeMultiplier(bm_config::range_multiplier<byte, 1, device_tag>())->Range(bm_config::min_shape<int64_t, 1, device_tag>(), bm_config::max_shape<int64_t, 1, device_tag>())->UseRealTime();
-BENCHMARK_TEMPLATE1(bm_gold_cu_fill_rank1, float)->RangeMultiplier(bm_config::range_multiplier<byte, 1, device_tag>())->Range(bm_config::min_shape<float, 1, device_tag>(), bm_config::max_shape<float, 1, device_tag>())->UseRealTime();
-BENCHMARK_TEMPLATE1(bm_gold_cu_fill_rank1, double)->RangeMultiplier(bm_config::range_multiplier<byte, 1, device_tag>())->Range(bm_config::min_shape<double, 1, device_tag>(), bm_config::max_shape<double, 1, device_tag>())->UseRealTime();
+BENCHMARK_TEMPLATE1(bm_gold_cu_fill_rank1, int16_t)->RangeMultiplier(bm_config::range_multiplier<int16_t, 1, device_tag>())->Range(bm_config::min_shape<int16_t, 1, device_tag>(), bm_config::max_shape<int16_t, 1, device_tag>())->UseRealTime();
+BENCHMARK_TEMPLATE1(bm_gold_cu_fill_rank1, int32_t)->RangeMultiplier(bm_config::range_multiplier<int32_t, 1, device_tag>())->Range(bm_config::min_shape<int32_t, 1, device_tag>(), bm_config::max_shape<int32_t, 1, device_tag>())->UseRealTime();
+BENCHMARK_TEMPLATE1(bm_gold_cu_fill_rank1, int64_t)->RangeMultiplier(bm_config::range_multiplier<int64_t, 1, device_tag>())->Range(bm_config::min_shape<int64_t, 1, device_tag>(), bm_config::max_shape<int64_t, 1, device_tag>())->UseRealTime();
+BENCHMARK_TEMPLATE1(bm_gold_cu_fill_rank1, float)->RangeMultiplier(bm_config::range_multiplier<float, 1, device_tag>())->Range(bm_config::min_shape<float, 1, device_tag>(), bm_config::max_shape<float, 1, device_tag>())->UseRealTime();
+BENCHMARK_TEMPLATE1(bm_gold_cu_fill_rank1, double)->RangeMultiplier(bm_config::range_multiplier<double, 1, device_tag>())->Range(bm_config::min_shape<double, 1, device_tag>(), bm_config::max_shape<double, 1, device_tag>())->UseRealTime();
 
 template <typename _ValueType>
 __global__ void gold_copy_rank1_kernel(_ValueType *p_src, _ValueType *p_dst, int_t count){

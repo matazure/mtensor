@@ -10,7 +10,7 @@
 
 namespace matazure {
 ///	unary is the namespace for unary functor
-namespace unary {
+inline namespace unary {
 
 /**
 * @brief saturate convert a value to a narrow type value

@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <matazure/operation.hpp>
+#include <matazure/binary_operator.hpp>
 
 namespace matazure {
 namespace numeric{

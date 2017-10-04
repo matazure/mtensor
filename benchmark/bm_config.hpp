@@ -33,12 +33,19 @@ struct bm_config{
 
 };
 
-#ifdef USE_CUDA
-#define HETE_TENSOR cuda::tensor
-#define HETE_TAG device_tag
-#endif
+using point3b = pointb<3>;
+using point4b = pointb<4>;
+using point3f = pointf<3>;
+using point4f = pointf<4>;
 
 #ifdef USE_HOST
 #define HETE_TENSOR tensor
 #define HETE_TAG host_tag
+#define HETE_SYNCHRONIZE
+#endif
+
+#ifdef USE_CUDA
+#define HETE_TENSOR cuda::tensor
+#define HETE_TAG device_tag
+#define HETE_SYNCHRONIZE  cuda::device_synchronize()
 #endif

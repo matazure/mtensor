@@ -25,6 +25,10 @@ struct aligned{};
 template <typename _T>
 struct zero;
 
+/// @todo: define one
+template <typename _T>
+struct one;
+
 /// special for most type, value() return 0 directly;
 template <typename _T>
 struct zero {

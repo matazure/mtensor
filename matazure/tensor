@@ -2,7 +2,7 @@
 
 #include <matazure/io.hpp>
 #include <matazure/unary.hpp>
-#include <matazure/operation.hpp>
+#include <matazure/binary_operator.hpp>
 #include <matazure/meta.hpp>
 
 #include <matazure/puzzle/prod.hpp>
