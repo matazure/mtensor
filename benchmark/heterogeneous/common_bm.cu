@@ -45,7 +45,7 @@ void bm_hete_tensor_section(benchmark::State &state) {
 	_Tensor ts_src(ext);
 	auto center = ts_src.shape() / 4;
 	auto dst_shape = ts_src.shape() / 2;
-	decltype(section(ts_src, center, dst_shape).persist()) ts_dst(ts_src.shape());
+	decltype(section(ts_src, center, dst_shape).persist()) ts_dst(dst_shape);
 
 	while (state.KeepRunning()) {
 		copy(section(ts_src, center, dst_shape), ts_dst);
