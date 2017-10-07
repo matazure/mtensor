@@ -31,12 +31,17 @@ void bm_gold_cu_fill_rank1(benchmark::State& state) {
 	state.SetBytesProcessed(state.iterations() * bytes_size);
 }
 
-BENCHMARK_TEMPLATE1(bm_gold_cu_fill_rank1, byte)->RangeMultiplier(bm_config::range_multiplier<byte, 1, device_tag>())->Range(bm_config::min_shape<byte, 1, device_tag>(), bm_config::max_shape<byte, 1, device_tag>())->UseRealTime();
-BENCHMARK_TEMPLATE1(bm_gold_cu_fill_rank1, int16_t)->RangeMultiplier(bm_config::range_multiplier<int16_t, 1, device_tag>())->Range(bm_config::min_shape<int16_t, 1, device_tag>(), bm_config::max_shape<int16_t, 1, device_tag>())->UseRealTime();
-BENCHMARK_TEMPLATE1(bm_gold_cu_fill_rank1, int32_t)->RangeMultiplier(bm_config::range_multiplier<int32_t, 1, device_tag>())->Range(bm_config::min_shape<int32_t, 1, device_tag>(), bm_config::max_shape<int32_t, 1, device_tag>())->UseRealTime();
-BENCHMARK_TEMPLATE1(bm_gold_cu_fill_rank1, int64_t)->RangeMultiplier(bm_config::range_multiplier<int64_t, 1, device_tag>())->Range(bm_config::min_shape<int64_t, 1, device_tag>(), bm_config::max_shape<int64_t, 1, device_tag>())->UseRealTime();
-BENCHMARK_TEMPLATE1(bm_gold_cu_fill_rank1, float)->RangeMultiplier(bm_config::range_multiplier<float, 1, device_tag>())->Range(bm_config::min_shape<float, 1, device_tag>(), bm_config::max_shape<float, 1, device_tag>())->UseRealTime();
-BENCHMARK_TEMPLATE1(bm_gold_cu_fill_rank1, double)->RangeMultiplier(bm_config::range_multiplier<double, 1, device_tag>())->Range(bm_config::min_shape<double, 1, device_tag>(), bm_config::max_shape<double, 1, device_tag>())->UseRealTime();
+#define BM_GOLD_CU_TENSOR_FILL_RANK1(ValueType) \
+BENCHMARK_TEMPLATE1(bm_gold_cu_fill_rank1, byte)->RangeMultiplier(bm_config::range_multiplier<ValueType, 1, device_tag>())->Range(bm_config::min_shape<ValueType, 1, device_tag>(), bm_config::max_shape<ValueType, 1, device_tag>())->UseRealTime();
+
+BM_GOLD_CU_TENSOR_FILL_RANK1(byte)
+BM_GOLD_CU_TENSOR_FILL_RANK1(int16_t)
+BM_GOLD_CU_TENSOR_FILL_RANK1(int32_t)
+BM_GOLD_CU_TENSOR_FILL_RANK1(int64_t)
+BM_GOLD_CU_TENSOR_FILL_RANK1(float)
+BM_GOLD_CU_TENSOR_FILL_RANK1(double)
+BM_GOLD_CU_TENSOR_FILL_RANK1(point3f)
+BM_GOLD_CU_TENSOR_FILL_RANK1(point4f)
 
 template <typename _ValueType>
 __global__ void gold_copy_rank1_kernel(_ValueType *p_src, _ValueType *p_dst, int_t count){
@@ -69,12 +74,17 @@ void bm_gold_cu_copy_rank1(benchmark::State& state) {
 	state.SetBytesProcessed(state.iterations() * bytes_size);
 }
 
-BENCHMARK_TEMPLATE1(bm_gold_cu_copy_rank1, byte)->RangeMultiplier(bm_config::range_multiplier<byte, 1, device_tag>())->Range(bm_config::min_shape<byte, 1, device_tag>(), bm_config::max_shape<byte, 1, device_tag>())->UseRealTime();
-BENCHMARK_TEMPLATE1(bm_gold_cu_copy_rank1, int16_t)->RangeMultiplier(bm_config::range_multiplier<byte, 1, device_tag>())->Range(bm_config::min_shape<int16_t, 1, device_tag>(), bm_config::max_shape<int16_t, 1, device_tag>())->UseRealTime();
-BENCHMARK_TEMPLATE1(bm_gold_cu_copy_rank1, int32_t)->RangeMultiplier(bm_config::range_multiplier<byte, 1, device_tag>())->Range(bm_config::min_shape<int32_t, 1, device_tag>(), bm_config::max_shape<int32_t, 1, device_tag>())->UseRealTime();
-BENCHMARK_TEMPLATE1(bm_gold_cu_copy_rank1, int64_t)->RangeMultiplier(bm_config::range_multiplier<byte, 1, device_tag>())->Range(bm_config::min_shape<int64_t, 1, device_tag>(), bm_config::max_shape<int64_t, 1, device_tag>())->UseRealTime();
-BENCHMARK_TEMPLATE1(bm_gold_cu_copy_rank1, float)->RangeMultiplier(bm_config::range_multiplier<byte, 1, device_tag>())->Range(bm_config::min_shape<float, 1, device_tag>(), bm_config::max_shape<float, 1, device_tag>())->UseRealTime();
-BENCHMARK_TEMPLATE1(bm_gold_cu_copy_rank1, double)->RangeMultiplier(bm_config::range_multiplier<byte, 1, device_tag>())->Range(bm_config::min_shape<double, 1, device_tag>(), bm_config::max_shape<double, 1, device_tag>())->UseRealTime();
+#define BM_GOLD_CU_TENSOR_COPY_RANK1(ValueType) \
+BENCHMARK_TEMPLATE1(bm_gold_cu_copy_rank1, byte)->RangeMultiplier(bm_config::range_multiplier<ValueType, 1, device_tag>())->Range(bm_config::min_shape<ValueType, 1, device_tag>(), bm_config::max_shape<ValueType, 1, device_tag>())->UseRealTime();
+
+BM_GOLD_CU_TENSOR_COPY_RANK1(byte)
+BM_GOLD_CU_TENSOR_COPY_RANK1(int16_t)
+BM_GOLD_CU_TENSOR_COPY_RANK1(int32_t)
+BM_GOLD_CU_TENSOR_COPY_RANK1(int64_t)
+BM_GOLD_CU_TENSOR_COPY_RANK1(float)
+BM_GOLD_CU_TENSOR_COPY_RANK1(double)
+BM_GOLD_CU_TENSOR_COPY_RANK1(point3f)
+BM_GOLD_CU_TENSOR_COPY_RANK1(point4f)
 
 #endif
 
@@ -99,12 +109,17 @@ void bm_gold_host_fill_rank1(benchmark::State& state) {
 	state.SetBytesProcessed(state.iterations() * bytes_size);
 }
 
-BENCHMARK_TEMPLATE1(bm_gold_host_fill_rank1, byte)->RangeMultiplier(bm_config::range_multiplier<byte, 1, host_tag>())->Range(bm_config::min_shape<byte, 1, host_tag>(), bm_config::max_shape<byte, 1, host_tag>())->UseRealTime();
-BENCHMARK_TEMPLATE1(bm_gold_host_fill_rank1, int16_t)->RangeMultiplier(bm_config::range_multiplier<byte, 1, host_tag>())->Range(bm_config::min_shape<int16_t, 1, host_tag>(), bm_config::max_shape<int16_t, 1, host_tag>())->UseRealTime();
-BENCHMARK_TEMPLATE1(bm_gold_host_fill_rank1, int32_t)->RangeMultiplier(bm_config::range_multiplier<byte, 1, host_tag>())->Range(bm_config::min_shape<int32_t, 1, host_tag>(), bm_config::max_shape<int32_t, 1, host_tag>())->UseRealTime();
-BENCHMARK_TEMPLATE1(bm_gold_host_fill_rank1, int64_t)->RangeMultiplier(bm_config::range_multiplier<byte, 1, host_tag>())->Range(bm_config::min_shape<int64_t, 1, host_tag>(), bm_config::max_shape<int64_t, 1, host_tag>())->UseRealTime();
-BENCHMARK_TEMPLATE1(bm_gold_host_fill_rank1, float)->RangeMultiplier(bm_config::range_multiplier<byte, 1, host_tag>())->Range(bm_config::min_shape<float, 1, host_tag>(), bm_config::max_shape<float, 1, host_tag>())->UseRealTime();
-BENCHMARK_TEMPLATE1(bm_gold_host_fill_rank1, double)->RangeMultiplier(bm_config::range_multiplier<byte, 1, host_tag>())->Range(bm_config::min_shape<double, 1, host_tag>(), bm_config::max_shape<double, 1, host_tag>())->UseRealTime();
+#define BM_GOLD_HOST_TENSOR_FILL_RANK1(ValueType) \
+BENCHMARK_TEMPLATE1(bm_gold_host_fill_rank1, byte)->RangeMultiplier(bm_config::range_multiplier<ValueType, 1, device_tag>())->Range(bm_config::min_shape<ValueType, 1, device_tag>(), bm_config::max_shape<ValueType, 1, device_tag>())->UseRealTime();
+
+BM_GOLD_HOST_TENSOR_FILL_RANK1(byte)
+BM_GOLD_HOST_TENSOR_FILL_RANK1(int16_t)
+BM_GOLD_HOST_TENSOR_FILL_RANK1(int32_t)
+BM_GOLD_HOST_TENSOR_FILL_RANK1(int64_t)
+BM_GOLD_HOST_TENSOR_FILL_RANK1(float)
+BM_GOLD_HOST_TENSOR_FILL_RANK1(double)
+BM_GOLD_HOST_TENSOR_FILL_RANK1(point3f)
+BM_GOLD_HOST_TENSOR_FILL_RANK1(point4f)
 
 template <typename _ValueType>
 void bm_gold_host_copy_rank1(benchmark::State& state) {
@@ -127,12 +142,17 @@ void bm_gold_host_copy_rank1(benchmark::State& state) {
 	state.SetBytesProcessed(state.iterations() * bytes_size);
 }
 
-BENCHMARK_TEMPLATE1(bm_gold_host_copy_rank1, byte)->RangeMultiplier(bm_config::range_multiplier<byte, 1, host_tag>())->Range(bm_config::min_shape<byte, 1, host_tag>(), bm_config::max_shape<byte, 1, host_tag>())->UseRealTime();
-BENCHMARK_TEMPLATE1(bm_gold_host_copy_rank1, int16_t)->RangeMultiplier(bm_config::range_multiplier<byte, 1, host_tag>())->Range(bm_config::min_shape<int16_t, 1, host_tag>(), bm_config::max_shape<int16_t, 1, host_tag>())->UseRealTime();
-BENCHMARK_TEMPLATE1(bm_gold_host_copy_rank1, int32_t)->RangeMultiplier(bm_config::range_multiplier<byte, 1, host_tag>())->Range(bm_config::min_shape<int32_t, 1, host_tag>(), bm_config::max_shape<int32_t, 1, host_tag>())->UseRealTime();
-BENCHMARK_TEMPLATE1(bm_gold_host_copy_rank1, int64_t)->RangeMultiplier(bm_config::range_multiplier<byte, 1, host_tag>())->Range(bm_config::min_shape<int64_t, 1, host_tag>(), bm_config::max_shape<int64_t, 1, host_tag>())->UseRealTime();
-BENCHMARK_TEMPLATE1(bm_gold_host_copy_rank1, float)->RangeMultiplier(bm_config::range_multiplier<byte, 1, host_tag>())->Range(bm_config::min_shape<float, 1, host_tag>(), bm_config::max_shape<float, 1, host_tag>())->UseRealTime();
-BENCHMARK_TEMPLATE1(bm_gold_host_copy_rank1, double)->RangeMultiplier(bm_config::range_multiplier<byte, 1, host_tag>())->Range(bm_config::min_shape<double, 1, host_tag>(), bm_config::max_shape<double, 1, host_tag>())->UseRealTime();
+#define BM_GOLD_HOST_TENSOR_COPY_RANK1(ValueType) \
+BENCHMARK_TEMPLATE1(bm_gold_host_copy_rank1, byte)->RangeMultiplier(bm_config::range_multiplier<ValueType, 1, device_tag>())->Range(bm_config::min_shape<ValueType, 1, device_tag>(), bm_config::max_shape<ValueType, 1, device_tag>())->UseRealTime();
+
+BM_GOLD_HOST_TENSOR_COPY_RANK1(byte)
+BM_GOLD_HOST_TENSOR_COPY_RANK1(int16_t)
+BM_GOLD_HOST_TENSOR_COPY_RANK1(int32_t)
+BM_GOLD_HOST_TENSOR_COPY_RANK1(int64_t)
+BM_GOLD_HOST_TENSOR_COPY_RANK1(float)
+BM_GOLD_HOST_TENSOR_COPY_RANK1(double)
+BM_GOLD_HOST_TENSOR_COPY_RANK1(point3f)
+BM_GOLD_HOST_TENSOR_COPY_RANK1(point4f)
 
 #endif
 
@@ -154,28 +174,24 @@ void bm_hete_tensor_fill(benchmark::State& state) {
 	state.SetBytesProcessed(state.iterations() * bytes_size);
 }
 
-auto bm_hete_tensor_fill_byte_rank1 = bm_hete_tensor_fill<HETE_TENSOR<byte, 1>>;
-auto bm_hete_tensor_fill_int16_rank1 = bm_hete_tensor_fill<HETE_TENSOR<int16_t, 1>>;
-auto bm_hete_tensor_fill_int32_rank1 = bm_hete_tensor_fill<HETE_TENSOR<int32_t, 1>>;
-auto bm_hete_tensor_fill_int64_rank1 = bm_hete_tensor_fill<HETE_TENSOR<int64_t, 1>>;
-auto bm_hete_tensor_fill_float_rank1 = bm_hete_tensor_fill<HETE_TENSOR<float, 1>>;
-auto bm_hete_tensor_fill_double_rank1 = bm_hete_tensor_fill<HETE_TENSOR<double, 1>>;
-BENCHMARK(bm_hete_tensor_fill_byte_rank1)->RangeMultiplier(bm_config::range_multiplier<byte, 1, HETE_TAG>())->Range(bm_config::min_shape<byte, 1, HETE_TAG>(), bm_config::max_shape<byte, 1, HETE_TAG>())->UseRealTime();
-BENCHMARK(bm_hete_tensor_fill_int16_rank1)->RangeMultiplier(bm_config::range_multiplier<byte, 1, HETE_TAG>())->Range(bm_config::min_shape<int16_t, 1, HETE_TAG>(), bm_config::max_shape<int16_t, 1, HETE_TAG>())->UseRealTime();
-BENCHMARK(bm_hete_tensor_fill_int32_rank1)->RangeMultiplier(bm_config::range_multiplier<byte, 1, HETE_TAG>())->Range(bm_config::min_shape<int32_t, 1, HETE_TAG>(), bm_config::max_shape<int32_t, 1, HETE_TAG>())->UseRealTime();
-BENCHMARK(bm_hete_tensor_fill_int64_rank1)->RangeMultiplier(bm_config::range_multiplier<byte, 1, HETE_TAG>())->Range(bm_config::min_shape<int64_t, 1, HETE_TAG>(), bm_config::max_shape<int64_t, 1, HETE_TAG>())->UseRealTime();
-BENCHMARK(bm_hete_tensor_fill_float_rank1)->RangeMultiplier(bm_config::range_multiplier<byte, 1, HETE_TAG>())->Range(bm_config::min_shape<float, 1, HETE_TAG>(), bm_config::max_shape<float, 1, HETE_TAG>())->UseRealTime();
-BENCHMARK(bm_hete_tensor_fill_double_rank1)->RangeMultiplier(bm_config::range_multiplier<byte, 1, HETE_TAG>())->Range(bm_config::min_shape<double, 1, HETE_TAG>(), bm_config::max_shape<double, 1, HETE_TAG>())->UseRealTime();
+#define BM_HETE_TENSOR_FILL(ValueType, Rank) \
+auto bm_hete_tensor_fill_##ValueType##_rank##Rank = bm_hete_tensor_fill<HETE_TENSOR<ValueType, Rank>>; \
+BENCHMARK(bm_hete_tensor_fill_##ValueType##_rank##Rank)->RangeMultiplier(bm_config::range_multiplier<ValueType, Rank, HETE_TAG>())->Range(bm_config::min_shape<ValueType, Rank, HETE_TAG>(), bm_config::max_shape<ValueType, Rank, HETE_TAG>())->UseRealTime();
 
-auto bm_hete_tensor_fill_float_rank2 = bm_hete_tensor_fill<HETE_TENSOR<float, 2>>;
-auto bm_hete_tensor_fill_float_rank3 = bm_hete_tensor_fill<HETE_TENSOR<float, 3>>;
-auto bm_hete_tensor_fill_float_rank4 = bm_hete_tensor_fill<HETE_TENSOR<float, 4>>;
-BENCHMARK(bm_hete_tensor_fill_float_rank2)->RangeMultiplier(bm_config::range_multiplier<byte, 2, HETE_TAG>())->Range(bm_config::min_shape<byte, 2, HETE_TAG>(), bm_config::max_shape<byte, 2, HETE_TAG>())->UseRealTime();
-BENCHMARK(bm_hete_tensor_fill_float_rank3)->RangeMultiplier(bm_config::range_multiplier<byte, 3, HETE_TAG>())->Range(bm_config::min_shape<byte, 3, HETE_TAG>(), bm_config::max_shape<byte, 3, HETE_TAG>())->UseRealTime();
-BENCHMARK(bm_hete_tensor_fill_float_rank4)->RangeMultiplier(bm_config::range_multiplier<byte, 4, HETE_TAG>())->Range(bm_config::min_shape<byte, 4, HETE_TAG>(), bm_config::max_shape<byte, 4, HETE_TAG>())->UseRealTime();
+#define BM_HETE_TENSOR_FILL_RANK1234(ValueType) \
+BM_HETE_TENSOR_FILL(ValueType, 1) \
+BM_HETE_TENSOR_FILL(ValueType, 2) \
+BM_HETE_TENSOR_FILL(ValueType, 3) \
+BM_HETE_TENSOR_FILL(ValueType, 4)
 
-auto bm_hete_tensor_fill_float_rank2_last_major_layout = bm_hete_tensor_fill<HETE_TENSOR<float, 2, last_major_layout<2>>>;
-BENCHMARK(bm_hete_tensor_fill_float_rank2_last_major_layout)->RangeMultiplier(bm_config::range_multiplier<byte, 2, HETE_TAG>())->Range(bm_config::min_shape<float, 2, HETE_TAG>(), bm_config::max_shape<float, 2, HETE_TAG>())->UseRealTime();
+BM_HETE_TENSOR_FILL_RANK1234(byte)
+BM_HETE_TENSOR_FILL_RANK1234(int16_t)
+BM_HETE_TENSOR_FILL_RANK1234(int32_t)
+BM_HETE_TENSOR_FILL_RANK1234(int64_t)
+BM_HETE_TENSOR_FILL_RANK1234(float)
+BM_HETE_TENSOR_FILL_RANK1234(double)
+BM_HETE_TENSOR_FILL_RANK1234(point3f)
+BM_HETE_TENSOR_FILL_RANK1234(point4f)
 
 template <typename _Tensor>
 void bm_hete_tensor_copy(benchmark::State& state) {
@@ -197,27 +213,23 @@ void bm_hete_tensor_copy(benchmark::State& state) {
 	state.SetBytesProcessed(state.iterations() * bytes_size);
 }
 
-auto bm_hete_tensor_copy_byte_rank1 = bm_hete_tensor_copy<HETE_TENSOR<byte, 1>>;
-auto bm_hete_tensor_copy_int16_rank1 = bm_hete_tensor_copy<HETE_TENSOR<int16_t, 1>>;
-auto bm_hete_tensor_copy_int32_rank1 = bm_hete_tensor_copy<HETE_TENSOR<int32_t, 1>>;
-auto bm_hete_tensor_copy_int64_rank1 = bm_hete_tensor_copy<HETE_TENSOR<int64_t, 1>>;
-auto bm_hete_tensor_copy_float_rank1 = bm_hete_tensor_copy<HETE_TENSOR<float, 1>>;
-auto bm_hete_tensor_copy_double_rank1 = bm_hete_tensor_copy<HETE_TENSOR<double, 1>>;
-BENCHMARK(bm_hete_tensor_copy_byte_rank1)->RangeMultiplier(bm_config::range_multiplier<byte, 1, HETE_TAG>())->Range(bm_config::min_shape<byte, 1, HETE_TAG>(), bm_config::max_shape<byte, 1, HETE_TAG>())->UseRealTime();
-BENCHMARK(bm_hete_tensor_copy_int16_rank1)->RangeMultiplier(bm_config::range_multiplier<byte, 1, HETE_TAG>())->Range(bm_config::min_shape<int16_t, 1, HETE_TAG>(), bm_config::max_shape<int16_t, 1, HETE_TAG>())->UseRealTime();
-BENCHMARK(bm_hete_tensor_copy_int32_rank1)->RangeMultiplier(bm_config::range_multiplier<byte, 1, HETE_TAG>())->Range(bm_config::min_shape<int32_t, 1, HETE_TAG>(), bm_config::max_shape<int32_t, 1, HETE_TAG>())->UseRealTime();
-BENCHMARK(bm_hete_tensor_copy_int64_rank1)->RangeMultiplier(bm_config::range_multiplier<byte, 1, HETE_TAG>())->Range(bm_config::min_shape<int64_t, 1, HETE_TAG>(), bm_config::max_shape<int64_t, 1, HETE_TAG>())->UseRealTime();
-BENCHMARK(bm_hete_tensor_copy_float_rank1)->RangeMultiplier(bm_config::range_multiplier<byte, 1, HETE_TAG>())->Range(bm_config::min_shape<float, 1, HETE_TAG>(), bm_config::max_shape<float, 1, HETE_TAG>())->UseRealTime();
-BENCHMARK(bm_hete_tensor_copy_double_rank1)->RangeMultiplier(bm_config::range_multiplier<byte, 1, HETE_TAG>())->Range(bm_config::min_shape<double, 1, HETE_TAG>(), bm_config::max_shape<double, 1, HETE_TAG>())->UseRealTime();
+#define BM_HETE_TENSOR_COPY(ValueType, Rank) \
+auto bm_hete_tensor_copy_##ValueType##_rank##Rank = bm_hete_tensor_copy<HETE_TENSOR<ValueType, Rank>>; \
+BENCHMARK(bm_hete_tensor_copy_##ValueType##_rank##Rank)->RangeMultiplier(bm_config::range_multiplier<ValueType, Rank, HETE_TAG>())->Range(bm_config::min_shape<ValueType, Rank, HETE_TAG>(), bm_config::max_shape<ValueType, Rank, HETE_TAG>())->UseRealTime();
 
-auto bm_hete_tensor_copy_float_rank2 = bm_hete_tensor_copy<HETE_TENSOR<float, 2>>;
-auto bm_hete_tensor_copy_float_rank3 = bm_hete_tensor_copy<HETE_TENSOR<float, 3>>;
-auto bm_hete_tensor_copy_float_rank4 = bm_hete_tensor_copy<HETE_TENSOR<float, 4>>;
-BENCHMARK(bm_hete_tensor_copy_float_rank2)->RangeMultiplier(bm_config::range_multiplier<byte, 2, HETE_TAG>())->Range(bm_config::min_shape<byte, 2, HETE_TAG>(), bm_config::max_shape<byte, 2, HETE_TAG>())->UseRealTime();
-BENCHMARK(bm_hete_tensor_copy_float_rank3)->RangeMultiplier(bm_config::range_multiplier<byte, 3, HETE_TAG>())->Range(bm_config::min_shape<byte, 3, HETE_TAG>(), bm_config::max_shape<byte, 3, HETE_TAG>())->UseRealTime();
-BENCHMARK(bm_hete_tensor_copy_float_rank4)->RangeMultiplier(bm_config::range_multiplier<byte, 4, HETE_TAG>())->Range(bm_config::min_shape<byte, 4, HETE_TAG>(), bm_config::max_shape<byte, 4, HETE_TAG>())->UseRealTime();
+#define BM_HETE_TENSOR_COPY_RANK1234(ValueType) \
+BM_HETE_TENSOR_COPY(ValueType, 1) \
+BM_HETE_TENSOR_COPY(ValueType, 2) \
+BM_HETE_TENSOR_COPY(ValueType, 3) \
+BM_HETE_TENSOR_COPY(ValueType, 4)
 
-auto bm_hete_tensor_copy_float_rank2_last_major_layout = bm_hete_tensor_copy<HETE_TENSOR<float, 2, last_major_layout<2>>>;
-BENCHMARK(bm_hete_tensor_copy_float_rank2_last_major_layout)->RangeMultiplier(bm_config::range_multiplier<byte, 2, HETE_TAG>())->Range(bm_config::min_shape<float, 2, HETE_TAG>(), bm_config::max_shape<float, 2, HETE_TAG>())->UseRealTime();
+BM_HETE_TENSOR_COPY_RANK1234(byte)
+BM_HETE_TENSOR_COPY_RANK1234(int16_t)
+BM_HETE_TENSOR_COPY_RANK1234(int32_t)
+BM_HETE_TENSOR_COPY_RANK1234(int64_t)
+BM_HETE_TENSOR_COPY_RANK1234(float)
+BM_HETE_TENSOR_COPY_RANK1234(double)
+BM_HETE_TENSOR_COPY_RANK1234(point3f)
+BM_HETE_TENSOR_COPY_RANK1234(point4f)
 
 //

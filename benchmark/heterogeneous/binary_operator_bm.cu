@@ -91,7 +91,7 @@ BM_GOLD_HOST_TENSOR_RANK1_MUL(point4f)
 
 #endif
 
-#define BM_HETE_TENSOR_OPERATOR(Name, Op)												\
+#define BM_HETE_TENSOR_BINARY_OPERATOR_FUNC(Name, Op)									\
 template <typename _Tensor>																\
 void bm_hete_tensor_##Name(benchmark::State &state) {									\
 	_Tensor ts0(state.range(0));														\
@@ -113,27 +113,27 @@ void bm_hete_tensor_##Name(benchmark::State &state) {									\
 }
 
 //Arithmetic
-BM_HETE_TENSOR_OPERATOR(add, +)
-BM_HETE_TENSOR_OPERATOR(sub, -)
-BM_HETE_TENSOR_OPERATOR(mul, *)
-BM_HETE_TENSOR_OPERATOR(div, /)
-BM_HETE_TENSOR_OPERATOR(mod, %)
+BM_HETE_TENSOR_BINARY_OPERATOR_FUNC(add, +)
+BM_HETE_TENSOR_BINARY_OPERATOR_FUNC(sub, -)
+BM_HETE_TENSOR_BINARY_OPERATOR_FUNC(mul, *)
+BM_HETE_TENSOR_BINARY_OPERATOR_FUNC(div, /)
+BM_HETE_TENSOR_BINARY_OPERATOR_FUNC(mod, %)
 //Bit
-BM_HETE_TENSOR_OPERATOR(left_shift, <<)
-BM_HETE_TENSOR_OPERATOR(right_shift, >>)
-BM_HETE_TENSOR_OPERATOR(bit_or, |)
-BM_HETE_TENSOR_OPERATOR(bit_and, &)
-BM_HETE_TENSOR_OPERATOR(bit_xor, ^)
+BM_HETE_TENSOR_BINARY_OPERATOR_FUNC(left_shift, <<)
+BM_HETE_TENSOR_BINARY_OPERATOR_FUNC(right_shift, >>)
+BM_HETE_TENSOR_BINARY_OPERATOR_FUNC(bit_or, |)
+BM_HETE_TENSOR_BINARY_OPERATOR_FUNC(bit_and, &)
+BM_HETE_TENSOR_BINARY_OPERATOR_FUNC(bit_xor, ^)
 //Logic
-BM_HETE_TENSOR_OPERATOR(or , ||)
-BM_HETE_TENSOR_OPERATOR(and, &&)
+BM_HETE_TENSOR_BINARY_OPERATOR_FUNC(or , ||)
+BM_HETE_TENSOR_BINARY_OPERATOR_FUNC(and, &&)
 //Compapre
-BM_HETE_TENSOR_OPERATOR(gt, >)
-BM_HETE_TENSOR_OPERATOR(lt, <)
-BM_HETE_TENSOR_OPERATOR(ge, >=)
-BM_HETE_TENSOR_OPERATOR(le, <=)
-BM_HETE_TENSOR_OPERATOR(equal, ==)
-BM_HETE_TENSOR_OPERATOR(not_equal, !=)
+BM_HETE_TENSOR_BINARY_OPERATOR_FUNC(gt, >)
+BM_HETE_TENSOR_BINARY_OPERATOR_FUNC(lt, <)
+BM_HETE_TENSOR_BINARY_OPERATOR_FUNC(ge, >=)
+BM_HETE_TENSOR_BINARY_OPERATOR_FUNC(le, <=)
+BM_HETE_TENSOR_BINARY_OPERATOR_FUNC(equal, ==)
+BM_HETE_TENSOR_BINARY_OPERATOR_FUNC(not_equal, !=)
 
 #define BM_HETE_TENSOR_BINARY_OPERATOR(Name, ValueType, Rank) \
 auto bm_hete_tensor_##ValueType##_rank##Rank##_##Name = bm_hete_tensor_##Name<HETE_TENSOR<ValueType, Rank>>; \
