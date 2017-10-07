@@ -35,12 +35,12 @@ void bm_gold_cu_tensor_mul(benchmark::State& state) {
 
 	auto bytes_size = static_cast<size_t>(ts0.size()) * sizeof(_ValueType);
 	state.SetBytesProcessed(state.iterations() * bytes_size * 3);
-	st.SetItemsProcessed(st.iterations() * bytes_size);
+	state.SetItemsProcessed(state.iterations() * bytes_size);
 }
 
 #define BM_GOLD_CU_TENSOR_RANK1_MUL(ValueType) \
 auto bm_gold_cu_tensor_##ValueType##_rank1_mul = bm_gold_cu_tensor_mul<ValueType>; \
-BENCHMARK(bm_gold_cu_tensor_##ValueType##_rank1_mul)->RangeMultiplier(bm_config::range_multiplier<ValueType, 1, device_tag>())->Range(bm_config::min_shape<ValueType, 1>(), bm_config::max_shape<ValueType, 1>())->UseRealTime();
+BENCHMARK(bm_gold_cu_tensor_##ValueType##_rank1_mul)->RangeMultiplier(bm_config::range_multiplier<ValueType, 1, device_tag>())->Range(bm_config::min_shape<ValueType, 1, device_tag>(), bm_config::max_shape<ValueType, 1, device_tag>())->UseRealTime();
 
 BM_GOLD_CU_TENSOR_RANK1_MUL(byte)
 BM_GOLD_CU_TENSOR_RANK1_MUL(int16_t)
@@ -56,13 +56,13 @@ BM_GOLD_CU_TENSOR_RANK1_MUL(point4f)
 #ifdef USE_HOST
 
 template <typename _ValueType>
-void bm_gold_host_tensor_mul(benchmark::State &st) {
-	tensor<_ValueType, 1> ts0(st.range(0));
-	tensor<_ValueType, 1> ts1(st.range(0));
+void bm_gold_host_tensor_mul(benchmark::State &state) {
+	tensor<_ValueType, 1> ts0(state.range(0));
+	tensor<_ValueType, 1> ts1(state.range(0));
 	fill(ts0, zero<_ValueType>::value());
 	fill(ts1, zero<_ValueType>::value());
 
-	while (st.KeepRunning()) {
+	while (state.KeepRunning()) {
 		tensor<_ValueType, 1> ts_re(ts0.shape());
 		for (int_t i = 0, size = ts_re.size(); i < size; ++i) {
 			ts_re[i] = ts0[i] * ts1[i];
@@ -72,13 +72,13 @@ void bm_gold_host_tensor_mul(benchmark::State &st) {
 	}
 
 	auto bytes_size = static_cast<size_t>(ts0.size()) * sizeof(decltype(ts0[0]));
-	st.SetBytesProcessed(st.iterations() * bytes_size * 3);
-	st.SetItemsProcessed(st.iterations() * bytes_size);
+	state.SetBytesProcessed(state.iterations() * bytes_size * 3);
+	state.SetItemsProcessed(state.iterations() * bytes_size);
 }
 
 #define BM_GOLD_HOST_TENSOR_RANK1_MUL(ValueType) \
 auto bm_gold_host_tensor_##ValueType##_rank1_mul = bm_gold_host_tensor_mul<ValueType>; \
-BENCHMARK(bm_gold_host_tensor_##ValueType##_rank1_mul)->RangeMultiplier(bm_config::range_multiplier<ValueType, 1, device_tag>())->Range(bm_config::min_shape<ValueType, 1>(), bm_config::max_shape<ValueType, 1>())->UseRealTime();
+BENCHMARK(bm_gold_host_tensor_##ValueType##_rank1_mul)->RangeMultiplier(bm_config::range_multiplier<ValueType, 1, host_tag>())->Range(bm_config::min_shape<ValueType, 1, host_tag>(), bm_config::max_shape<ValueType, 1, host_tag>())->UseRealTime();
 
 BM_GOLD_HOST_TENSOR_RANK1_MUL(byte)
 BM_GOLD_HOST_TENSOR_RANK1_MUL(int16_t)
@@ -93,16 +93,14 @@ BM_GOLD_HOST_TENSOR_RANK1_MUL(point4f)
 
 #define BM_HETE_TENSOR_OPERATOR(Name, Op)												\
 template <typename _Tensor>																\
-void bm_hete_tensor_##Name(benchmark::State &st) {										\
-	_Tensor ts0(st.range(0));															\
-	_Tensor ts1(st.range(0));															\
+void bm_hete_tensor_##Name(benchmark::State &state) {									\
+	_Tensor ts0(state.range(0));														\
+	_Tensor ts1(state.range(0));														\
 	fill(ts0, zero<typename _Tensor::value_type>::value());								\
 	fill(ts1, zero<typename _Tensor::value_type>::value());								\
+	decltype((ts0 Op ts1).persist()) ts_re(state.range(0));								\
 																						\
-	auto ts_tmp = (ts0 Op ts1).persist();												\
-	decltype(ts_tmp) ts_re(st.range(0));												\
-																						\
-	while (st.KeepRunning()) {															\
+	while (state.KeepRunning()) {														\
 	  	copy(ts0 Op ts1, ts_re);														\
 		HETE_SYNCHRONIZE;																\
 																						\
@@ -110,8 +108,8 @@ void bm_hete_tensor_##Name(benchmark::State &st) {										\
 	}																					\
 																						\
 	auto bytes_size = static_cast<size_t>(ts_re.size()) * sizeof(decltype(ts_re[0]));	\
-	st.SetBytesProcessed(st.iterations() * bytes_size * 3);								\
-	st.SetItemsProcessed(st.iterations() * bytes_size);									\
+	state.SetBytesProcessed(state.iterations() * bytes_size * 3);						\
+	state.SetItemsProcessed(state.iterations() * bytes_size);							\
 }
 
 //Arithmetic
@@ -139,7 +137,7 @@ BM_HETE_TENSOR_OPERATOR(not_equal, !=)
 
 #define BM_HETE_TENSOR_BINARY_OPERATOR(Name, ValueType, Rank) \
 auto bm_hete_tensor_##ValueType##_rank##Rank##_##Name = bm_hete_tensor_##Name<HETE_TENSOR<ValueType, Rank>>; \
-BENCHMARK(bm_hete_tensor_##ValueType##_rank##Rank##_##Name)->RangeMultiplier(bm_config::range_multiplier<ValueType, Rank, device_tag>())->Range(bm_config::min_shape<ValueType, Rank>(), bm_config::max_shape<ValueType, Rank>())->UseRealTime();
+BENCHMARK(bm_hete_tensor_##ValueType##_rank##Rank##_##Name)->RangeMultiplier(bm_config::range_multiplier<ValueType, Rank, HETE_TAG>())->Range(bm_config::min_shape<ValueType, Rank, HETE_TAG>(), bm_config::max_shape<ValueType, Rank, HETE_TAG>())->UseRealTime();
 
 #define BM_HETE_TENSOR_BINARY_OPERATOR_RANK1234(Name, ValueType) \
 BM_HETE_TENSOR_BINARY_OPERATOR(Name, ValueType, 1) \

@@ -49,3 +49,7 @@ using point4f = pointf<4>;
 #define HETE_TAG device_tag
 #define HETE_SYNCHRONIZE  cuda::device_synchronize()
 #endif
+
+// #ifdef USE_OMP
+//
+// #endif
