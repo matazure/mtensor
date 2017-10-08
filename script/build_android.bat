@@ -29,6 +29,7 @@ cmake .. ^
     -DANDROID_NDK=%ANDROID_NDK% ^
     -DANDROID_ABI=%ANDROID_ABI% ^
     -DANDROID_NATIVE_API_LEVEL=21 ^
+    %* ^
     || exit /b
 
 cmake --build . || exit /b
