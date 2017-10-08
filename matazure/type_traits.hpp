@@ -33,7 +33,7 @@ struct one;
 template <typename _T>
 struct zero {
 	MATAZURE_GENERAL static constexpr _T value() {
-		return 0;
+		return _T(0);
 	};
 };
 

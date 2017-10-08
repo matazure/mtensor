@@ -27,6 +27,7 @@ cmake .. \
     -DANDROID_NDK=$ANDROID_NDK \
     -DANDROID_ABI="$ANDROID_ABI" \
     -DCMAKE_BUILD_TYPE=Release \
+    -DBUILD_TEST=ON \
     -DANDROID_NATIVE_API_LEVEL=21 \
     -DWITH_CUDA=OFF \
     $@ \

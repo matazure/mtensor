@@ -4,9 +4,6 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/vendor/googletest/googletest)
 set_property(TARGET gtest PROPERTY FOLDER "vendor")
 set_property(TARGET gtest_main PROPERTY FOLDER "vendor")
 
-include_directories(${EXTERNAL_INSTALL_LOCATION}/include)
-link_directories(${EXTERNAL_INSTALL_LOCATION}/lib)
-
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/vendor/googletest/googletest/include)
 
 file(GLOB Files ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
