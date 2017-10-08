@@ -28,7 +28,7 @@ public:
 		tensor(pointi<rank>::zeros())
 	{}
 
-	template <typename ..._Ext>
+	template <typename ..._Ext,  typename _Tmp = enable_if_t<sizeof...(_Ext) == rank>>
 	explicit tensor(_Ext... ext) :
 		tensor(pointi<rank>{ext...})
 	{}

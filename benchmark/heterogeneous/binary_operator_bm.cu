@@ -94,11 +94,11 @@ BM_GOLD_HOST_TENSOR_RANK1_MUL(point4f)
 #define BM_HETE_TENSOR_BINARY_OPERATOR_FUNC(Name, Op)									\
 template <typename _Tensor>																\
 void bm_hete_tensor_##Name(benchmark::State &state) {									\
-	_Tensor ts0(state.range(0));														\
-	_Tensor ts1(state.range(0));														\
+	_Tensor ts0(pointi<_Tensor::rank>::all(state.range(0)));							\
+	_Tensor ts1(ts0.shape());															\
 	fill(ts0, zero<typename _Tensor::value_type>::value());								\
 	fill(ts1, zero<typename _Tensor::value_type>::value());								\
-	decltype((ts0 Op ts1).persist()) ts_re(state.range(0));								\
+	decltype((ts0 Op ts1).persist()) ts_re(ts0.shape());								\
 																						\
 	while (state.KeepRunning()) {														\
 	  	copy(ts0 Op ts1, ts_re);														\

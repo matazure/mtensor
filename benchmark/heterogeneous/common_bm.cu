@@ -2,9 +2,8 @@
 
 template <typename _Tensor, typename _ValueType>
 void bm_hete_tensor_cast(benchmark::State &state) {
-	auto ext = pointi<_Tensor::rank>::zeros();
-	fill(ext, state.range(1));
-	_Tensor ts_src(ext);
+	_Tensor ts_src(pointi<_Tensor::rank>::all(state.range(0)));
+	fill(ts_src, zero<typename _Tensor::value_type>::value());
  	decltype(cast<_ValueType>(ts_src).persist()) ts_dst(ts_src.shape());
 
 	while (state.KeepRunning()) {
@@ -40,9 +39,8 @@ BM_HETE_TENSOR_CAST_RANK1234(point4f, point4b);
 
 template <typename _Tensor>
 void bm_hete_tensor_section(benchmark::State &state) {
-	auto ext = pointi<_Tensor::rank>::zeros();
-	fill(ext, state.range(1));
-	_Tensor ts_src(ext);
+	_Tensor ts_src(pointi<_Tensor::rank>::all(state.range(0)));
+	fill(ts_src, zero<typename _Tensor::value_type>::value());
 	auto center = ts_src.shape() / 4;
 	auto dst_shape = ts_src.shape() / 2;
 	decltype(section(ts_src, center, dst_shape).persist()) ts_dst(dst_shape);
@@ -78,9 +76,8 @@ BM_HETE_TENSOR_SECTION_RANK1234(point4f)
 
  template <typename _Tensor>
  void bm_hete_tensor_stride_step2(benchmark::State &state) {
- 	auto ext = pointi<_Tensor::rank>::zeros();
- 	fill(ext, state.range(0));
- 	_Tensor ts_src(ext);
+ 	_Tensor ts_src(pointi<_Tensor::rank>::all(state.range(0)));
+	fill(ts_src, zero<typename _Tensor::value_type>::value());
  	_Tensor ts_dst(ts_src.shape() / 2);
 
  	while (state.KeepRunning()) {

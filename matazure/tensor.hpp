@@ -529,7 +529,7 @@ public:
 	* @brief constructs by the shape
 	* @prama ext the packed shape parameters
 	*/
-	 template <typename ..._Ext>
+	 template <typename ..._Ext, typename _Tmp = enable_if_t<sizeof...(_Ext) == rank>>
 	 explicit tensor(_Ext... ext) :
 	 	tensor(pointi<rank>{ ext... })
 	 {}

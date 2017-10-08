@@ -158,8 +158,7 @@ BM_GOLD_HOST_TENSOR_COPY_RANK1(point4f)
 
 template <typename _Tensor>
 void bm_hete_tensor_fill(benchmark::State& state) {
-	auto shape = pointi<_Tensor::rank>::all(state.range(0));
-	_Tensor ts_src(shape);
+	_Tensor ts_src(pointi<_Tensor::rank>::all(state.range(0)));
 
 	while (state.KeepRunning()) {
 		fill(ts_src, zero<typename _Tensor::value_type>::value());
@@ -195,9 +194,8 @@ BM_HETE_TENSOR_FILL_RANK1234(point4f)
 
 template <typename _Tensor>
 void bm_hete_tensor_copy(benchmark::State& state) {
-	auto shape = pointi<_Tensor::rank>::all(state.range(0));
-	_Tensor ts_src(shape);
-	_Tensor ts_dst(shape);
+	_Tensor ts_src(pointi<_Tensor::rank>::all(state.range(0)));
+	_Tensor ts_dst(ts_src.shape());
 	fill(ts_src, zero<typename _Tensor::value_type>::value());
 
 	while (state.KeepRunning()) {
