@@ -19,8 +19,8 @@ else()
 endif()
 
 option(BUILD_EXAMPLE "Build Example" ON)
-option(BUILD_BENCHMARK "Build Benchmark" ON)
-option(BUILD_TEST "Build Test" ON)
+option(BUILD_BENCHMARK "Build Benchmark" OFF)
+option(BUILD_TEST "Build Test" OFF)
 
 message("current compiler is ${CMAKE_CXX_COMPILER}")
 
