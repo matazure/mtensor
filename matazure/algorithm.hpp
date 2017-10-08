@@ -496,7 +496,7 @@ inline MATAZURE_GENERAL void fill(_Tensor &&ts, typename decay_t<_Tensor>::value
 */
 template <typename _ExectutionPolicy, typename _T1, typename _T2>
 inline MATAZURE_GENERAL void copy(_ExectutionPolicy policy, const _T1 &ts_src, _T2 &&ts_dst, enable_if_t<are_linear_access<decay_t<_T1>, decay_t<_T2>>::value && none_device_memory<decay_t<_T1>, decay_t<_T2>>::value>* = 0) {
-	for_index(policy, 0, ts_src.size(), [&](int_t i) {
+	for_index(policy, 0, ts_src.size(), [&] (int_t i) {
 		ts_dst[i] = ts_src[i];
 	});
 }
@@ -509,7 +509,7 @@ inline MATAZURE_GENERAL void copy(_ExectutionPolicy policy, const _T1 &ts_src, _
 */
 template <typename _ExectutionPolicy, typename _T1, typename _T2>
 inline MATAZURE_GENERAL void copy(_ExectutionPolicy policy, const _T1 &ts_src, _T2 &&ts_dst, enable_if_t<!are_linear_access<decay_t<_T1>, decay_t<_T2>>::value && none_device_memory<decay_t<_T1>, decay_t<_T2>>::value>* = 0) {
-	for_index(policy, pointi<_T1::rank>::zeros(), ts_src.shape(), [&](pointi<_T1::rank> idx) {
+	for_index(policy, pointi<_T1::rank>::zeros(), ts_src.shape(), [&] (pointi<_T1::rank> idx) {
 		ts_dst[idx] = ts_src[idx];
 	});
 }
@@ -553,7 +553,7 @@ template <typename _Tensor, typename _VT, typename _BinaryFunc>
 inline MATAZURE_GENERAL _VT reduce(const _Tensor &ts, _VT init, _BinaryFunc binary_fun) {
 	sequence_policy policy{};
 	auto re = init;
-	for_each(policy, ts, [&re, binary_fun](decltype(ts[0]) x) {
+	for_each(policy, ts, [&re, binary_fun] (decltype(ts[0]) x) {
 		re = binary_fun(re, x);
 	});
 

@@ -58,11 +58,11 @@ public:
 		return id;
 	}
 
-	pointi<rank> shape() const{
+	MATAZURE_GENERAL pointi<rank> shape() const{
 		return shape_;
 	}
 
-	pointi<rank> stride() const{
+	MATAZURE_GENERAL pointi<rank> stride() const{
 		return stride_;
 	}
 
