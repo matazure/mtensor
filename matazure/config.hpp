@@ -8,6 +8,7 @@
 #include <limits>
 #include <memory>
 #include <tuple>
+#include <string>
 #include <algorithm>
 
 //for cuda
@@ -67,6 +68,8 @@ using std::tuple_size;
 using std::tuple_element;
 using std::tie;
 using std::get;
+
+using std::string;
 
 template<bool _Val>
 using bool_constant = integral_constant<bool, _Val>;

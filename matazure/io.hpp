@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include <string>
 #include <fstream>
 #include <iostream>
 #include <matazure/type_traits.hpp>
