@@ -58,7 +58,7 @@ endif()
 if (UNIX)
 	add_definitions("-x c++")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -funroll-loops")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -s")
 
 	if (ANDROID)
 		# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=atom -mtune=atom")

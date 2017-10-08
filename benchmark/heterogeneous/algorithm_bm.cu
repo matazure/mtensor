@@ -165,9 +165,7 @@ void bm_hete_tensor_fill(benchmark::State& state) {
 
 	while (state.KeepRunning()) {
 		fill(ts_src, zero<typename _Tensor::value_type>::value());
-	#ifdef USE_CUDA
-		cuda::device_synchronize();
-	#endif
+		HETE_SYNCHRONIZE;
 
 		benchmark::ClobberMemory();
 	}
@@ -192,8 +190,6 @@ BM_HETE_TENSOR_FILL_RANK1234(int32_t)
 BM_HETE_TENSOR_FILL_RANK1234(int64_t)
 BM_HETE_TENSOR_FILL_RANK1234(float)
 BM_HETE_TENSOR_FILL_RANK1234(double)
-BM_HETE_TENSOR_FILL_RANK1234(point3b)
-BM_HETE_TENSOR_FILL_RANK1234(point4b)
 BM_HETE_TENSOR_FILL_RANK1234(point3f)
 BM_HETE_TENSOR_FILL_RANK1234(point4f)
 
