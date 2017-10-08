@@ -1,6 +1,6 @@
 #!/bin/bash
 
-git submodule update --init vendor/android-cmake
+git submodule update --init cmake/android-cmake
 
 if [ -z "$ANDROID_NDK" ]; then
     echo "Did you set ANDROID_NDK variable?"
