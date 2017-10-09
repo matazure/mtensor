@@ -455,7 +455,7 @@ inline MATAZURE_GENERAL void for_each(_Tensor &&ts, _Fun fun,
 		>::value
 	>* = 0)
 {
-	sequence_policy policy{};
+	sequence_vectorized_policy policy{};
 	for_each(policy, std::forward<_Tensor>(ts), fun);
 }
 
@@ -484,7 +484,7 @@ inline MATAZURE_GENERAL void fill(_Tensor &&ts, typename decay_t<_Tensor>::value
 			>
 		>::value
 	>* = 0) {
-	sequence_policy policy{};
+	sequence_vectorized_policy policy{};
 	fill(policy, std::forward<_Tensor>(ts), v);
 }
 
@@ -494,8 +494,8 @@ inline MATAZURE_GENERAL void fill(_Tensor &&ts, typename decay_t<_Tensor>::value
 * @param ts_src the source tensor
 * @param ts_dst the dest tensor
 */
-template <typename _ExectutionPolicy, typename _T1, typename _T2>
-inline MATAZURE_GENERAL void copy(_ExectutionPolicy policy, const _T1 &ts_src, _T2 &&ts_dst, enable_if_t<are_linear_access<decay_t<_T1>, decay_t<_T2>>::value && none_device_memory<decay_t<_T1>, decay_t<_T2>>::value>* = 0) {
+template <typename _ExectutionPolicy, typename _TensorSrc, typename _TensorDst>
+inline MATAZURE_GENERAL void copy(_ExectutionPolicy policy, const _TensorSrc &ts_src, _TensorDst &&ts_dst, enable_if_t<are_linear_access<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value && none_device_memory<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value>* = 0) {
 	for_index(policy, 0, ts_src.size(), [&] (int_t i) {
 		ts_dst[i] = ts_src[i];
 	});
@@ -507,9 +507,9 @@ inline MATAZURE_GENERAL void copy(_ExectutionPolicy policy, const _T1 &ts_src, _
 * @param ts_src the source tensor
 * @param ts_dst the dest tensor
 */
-template <typename _ExectutionPolicy, typename _T1, typename _T2>
-inline MATAZURE_GENERAL void copy(_ExectutionPolicy policy, const _T1 &ts_src, _T2 &&ts_dst, enable_if_t<!are_linear_access<decay_t<_T1>, decay_t<_T2>>::value && none_device_memory<decay_t<_T1>, decay_t<_T2>>::value>* = 0) {
-	for_index(policy, pointi<_T1::rank>::zeros(), ts_src.shape(), [&] (pointi<_T1::rank> idx) {
+template <typename _ExectutionPolicy, typename _TensorSrc, typename _TensorDst>
+inline MATAZURE_GENERAL void copy(_ExectutionPolicy policy, const _TensorSrc &ts_src, _TensorDst &&ts_dst, enable_if_t<!are_linear_access<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value && none_device_memory<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value>* = 0) {
+	for_index(policy, pointi<_TensorSrc::rank>::zeros(), ts_src.shape(), [&] (pointi<_TensorSrc::rank> idx) {
 		ts_dst[idx] = ts_src[idx];
 	});
 }
@@ -519,10 +519,51 @@ inline MATAZURE_GENERAL void copy(_ExectutionPolicy policy, const _T1 &ts_src, _
 * @param ts_src the source tensor
 * @param ts_dst the dest tensor
 */
-template <typename _T1, typename _T2>
-inline MATAZURE_GENERAL void copy(const _T1 &ts_src, _T2 &&ts_dst, enable_if_t<none_device_memory<enable_if_t<is_linear_array<decay_t<_T1>>::value, decay_t<_T1>>, decay_t<_T2>>::value>* = 0) {
-	sequence_policy policy;
-	copy(policy, ts_src, ts_dst);
+template <typename _TensorSrc, typename _TensorDst>
+inline MATAZURE_GENERAL void copy(const _TensorSrc &ts_src, _TensorDst &&ts_dst, enable_if_t<none_device_memory<enable_if_t<is_linear_array<decay_t<_TensorSrc>>::value, decay_t<_TensorSrc>>, decay_t<_TensorDst>>::value>* = 0) {
+	sequence_vectorized_policy policy;
+	copy(policy, ts_src, std::forward<_TensorDst>(ts_dst));
+}
+
+/**
+* @brief transform a linear indexing tensor to another by the fun
+* @param policy the execution policy
+* @param ts_src the source tensor
+* @param ts_dst the destination tensor
+* @param fun the functor, (e_src) -> e_dst pattern
+*/
+template <typename _ExectutionPolicy, typename _TensorSrc, typename _TensorDst, typename _Fun>
+inline MATAZURE_GENERAL void transform(_ExectutionPolicy policy, const _TensorSrc &ts_src, _TensorDst &&ts_dst, _Fun fun, enable_if_t<are_linear_access<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value && none_device_memory<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value>* = 0) {
+	for_index(policy, 0, ts_src.size(), [&](int_t i) {
+		ts_dst[i] = fun(ts_src[i]);
+	});
+}
+
+/**
+* @brief transform a array indexing tensor to another by the fun
+* @param policy the execution policy
+* @param ts_src the source tensor
+* @param ts_dst the destination tensor
+* @param fun the functor, (e_src) -> e_dst pattern
+*/
+template <typename _ExectutionPolicy, typename _TensorSrc, typename _TensorDst, typename _Fun>
+inline MATAZURE_GENERAL void transform(_ExectutionPolicy policy, const _TensorSrc &ts_src, _TensorDst &&ts_dst, _Fun fun, enable_if_t<!are_linear_access<decay_t<_TensorSrc>>::value && none_device_memory<decay_t<_TensorSrc>>::value>* = 0) {
+	for_index(policy, pointi<_TensorSrc::rank>::zeros(), ts_src.shape(), [&] (pointi<_TensorSrc::rank> idx) {
+		ts_dst[idx] = fun(ts_src[idx]);
+	});
+}
+
+/**
+* @brief transform a tensor to another by the fun
+* @param ts_src the source tensor
+* @param ts_dst the destination tensor
+* @param fun the functor, (e_src) -> e_dst pattern
+*/
+template <typename _TensorSrc, typename _TensorDst, typename _Fun>
+inline MATAZURE_GENERAL void transform(const _TensorSrc &ts_src, _TensorDst &&ts_dst, _Fun fun, enable_if_t<none_device_memory<enable_if_t<is_linear_array<decay_t<_TensorSrc>>::value, decay_t<_TensorSrc>>, decay_t<_TensorDst>>::value>* = 0)
+{
+	sequence_vectorized_policy policy{};
+	transform(policy, ts_src, std::forward<_TensorDst>(ts_dst), fun);
 }
 
 /**

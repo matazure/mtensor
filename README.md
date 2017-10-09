@@ -86,6 +86,7 @@ mkdir build
 cd build
 cmake ..
 ```
+
 ### Windows
 ``` sh
 git clone https://github.com/Matazure/tensor.git
@@ -95,7 +96,7 @@ cd build
 cmake .. -G "Visual Studio 14 2015 Win64"
 ```
 查看example下的简单示例会是一个很好的开始。  
---shallow-submodules参数是为了加快下载速度，若git版本太低，可以不要加该参数。
+
 ## 使用
 ```
 git clone https://github.com/Matazure/tensor.git

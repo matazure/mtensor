@@ -22,7 +22,7 @@ public:
 	typedef value_type &			reference;
 	typedef const value_type &		const_reference;
 	typedef linear_index			index_type;
-	typedef local_tag					memory_type;
+	typedef local_tag				memory_type;
 
 	/**
 	* @brief accesses element by index

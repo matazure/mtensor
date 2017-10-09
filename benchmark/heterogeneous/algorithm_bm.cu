@@ -229,4 +229,42 @@ BM_HETE_TENSOR_RANK1234_COPY(double)
 BM_HETE_TENSOR_RANK1234_COPY(point3f)
 BM_HETE_TENSOR_RANK1234_COPY(point4f)
 
-//
+template <typename _Tensor>
+void bm_hete_tensor_transform(benchmark::State& state) {
+	_Tensor ts_src(pointi<_Tensor::rank>::all(state.range(0)));
+	_Tensor ts_dst(ts_src.shape());
+	fill(ts_src, zero<typename _Tensor::value_type>::value());
+
+	while (state.KeepRunning()) {
+		transform(ts_src, ts_dst, [] __matazure__ (const typename _Tensor::value_type &e){
+			return e + e;
+		});
+		HETE_SYNCHRONIZE;
+
+		benchmark::ClobberMemory();
+	}
+
+	auto bytes_size = static_cast<size_t>(ts_src.size()) * sizeof(decltype(ts_src[0]));
+	state.SetBytesProcessed(state.iterations() * bytes_size * 2);
+}
+
+#define BM_HETE_TENSOR_TRANSFORM(ValueType, Rank) \
+auto bm_hete_tensor_##ValueType##_rank##Rank##_transform = bm_hete_tensor_transform<HETE_TENSOR<ValueType, Rank>>; \
+BENCHMARK(bm_hete_tensor_##ValueType##_rank##Rank##_transform)->RangeMultiplier(bm_config::range_multiplier<ValueType, Rank, HETE_TAG>())->Range(bm_config::min_shape<ValueType, Rank, HETE_TAG>(), bm_config::max_shape<ValueType, Rank, HETE_TAG>())->UseRealTime();
+
+#define BM_HETE_TENSOR_RANK1234_TRANSFORM(ValueType) \
+BM_HETE_TENSOR_TRANSFORM(ValueType, 1) \
+BM_HETE_TENSOR_TRANSFORM(ValueType, 2) \
+BM_HETE_TENSOR_TRANSFORM(ValueType, 3) \
+BM_HETE_TENSOR_TRANSFORM(ValueType, 4)
+
+BM_HETE_TENSOR_RANK1234_TRANSFORM(byte)
+BM_HETE_TENSOR_RANK1234_TRANSFORM(int16_t)
+BM_HETE_TENSOR_RANK1234_TRANSFORM(int32_t)
+BM_HETE_TENSOR_RANK1234_TRANSFORM(int64_t)
+BM_HETE_TENSOR_RANK1234_TRANSFORM(float)
+BM_HETE_TENSOR_RANK1234_TRANSFORM(double)
+BM_HETE_TENSOR_RANK1234_TRANSFORM(point3f)
+BM_HETE_TENSOR_RANK1234_TRANSFORM(point4f)
+
+
