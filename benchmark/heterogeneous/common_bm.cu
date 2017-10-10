@@ -36,8 +36,8 @@ BM_HETE_TENSOR_RANK1234_CAST(point3b, point3f)
 BM_HETE_TENSOR_RANK1234_CAST(point4b, point4f)
 BM_HETE_TENSOR_RANK1234_CAST(point3f, point3b)
 BM_HETE_TENSOR_RANK1234_CAST(point4f, point4b)
-BM_HETE_TENSOR_RANK1234_CAST(hete_float32x4_t, point4f)
-BM_HETE_TENSOR_RANK1234_CAST(point4f, hete_float32x4_t)
+// BM_HETE_TENSOR_RANK1234_CAST(hete_float32x4_t, point4f)
+// BM_HETE_TENSOR_RANK1234_CAST(point4f, hete_float32x4_t)
 
 template <typename _Tensor>
 void bm_hete_tensor_section(benchmark::State &state) {
