@@ -42,6 +42,7 @@ BM_GOLD_CU_TENSOR_RANK1_FILL(float)
 BM_GOLD_CU_TENSOR_RANK1_FILL(double)
 BM_GOLD_CU_TENSOR_RANK1_FILL(point3f)
 BM_GOLD_CU_TENSOR_RANK1_FILL(point4f)
+BM_GOLD_CU_TENSOR_RANK1_FILL(hete_float32x4_t)
 
 template <typename _ValueType>
 __global__ void gold_tensor_rank1_copy_kernel(_ValueType *p_src, _ValueType *p_dst, int_t count){
@@ -86,6 +87,7 @@ BM_GOLD_CU_TENSOR_RANK1_COPY(float)
 BM_GOLD_CU_TENSOR_RANK1_COPY(double)
 BM_GOLD_CU_TENSOR_RANK1_COPY(point3f)
 BM_GOLD_CU_TENSOR_RANK1_COPY(point4f)
+BM_GOLD_CU_TENSOR_RANK1_COPY(hete_float32x4_t)
 
 #endif
 
@@ -122,6 +124,7 @@ BM_GOLD_HOST_TENSOR_RANK1_FILL(float)
 BM_GOLD_HOST_TENSOR_RANK1_FILL(double)
 BM_GOLD_HOST_TENSOR_RANK1_FILL(point3f)
 BM_GOLD_HOST_TENSOR_RANK1_FILL(point4f)
+BM_GOLD_HOST_TENSOR_RANK1_FILL(hete_float32x4_t)
 
 template <typename _ValueType>
 void bm_gold_host_copy_rank1(benchmark::State& state) {
@@ -156,6 +159,7 @@ BM_GOLD_HOST_TENSOR_RANK1_COPY(float)
 BM_GOLD_HOST_TENSOR_RANK1_COPY(double)
 BM_GOLD_HOST_TENSOR_RANK1_COPY(point3f)
 BM_GOLD_HOST_TENSOR_RANK1_COPY(point4f)
+BM_GOLD_HOST_TENSOR_RANK1_COPY(hete_float32x4_t)
 
 #endif
 
@@ -192,6 +196,7 @@ BM_HETE_TENSOR_FILL_RANK1234(float)
 BM_HETE_TENSOR_FILL_RANK1234(double)
 BM_HETE_TENSOR_FILL_RANK1234(point3f)
 BM_HETE_TENSOR_FILL_RANK1234(point4f)
+BM_HETE_TENSOR_FILL_RANK1234(hete_float32x4_t)
 
 template <typename _Tensor>
 void bm_hete_tensor_copy(benchmark::State& state) {
@@ -228,6 +233,7 @@ BM_HETE_TENSOR_RANK1234_COPY(float)
 BM_HETE_TENSOR_RANK1234_COPY(double)
 BM_HETE_TENSOR_RANK1234_COPY(point3f)
 BM_HETE_TENSOR_RANK1234_COPY(point4f)
+BM_HETE_TENSOR_RANK1234_COPY(hete_float32x4_t)
 
 template <typename _Tensor>
 void bm_hete_tensor_transform(benchmark::State& state) {
@@ -266,5 +272,4 @@ BM_HETE_TENSOR_RANK1234_TRANSFORM(float)
 BM_HETE_TENSOR_RANK1234_TRANSFORM(double)
 BM_HETE_TENSOR_RANK1234_TRANSFORM(point3f)
 BM_HETE_TENSOR_RANK1234_TRANSFORM(point4f)
-
-
+BM_HETE_TENSOR_RANK1234_TRANSFORM(hete_float32x4_t)

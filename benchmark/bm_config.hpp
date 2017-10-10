@@ -39,15 +39,29 @@ using point3f = pointf<3>;
 using point4f = pointf<4>;
 
 #ifdef USE_HOST
+
 #define HETE_TENSOR tensor
 #define HETE_TAG host_tag
 #define HETE_SYNCHRONIZE
+
+#ifdef MATAZURE_SSE
+using hete_float32x4_t = __m128 ;
+#elif MATAZURE_NEON
+using hete_float32x4_t = float32x4_t;
+#else
+using hete_float32x4_t = pointf<4>;
+#endif
+
 #endif
 
 #ifdef USE_CUDA
+
 #define HETE_TENSOR cuda::tensor
 #define HETE_TAG device_tag
 #define HETE_SYNCHRONIZE  cuda::device_synchronize()
+
+using hete_float32x4_t = pointf<4>;
+
 #endif
 
 // #ifdef USE_OMP
