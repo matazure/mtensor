@@ -32,15 +32,7 @@ int main(int argc, char *argv[]) {
 	fill(sts_kernel, pointf<3>::all(1.0f) / sts_kernel.size());
 	cuda::copy_symbol(sts_kernel, constant_ts_kernel);
 
-	auto pointf3_to_pointb3 = [] __matazure__ (pointf<3> x){
-		pointb<3> re{};
-		auto convertor = unary::saturate_convertor<byte>{};
-		re[0] = convertor(x[0]);
-		re[1] = convertor(x[1]);
-		re[2] = convertor(x[2]);
-		return re;
-	};
-
+	auto pointf3_to_pointb3 = unary::saturate_convertor<pointb<3>>{};
 
 	auto cts_rgb = mem_clone(ts_rgb, device_tag{});
 

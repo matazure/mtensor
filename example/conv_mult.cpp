@@ -16,14 +16,7 @@ int main(int argc, char *argv[]) {
 	//使用均值卷积核
 	fill(sts_kernel, pointf<3>::all(1.0f) / sts_kernel.size());
 
-	auto pointf3_to_pointb3 = [] __matazure__ (pointf<3> x){
-		pointb<3> re{};
-		auto convertor = unary::saturate_convertor<byte>{};
-		re[0] = convertor(x[0]);
-		re[1] = convertor(x[1]);
-		re[2] = convertor(x[2]);
-		return re;
-	};
+	auto pointf3_to_pointb3 = unary::saturate_convertor<pointb<3>>{};
 
 	{
 		auto lts_conv = puzzle::conv_lazy_array_index_inside_clamp(cast<pointf<3>>(ts_rgb), sts_kernel);

@@ -7,6 +7,8 @@
 #include <matazure/cuda/tensor.hpp>
 #endif
 
+#include <matazure/unary.hpp>
+
 namespace matazure {
 
 #ifndef MATAZURE_CUDA
