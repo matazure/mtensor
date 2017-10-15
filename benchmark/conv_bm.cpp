@@ -838,7 +838,7 @@ void bm_gold_conv_3x3_sse2_expand_inside_check(benchmark::State &state){
 
 				__m128 sum = _mm_setzero_ps();
 
-				if (MATAZURE_LIKELY(inside(pointi<2>{i, j}, pointi<2>{1,1}, ts_input.shape()))){
+				if (MATAZURE_LIKELY(inside_range(pointi<2>{i, j}, pointi<2>{1,1}, ts_input.shape()))){
 					sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{0, 0} -kenel_radius], kenel[pointi<2>{0, 0}]));
 					sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{1, 0} -kenel_radius], kenel[pointi<2>{1, 0}]));
 					sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +pointi<2>{2, 0} -kenel_radius], kenel[pointi<2>{2, 0}]));
@@ -891,7 +891,7 @@ void bm_gold_conv_3x3_sse2_inside_check(benchmark::State &state){
 
 				__m128 sum = _mm_setzero_ps();
 
-				if (MATAZURE_LIKELY(inside(pointi<2>{i, j}, pointi<2>{1,1}, ts_input.shape() - 2))){
+				if (MATAZURE_LIKELY(inside_range(pointi<2>{i, j}, pointi<2>{1,1}, ts_input.shape() - 2))){
 					for_index(pointi<2>{0,0}, kenel.shape(), [&](pointi<2> kenel_idx){
  						sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} + kenel_idx -kenel_radius], kenel[kenel_idx]));
 					});
@@ -899,7 +899,7 @@ void bm_gold_conv_3x3_sse2_inside_check(benchmark::State &state){
 					for_index(pointi<2>{0,0}, kenel.shape(), [&](pointi<2> kenel_idx){
 						__m128 value = _mm_setzero_ps();
 						auto value_index = pointi<2>{i, j} + kenel_idx - kenel_radius;
-						if (MATAZURE_LIKELY(inside(value_index, pointi<2>{1,1}, ts_input.shape() - 2))){
+						if (MATAZURE_LIKELY(inside_range(value_index, pointi<2>{1,1}, ts_input.shape() - 2))){
 							value = ts_input[value_index];
 						}
  						sum = _mm_add_ps(sum, _mm_mul_ps(value, kenel[kenel_idx]));
@@ -947,7 +947,7 @@ void bm_gold_conv_3x3_sse2_op_inside_check(benchmark::State &state) {
 
 				__m128 sum = zero<__m128>::value();
 
-				if (MATAZURE_LIKELY(inside(pointi<2>{i, j}, pointi<2>{1, 1}, ts_input.shape() - 2))) {
+				if (MATAZURE_LIKELY(inside_range(pointi<2>{i, j}, pointi<2>{1, 1}, ts_input.shape() - 2))) {
 					for_index(pointi<2>{0, 0}, kenel.shape(), [&](pointi<2> kenel_idx) {
 						sum = _mm_add_ps(sum, _mm_mul_ps(ts_input[pointi<2>{i, j} +kenel_idx - kenel_radius], kenel[kenel_idx]));
 					});
@@ -956,7 +956,7 @@ void bm_gold_conv_3x3_sse2_op_inside_check(benchmark::State &state) {
 					for_index(pointi<2>{0, 0}, kenel.shape(), [&](pointi<2> kenel_idx) {
 						__m128 value = zero<__m128>::value();
 						auto value_index = pointi<2>{ i, j } +kenel_idx - kenel_radius;
-						if (MATAZURE_LIKELY(inside(value_index, pointi<2>{1, 1}, ts_input.shape() - 2))) {
+						if (MATAZURE_LIKELY(inside_range(value_index, pointi<2>{1, 1}, ts_input.shape() - 2))) {
 							value = ts_input[value_index];
 						}
 						sum = value * kenel[kenel_idx];
@@ -989,7 +989,7 @@ void bm_conv_lazy_array_none_check_3x3(benchmark::State &state){
 	fill(kenel, 1.0f);
 
 	while (state.KeepRunning()){
-		auto ts_tmp = section(puzzle::conv_lazy_array_none_check(ts_input, kenel), pointi<2>::all(1), ts_input.shape() - pointi<2>::all(2));
+		auto ts_tmp = section(puzzle::conv_lazy_array_index_unclamp(ts_input, kenel), pointi<2>::all(1), ts_input.shape() - pointi<2>::all(2));
 		copy(ts_tmp, ts_output);
 
 		benchmark::ClobberMemory();

@@ -77,7 +77,7 @@ inline void prod_block(_MatrixLhs cmat_lhs, _MatrixRhs cmat_rhs, _MatrixRe &cmat
 		__shared__ static_tensor<value_type, dim<block_size, block_size>> local_lhs;
 		__shared__ static_tensor<value_type, dim<block_size, block_size>> local_rhs;
 
-		auto is_valid = inside(block_idx.global, pointi<2>::zeros(), cmat_re.shape());
+		auto is_valid = inside_range(block_idx.global, pointi<2>::zeros(), cmat_re.shape());
 		auto l = cmat_lhs.shape()[0];
 		auto m = cmat_lhs.shape()[1];
 		auto n = cmat_rhs.shape()[1];

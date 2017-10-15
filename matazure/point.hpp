@@ -255,14 +255,14 @@ inline MATAZURE_GENERAL pointi<_Rank> cumulative_prod(pointi<_Rank> ex) {
 }
 
 /**
-* @brief detect whether a point is inside of a rect (left close, right open)
+* @brief detect whether a point is inside_range of a rect (left close, right open)
 * @param idx point position
 * @param left_top the lef top index of the rect
 * @param right_bottom the right bottom index of the rect
-* @return returns true if the point is inside of the rect
+* @return returns true if the point is inside_range of the rect
 */
 template <typename _ValueType, int_t _Rank>
-inline MATAZURE_GENERAL bool inside(point<_ValueType, _Rank> idx, point<_ValueType, _Rank> left_top, point<_ValueType, _Rank> right_bottom) {
+inline MATAZURE_GENERAL bool inside_range(point<_ValueType, _Rank> idx, point<_ValueType, _Rank> left_top, point<_ValueType, _Rank> right_bottom) {
 	for (int_t i = 0; i < _Rank; ++i) {
 		if ((idx[i] < left_top[i] || idx[i] >= right_bottom[i]))
 			return false;
@@ -271,7 +271,7 @@ inline MATAZURE_GENERAL bool inside(point<_ValueType, _Rank> idx, point<_ValueTy
 	return true;
 }
 
-inline MATAZURE_GENERAL bool inside(pointi<1> idx, pointi<1> left_top, pointi<1> right_bottom) {
+inline MATAZURE_GENERAL bool inside_range(pointi<1> idx, pointi<1> left_top, pointi<1> right_bottom) {
 	if ((idx[0] >= left_top[0] && idx[0] < right_bottom[0])){
 		return true;
 	} else {
@@ -279,7 +279,7 @@ inline MATAZURE_GENERAL bool inside(pointi<1> idx, pointi<1> left_top, pointi<1>
 	}
 }
 
-inline MATAZURE_GENERAL bool inside(pointi<2> idx, pointi<2> left_top, pointi<2> right_bottom) {
+inline MATAZURE_GENERAL bool inside_range(pointi<2> idx, pointi<2> left_top, pointi<2> right_bottom) {
 	if (idx[0] >= left_top[0] && idx[0] < right_bottom[0] &&
 		idx[1] >= left_top[1] && idx[1] < right_bottom[1])
 		return true;
@@ -287,7 +287,7 @@ inline MATAZURE_GENERAL bool inside(pointi<2> idx, pointi<2> left_top, pointi<2>
 		return false;
 }
 
-inline MATAZURE_GENERAL bool inside(pointi<3> idx, pointi<3> left_top, pointi<3> right_bottom) {
+inline MATAZURE_GENERAL bool inside_range(pointi<3> idx, pointi<3> left_top, pointi<3> right_bottom) {
 	if (idx[0] >= left_top[0] && idx[0] < right_bottom[0] &&
 		idx[1] >= left_top[1] && idx[1] < right_bottom[1] &&
 		idx[2] >= left_top[2] && idx[2] < right_bottom[2])
@@ -296,7 +296,7 @@ inline MATAZURE_GENERAL bool inside(pointi<3> idx, pointi<3> left_top, pointi<3>
 		return false;
 }
 
-inline MATAZURE_GENERAL bool inside(pointi<4> idx, pointi<4> left_top, pointi<4> right_bottom) {
+inline MATAZURE_GENERAL bool inside_range(pointi<4> idx, pointi<4> left_top, pointi<4> right_bottom) {
 	if (idx[0] >= left_top[0] && idx[0] < right_bottom[0] &&
 		idx[1] >= left_top[1] && idx[1] < right_bottom[1] &&
 		idx[2] >= left_top[2] && idx[2] < right_bottom[2] &&
@@ -308,14 +308,14 @@ inline MATAZURE_GENERAL bool inside(pointi<4> idx, pointi<4> left_top, pointi<4>
 }
 
 /**
-* @brief detect whether a point is outside of a rect (left close, right open)
+* @brief detect whether a point is outside_range of a rect (left close, right open)
 * @param idx point position
 * @param left_top the lef top index of the rect
 * @param right_bottom the right bottom index of the rect
-* @return true if the point is outside of the rect
+* @return true if the point is outside_range of the rect
 */
 template <typename _ValueType, int_t _Rank>
-inline MATAZURE_GENERAL bool outside(point<_ValueType, _Rank> idx, point<_ValueType, _Rank> left_top, point<_ValueType, _Rank> right_bottom) {
+inline MATAZURE_GENERAL bool outside_range(point<_ValueType, _Rank> idx, point<_ValueType, _Rank> left_top, point<_ValueType, _Rank> right_bottom) {
 	for (int_t i = 0; i < _Rank; ++i) {
 		if ((idx[i] < left_top[i] || idx[i] >= right_bottom[i]))
 			return true;
@@ -324,7 +324,7 @@ inline MATAZURE_GENERAL bool outside(point<_ValueType, _Rank> idx, point<_ValueT
 	return false;
 }
 
-inline MATAZURE_GENERAL bool outside(pointi<1> idx, pointi<1> left_top, pointi<1> right_bottom) {
+inline MATAZURE_GENERAL bool outside_range(pointi<1> idx, pointi<1> left_top, pointi<1> right_bottom) {
 	if ((idx[0] >= left_top[0] && idx[0] < right_bottom[0])){
 		return true;
 	} else {
@@ -332,7 +332,7 @@ inline MATAZURE_GENERAL bool outside(pointi<1> idx, pointi<1> left_top, pointi<1
 	}
 }
 
-inline MATAZURE_GENERAL bool outside(pointi<2> idx, pointi<2> left_top, pointi<2> right_bottom) {
+inline MATAZURE_GENERAL bool outside_range(pointi<2> idx, pointi<2> left_top, pointi<2> right_bottom) {
 	if (idx[0] >= left_top[0] && idx[0] < right_bottom[0] &&
 		idx[1] >= left_top[1] && idx[1] < right_bottom[1])
 		return true;
@@ -340,7 +340,7 @@ inline MATAZURE_GENERAL bool outside(pointi<2> idx, pointi<2> left_top, pointi<2
 		return false;
 }
 
-inline MATAZURE_GENERAL bool outside(pointi<3> idx, pointi<3> left_top, pointi<3> right_bottom) {
+inline MATAZURE_GENERAL bool outside_range(pointi<3> idx, pointi<3> left_top, pointi<3> right_bottom) {
 	if (idx[0] >= left_top[0] && idx[0] < right_bottom[0] &&
 		idx[1] >= left_top[1] && idx[1] < right_bottom[1] &&
 		idx[2] >= left_top[2] && idx[2] < right_bottom[2])
@@ -349,7 +349,7 @@ inline MATAZURE_GENERAL bool outside(pointi<3> idx, pointi<3> left_top, pointi<3
 		return false;
 }
 
-inline MATAZURE_GENERAL bool outside(pointi<4> idx, pointi<4> left_top, pointi<4> right_bottom) {
+inline MATAZURE_GENERAL bool outside_range(pointi<4> idx, pointi<4> left_top, pointi<4> right_bottom) {
 	if (idx[0] >= left_top[0] && idx[0] < right_bottom[0] &&
 		idx[1] >= left_top[1] && idx[1] < right_bottom[1] &&
 		idx[2] >= left_top[2] && idx[2] < right_bottom[2] &&
