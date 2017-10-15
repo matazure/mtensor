@@ -1,5 +1,15 @@
 cmake_minimum_required(VERSION 3.1)
 
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  # using Clang
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  # using GCC
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+  # using Intel C++
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  # using Visual Studio C++
+endif()
+
 project(MatazureTensor CXX)
 
 set(CMAKE_CXX_STANDARD 11)
@@ -10,12 +20,28 @@ if(CUDA_FOUND)
 else()
 	option(WITH_CUDA "With CUDA" OFF)
 endif()
+if(WITH_CUDA)
+	if(NOT CUDA_FOUND)
+		message(FATAL_ERROR "CUDA is not found")
+	endif()
+endif()
 
 find_package(OpenMP)
 if(OPENMP_FOUND)
 	option(WITH_OPENMP "With OpenMP" ON)
 else()
 	option(WITH_OPENMP "With OpenMP" OFF)
+endif()
+if(WITH_OPENMP)
+	# clang not surpport 
+	# if(NOT OPENMP_FOUND)
+	# 	message(FATAL_ERROR "OPENMP_FOUND is not found")
+	# endif()
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")	
+	
+	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")	
+	endif()
 endif()
 
 option(BUILD_EXAMPLE "Build Example" ON)
@@ -26,16 +52,6 @@ message("current compiler is ${CMAKE_CXX_COMPILER}")
 
 include_directories(.)
 set_property( GLOBAL PROPERTY USE_FOLDERS ON)
-
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  # using Clang
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  # using GCC
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-  # using Intel C++
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-  # using Visual Studio C++
-endif()
 
 set(BUILD_SHARED_LIBS OFF)
 if (MSVC)
@@ -48,11 +64,6 @@ if (MSVC)
 			string(REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
 		endif()
 	endforeach()
-endif()
-
-if (WITH_OPENMP)
-	find_package(OpenMP REQUIRED)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
 if (UNIX)

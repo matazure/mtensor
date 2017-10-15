@@ -34,4 +34,4 @@ script:
   - mkdir build && cd build && cmake .. -DWITH_CUDA=ON -DWITH_BENCHMARK=ON && make
   - cd ..
   - chmod +x ./script/build_android.sh
-  - ./script/build_android.sh
+  - ./script/build_android.sh -DWITH_CUDA=OFF -DBUILD_TEST=ON -DBUILD_BENCHMARK=ON
