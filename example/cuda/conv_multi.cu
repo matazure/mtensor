@@ -32,7 +32,8 @@ int main(int argc, char *argv[]) {
 	fill(sts_kernel, pointf<3>::all(1.0f) / sts_kernel.size());
 	cuda::copy_symbol(sts_kernel, constant_ts_kernel);
 
-	auto pointf3_to_pointb3 = unary::saturate_convertor<pointb<3>>{};
+	typedef point<byte, 3> (* sature_cast_op)(const point<float, 3> &);
+	sature_cast_op pointf3_to_pointb3 = &unary::saturate_cast<byte, float, 3>;
 
 	auto cts_rgb = mem_clone(ts_rgb, device_tag{});
 

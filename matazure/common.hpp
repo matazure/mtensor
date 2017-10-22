@@ -438,9 +438,22 @@ inline auto apply(_Tensor ts, _Func fun, enable_if_t<is_same<array_index, typena
 * @return a lambda_tensor whose value_type is _ValueType
 */
 template <typename _ValueType, typename _Tensor>
-inline auto cast(_Tensor tensor)->decltype(apply(tensor, internal::cast_op<_ValueType>())) {
+inline auto cast(_Tensor tensor, enable_if_t<is_tensor<_Tensor>::value>* = 0)->decltype(apply(tensor, internal::cast_op<_ValueType>())) {
 	return apply(tensor, internal::cast_op<_ValueType>());
 }
+
+///**
+//* @brief saturate cast a tensor to another value_type lambda_tensor
+//* @param tensor the source tensor
+//* @tparam _ValueType the dest tensor value type
+//* @return a lambda_tensor whose value_type is _ValueType
+//*/
+//template <typename _ValueType, typename _Tensor>
+//inline auto saturate_cast(_Tensor tensor, enable_if_t<is_tensor<_Tensor>>* = 0)->decltype(apply(tensor, internal::cast_op<_ValueType>())) {
+//	// typedef point<byte, 3> (* sature_cast_op)(const point<float, 3> &);
+//	// sature_cast_op pointf3_to_pointb3 = &unary::saturate_cast<byte, float, 3>;
+//	return apply(tensor, internal::cast_op<_ValueType>());
+//}
 
 /**
 * @brief produces a subsection lambda_tensor of the source tensor

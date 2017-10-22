@@ -188,11 +188,11 @@ MATAZURE_GENERAL point<_T, _Rank>& operator--(point<_T, _Rank> &p) {
 	return p;
 }
 
-template <typename _DstType, typename _T, int_t _Rank>
-MATAZURE_GENERAL point<_DstType, _Rank> point_cast(const point<_T, _Rank> &p) {
-	point<_DstType, _Rank> re;
+template <typename _ValueTypeDst, typename _ValueTypeSrc, int_t _Rank>
+MATAZURE_GENERAL point<_ValueTypeDst, _Rank> point_cast(const point<_ValueTypeSrc, _Rank> &p) {
+	point<_ValueTypeDst, _Rank> re;
 	for (int_t i = 0; i < _Rank; ++i) {
-		re[i] = static_cast<_DstType>(p[i]);
+		re[i] = static_cast<_ValueTypeDst>(p[i]);
 	}
 
 	return re;
