@@ -12,9 +12,9 @@ endif()
 
 project(MatazureTensor CXX)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 
-find_package(CUDA 8.0)
+find_package(CUDA 9.0)
 if(CUDA_FOUND)
 	option(WITH_CUDA "With CUDA" ON)
 else()

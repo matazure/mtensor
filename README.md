@@ -72,29 +72,17 @@ int main(int argc, char *argv[]) {
 丰富的tensor操作，向量化的接口使代码看起来清晰整洁，延迟计算的使用，避免了额外的内存读写，让程序拥有极佳的性能。
 ## 开发环境
 ### 仅CPU支持
-Tensor的代码规范遵循C++11标准， 所以只需编译器支持C++11即可。
+Tensor的代码规范遵循C++14标准， 所以只需编译器支持C++14即可。
 ### CUDA支持
-在符合CPU支持的基础上，需要安装[CUDA 8.0](https://developer.nvidia.com/cuda-downloads)，详情可查看[CUDA官方文档](http://docs.nvidia.com/cuda/index.html#axzz4kQuxAvUe)
+在符合CPU支持的基础上，需要安装[CUDA 9.0](https://developer.nvidia.com/cuda-downloads)，详情可查看[CUDA官方文档](http://docs.nvidia.com/cuda/index.html#axzz4kQuxAvUe)
 
-## 生成项目
-先安装[git](https://git-scm.com/)和[CMake](https://cmake.org/),然后在命令行里执行
-### Linux
-``` sh
-git clone https://github.com/Matazure/tensor.git
-cd tensor
-mkdir build
-cd build
-cmake ..
-```
+## 编译项目
+需先安装[git](https://git-scm.com/)和[CMake](https://cmake.org/)及相应的编译工具，然后运行script下对应的编译脚本即可。  
+* build_win.bat编译windows版本
+* build.sh编译unix版本(linux及mac)
+* build_android.bat可以在windows主机编译android版本，需要cmake-3.6.3或者android studio自带的cmake
+* build_android.sh可以在linux主机编译android版本。
 
-### Windows
-``` sh
-git clone https://github.com/Matazure/tensor.git
-cd tensor
-mkdir build
-cd build
-cmake .. -G "Visual Studio 14 2015 Win64"
-```
 查看example下的简单示例会是一个很好的开始。  
 
 ## 使用

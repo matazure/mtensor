@@ -2,7 +2,8 @@
 
 #include <matazure/tensor.hpp>
 
-namespace matazure { namespace puzzle {
+namespace matazure {
+namespace puzzle {
 
 namespace internal{
 
@@ -11,12 +12,12 @@ namespace internal{
 		_TensorSrc ts_src_;
 		_TensorKernel ts_kernel_;
 
-		conv_array_index_op(_TensorSrc ts_src, _TensorKernel ts_kernel): ts_src_(ts_src), ts_kernel_(ts_kernel) {}
+		conv_array_index_op(_TensorSrc ts_src, _TensorKernel ts_kernel) : ts_src_(ts_src), ts_kernel_(ts_kernel) {}
 
 		MATAZURE_GENERAL auto operator()(const pointi<_TensorSrc::rank> &idx) const ->typename _TensorSrc::value_type {
 			auto kernel_radius = (ts_kernel_.shape() / 2);
 			auto sum = zero<typename _TensorSrc::value_type>::value();
-			for_index(pointi<_TensorSrc::rank>::zeros(), ts_kernel_.shape(), [&] (const pointi<2> &kenel_idx) {
+			for_index(pointi<_TensorSrc::rank>::zeros(), ts_kernel_.shape(), [&](const pointi<2> &kenel_idx) {
 				sum += ts_src_[idx + kenel_idx - kernel_radius] * ts_kernel_[kenel_idx];
 			});
 			return sum;
@@ -31,11 +32,11 @@ namespace internal{
 template <typename _TensorSrc, typename _TensorKernel>
 inline MATAZURE_GENERAL auto conv_lazy_array_index_unclamp(_TensorSrc ts_src, _TensorKernel ts_kernel)->decltype(
 	make_lambda(
-		ts_src.shape(),
-		internal::conv_array_index_op<_TensorSrc, _TensorKernel>(ts_src, ts_kernel),
-		typename _TensorSrc::memory_type{}
+	ts_src.shape(),
+	internal::conv_array_index_op<_TensorSrc, _TensorKernel>(ts_src, ts_kernel),
+	typename _TensorSrc::memory_type{}
 	)
-){
+	) {
 	return make_lambda(
 		ts_src.shape(),
 		internal::conv_array_index_op<_TensorSrc, _TensorKernel>(ts_src, ts_kernel),
@@ -43,20 +44,9 @@ inline MATAZURE_GENERAL auto conv_lazy_array_index_unclamp(_TensorSrc ts_src, _T
 	);
 }
 
-// namespace internal{
-//
-// 	template <typename _TensorSrc, typename _TensorKernel>
-// 	struct conv_array_index_inside_clamp_op{
-// 		_TensorSrc ts_src_;
-// 		_TensorKernel ts_kernel_;
-// 		decltype(conv_lazy_array_index_unclamp(ts_src_, ts_kernel_))
-//
-// 	};
-//
-// }
 
 template <typename _TensorSrc, typename _TensorKernel>
-inline auto conv_lazy_array_index_inside_clamp(_TensorSrc ts_src, _TensorKernel ts_kernel){
+inline auto conv_lazy_array_index_inside_clamp(_TensorSrc ts_src, _TensorKernel ts_kernel) {
 	auto lts_conv_unclamp = conv_lazy_array_index_unclamp(ts_src, ts_kernel);
 	auto lts_conv_clamp = conv_lazy_array_index_unclamp(clamp_zero(ts_src), ts_kernel);
 
@@ -64,10 +54,11 @@ inline auto conv_lazy_array_index_inside_clamp(_TensorSrc ts_src, _TensorKernel 
 	auto safe_shape = ts_src.shape() - (ts_kernel.shape() - 1) / 2;
 	auto start = kernel_radius;
 	auto end = kernel_radius + safe_shape;
-	return make_lambda(ts_src.shape(), [=](pointi<_TensorSrc::rank> a_idx){
-		if (MATAZURE_LIKELY(inside_range(a_idx, start, end))){
+	return make_lambda(ts_src.shape(), [=](pointi<_TensorSrc::rank> a_idx) {
+		if (MATAZURE_LIKELY(inside_range(a_idx, start, end))) {
 			return lts_conv_unclamp[a_idx];
-		} else{
+		}
+		else {
 			return lts_conv_clamp[a_idx];
 		}
 	});
@@ -115,4 +106,5 @@ inline auto conv_lazy_array_index_inside_clamp(_TensorSrc ts_src, _TensorKernel 
 
 // template <typename _TensorSrc, typename
 
-} }
+}
+}
