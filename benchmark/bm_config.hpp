@@ -44,9 +44,9 @@ using point4f = pointf<4>;
 #define HETE_TAG host_tag
 #define HETE_SYNCHRONIZE
 
-#ifdef MATAZURE_SSE
+#if defined(MATAZURE_SSE)
 using hete_float32x4_t = __m128 ;
-#elif MATAZURE_NEON
+#elif defined(MATAZURE_NEON)
 using hete_float32x4_t = float32x4_t;
 #else
 using hete_float32x4_t = pointf<4>;

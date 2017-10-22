@@ -63,6 +63,18 @@ struct zero<__m128>{
 #include <arm_neon.h>
 #define MATAZURE_NEON
 
+namespace matazure{
+
+///@todo: may be need a  template
+template <>
+struct zero<float32x4_t>{
+	static float32x4_t value() {
+		return float32x4_t{0.0f, 0.0f, 0.0f, 0.0f};
+	}
+};
+
+}
+
 #endif
 
 //#if

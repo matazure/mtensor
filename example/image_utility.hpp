@@ -8,6 +8,7 @@
 #include <stb_image.h>
 #include <stb_image_write.h>
 #include <matazure/tensor>
+#include <stdexcept>
 
 inline matazure::tensor<matazure::pointb<3>, 2> read_rgb_image(const char *image_path){
 	using namespace matazure;
