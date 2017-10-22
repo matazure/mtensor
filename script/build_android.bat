@@ -27,7 +27,7 @@ cmake .. ^
     -DCMAKE_MAKE_PROGRAM="%ANDROID_NDK%/prebuilt/windows-x86_64/bin/make.exe" ^
     -DANDROID_NDK=%ANDROID_NDK% ^
     -DANDROID_ABI=%ANDROID_ABI% ^
-    -DANDROID_TOOLCHAIN_NAME=clang ^
+    -DANDROID_TOOLCHAIN=gcc ^
     -DANDROID_NATIVE_API_LEVEL=21 ^
     -G "Unix Makefiles" ^
     %* ^
