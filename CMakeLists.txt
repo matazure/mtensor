@@ -84,7 +84,7 @@ if (WITH_CUDA)
 	endif()
 
 	#--expt-relaxed-constexpr  (don't use this)
-	set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} --expt-extended-lambda -Wno-deprecated-gpu-targets")
+	set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} --expt-extended-lambda --disable-warnings")
 	if (UNIX)
 		set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} --std=c++14")
 	endif()
