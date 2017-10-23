@@ -71,7 +71,7 @@ void bm_gold_conv_3x3_inside_check(benchmark::State &state){
 		benchmark::ClobberMemory();
 	}
 
-	auto valid_shape = ts_output.shape() - 1;
+	auto valid_shape = ts_output.shape() - 2;
 	auto valid_size = reduce(valid_shape, 1, [](int_t x, int_t y){ return x * y; });
 	state.SetBytesProcessed(state.iterations() * ts_output.size() * sizeof(float));
 	state.SetItemsProcessed(state.iterations() * valid_size * kenel.size());
@@ -979,14 +979,13 @@ BENCHMARK(bm_gold_conv_3x3_sse2_op_inside_check)->Arg(7)->Arg(14)->Arg(28)->Arg(
 
 #endif
 
-void bm_conv_lazy_array_none_check_3x3(benchmark::State &state){
+template <typename _ValueType>
+void bm_conv_lazy_array_index_unclamp_3x3(benchmark::State &state){
 	pointi<2> ext;
 	fill(ext, state.range(0));
-	tensor<float, 2> ts_input(ext);
-	tensor<float, 2> ts_output(ts_input.shape() - pointi<2>::all(2));
-	static_tensor<float, dim<3,3>> kenel;
-	fill(ts_input, 1.0f);
-	fill(kenel, 1.0f);
+	tensor<_ValueType, 2> ts_input(ext);
+	tensor<_ValueType, 2> ts_output(ts_input.shape() - pointi<2>::all(2));
+	static_tensor<_ValueType, dim<3,3>> kenel;
 
 	while (state.KeepRunning()){
 		auto ts_tmp = section(puzzle::conv_lazy_array_index_unclamp(ts_input, kenel), pointi<2>::all(1), ts_input.shape() - pointi<2>::all(2));
@@ -997,7 +996,18 @@ void bm_conv_lazy_array_none_check_3x3(benchmark::State &state){
 
 	auto valid_shape = ts_output.shape();
 	auto valid_size = reduce(valid_shape, 1, [](int_t x, int_t y){ return x * y; });
-	state.SetBytesProcessed(state.iterations() * valid_size * sizeof(float));
+	state.SetBytesProcessed(state.iterations() * valid_size * sizeof(_ValueType));
 	state.SetItemsProcessed(state.iterations() * valid_size * kenel.size());
 }
-BENCHMARK(bm_conv_lazy_array_none_check_3x3)->Arg(7)->Arg(14)->Arg(28)->Arg(56)->Arg(112)->Arg(224)->UseRealTime();
+#define BM_TENSOR_RANK2_KERNEL3x3(ValueType) \
+auto bm_tensor_##ValueType##_rank2_kernel3x3 = bm_conv_lazy_array_index_unclamp_3x3<ValueType>; \
+BENCHMARK(bm_tensor_##ValueType##_rank2_kernel3x3)->RangeMultiplier(bm_config::range_multiplier<ValueType, 2, host_tag>())->Range(bm_config::min_shape<ValueType, 2, host_tag>(), bm_config::max_shape<ValueType, 2, host_tag>())->UseRealTime();
+
+BM_TENSOR_RANK2_KERNEL3x3(byte)
+BM_TENSOR_RANK2_KERNEL3x3(int16_t)
+BM_TENSOR_RANK2_KERNEL3x3(int32_t)
+BM_TENSOR_RANK2_KERNEL3x3(int64_t)
+BM_TENSOR_RANK2_KERNEL3x3(float)
+BM_TENSOR_RANK2_KERNEL3x3(double)
+BM_TENSOR_RANK2_KERNEL3x3(point4f)
+BM_TENSOR_RANK2_KERNEL3x3(hete_float32x4_t)

@@ -33,4 +33,4 @@ cmake .. ^
     %* ^
     || exit /b
 
-cmake --build . || exit /b
+cmake --build --config release . || exit /b
