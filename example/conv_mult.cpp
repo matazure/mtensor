@@ -21,7 +21,12 @@ int main(int argc, char *argv[]) {
 
 	{
 		auto lts_conv = puzzle::conv_lazy_array_index_inside_clamp(cast<pointf<3>>(ts_rgb), sts_kernel);
-		auto ts_conv = apply(lts_conv, pointf3_to_pointb3).persist();
+	#ifdef MATAZURE_OPENMP
+		omp_policy policy{};
+	#else
+		sequence_policy policy{};
+	#endif
+		auto ts_conv = apply(lts_conv, pointf3_to_pointb3).persist(policy);
 
 		auto image_path = argc > 2 ? argv[2] : "conv_lazy_array_index_inside_clamp.png";
 		write_rgb_png(image_path, ts_conv);
