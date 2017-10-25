@@ -999,15 +999,47 @@ void bm_conv_lazy_array_index_unclamp_3x3(benchmark::State &state){
 	state.SetBytesProcessed(state.iterations() * valid_size * sizeof(_ValueType));
 	state.SetItemsProcessed(state.iterations() * valid_size * kenel.size());
 }
-#define BM_TENSOR_RANK2_KERNEL3x3(ValueType) \
-auto bm_tensor_##ValueType##_rank2_kernel3x3 = bm_conv_lazy_array_index_unclamp_3x3<ValueType>; \
-BENCHMARK(bm_tensor_##ValueType##_rank2_kernel3x3)->RangeMultiplier(bm_config::range_multiplier<ValueType, 2, host_tag>())->Range(bm_config::min_shape<ValueType, 2, host_tag>(), bm_config::max_shape<ValueType, 2, host_tag>())->UseRealTime();
+#define BM_TENSOR_RANK2_CONV_LAZY_ARRAY_INDEX_UNCLAMP_KERNEL3x3(ValueType) \
+auto bm_tensor_##ValueType##_rank2_conv_layz_array_index_unclamp_kernel3x3 = bm_conv_lazy_array_index_unclamp_3x3<ValueType>; \
+BENCHMARK(bm_tensor_##ValueType##_rank2_conv_layz_array_index_unclamp_kernel3x3)->RangeMultiplier(bm_config::range_multiplier<ValueType, 2, host_tag>())->Range(bm_config::min_shape<ValueType, 2, host_tag>(), bm_config::max_shape<ValueType, 2, host_tag>())->UseRealTime();
 
-BM_TENSOR_RANK2_KERNEL3x3(byte)
-BM_TENSOR_RANK2_KERNEL3x3(int16_t)
-BM_TENSOR_RANK2_KERNEL3x3(int32_t)
-BM_TENSOR_RANK2_KERNEL3x3(int64_t)
-BM_TENSOR_RANK2_KERNEL3x3(float)
-BM_TENSOR_RANK2_KERNEL3x3(double)
-BM_TENSOR_RANK2_KERNEL3x3(point4f)
-BM_TENSOR_RANK2_KERNEL3x3(hete_float32x4_t)
+BM_TENSOR_RANK2_CONV_LAZY_ARRAY_INDEX_UNCLAMP_KERNEL3x3(byte)
+BM_TENSOR_RANK2_CONV_LAZY_ARRAY_INDEX_UNCLAMP_KERNEL3x3(int16_t)
+BM_TENSOR_RANK2_CONV_LAZY_ARRAY_INDEX_UNCLAMP_KERNEL3x3(int32_t)
+BM_TENSOR_RANK2_CONV_LAZY_ARRAY_INDEX_UNCLAMP_KERNEL3x3(int64_t)
+BM_TENSOR_RANK2_CONV_LAZY_ARRAY_INDEX_UNCLAMP_KERNEL3x3(float)
+BM_TENSOR_RANK2_CONV_LAZY_ARRAY_INDEX_UNCLAMP_KERNEL3x3(double)
+BM_TENSOR_RANK2_CONV_LAZY_ARRAY_INDEX_UNCLAMP_KERNEL3x3(point4f)
+BM_TENSOR_RANK2_CONV_LAZY_ARRAY_INDEX_UNCLAMP_KERNEL3x3(hete_float32x4_t)
+
+template <typename _ValueType>
+void conv_lazy_array_index_inside_clamp_zero(benchmark::State &state){
+	pointi<2> ext;
+	fill(ext, state.range(0));
+	tensor<_ValueType, 2> ts_input(ext);
+	tensor<_ValueType, 2> ts_output(ts_input.shape());
+	static_tensor<_ValueType, dim<3,3>> kenel;
+
+	while (state.KeepRunning()){
+		copy(puzzle::conv_lazy_array_index_inside_clamp_zero(ts_input, kenel), ts_output);
+
+		benchmark::ClobberMemory();
+	}
+
+	auto valid_shape = ts_output.shape();
+	auto valid_size = reduce(valid_shape, 1, [](int_t x, int_t y){ return x * y; });
+	state.SetBytesProcessed(state.iterations() * valid_size * sizeof(_ValueType));
+	state.SetItemsProcessed(state.iterations() * valid_size * kenel.size());
+}
+#define BM_TENSOR_RANK2_CONV_LAZY_ARRAY_INDEX_INSIDE_CLAMP_ZERO_KERNEL3x3(ValueType) \
+auto bm_tensor_##ValueType##_rank2_conv_lazy_array_index_inside_clamp_zero_kernel3x3 = conv_lazy_array_index_inside_clamp_zero<ValueType>; \
+BENCHMARK(bm_tensor_##ValueType##_rank2_conv_lazy_array_index_inside_clamp_zero_kernel3x3)->RangeMultiplier(bm_config::range_multiplier<ValueType, 2, host_tag>())->Range(bm_config::min_shape<ValueType, 2, host_tag>(), bm_config::max_shape<ValueType, 2, host_tag>())->UseRealTime();
+
+BM_TENSOR_RANK2_CONV_LAZY_ARRAY_INDEX_INSIDE_CLAMP_ZERO_KERNEL3x3(byte)
+BM_TENSOR_RANK2_CONV_LAZY_ARRAY_INDEX_INSIDE_CLAMP_ZERO_KERNEL3x3(int16_t)
+BM_TENSOR_RANK2_CONV_LAZY_ARRAY_INDEX_INSIDE_CLAMP_ZERO_KERNEL3x3(int32_t)
+BM_TENSOR_RANK2_CONV_LAZY_ARRAY_INDEX_INSIDE_CLAMP_ZERO_KERNEL3x3(int64_t)
+BM_TENSOR_RANK2_CONV_LAZY_ARRAY_INDEX_INSIDE_CLAMP_ZERO_KERNEL3x3(float)
+BM_TENSOR_RANK2_CONV_LAZY_ARRAY_INDEX_INSIDE_CLAMP_ZERO_KERNEL3x3(double)
+BM_TENSOR_RANK2_CONV_LAZY_ARRAY_INDEX_INSIDE_CLAMP_ZERO_KERNEL3x3(point4f)
+BM_TENSOR_RANK2_CONV_LAZY_ARRAY_INDEX_INSIDE_CLAMP_ZERO_KERNEL3x3(hete_float32x4_t)

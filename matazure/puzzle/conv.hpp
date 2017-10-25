@@ -46,7 +46,7 @@ inline MATAZURE_GENERAL auto conv_lazy_array_index_unclamp(_TensorSrc ts_src, _T
 
 
 template <typename _TensorSrc, typename _TensorKernel>
-inline auto conv_lazy_array_index_inside_clamp(_TensorSrc ts_src, _TensorKernel ts_kernel) {
+inline auto conv_lazy_array_index_inside_clamp_zero(_TensorSrc ts_src, _TensorKernel ts_kernel) {
 	auto lts_conv_unclamp = conv_lazy_array_index_unclamp(ts_src, ts_kernel);
 	auto lts_conv_clamp = conv_lazy_array_index_unclamp(clamp_zero(ts_src), ts_kernel);
 

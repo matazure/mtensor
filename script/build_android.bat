@@ -11,13 +11,10 @@ if not exist %ANDROID_NDK% (
 )
 
 if NOT DEFINED ANDROID_ABI (
-  set ANDROID_ABI="armeabi-v7a with NEON"
+  rem set ANDROID_ABI="arm64-v8a"
   echo "Set ANDROID_ABI %ANDROID_ABI%"
 )
 
-if NOT DEFINED CMAKE_BUILD_TYPE (
-  set CMAKE_BUILD_TYPE=Release
-)
 
 if not exist build_android mkdir build_android
 cd build_android
@@ -27,10 +24,12 @@ cmake .. ^
     -DCMAKE_MAKE_PROGRAM="%ANDROID_NDK%/prebuilt/windows-x86_64/bin/make.exe" ^
     -DANDROID_NDK=%ANDROID_NDK% ^
     -DANDROID_ABI=%ANDROID_ABI% ^
-    -DANDROID_TOOLCHAIN=gcc ^
+    -DANDROID_ARM_NEON=true ^
+    -DANDROID_TOOLCHAIN=clang ^
     -DANDROID_NATIVE_API_LEVEL=21 ^
+    -DCMAKE_BUILD_TYPE=Release ^
     -G "Unix Makefiles" ^
     %* ^
     || exit /b
 
-cmake --build --config release . || exit /b
+cmake --build . || exit /b

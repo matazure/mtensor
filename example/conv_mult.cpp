@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
 	sature_cast_op pointf3_to_pointb3 = &unary::saturate_cast<byte, float, 3>;
 
 	{
-		auto lts_conv = puzzle::conv_lazy_array_index_inside_clamp(cast<pointf<3>>(ts_rgb), sts_kernel);
+		auto lts_conv = puzzle::conv_lazy_array_index_inside_clamp_zero(cast<pointf<3>>(ts_rgb), sts_kernel);
 	#ifdef MATAZURE_OPENMP
 		omp_policy policy{};
 	#else
@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
 	#endif
 		auto ts_conv = apply(lts_conv, pointf3_to_pointb3).persist(policy);
 
-		auto image_path = argc > 2 ? argv[2] : "conv_lazy_array_index_inside_clamp.png";
+		auto image_path = argc > 2 ? argv[2] : "conv_lazy_array_index_inside_clamp_zero.png";
 		write_rgb_png(image_path, ts_conv);
 	}
 
