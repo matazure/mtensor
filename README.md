@@ -1,14 +1,20 @@
 # [Tensor](https://github.com/Matazure/tensor) [![Build Status](https://travis-ci.org/Matazure/tensor.svg?branch=master)](https://travis-ci.org/Matazure/tensor)  [![AppVeyor](https://img.shields.io/appveyor/ci/zhangzhimin/tensor.svg)](https://ci.appveyor.com/project/zhangzhimin/tensor) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/Matazure/tensor/blob/master/LICENSE)
-Tensor是一个C++实现的异构计算库，基于for_index算法引擎和多维数组(tensor)来构建一个通用的异构计算库。目前支持C++和CUDA，即将对OpenCL和Metal进行验证。Tensor以最为优雅的设计来追求最为极致的性能。
+Tensor是一个C++实现的异构计算库，基于for_index算法引擎和多维数组(tensor)来构建一个通用的异构计算库。可广泛适用于图像处理，深度学习，数值计算等领域。 目前支持C++和CUDA，即将对OpenCL和Metal进行验证。Tensor以最为优雅的设计来追求最为极致的性能。
+
+## 为什么使用Tensor
+* 避免在算法实现的过程中花太多精力在坐标计算，元素遍历等繁琐处理上
+* Tensor拥有丰富的基础操作，并且会随着大家的参与越来越丰富
+* Tensor可以使延迟计算，向量化，并行等技术的完美配合，可以让代码保持优雅结构的同时，拥有极佳的性能
+* 异构编程的强有力支持，让你可以轻松使用GPU来运行算法，性能媲美原生异构语言。
 
 ## 特点
-* 统一的异构编程接口
+* 统一的跨平台异构编程接口
 * 泛型设计，元编程支持
 * 内存自动回收
 * 向量化操作
 * 延迟计算
 * Header only
-* 多平台支持
+
 
 ## 示例
 下面的程序用于rgb图像归一化和通道分离，可兼容CPU和GPU。
