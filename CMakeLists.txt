@@ -14,6 +14,13 @@ project(MatazureTensor CXX)
 
 set(CMAKE_CXX_STANDARD 14)
 
+find_package(OPENCL)
+if(OPENCL_FOUND)
+	option(WITH_OPENCL "With OpenCL" ON)
+else()
+	option(WITH_OPENCL "With OpenCL" OFF)
+endif()
+
 find_package(CUDA 9.0)
 if(CUDA_FOUND)
 	option(WITH_CUDA "With CUDA" ON)
