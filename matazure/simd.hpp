@@ -2,7 +2,7 @@
 
 #include <matazure/config.hpp>
 
-#if defined(__x86_64__) || defined(_M_X64) || defined(__amd64) && !defined(MATAZURE_DISABLE_SSE)
+#if (defined(__x86_64__) || defined(_M_X64) || defined(__amd64)) && !defined(MATAZURE_DISABLE_SSE)
 	#define MATAZURE_SSE
 #endif
 

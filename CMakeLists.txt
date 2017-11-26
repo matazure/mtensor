@@ -84,7 +84,7 @@ if (UNIX)
 endif()
 
 if (WITH_CUDA)
-	find_package(CUDA 8.0 REQUIRED)
+	find_package(CUDA 9.0 REQUIRED)
 
 	if(NOT(CMAKE_SIZEOF_VOID_P EQUAL 8))
 		message(FATAL_ERROR "Matazure Tensor with CUDA Only support 64 bit platform")
@@ -98,6 +98,9 @@ if (WITH_CUDA)
 	if (MSVC)
 		set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -Xcompiler \"/wd4819 /wd4503\" ")
 	endif()
+
+	#disable sse,because the cuda 9.0 bug with sse
+	add_definitions(-DMATAZURE_DISABLE_SSE)
 endif()
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
