@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <matazure/type_traits.hpp>
 
