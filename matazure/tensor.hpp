@@ -1,4 +1,4 @@
-﻿/**
+/**
 * Defines tensor classes of host end
 */
 
@@ -36,6 +36,21 @@ public:
 		for_each(shape_, [](int_t b){
 			if (b < 0) throw invalid_shape{};
 		});
+	}
+
+	first_major_layout(const first_major_layout &rhs) :
+		first_major_layout(rhs.shape())
+	{ }
+
+	first_major_layout & operator=(const first_major_layout &rhs) {
+		shape_ = rhs.shape();
+		stride_ = get_stride(shape_);
+
+		matazure::for_each(shape_, [](int_t b) {
+			if (b < 0) throw invalid_shape{};
+		});
+
+		return *this;
 	}
 
 	MATAZURE_GENERAL int_t index2offset(const pointi<rank> &id) const {
@@ -78,8 +93,8 @@ private:
 	}
 
 private:
-	const pointi<rank> shape_;
-	const pointi<rank> stride_;
+	pointi<rank> shape_;
+	pointi<rank> stride_;
 };
 
 template <int_t _Rank>
@@ -453,7 +468,7 @@ struct is_tensor<static_tensor<_ValueType, _Ext>> : bool_constant<true> {};
 template <typename _ValueType, int_t _Rank, typename _Layout = first_major_layout<_Rank>>
 class tensor : public tensor_expression<tensor<_ValueType, _Rank, _Layout>> {
 public:
-	static_assert(std::is_pod<_ValueType>::value, "only supports pod type now");
+	//static_assert(std::is_pod<_ValueType>::value, "only supports pod type now");
 	/// the rank of tensor
 	static const int_t						rank = _Rank;
 	/**
@@ -662,10 +677,10 @@ private:
 #endif
 
 public:
-	const pointi<rank>	extent_;
-	const layout_type		layout_;
-	const shared_ptr<value_type>	sp_data_;
-	value_type * const data_;
+	pointi<rank>	extent_;
+	layout_type		layout_;
+	shared_ptr<value_type>	sp_data_;
+	value_type * data_;
 };
 
 using column_major_layout = first_major_layout<2>;
@@ -675,9 +690,9 @@ using row_major_layout = last_major_layout<2>;
 template <typename _ValueType, typename _Layout = column_major_layout>
 using matrix = tensor<_ValueType, 2, _Layout>;
 
-/// alias of tensor <_ValueType, 1>
-template <typename _ValueType, typename _Layout = first_major_layout<1>>
-using vector = tensor<_ValueType, 1, _Layout>;
+///// alias of tensor <_ValueType, 1>
+//template <typename _ValueType, typename _Layout = first_major_layout<1>>
+//using vector = tensor<_ValueType, 1, _Layout>;
 
 /// alias of tensor<static_tensor<_ValueType, _BlockDim>, _BlockDim::size(), _Layout>
 template <typename _ValueType, typename _BlockDim, typename _Layout = first_major_layout<_BlockDim::size()>>

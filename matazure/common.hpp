@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <matazure/tensor.hpp>
 #include <matazure/algorithm.hpp>
@@ -502,11 +502,11 @@ inline auto slice(_Tensor ts, int_t positon_index)->decltype(make_lambda(interna
 }
 
 /// special for slice<rank-1>(tensor<_T, rank>, position_index), it produces a tensor<_T, rank-1>
-template <int_t _DimIdx, typename _T, int_t _Rank, typename _Layout>
-inline auto slice(tensor<_T, _Rank, _Layout> ts, int_t positon_index, enable_if_t<_DimIdx == _Rank-1>* = nullptr)->tensor<_T, _Rank-1, _Layout>{
-	const auto slice_ext = internal::slice_point<_DimIdx>(ts.shape());
+template <typename _T, int_t _Rank>
+inline auto dense_slice(tensor<_T, _Rank, first_major_layout<_Rank>> ts, int_t positon_index)->tensor<_T, _Rank-1, first_major_layout<_Rank-1>>{
+	const auto slice_ext = internal::slice_point<_Rank-1>(ts.shape());
 	auto slice_size = cumulative_prod(slice_ext)[_Rank-1];
-	tensor<_T, _Rank-1, _Layout> ts_re(slice_ext, shared_ptr<_T>(ts.shared_data().get() + positon_index * slice_size, [ts](_T *){ }));
+	tensor<_T, _Rank-1, first_major_layout<_Rank-1>> ts_re(slice_ext, shared_ptr<_T>(ts.shared_data().get() + positon_index * slice_size, [ts](_T *){ }));
 	return ts_re;
 }
 
