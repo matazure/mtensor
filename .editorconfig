@@ -6,7 +6,14 @@ insert_final_newline = true
 
 # Matches multiple files with brace expansion notation
 # Set default charset
-[{*.{c,cpp,hpp,h,cu,cl,metal,cmake}, CMakeLists.txt}]
+[*.{c,cpp,hpp,h,cu,cl,metal}]
+end_of_line = lf
+charset = utf-8-bom
+indent_style = tab
+indent_size = 4
+trim_trailing_whitespace = true
+
+[{{*.cmake}, CMakeLists.txt}]
 end_of_line = lf
 charset = utf-8-bom
 indent_style = tab
