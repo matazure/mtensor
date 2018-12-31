@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include <string>
 #include <fstream>
 #include <iostream>
 #include <matazure/type_traits.hpp>
@@ -17,7 +16,7 @@ namespace io {
 template <typename _T>
 void read_raw_data(std::istream &istr, _T &container) {
 	istr.exceptions(std::ifstream::failbit | std::ifstream::badbit | std::ifstream::eofbit);
-	istr.read(reinterpret_cast<char *>(container.data()), container.size() * sizeof(typename _T::value_type));
+	istr.read(reinterpret_cast<char *>(container.data()), container.size() * sizeof(decltype((*container.data()))));
 }
 
 /**
@@ -28,7 +27,7 @@ void read_raw_data(std::istream &istr, _T &container) {
 template <typename _T>
 void write_raw_data(std::ostream &ostr, const _T &container) {
 	ostr.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-	ostr.write(reinterpret_cast<const char *>(container.data()), container.size() * sizeof(typename _T::value_type));
+	ostr.write(reinterpret_cast<const char *>(container.data()), container.size() * sizeof(decltype((*container.data()))));
 }
 
 /**

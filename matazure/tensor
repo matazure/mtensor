@@ -2,12 +2,24 @@
 
 #include <matazure/io.hpp>
 #include <matazure/unary.hpp>
-#include <matazure/operation.hpp>
+#include <matazure/binary_operator.hpp>
 #include <matazure/meta.hpp>
+#include <matazure/dynamic_tensor.hpp>
+#include <matazure/iterator.hpp>
 
-#include <matazure/numeric/prod.hpp>
+#include <matazure/complex.hpp>
+
+#include <matazure/puzzle/prod.hpp>
+#include <matazure/puzzle/conv.hpp>
+#include <matazure/puzzle/transpose.hpp>
 
 #ifdef MATAZURE_CUDA
-#include <matazure/cuda/numeric/prod.hpp>
-#include <matazure/cuda/puzzle/conv.hpp>
+    #include <matazure/puzzle/cuda/prod.hpp>
+    #include <matazure/puzzle/cuda/conv.hpp>
+#endif
+
+#include <matazure/simd.hpp>
+
+#ifdef CEREAL_CEREAL_HPP
+    #include <matazure/external/cereal_serialize.hpp>
 #endif

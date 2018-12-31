@@ -1,18 +1,23 @@
 ﻿#include <matazure/tensor>
+#include <image_utility.hpp>
 
 using namespace matazure;
 
-#ifdef MATAZURE_CUDA
-#define WITH_CUDA
+#ifdef USE_CUDA
+#ifndef MATAZURE_CUDA
+#error "does not support cuda"
+#endif
 #endif
 
 #ifdef _OPENMP
-#define WITH_OPENMP
+#define USE_OPENMP
 #endif
 
 typedef point<byte, 3> rgb;
 
-int main() {
+int main(int argc, char *argv[]) {
+	auto output_mandelbrot_path = argc > 1 ? argv[1] : "mandelbrot.png";
+
 	//设置最大迭代次数， 超过max_iteration认为不收敛
 	int_t max_iteration = 256 * 16;
 	//颜色映射函数
@@ -43,20 +48,20 @@ int main() {
 		return color_fun(i);
 	};
 
-#ifdef WITH_CUDA
-	//通过shape和mandelbrot_fun构造lambda tensor并直接把结果固化的内存（显存）里
-	auto cts_mandelbrot_rgb = make_lambda(shape, mandelbrot_fun, device_t{}).persist();
-	auto ts_mandelbrot_rgb = mem_clone(cts_mandelbrot_rgb, host_t{});
+#ifdef USE_CUDA
+	//通过shape和mandelbrot_fun构造lambda tensor
+	auto cts_mandelbrot_rgb = make_lambda(shape, mandelbrot_fun, device_tag{}).persist();
+	auto ts_mandelbrot_rgb = mem_clone(cts_mandelbrot_rgb, host_tag{});
 #else
-#ifdef WITH_OPENMP
+#ifdef USE_OPENMP
 	//使用omp_policy并行策略
-	auto ts_mandelbrot_rgb = make_lambda(shape, mandelbrot_fun, host_t{}).persist(omp_policy{});
+	auto ts_mandelbrot_rgb = make_lambda(shape, mandelbrot_fun, host_tag{}).persist(omp_policy{});
 #else
-	auto ts_mandelbrot_rgb = make_lambda(shape, mandelbrot_fun, host_t{}).persist();
+	auto ts_mandelbrot_rgb = make_lambda(shape, mandelbrot_fun, host_tag{}).persist();
 #endif
 #endif
-	//将结果写入raw数据了，可以使用ImageMagick等工具查看
-	io::write_raw_data("data/mandelbrot_rgb888_2048x2048.raw_data", ts_mandelbrot_rgb);
+
+	write_rgb_png(output_mandelbrot_path, ts_mandelbrot_rgb);
 
 	return 0;
 }

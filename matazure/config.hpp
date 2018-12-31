@@ -8,6 +8,33 @@
 #include <limits>
 #include <memory>
 #include <tuple>
+#include <string>
+#include <algorithm>
+
+//for cuda
+#if defined(__CUDACC__) && !defined(MATAZURE_DISABLE_CUDA)
+	#if __CUDACC_VER_MAJOR__ < 9
+		#error CUDA minimum version is 9.0
+	#endif
+
+	#define MATAZURE_CUDA
+#endif
+#ifdef MATAZURE_CUDA
+	#define MATAZURE_GENERAL __host__ __device__
+	#define MATAZURE_DEVICE __device__
+	#define MATAZURE_GLOBAL __global__
+	#define __matazure__ MATAZURE_GENERAL
+#else
+	#define MATAZURE_DEVICE
+	#define MATAZURE_GENERAL
+	#define MATAZURE_GLOBAL
+	#define __matazure__
+#endif
+
+#ifdef _OPENMP
+	#define MATAZURE_OPENMP
+#endif
+
 
 //for using
 namespace matazure {
@@ -24,6 +51,7 @@ typedef unsigned char byte;
 using std::decay;
 using std::remove_const;
 using std::remove_reference;
+using std::remove_cv;
 using std::remove_all_extents;
 using std::forward;
 
@@ -40,6 +68,8 @@ using std::tuple_size;
 using std::tuple_element;
 using std::tie;
 using std::get;
+
+using std::string;
 
 template<bool _Val>
 using bool_constant = integral_constant<bool, _Val>;
@@ -58,6 +88,9 @@ using conditional_t = typename conditional<_Test, _Ty1, _Ty2>::type;
 
 template<typename _Ty>
 using remove_const_t = typename remove_const<_Ty>::type;
+
+template <typename _Ty>
+using remove_cv_t = typename remove_cv<_Ty>::type;
 
 struct blank_t {};
 
@@ -90,7 +123,7 @@ struct blank_t {};
 
 #if defined(MATAZURE_DISABLE_ASSERTS)
 
-#define MATAZURE_ASSERT(expr) ((void)0)
+#define MATAZURE_ASSERT(expr, msg) ((void)0)
 
 #else
 
@@ -113,30 +146,5 @@ inline void assertion_failed(char const * expr, char const * msg, char const * f
 }
 
 #define MATAZURE_ASSERT(expr, msg) (MATAZURE_LIKELY(!!(expr))? ((void)0): ::matazure::assertion_failed(#expr, msg, MATAZURE_CURRENT_FUNCTION, __FILE__, __LINE__))
-
-#endif
-
-//for cuda
-#ifdef __CUDACC__
-
-#define MATAZURE_CUDA
-
-#endif
-
-#ifdef MATAZURE_CUDA
-
-#define MATAZURE_GENERAL __host__ __device__
-#define MATAZURE_DEVICE __device__
-#define MATAZURE_GLOBAL __global__
-
-#define __matazure__ MATAZURE_GENERAL
-
-#else
-
-#define MATAZURE_DEVICE
-#define MATAZURE_GENERAL
-#define MATAZURE_GLOBAL
-
-#define __matazure__
 
 #endif

@@ -1,6 +1,24 @@
-[submodule "benchmark/vendors/benchmark"]
-	path = benchmark/vendors/benchmark
-	url = https://github.com/google/benchmark.git
-[submodule "test/vendors/googletest"]
-	path = test/vendors/googletest
-	url = git@github.com:google/googletest.git
+[submodule "benchmark/vendor/benchmark"]
+	path = benchmark/vendor/benchmark
+	url = https://github.com/Matazure/benchmark.git
+	shallow = true
+[submodule "test/vendor/googletest"]
+	path = test/vendor/googletest
+	url = https://github.com/Matazure/googletest.git
+	shallow = true
+[submodule "vendor/android-cmake"]
+	path = cmake/android-cmake
+	url = https://github.com/Matazure/android-cmake.git
+	shallow = true
+[submodule "benchmark/vendor/eigen"]
+	path = benchmark/vendor/eigen
+	url = https://github.com/Matazure/eigen.git
+	shallow = true
+[submodule "example/vendor/stb"]
+	path = example/vendor/stb
+	url = https://github.com/Matazure/stb.git
+	shallow = true
+[submodule "dependency/cereal"]
+	path = dependency/cereal
+	url = https://github.com/USCiLab/cereal.git
+	shallow = true
