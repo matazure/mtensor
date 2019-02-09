@@ -1,4 +1,4 @@
-﻿#include <benchmark/benchmark.h>
+#include <benchmark/benchmark.h>
 #include <bm_config.hpp>
 #include <matazure/tensor>
 
@@ -1112,7 +1112,8 @@ void bm_conv_lazy_array_index_unclamp_3x3(benchmark::State &state){
 	fill(ext, state.range(0));
 	tensor<_ValueType, 2> ts_input(ext);
 	tensor<_ValueType, 2> ts_output(ts_input.shape() - pointi<2>::all(2));
-	static_tensor<_ValueType, dim<3,3>> kenel;
+	static_tensor<_ValueType, dim<3, 3>> kenel;
+	fill(kenel, zero<_ValueType>::value());
 
 	while (state.KeepRunning()){
 		auto ts_tmp = section(puzzle::conv_lazy_array_index_unclamp(ts_input, kenel), pointi<2>::all(1), ts_input.shape() - pointi<2>::all(2));
@@ -1146,6 +1147,7 @@ void conv_lazy_array_index_inside_clamp_zero(benchmark::State &state){
 	tensor<_ValueType, 2> ts_input(ext);
 	tensor<_ValueType, 2> ts_output(ts_input.shape());
 	static_tensor<_ValueType, dim<3,3>> kenel;
+	fill(kenel, zero<_ValueType>::value());
 
 	while (state.KeepRunning()){
 		copy(puzzle::conv_lazy_array_index_inside_clamp_zero(ts_input, kenel), ts_output);

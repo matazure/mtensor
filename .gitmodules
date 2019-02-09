@@ -10,10 +10,6 @@
 	path = cmake/android-cmake
 	url = https://github.com/Matazure/android-cmake.git
 	shallow = true
-[submodule "benchmark/vendor/eigen"]
-	path = benchmark/vendor/eigen
-	url = https://github.com/Matazure/eigen.git
-	shallow = true
 [submodule "example/vendor/stb"]
 	path = example/vendor/stb
 	url = https://github.com/Matazure/stb.git

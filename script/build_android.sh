@@ -1,7 +1,5 @@
 #!/bin/bash
 
-git submodule update --init cmake/android-cmake
-
 if [ -z "$ANDROID_NDK" ]; then
     echo "Did you set ANDROID_NDK variable?"
     exit 1
@@ -23,7 +21,7 @@ mkdir -p build_android
 cd build_android
 
 cmake .. \
-    -DCMAKE_TOOLCHAIN_FILE=../cmake/android-cmake/android.toolchain.cmake \
+    -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake \
     -DANDROID_NDK=$ANDROID_NDK \
     -DANDROID_ABI="$ANDROID_ABI" \
     -DCMAKE_BUILD_TYPE=Release \

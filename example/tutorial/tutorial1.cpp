@@ -1,4 +1,4 @@
-﻿#include <matazure/tensor>
+#include <matazure/tensor>
 
 using namespace matazure;
 
@@ -8,6 +8,7 @@ int main() {
 	point<int, 2> vec2b;
 	point<float, 3> vec3f;
 	point<point<double, 2>, 4> vec4vec2d;
+	(&vec4vec2d); //disable unused warning
 
 	static_assert(vec1b.size() == 1, "");
 	static_assert(vec2b.size() == 2, "");

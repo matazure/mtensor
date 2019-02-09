@@ -8,14 +8,14 @@ insert_final_newline = true
 # Set default charset
 [*.{c,cpp,hpp,h,cu,cl,metal}]
 end_of_line = lf
-charset = utf-8-bom
+charset = utf-8
 indent_style = tab
 indent_size = 4
 trim_trailing_whitespace = true
 
 [{{*.cmake}, CMakeLists.txt}]
 end_of_line = lf
-charset = utf-8-bom
+charset = utf-8
 indent_style = tab
 indent_size = 4
 trim_trailing_whitespace = true

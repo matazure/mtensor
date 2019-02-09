@@ -21,7 +21,7 @@ if (WITH_OPENCL)
     find_package(OPENCL REQUIRED)
 endif()
 
-option(WITH_CUDA "With CUDA" ON)
+option(WITH_CUDA "With CUDA" OFF)
 if(WITH_CUDA)
     find_package(CUDA REQUIRED)
 endif()
@@ -55,6 +55,9 @@ set_property( GLOBAL PROPERTY USE_FOLDERS ON)
 
 set(BUILD_SHARED_LIBS OFF)
 if (MSVC)
+	add_definitions(-D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
+	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /bigobj")
 
 	foreach (flag_var
@@ -110,5 +113,3 @@ endif()
 if (BUILD_TEST)
 	add_subdirectory(test)
 endif()
-
-
