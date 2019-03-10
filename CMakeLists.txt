@@ -94,9 +94,13 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-execute_process(COMMAND git submodule update --init . WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+execute_process(COMMAND git submodule update --init third_party WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/googletest)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/googletest/include)
+
+set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Build gtest's sample programs." FORCE)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/third_party/benchmark)
 
 add_subdirectory(matazure)
 
