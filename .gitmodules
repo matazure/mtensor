@@ -1,5 +1,5 @@
 [submodule "benchmark/vendor/benchmark"]
-	path = benchmark/vendor/benchmark
+	path = third_party/benchmark
 	url = https://github.com/Matazure/benchmark.git
 	shallow = true
 [submodule "test/vendor/googletest"]

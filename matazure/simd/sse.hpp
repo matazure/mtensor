@@ -10,7 +10,7 @@ namespace matazure { namespace simd {
 	class sse_wrapper;
 
 	template <typename _ValueType, int_t _Rank>
-	class __declspec(intrin_type) __declspec(align(16)) sse_wrapper<point<_ValueType, _Rank>> : public point<_ValueType, _Rank> {
+	class alignas(16) sse_wrapper<point<_ValueType, _Rank>> : public point<_ValueType, _Rank> {
 	public:
 		//_ElementType is not supported
 		static_assert(sizeof(_ValueType) * _Rank * 8 == 128, "");

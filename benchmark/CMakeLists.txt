@@ -1,11 +1,5 @@
-execute_process(COMMAND git submodule update --init . WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-
-set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Build gtest's sample programs." FORCE)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/vendor/benchmark)
-set_property(TARGET benchmark PROPERTY FOLDER "vendor")
-
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/vendor/benchmark/include)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/vendor/eigen)
+# include_directories(${CMAKE_CURRENT_SOURCE_DIR}/vendor/benchmark/include)
+# include_directories(${CMAKE_CURRENT_SOURCE_DIR}/vendor/eigen)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 file(GLOB Files ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
