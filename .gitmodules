@@ -3,7 +3,7 @@
 	url = https://github.com/Matazure/benchmark.git
 	shallow = true
 [submodule "test/vendor/googletest"]
-	path = test/vendor/googletest
+	path = third_party/googletest
 	url = https://github.com/Matazure/googletest.git
 	shallow = true
 [submodule "example/vendor/stb"]
