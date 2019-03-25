@@ -9,7 +9,7 @@ pipeline{
 			steps {
 				sh 'python --version'
 				sh 'echo "Hello world"'
-				sh 'zzm testfdasf2'
+				sh 'zzm testfdasf3'
 			}
 		}
 		stage('test') {
