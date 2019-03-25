@@ -1,5 +1,5 @@
 pipeline{
-	agent { docker { image 'python:3.5.1'  }  }
+	agent { docker { image 'gcc:6.5'  }  }
 	environment {
 		DISABLE_AUTH = 'true'
 		DB_ENGINE    = 'sqlite'
@@ -7,9 +7,11 @@ pipeline{
 	stages {
 		stage('build') {
 			steps {
-				sh 'python --version'
+				// sh 'python --version'
 				sh 'echo "Hello world"'
 				sh 'echo testfdasf3'
+				sh 'pwd'
+				sh './script/build.sh'
 			}
 		}
 		stage('test') {
@@ -22,13 +24,6 @@ pipeline{
 				echo 'Deploying'
 			}
 		}	
-		stage('buildsdf') {
-			agent { docker { image 'gcc:6.5' } }
-			steps {
-				sh 'pwd'
-				sh './script/build.sh'
-			}
-		}
 	}
 	post {
 		always {
