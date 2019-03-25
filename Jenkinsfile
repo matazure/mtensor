@@ -21,9 +21,9 @@ pipeline{
 			steps {
 				echo 'Deploying'
 			}
-		}
-		agent { docker { image 'gcc:6.5' } }
-		stage('build') {
+		}	
+		stage('buildsdf') {
+			agent { docker { image 'gcc:6.5' } }
 			steps {
 				sh 'pwd'
 				sh './script/build.sh'
