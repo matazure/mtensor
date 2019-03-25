@@ -22,6 +22,13 @@ pipeline{
 				echo 'Deploying'
 			}
 		}
+		agent { docker { image 'gcc:6.5' } }
+		stage('build') {
+			steps {
+				sh 'pwd'
+				sh './script/build.sh'
+			}
+		}
 	}
 	post {
 		always {
