@@ -1,30 +1,32 @@
 pipeline{
 	agent none
 	stages {
-		parallel {
-			stage('linux') {
-				stages {
-					stage('x86_64'){
-						agent { 
-							docker { 
-								image 'matazure/ci4tensor:gcc-ubuntu18.04'  }
-					 	}
-						environment {
-							CXX = 'g++'
-							CC = 'gcc'
-						}
-						steps {
-							sh './script/build.sh'
+		stage{
+			parallel {
+				stage('linux') {
+					stages {
+						stage('x86_64'){
+							agent { 
+								docker { 
+									image 'matazure/ci4tensor:gcc-ubuntu18.04'  }
+					 		}
+							environment {
+								CXX = 'g++'
+								CC = 'gcc'
+							}
+							steps {
+								sh './script/build.sh'
+							}
 						}
 					}
 				}
-			}
-			stage('windows') {
-				agent {
-					label 'win10-x64'
-				}
-				steps {
-					bat 'echo zzm'
+				stage('windows') {
+					agent {
+						label 'win10-x64'
+					}
+					steps {
+						bat 'echo zzm'
+					}
 				}
 			}
 		}
