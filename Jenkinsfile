@@ -1,10 +1,13 @@
 pipeline{
-
+	agent {}
 	stages {
 		stage('linux') {
 			stages {
-				stage('x86-64'){
-					agent { docker { image 'matazure/ci4tensor:gcc-ubuntu18.04'  }  }
+				stage('x86_64'){
+					agent { 
+						docker { 
+							image 'matazure/ci4tensor:gcc-ubuntu18.04'  }
+					 }
 					environment {
 						CXX = 'g++'
 						CC = 'gcc'
@@ -16,6 +19,9 @@ pipeline{
 			}
 		}
 		stage('windows') {
+			agent {
+				label 'win10-x64'
+			}
 			steps {
 				bat 'echo zzm'
 			}
