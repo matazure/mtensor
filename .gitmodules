@@ -6,10 +6,6 @@
 	path = third_party/googletest
 	url = https://github.com/Matazure/googletest.git
 	shallow = true
-[submodule "vendor/android-cmake"]
-	path = cmake/android-cmake
-	url = https://github.com/Matazure/android-cmake.git
-	shallow = true
 [submodule "example/vendor/stb"]
 	path = example/vendor/stb
 	url = https://github.com/Matazure/stb.git
