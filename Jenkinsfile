@@ -31,10 +31,10 @@ pipeline{
 				stage('android') {
 					agent {
 						docker {
-							image 'matazure/ci4tensor:ndk-r14b'
+							image 'matazure/ci4tensor:android-ndk-r14b'
 						}
 					}
-					parallel {
+					stages {
 						stage('armv7') {
 							stages {
 								stage('build') {
