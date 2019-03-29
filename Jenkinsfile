@@ -6,8 +6,8 @@ pipeline{
 				stage('x86-64'){
 					agent { docker { image 'matazure/ci4tensor:gcc-ubuntu18.04'  }  }
 					environment {
-						CXX = g++
-						CC = gcc
+						CXX = 'g++'
+						CC = 'gcc'
 					}
 					steps {
 						sh './script/build.sh'
