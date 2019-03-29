@@ -13,7 +13,7 @@ else
 fi
 
 if [ -z "$ANDROID_ABI" ]; then
-    export ANDROID_ABI="armeabi-v7a with NEON"
+    export ANDROID_ABI="armeabi-v7a"
     echo "Set ANDROID_ABI $ANDROID_ABI"
 fi
 
@@ -25,7 +25,7 @@ cmake .. \
     -DANDROID_NDK=$ANDROID_NDK \
     -DANDROID_ABI="$ANDROID_ABI" \
     -DANDROID_TOOLCHAIN=clang \
-    -DANDROID_STL=c++_statics \
+    -DANDROID_STL=c++_static \
     -DCMAKE_BUILD_TYPE=Release \
     -DANDROID_NATIVE_API_LEVEL=21 \
     -DBUILD_TEST=ON \
