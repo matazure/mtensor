@@ -1,5 +1,5 @@
 pipeline{
-	agent { docker { image 'gcc:6.5'  }  }
+	agent { docker { image 'matazure/ci4tensor:gcc-ubuntu18.04'  }  }
 	environment {
 		DISABLE_AUTH = 'true'
 		DB_ENGINE    = 'sqlite'
