@@ -16,7 +16,9 @@ pipeline{
 			}
 		}
 		stage('windows') {
-			
+			steps {
+				bat 'echo zzm'
+			}
 		}
 	}
 	post {
