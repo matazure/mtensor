@@ -5,7 +5,7 @@ pipeline{
 			parallel {
 				stage('linux') {
 					stages {
-						stage('x86_64'){
+						stage('x86_64') {
 							agent { 
 								docker { 
 									image 'matazure/ci4tensor:gcc-ubuntu18.04'  }
@@ -26,6 +26,29 @@ pipeline{
 					}
 					steps {
 						bat 'call ./script/build_win.bat'
+					}
+				}
+				stage('android') {
+					agent {
+						docker {
+							image 'matazure/ci4tensor:ndk-r14b'
+						}
+					}
+					parallel {
+						stage('armv7') {
+							stages {
+								stage('build') {
+									steps {
+										sh './script/build_android.sh'
+									}
+								}
+								stage('test') {
+									steps {
+										sh 'echo armv7-test'
+									}
+								}
+							}
+						}
 					}
 				}
 			}
