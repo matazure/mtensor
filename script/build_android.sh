@@ -24,6 +24,8 @@ cmake .. \
     -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake \
     -DANDROID_NDK=$ANDROID_NDK \
     -DANDROID_ABI="$ANDROID_ABI" \
+    -DANDROID_TOOLCHAIN=clang \
+    -DANDROID_STL=c++_statics \
     -DCMAKE_BUILD_TYPE=Release \
     -DANDROID_NATIVE_API_LEVEL=21 \
     -DBUILD_TEST=ON \
