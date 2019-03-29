@@ -25,7 +25,7 @@ pipeline{
 						label 'win10-x64'
 					}
 					steps {
-						bat 'echo zzm'
+						bat 'call ./script/build_win.bat'
 					}
 				}
 			}
