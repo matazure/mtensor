@@ -31,7 +31,7 @@ pipeline{
 				stage('android') {
 					agent {
 						docker {
-							image 'matazure/ci4tensor:android-ndk-r14b'
+							image 'matazure/ci4tensor:android-ndk-r16b'
 						}
 					}
 					stages {
