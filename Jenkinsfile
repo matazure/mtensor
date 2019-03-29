@@ -1,6 +1,6 @@
 pipeline{
 	agent none
-	stages {
+	parallel  {
 		stage('linux') {
 			stages {
 				stage('x86_64'){
