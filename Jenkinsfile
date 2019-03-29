@@ -1,29 +1,23 @@
 pipeline{
-	agent { docker { image 'matazure/ci4tensor:gcc-ubuntu18.04'  }  }
-	environment {
-		DISABLE_AUTH = 'true'
-		DB_ENGINE    = 'sqlite'
- 	}
+
 	stages {
-		stage('build') {
-			steps {
-				// sh 'python --version'
-				sh 'echo "Hello world"'
-				sh 'echo testfdasf3'
-				sh 'pwd'
-				sh './script/build.sh'
+		stage('linux') {
+			stages {
+				stage('x86-64'){
+					agent { docker { image 'matazure/ci4tensor:gcc-ubuntu18.04'  }  }
+					environment {
+						CXX = g++
+						CC = gcc
+					}
+					steps {
+						sh './script/build.sh'
+					}
+				}
 			}
 		}
-		stage('test') {
-			steps {
-				sh 'echo "zzm test"'
-			}
+		stage('windows') {
+			
 		}
-		stage('Deploy') {
-			steps {
-				echo 'Deploying'
-			}
-		}	
 	}
 	post {
 		always {
