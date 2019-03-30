@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <malloc.h>
 #include <matazure/meta.hpp>
 #include <matazure/type_traits.hpp>
 #include <matazure/algorithm.hpp>
@@ -708,20 +707,6 @@ using block_tensor = tensor<static_tensor<_ValueType, _BlockDim>, _BlockDim::siz
 template <typename _Type, int_t _Rank, typename _Layout = first_major_layout<_Rank>>
 auto make_tensor(pointi<_Rank> ext, _Type *p_data)->tensor<_Type, _Rank, _Layout>{
 	std::shared_ptr<_Type> sp_data(p_data, [](_Type *p){});
-	return tensor<_Type, _Rank, _Layout>(ext, sp_data);
-}
-
-template <typename _Type, int_t _Rank, typename _Layout = first_major_layout<_Rank>>
-auto make_tensor(pointi<_Rank> ext, _Type t, aligned, size_t alignment=16)->tensor<_Type, _Rank, _Layout>{
-	_Layout layout(ext);
-	auto ele_size = layout.stride()[_Rank - 1];
-#ifdef __linux__
-	auto p_aligned = memalign(alignment, ele_size * sizeof(_Type));
-	std::shared_ptr<_Type> sp_data((_Type *)p_aligned, [](_Type *p) { free(p); });
-#else
-	auto p_aligned = _aligned_malloc(ele_size * sizeof(_Type), alignment);
-	std::shared_ptr<_Type> sp_data((_Type *)p_aligned, [](_Type *p) { _aligned_free(p); });
-#endif
 	return tensor<_Type, _Rank, _Layout>(ext, sp_data);
 }
 

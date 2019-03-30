@@ -50,7 +50,6 @@ TYPED_TEST(TensorTest, TestConstruct){
 	{
 		pointi<TypeParam::rank> ext{};
 		fill(ext, 100);
-		auto ts = make_tensor(ext, typename TypeParam::value_type(0.0f),aligned{}, 16);
 	}
 }
 
