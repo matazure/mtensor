@@ -3,6 +3,7 @@ pipeline{
 	stages {
 		stage('ci'){
 			parallel {
+				
 				stage('linux') {
 					stages {
 						stage('x86_64') {
@@ -20,6 +21,7 @@ pipeline{
 						}
 					}
 				}
+				
 				stage('windows') {
 					agent {
 						label 'win10-x64'
@@ -28,6 +30,7 @@ pipeline{
 						bat 'call ./script/build_win.bat'
 					}
 				}
+				
 				stage('android') {
 					agent {
 						docker {
@@ -49,6 +52,15 @@ pipeline{
 								}
 							}
 						}
+					}
+				}
+				
+				stage('macos') {
+					agent {
+						label 'macos-x64'
+					}
+					steps {
+						sh './script/build.sh'
 					}
 				}
 			}
