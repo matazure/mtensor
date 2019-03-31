@@ -7,7 +7,8 @@ pipeline{
 				stage('linux-x64') {
 					agent { 
 						docker { 
-							image 'matazure/ci4tensor:gcc-ubuntu18.04'  }
+							image 'matazure/ci4tensor:gcc-ubuntu18.04'  
+						}
 					}
 					environment {
 						CXX = 'g++'
@@ -17,6 +18,32 @@ pipeline{
 						stage('build') {
 							steps {
 								sh './script/build.sh'
+							}
+						}
+					}
+				}
+				
+				stage('linux-x64-cuda') {
+					agent {
+						docker {
+							image 'matazure/ci4tensor:cuda10.1-ubuntu16.04'
+							args '--runtime=nvidia'
+						}
+					}
+					environment {
+						CXX = 'g++'
+						CC = 'gcc'
+						CUDACXX = 'nvcc'
+					}
+					stages {
+						stage('build') {
+							steps {
+								sh './script/build.sh -DWITH_CUDA=ON'
+							}
+						}
+						stage('test') {
+							steps {
+								sh 'echo hicudatest'
 							}
 						}
 					}
