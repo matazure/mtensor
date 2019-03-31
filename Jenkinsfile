@@ -26,7 +26,7 @@ pipeline{
 				stage('linux-x64-cuda') {
 					agent {
 						docker {
-							image 'matazure/ci4tensor:cuda10.1-ubuntu16.04'
+							image 'matazure/ci4tensor:cuda10.1-ubuntu18.04'
 							args '--runtime=nvidia'
 						}
 					}
