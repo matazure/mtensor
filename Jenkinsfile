@@ -38,10 +38,7 @@ pipeline{
 					stages {
 						stage('build') {
 							steps {
-								sh 'mkdir build && cd build'
-								sh 'cmake .. -DCMAKE_BUILD_TYPE=Release -DWITH_CUDA=ON'
-								sh 'make'
-								sh 'cd ..'
+								sh 'mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=Release -DWITH_CUDA=ON && cmake --build .'
 							}
 						}
 						stage('test') {
