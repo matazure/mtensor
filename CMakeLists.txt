@@ -66,8 +66,11 @@ if (MSVC)
 endif()
 
 if (UNIX)
-    add_definitions("-x c++")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.2")
+	add_definitions("-x c++")
+endif()
+
+if (WITH_SSE)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.2")
 endif()
 
 if (WITH_CUDA)
