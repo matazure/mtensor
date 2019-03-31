@@ -44,7 +44,6 @@ build_win
 build_bash
 build_icc
 build_android_icc
-build_*
 tmp
 
 bin
