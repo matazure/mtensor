@@ -61,10 +61,10 @@ pipeline{
 							}
 						}
 						stage('RPi3b+') {
+							agent {
+								lable 'rpi-armv7'
+							}
 							stages {
-								agent {
-									lable 'rpi-armv7'
-								}
 								stage ('test'){
 									steps {
 										sh 'echo test'
