@@ -87,7 +87,7 @@ pipeline{
 					stages {
 						stage('build'){
 							steps {
-								bat 'call ./script/build_win.bat'
+								bat 'call ./script/build_windows.bat'
 							}
 						}
 					}

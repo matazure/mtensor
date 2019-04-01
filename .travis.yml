@@ -31,7 +31,7 @@ before_install:
   # - export ANDROID_NDK_HOME="$ANDROID_NDK_HOME"
   # - export PATH=$PATH:${ANDROID_NDK_HOME}
 script:
-  - chmod +x ./script/build.sh
-  - ./script/build.sh -DWITH_CUDA=OFF  
+  - chmod +x ./script/build_native.sh
+  - ./script/build_native.sh -DWITH_CUDA=OFF  
   #- chmod +x ./script/build_android.sh
   #- ./script/build_android.sh -DWITH_CUDA=OFF -DBUILD_TEST=ON -DBUILD_BENCHMARK=ON

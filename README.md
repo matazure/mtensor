@@ -84,8 +84,8 @@ Tensor的代码规范遵循C++14标准， 所以只需编译器支持C++14即可
 
 ## 编译项目
 需先安装[git](https://git-scm.com/)和[CMake](https://cmake.org/)及相应的编译工具，然后运行script下对应的编译脚本即可。  
-* build_win.bat编译windows版本
-* build.sh编译unix版本(linux及mac)
+* build_windows.bat编译windows版本
+* build_native.sh编译unix版本(linux及mac)
 * build_android.bat可以在windows主机编译android版本，需要cmake-3.6.3或者android studio自带的cmake
 * build_android.sh可以在linux主机编译android版本。
 
