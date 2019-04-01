@@ -53,11 +53,11 @@ pipeline{
 						stage('cross-build') {
 							agent {
 								docker {
-									image 'matazure/ci4tensor:linaro-armv7'
+									image 'matazure/ci4tensor:gcc-linaro-7.4.1-2019.02-x86_64_arm-linux-gnueabihf'
 								}
 							}
 							steps {
-								sh './script/build_android.sh'
+								sh 'echo armv7 build'
 							}
 						}
 						stage('RPi3b+') {
