@@ -56,8 +56,11 @@ pipeline{
 									image 'matazure/ci4tensor:gcc-linaro-7.4.1-2019.02-x86_64_arm-linux-gnueabihf'
 								}
 							}
+							environment {
+								GCC_LINARO_TOOLCHAIN = '"/gcc-linaro-7.4.1-2019.02-x86_64_arm-linux-gnueabihf"'
+							}
 							steps {
-								sh 'echo armv7 build'
+								sh './script/build-linux-arm.sh'
 							}
 						}
 						stage('RPi3b+') {
@@ -67,7 +70,7 @@ pipeline{
 							stages {
 								stage ('test'){
 									steps {
-										sh 'echo test'
+										sh 'uname -a'
 									}
 								}
 								stage ('benchmark'){
