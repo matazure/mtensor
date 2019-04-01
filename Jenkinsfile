@@ -1,7 +1,7 @@
 pipeline{
 	agent none
 	stages {
-		stage('Matazure Tensor CI'){
+		stage('TENSOR CI'){
 			parallel {
 				
 				stage('linux-x64') {
@@ -66,6 +66,41 @@ pipeline{
 						stage('RPi3b+') {
 							agent {
 								label 'RPi3-armv7'
+							}
+							stages {
+								stage ('test'){
+									steps {
+										sh 'uname -a'
+									}
+								}
+								stage ('benchmark'){
+									steps {
+										sh 'echo benchmark'
+									}
+								}
+							}
+						}
+					}
+				}
+				
+				stage('rk3399-linux-aarch64') {
+					stages {	
+						stage('cross-build') {
+							agent {
+								docker {
+									image 'matazure/ci4tensor:gcc-linaro-7.4.1-2019.02-x86_64_aarch64-linux-gnu'
+								}
+							}
+							environment {
+								GCC_LINARO_TOOLCHAIN = '/gcc-linaro-7.4.1-2019.02-x86_64_aarch64-linux-gnu'
+							}
+							steps {
+								sh './script/build-linux-aarch64.sh'
+							}
+						}
+						stage('jeston-nano') {
+							agent {
+								label 'Nano-arch64'
 							}
 							stages {
 								stage ('test'){
