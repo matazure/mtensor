@@ -41,7 +41,7 @@ configuration:
 install:
 
 build_script:
-  - ./script/build_win.bat -DWITH_CUDA=OFF -DBUILD_BENCHMARK=ON -DBUILD_TEST=ON
+  - ./script/build_windows.bat -DWITH_CUDA=OFF -DBUILD_BENCHMARK=ON -DBUILD_TEST=ON
 
 # test_script:
 #   - cd build_win
