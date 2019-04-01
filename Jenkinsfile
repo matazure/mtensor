@@ -50,7 +50,7 @@ pipeline{
 				
 				stage('android-armv7') {
 					stages {	
-						stage('build') {
+						stage('cross-build') {
 							agent {
 								docker {
 									image 'matazure/ci4tensor:linaro-armv7'
@@ -60,7 +60,7 @@ pipeline{
 								sh './script/build_android.sh'
 							}
 						}
-						stage {
+						stage('RPi3b+') {
 							stages {
 								agent {
 									lable 'rpi-armv7'
