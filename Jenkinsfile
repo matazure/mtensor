@@ -31,9 +31,8 @@ pipeline{
 						}
 					}
 					environment {
-						CXX = 'g++'
-						CC = 'gcc'
-						CUDACXX = 'nvcc'
+						CXX = 'g++-6'
+						CC = 'gcc-6'
 					}
 					stages {
 						stage('build') {
@@ -44,6 +43,38 @@ pipeline{
 						stage('test') {
 							steps {
 								sh 'echo hicudatest'
+							}
+						}
+					}
+				}
+				
+				stage('android-armv7') {
+					stages {	
+						stage('build') {
+							agent {
+								docker {
+									image 'matazure/ci4tensor:linaro-armv7'
+								}
+							}
+							steps {
+								sh './script/build_android.sh'
+							}
+						}
+						stage {
+							stages {
+								agent {
+									lable 'rpi-armv7'
+								}
+								stage ('test'){
+									steps {
+										sh 'echo test'
+									}
+								}
+								stage ('benchmark'){
+									steps {
+										sh 'echo benchmark'
+									}
+								}
 							}
 						}
 					}
