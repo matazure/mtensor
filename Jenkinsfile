@@ -48,7 +48,7 @@ pipeline{
 					}
 				}
 				
-				stage('android-armv7') {
+				stage('linux-armv7') {
 					stages {	
 						stage('cross-build') {
 							agent {
