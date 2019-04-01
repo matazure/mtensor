@@ -17,7 +17,7 @@ pipeline{
 					stages {
 						stage('build') {
 							steps {
-								sh './script/build.sh'
+								sh './script/build_native.sh'
 							}
 						}
 					}
@@ -62,7 +62,7 @@ pipeline{
 						}
 						stage('RPi3b+') {
 							agent {
-								lable 'rpi-armv7'
+								label 'RPi3-armv7'
 							}
 							stages {
 								stage ('test'){
@@ -120,7 +120,7 @@ pipeline{
 					stages {
 						stage('build') {
 							steps {
-								sh './script/build.sh'
+								sh './script/build_native.sh'
 							}
 						}
 					}
