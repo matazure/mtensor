@@ -57,7 +57,7 @@ pipeline{
 								}
 							}
 							environment {
-								GCC_LINARO_TOOLCHAIN = '"/gcc-linaro-7.4.1-2019.02-x86_64_arm-linux-gnueabihf"'
+								GCC_LINARO_TOOLCHAIN = '/gcc-linaro-7.4.1-2019.02-x86_64_arm-linux-gnueabihf'
 							}
 							steps {
 								sh './script/build-linux-arm.sh'
