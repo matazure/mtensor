@@ -98,7 +98,7 @@ pipeline{
 								sh './script/build-linux-aarch64.sh'
 							}
 						}
-						stage('') {
+						stage('device') {
 							agent {
 								label 'rk3399-aarch64'
 							}
