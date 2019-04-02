@@ -98,7 +98,7 @@ pipeline{
 								sh './script/build-linux-aarch64.sh'
 							}
 						}
-						stage('jeston-nano') {
+						stage('') {
 							agent {
 								label 'rk3399-aarch64'
 							}
