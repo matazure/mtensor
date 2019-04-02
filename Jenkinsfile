@@ -100,7 +100,7 @@ pipeline{
 						}
 						stage('jeston-nano') {
 							agent {
-								label 'Nano-arch64'
+								label 'rk3399-aarch64'
 							}
 							stages {
 								stage ('test'){
