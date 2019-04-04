@@ -146,6 +146,7 @@ pipeline{
 						stage('test') {
 							steps {
 								sh 'echo armv7-test'
+                                sh 'sshpass -p admin ssh root@192.168.0.105 "echo lex620"'
 							}
 						}	
 					}
