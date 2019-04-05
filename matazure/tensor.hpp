@@ -501,7 +501,7 @@ public:
 	* @prama ext the shape of tensor
 	*/
 	explicit tensor(pointi<rank> ext) :
-		extent_(ext),
+		shape_(ext),
 		layout_(ext),
 		sp_data_(malloc_shared_memory(layout_.stride()[rank - 1])),
 		data_(sp_data_.get())
@@ -523,7 +523,7 @@ public:
 	* @param pinned_v  the instance of pinned
 	*/
 	explicit tensor(pointi<rank> ext, pinned pinned_v) :
-		extent_(ext),
+		shape_(ext),
 		layout_(ext),
 		sp_data_(malloc_shared_memory(layout_.stride()[rank - 1], pinned_v)),
 		data_(sp_data_.get())
@@ -535,7 +535,7 @@ public:
 	* @param pinned_v  the instance of unpinned
 	*/
 	explicit tensor(pointi<rank> ext, unpinned) :
-		extent_(ext),
+		shape_(ext),
 		layout_(ext),
 		sp_data_(malloc_shared_memory(layout_.stride()[rank - 1])),
 		data_(sp_data_.get())
@@ -558,7 +558,7 @@ public:
 	* @param sp_data the shared_ptr of host memory
 	*/
 	explicit tensor(const pointi<rank> &ext, std::shared_ptr<value_type> sp_data) :
-		extent_(ext),
+		shape_(ext),
 		layout_(ext),
 		sp_data_(sp_data),
 		data_(sp_data_.get())
@@ -576,7 +576,7 @@ public:
 	*/
 	template <typename _VT>
 	tensor(const tensor<_VT, rank, layout_type> &ts) :
-		extent_(ts.shape()),
+		shape_(ts.shape()),
 		layout_(ts.shape()),
 		sp_data_(ts.shared_data()),
 		data_(ts.data())
@@ -597,7 +597,7 @@ public:
 	*/
 	template <typename _VT>
 	const tensor &operator=(const tensor<_VT, _Rank, _Layout> &ts) {
-		extent_ = ts.shape();
+		shape_ = ts.shape();
 		layout_ = ts.layout_;
 		sp_data_ = ts.shared_data();
 		data_ = ts.data();
@@ -652,7 +652,7 @@ public:
 
 	/// @return the shape of tensor
 	pointi<rank> shape() const {
-		return extent_;
+		return shape_;
 	}
 
 
@@ -691,7 +691,7 @@ private:
 #endif
 
 public:
-	pointi<rank>	extent_;
+	pointi<rank>	shape_;
 	layout_type		layout_;
 	shared_ptr<value_type>	sp_data_;
 	value_type * data_;
@@ -762,7 +762,7 @@ public:
 	* @param fun the functor of lambdd_tensor, should be Index -> Value pattern
 	*/
 	lambda_tensor(const pointi<rank> &ext, _Func fun) :
-		extent_(ext),
+		shape_(ext),
 		layout_(ext),
 		fun_(fun)
 	{}
@@ -771,7 +771,7 @@ public:
 	* @brief copy constructor
 	*/
 	lambda_tensor(const lambda_tensor &rhs) :
-		extent_(rhs.extent_),
+		shape_(rhs.shape_),
 		layout_(rhs.layout_),
 		fun_(rhs.fun_)
 	{ }
@@ -823,7 +823,7 @@ public:
 
 	/// @return the shape of lambed_tensor
 	pointi<rank> shape() const {
-		return extent_;
+		return shape_;
 	}
 
 	/// return the total size of lambda_tensor elements
@@ -871,7 +871,7 @@ private:
 	}
 
 private:
-	const pointi<rank> extent_;
+	const pointi<rank> shape_;
 	const layout_type layout_;
 	const _Func fun_;
 };
