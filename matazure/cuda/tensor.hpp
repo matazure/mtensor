@@ -34,14 +34,14 @@ public:
 	{}
 
 	explicit tensor(pointi<rank> ext) :
-		extent_(ext),
+		shape_(ext),
 		layout_(ext),
 		sp_data_(malloc_shared_memory(layout_.stride()[rank - 1])),
 		data_(sp_data_.get())
 	{ }
 
 	explicit tensor(pointi<rank> ext, std::shared_ptr<value_type> sp_data) :
-		extent_(ext),
+		shape_(ext),
 		layout_(ext),
 		sp_data_(sp_data),
 		data_(sp_data_.get())
@@ -49,7 +49,7 @@ public:
 
 	template <typename _VT>
 	tensor(const tensor<_VT, _Rank, _Layout> &ts) :
-		extent_(ts.shape()),
+		shape_(ts.shape()),
 		layout_(ts.layout_),
 		sp_data_(ts.shared_data()),
 		data_(ts.data())
@@ -78,7 +78,7 @@ public:
 		return data_[i];
 	}
 
-	MATAZURE_GENERAL pointi<rank> shape() const { return extent_; }
+	MATAZURE_GENERAL pointi<rank> shape() const { return shape_; }
 	MATAZURE_GENERAL pointi<rank> stride() const { return layout_.stride(); }
 	MATAZURE_GENERAL int_t size() const { return layout_.stride()[rank - 1]; }
 
@@ -95,7 +95,7 @@ private:
 	}
 
 private:
-	const pointi<rank>	extent_;
+	const pointi<rank>	shape_;
 	const layout_type	layout_;
 	const shared_ptr<value_type>	sp_data_;
 	const pointer data_;
@@ -135,7 +135,7 @@ public:
 	device_lambda_tensor() = delete;
 
 	device_lambda_tensor(const pointi<rank> &ext, _Func fun) :
-		extent_(ext),
+		shape_(ext),
 		layout_(ext),
 		fun_(fun)
 	{ }
@@ -171,7 +171,7 @@ public:
 		return persist(policy);
 	}
 
-	MATAZURE_GENERAL pointi<rank> shape() const { return extent_; }
+	MATAZURE_GENERAL pointi<rank> shape() const { return shape_; }
 	MATAZURE_GENERAL int_t size() const { return layout_.stride()[rank - 1]; }
 
 private:
@@ -200,7 +200,7 @@ private:
 	}
 
 private:
-	const pointi<rank> extent_;
+	const pointi<rank> shape_;
 	const layout_type layout_;
 	const _Func fun_;
 };
@@ -218,7 +218,7 @@ public:
 
 public:
 	general_lambda_tensor(const pointi<rank> &ext, _Func fun) :
-		extent_(ext),
+		shape_(ext),
 		layout_(ext),
 		fun_(fun)
 	{}
@@ -249,7 +249,7 @@ public:
 		return persist(policy);
 	}
 
-	MATAZURE_GENERAL pointi<rank> shape() const { return extent_; }
+	MATAZURE_GENERAL pointi<rank> shape() const { return shape_; }
 	MATAZURE_GENERAL int_t size() const { return layout_.stride()[rank - 1]; }
 
 public:
@@ -274,7 +274,7 @@ public:
 	}
 
 private:
-	const pointi<rank> extent_;
+	const pointi<rank> shape_;
 	const layout_type layout_;
 	const _Func fun_;
 };

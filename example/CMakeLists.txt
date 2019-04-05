@@ -44,9 +44,4 @@ foreach(File ${Files})
 	# target_compile_features(${TargetName} PRIVATE cxx_constexpr cxx_deleted_functions cxx_lambdas cxx_rvalue_references cxx_variadic_templates)
 endforeach()
 
-if(WITH_OPENCL)
-	add_subdirectory(opencl)
-endif()
-
-
 add_subdirectory(tutorial)
