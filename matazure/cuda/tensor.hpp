@@ -137,7 +137,7 @@ public:
 	device_lambda_tensor(const pointi<rank> &ext, _Func fun) :
 		shape_(ext),
 		layout_(ext),
-		fun_(fun)
+		functor_(fun)
 	{ }
 
 	 template <typename _Idx>
@@ -178,7 +178,7 @@ private:
 	template <typename _Mode>
 	MATAZURE_DEVICE enable_if_t<is_same<_Mode, array_index>::value, reference>
 		index_imp(pointi<rank> index) const {
-		return fun_(index);
+		return functor_(index);
 	}
 
 	template <typename _Mode>
@@ -196,13 +196,13 @@ private:
 	template <typename _Mode>
 	MATAZURE_DEVICE enable_if_t<is_same<_Mode, linear_index>::value, reference>
 		offset_imp(int_t i) const {
-		return fun_(i);
+		return functor_(i);
 	}
 
 private:
 	const pointi<rank> shape_;
 	const layout_type layout_;
-	const _Func fun_;
+	const _Func functor_;
 };
 
 template <int_t _Rank, typename _Func, typename _Layout = first_major_layout<_Rank>>
@@ -220,7 +220,7 @@ public:
 	general_lambda_tensor(const pointi<rank> &ext, _Func fun) :
 		shape_(ext),
 		layout_(ext),
-		fun_(fun)
+		functor_(fun)
 	{}
 
 	MATAZURE_GENERAL reference operator[](int_t i) const {
@@ -255,7 +255,7 @@ public:
 public:
 	template <typename _Mode>
 	MATAZURE_GENERAL enable_if_t<is_same<_Mode, array_index>::value, reference> index_imp(pointi<rank> index) const {
-		return fun_(index);
+		return functor_(index);
 	}
 
 	template <typename _Mode>
@@ -270,13 +270,13 @@ public:
 
 	template <typename _Mode>
 	MATAZURE_GENERAL enable_if_t<is_same<_Mode, linear_index>::value, reference> offset_imp(int_t i) const {
-		return fun_(i);
+		return functor_(i);
 	}
 
 private:
 	const pointi<rank> shape_;
 	const layout_type layout_;
-	const _Func fun_;
+	const _Func functor_;
 };
 
 template <typename _ValueType, int_t _Rank, typename _Func>
