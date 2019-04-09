@@ -20,7 +20,7 @@ namespace matazure { namespace unify {
 	class tensor {
 	public:
 		//typedef _TensorType								tensor_type;
-		typedef typename _ValueType		value_type;
+		typedef _ValueType								value_type;
 		const static int rank = _Rank;
 		typedef value_type &							reference;
 		typedef _Layout									layout_type;
@@ -45,6 +45,6 @@ namespace matazure { namespace unify {
 		pointi<rank>			shape_;
 		layout_type				layout_;
 		shared_ptr<value_type>	sp_data_;
-	};
+	}
 
 } }
