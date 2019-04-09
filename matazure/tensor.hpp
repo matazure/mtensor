@@ -669,7 +669,9 @@ public:
 	/// return the pointer of tensor elements
 	value_type * data() const { return sp_data_.get(); }
 
-	constexpr int_t element_size() const { return sizeof(value_type); };
+	constexpr int_t element_size() const { return sizeof(value_type); }
+
+	layout_type layout() const { return layout_; }
 
 private:
 	shared_ptr<value_type> malloc_shared_memory(int_t size) {
@@ -764,7 +766,7 @@ public:
 	lambda_tensor(const pointi<rank> &ext, _Func fun) :
 		shape_(ext),
 		layout_(ext),
-		fun_(fun)
+		functor_(fun)
 	{}
 
 	/**
@@ -773,7 +775,7 @@ public:
 	lambda_tensor(const lambda_tensor &rhs) :
 		shape_(rhs.shape_),
 		layout_(rhs.layout_),
-		fun_(rhs.fun_)
+		functor_(rhs.functor_)
 	{ }
 
 	/**
@@ -849,10 +851,14 @@ public:
 		return persist(policy);
 	}
 
+	layout_type layout() const { return layout_; }
+
+	functor_type functor() const { return functor_; }
+
 private:
 	template <typename _Mode>
 	enable_if_t<is_same<_Mode, array_index>::value, reference> index_imp(pointi<rank> idx) const {
-		return fun_(idx);
+		return functor_(idx);
 	}
 
 	template <typename _Mode>
@@ -867,13 +873,13 @@ private:
 
 	template <typename _Mode>
 	enable_if_t<is_same<_Mode, linear_index>::value, reference> offset_imp(int_t i) const {
-		return fun_(i);
+		return functor_(i);
 	}
 
 private:
 	const pointi<rank> shape_;
 	const layout_type layout_;
-	const _Func fun_;
+	const _Func functor_;
 };
 
 /**

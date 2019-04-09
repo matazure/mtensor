@@ -111,13 +111,13 @@ template <typename _Tensor, typename _Func>
 struct linear_map_op {
 private:
 	const _Tensor ts_;
-	const _Func fun_;
+	const _Func functor_;
 
 public:
-	linear_map_op(_Tensor ts, _Func fun) : ts_(ts), fun_(fun) {}
+	linear_map_op(_Tensor ts, _Func fun) : ts_(ts), functor_(fun) {}
 
-	MATAZURE_GENERAL auto operator()(int_t i) const->decltype(this->fun_(this->ts_[i])){
-		return fun_(ts_[i]);
+	MATAZURE_GENERAL auto operator()(int_t i) const->decltype(this->functor_(this->ts_[i])){
+		return functor_(ts_[i]);
 	}
 };
 
@@ -125,13 +125,13 @@ template <typename _Tensor, typename _Func>
 struct array_map_op {
 private:
 	const _Tensor ts_;
-	const _Func fun_;
+	const _Func functor_;
 
 public:
-	array_map_op(_Tensor ts, _Func fun) : ts_(ts), fun_(fun) {}
+	array_map_op(_Tensor ts, _Func fun) : ts_(ts), functor_(fun) {}
 
-	MATAZURE_GENERAL auto operator()(pointi<_Tensor::rank> idx) const->decltype(this->fun_(this->ts_[idx])) {
-		return fun_(ts_[idx]);
+	MATAZURE_GENERAL auto operator()(pointi<_Tensor::rank> idx) const->decltype(this->functor_(this->ts_[idx])) {
+		return functor_(ts_[idx]);
 	}
 };
 
@@ -139,13 +139,13 @@ template <typename _Tensor, typename _Func>
 struct device_linear_map_op {
 private:
 	const _Tensor ts_;
-	const _Func fun_;
+	const _Func functor_;
 
 public:
-	device_linear_map_op(_Tensor ts, _Func fun) : ts_(ts), fun_(fun) {}
+	device_linear_map_op(_Tensor ts, _Func fun) : ts_(ts), functor_(fun) {}
 
-	MATAZURE_DEVICE auto operator()(int_t i) const->decltype(this->fun_(this->ts_[i])) {
-		return fun_(ts_[i]);
+	MATAZURE_DEVICE auto operator()(int_t i) const->decltype(this->functor_(this->ts_[i])) {
+		return functor_(ts_[i]);
 	}
 };
 
@@ -153,13 +153,13 @@ template <typename _Tensor, typename _Func>
 struct device_array_map_op {
 private:
 	const _Tensor ts_;
-	const _Func fun_;
+	const _Func functor_;
 
 public:
-	device_array_map_op(_Tensor ts, _Func fun) : ts_(ts), fun_(fun) {}
+	device_array_map_op(_Tensor ts, _Func fun) : ts_(ts), functor_(fun) {}
 
-	MATAZURE_DEVICE auto operator()(pointi<_Tensor::rank> idx) const->decltype(this->fun_(this->ts_[idx])) {
-		return fun_(ts_[idx]);
+	MATAZURE_DEVICE auto operator()(pointi<_Tensor::rank> idx) const->decltype(this->functor_(this->ts_[idx])) {
+		return functor_(ts_[idx]);
 	}
 };
 
