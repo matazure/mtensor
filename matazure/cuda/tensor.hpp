@@ -121,13 +121,13 @@ inline void copy_symbol(_TensorSrc src, _TensorSymbol &symbol_dst) {
 	assert_runtime_success(cudaMemcpyToSymbol(symbol_dst, src.data(), src.size() * sizeof(typename _TensorSrc::value_type)));
 }
 
-template <typename _Reference, typename _AccessMode, int_t _Rank, typename _Func, typename _Layout = first_major_layout<_Rank>>
-class device_lambda_tensor : public tensor_expression<device_lambda_tensor<_Reference, _AccessMode, _Rank, _Func, _Layout>> {
+template <typename _Reference, int_t _Rank, typename _Func, typename _Layout = first_major_layout<_Rank>>
+class device_lambda_tensor : public tensor_expression<device_lambda_tensor<_Reference, _Rank, _Func, _Layout>> {
 public:
 	static const int_t									rank = _Rank;
 	typedef _Reference									reference;
 	typedef remove_reference_t<reference>				value_type;
-	typedef _AccessMode									index_type;
+	typedef typename matazure::internal::get_functor_accessor_type<_Rank, _Func>::type	index_type;
 	typedef device_tag									memory_type;
 	typedef _Layout										layout_type;
 
@@ -279,9 +279,9 @@ private:
 	const _Func fun_;
 };
 
-template <typename _ValueType, typename _AccessMode, int_t _Rank, typename _Func>
-inline auto make_device_lambda(pointi<_Rank> ext, _Func fun)->cuda::device_lambda_tensor<_ValueType, _AccessMode, _Rank, _Func>{
-	return cuda::device_lambda_tensor<_ValueType, _AccessMode, _Rank, _Func>(ext, fun);
+template <typename _ValueType, int_t _Rank, typename _Func>
+inline auto make_device_lambda(pointi<_Rank> ext, _Func fun)->cuda::device_lambda_tensor<_ValueType, _Rank, _Func>{
+	return cuda::device_lambda_tensor<_ValueType, _Rank, _Func>(ext, fun);
 }
 
 template <int_t _Rank, typename _Func>
