@@ -19,7 +19,7 @@ int main(){
 
 	//开启omp并行执行， index是不确定的
 #ifdef MATAZURE_OPENMP
-	for_index(omp_vectorized_policy{}, 0, 20, [](int_t i) {
+	for_index(omp_policy{}, 0, 20, [](int_t i) {
 		printf("%d ", i);
 	});
 #endif
