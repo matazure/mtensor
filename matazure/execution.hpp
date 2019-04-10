@@ -15,9 +15,6 @@ struct sequence_vectorized_policy {};
 /// openmp parallel execution policy
 struct omp_policy {};
 
-/// openmp parallel execution policy with auto vectorization
-struct omp_vectorized_policy {};
-
 #endif
 
 }

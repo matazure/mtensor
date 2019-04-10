@@ -26,17 +26,6 @@
 		 	#define MATAZURE_OPENMP_PARALLEL_FOR(n) _Pragma("omp parallel for")
 		#endif
 	#endif
-
-	#if defined(_MSC_VER)
-		#define MATAZURE_OPENMP_PARALLEL_FOR_VECTORISED(n) \
-		 	__pragma(omp parallel for)
-	#else
-		 #if _OPENMP >= 200805
-		 	#define MATAZURE_OPENMP_PARALLEL_FOR_VECTORISED(n) _Pragma(MATAZURE_STRINGIFY(omp parallel for schedule(dynamic, 1) collapse(n)))
-		 #else
-		 	#define MATAZURE_OPENMP_PARALLEL_FOR_VECTORISED(n) _Pragma("omp parallel for simd")
-		#endif
-	#endif
 #endif
 
 namespace matazure {
@@ -83,20 +72,6 @@ inline MATAZURE_GENERAL void for_index(sequence_vectorized_policy policy, int_t 
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(omp_policy policy, int_t first, int_t last, _Func fun){
 	MATAZURE_OPENMP_PARALLEL_FOR(1)
-	for (int_t i = first; i < last; ++i) {
-		fun(i);
-	}
-}
-
-/**
-* @brief for each linear index, apply fun by the openmp parallel vectorized policy
-* @param first the first index
-* @param last the last index
-* @param fun the functor,  int_t -> value pattern.
-*/
-template <typename _Func>
-inline MATAZURE_GENERAL void for_index(omp_vectorized_policy policy, int_t first, int_t last, _Func fun){
-	#pragma omp parallel for
 	for (int_t i = first; i < last; ++i) {
 		fun(i);
 	}
@@ -315,74 +290,6 @@ inline MATAZURE_GENERAL void for_index(omp_policy, pointi<3> origin, pointi<3> e
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(omp_policy, pointi<4> origin, pointi<4> end, _Func fun) {
 	MATAZURE_OPENMP_PARALLEL_FOR(4)
-	for (int_t l = origin[3]; l < end[3]; ++l) {
-		for (int_t k = origin[2]; k < end[2]; ++k) {
-			for (int_t j = origin[1]; j < end[1]; ++j) {
-				for (int_t i = origin[0]; i < end[0]; ++i) {
-					fun(pointi<4>{ {i, j, k, l} });
-				}
-			}
-		}
-	}
-}
-
-/**
-* @brief for each 1-dim array index, apply fun by the openmp parallel vectorized policy
-* @param origin the origin index of the 1-dim range
-* @param end the end index
-* @param fun the functor,  pointi<1> -> value pattern.
-*/
-template <typename _Func>
-inline MATAZURE_GENERAL void for_index(omp_vectorized_policy, pointi<1> origin, pointi<1> end, _Func fun) {
-	MATAZURE_OPENMP_PARALLEL_FOR_VECTORISED(1)
-	for (int_t i = origin[0]; i < end[0]; ++i) {
-		fun(pointi<1>{ { i } });
-	}
-}
-
-/**
-* @brief for each 2-dim array index, apply fun by the openmp parallel vectorized policy
-* @param origin the origin index of the 2-dim range
-* @param end the end index
-* @param fun the functor,  pointi<2> -> value pattern.
-*/
-template <typename _Func>
-inline MATAZURE_GENERAL void for_index(omp_vectorized_policy, pointi<2> origin, pointi<2> end, _Func fun) {
-	MATAZURE_OPENMP_PARALLEL_FOR_VECTORISED(2)
-	for (int_t j = origin[1]; j < end[1]; ++j) {
-		for (int_t i = origin[0]; i < end[0]; ++i) {
-			fun(pointi<2>{ { i, j } });
-		}
-	}
-}
-
-/**
-* @brief for each 3-dim array index, apply fun by the openmp parallel vectorized policy
-* @param origin the origin index of the 3-dim range
-* @param end the end index
-* @param fun the functor,  pointi<3> -> value pattern.
-*/
-template <typename _Func>
-inline MATAZURE_GENERAL void for_index(omp_vectorized_policy, pointi<3> origin, pointi<3> end, _Func fun) {
-	MATAZURE_OPENMP_PARALLEL_FOR_VECTORISED(3)
-	for (int_t k = origin[2]; k < end[2]; ++k) {
-		for (int_t j = origin[1]; j < end[1]; ++j) {
-			for (int_t i = origin[0]; i < end[0]; ++i) {
-				fun(pointi<3>{ { i, j, k } });
-			}
-		}
-	}
-}
-
-/**
-* @brief for each 4-dim array index, apply fun by the openmp parallel vectorized policy
-* @param origin the origin index of the 4-dim range
-* @param end the end index
-* @param fun the functor,  pointi<4> -> value pattern.
-*/
-template <typename _Func>
-inline MATAZURE_GENERAL void for_index(omp_vectorized_policy, pointi<4> origin, pointi<4> end, _Func fun) {
-	MATAZURE_OPENMP_PARALLEL_FOR_VECTORISED(4)
 	for (int_t l = origin[3]; l < end[3]; ++l) {
 		for (int_t k = origin[2]; k < end[2]; ++k) {
 			for (int_t j = origin[1]; j < end[1]; ++j) {
