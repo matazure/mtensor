@@ -1,4 +1,4 @@
-# [Tensor](https://github.com/Matazure/tensor) [![Build Status](https://travis-ci.org/Matazure/tensor.svg?branch=master)](https://travis-ci.org/Matazure/tensor)  [![AppVeyor](https://img.shields.io/appveyor/ci/zhangzhimin/tensor.svg)](https://ci.appveyor.com/project/zhangzhimin/tensor) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/Matazure/tensor/blob/master/LICENSE)
+# [Tensor](https://github.com/Matazure/tensor) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/Matazure/tensor/blob/master/LICENSE)
 Tensor是一个C++实现的异构计算库，基于for_index算法引擎和多维数组(tensor)来构建一个通用的异构计算库。可广泛适用于图像处理，深度学习，数值计算等领域。 目前支持C++和CUDA，即将对OpenCL和Metal进行验证。Tensor以最为优雅的设计来追求最为极致的性能。
 
 ## 为什么使用Tensor
