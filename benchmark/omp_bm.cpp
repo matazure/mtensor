@@ -21,7 +21,6 @@ void bm_omp_for_index(benchmark::State& state) {
 }
 
 BENCHMARK_TEMPLATE1(bm_omp_for_index, sequence_policy)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();
-BENCHMARK_TEMPLATE1(bm_omp_for_index, sequence_vectorized_policy)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();
 
 BENCHMARK_TEMPLATE1(bm_omp_for_index, omp_policy)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();
 
@@ -44,10 +43,6 @@ BENCHMARK_TEMPLATE2(bm_omp_for_index_array, sequence_policy, 1)->RangeMultiplier
 BENCHMARK_TEMPLATE2(bm_omp_for_index_array, sequence_policy, 2)->RangeMultiplier(4)->Range(1<<5, 1 << ((bm_config::max_memory_exponent() - 2) / 2))->UseRealTime();
 BENCHMARK_TEMPLATE2(bm_omp_for_index_array, sequence_policy, 3)->RangeMultiplier(2)->Range(1<<3, 1 << ((bm_config::max_memory_exponent() - 2) / 3))->UseRealTime();
 BENCHMARK_TEMPLATE2(bm_omp_for_index_array, sequence_policy, 4)->RangeMultiplier(2)->Range(1<<2, 1 << ((bm_config::max_memory_exponent() - 2) / 4))->UseRealTime();
-BENCHMARK_TEMPLATE2(bm_omp_for_index_array, sequence_vectorized_policy, 1)->RangeMultiplier(8)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();
-BENCHMARK_TEMPLATE2(bm_omp_for_index_array, sequence_vectorized_policy, 2)->RangeMultiplier(4)->Range(1<<5, 1 << ((bm_config::max_memory_exponent() - 2) / 2))->UseRealTime();
-BENCHMARK_TEMPLATE2(bm_omp_for_index_array, sequence_vectorized_policy, 3)->RangeMultiplier(2)->Range(1<<3, 1 << ((bm_config::max_memory_exponent() - 2) / 3))->UseRealTime();
-BENCHMARK_TEMPLATE2(bm_omp_for_index_array, sequence_vectorized_policy, 4)->RangeMultiplier(2)->Range(1<<2, 1 << ((bm_config::max_memory_exponent() - 2) / 4))->UseRealTime();
 
 BENCHMARK_TEMPLATE2(bm_omp_for_index_array, omp_policy, 1)->RangeMultiplier(8)->Range(bm_config::min_shape<float, 1>(), bm_config::max_shape<float, 1>())->UseRealTime();
 BENCHMARK_TEMPLATE2(bm_omp_for_index_array, omp_policy, 2)->RangeMultiplier(4)->Range(1<<5, 1 << ((bm_config::max_memory_exponent() - 2) / 2))->UseRealTime();
