@@ -6,15 +6,6 @@
 
 #define MATAZURE_STRINGIFY(a) #a
 
-#if defined(_MSC_VER)
-	#define MATAZURE_AUTO_VECTORISED __pragma(loop(ivdep))
-#elif defined(__GNUC__)
-	///@todo： auto vectorized does not support gcc now, to fix it
-	#define MATAZURE_AUTO_VECTORISED /*_Pragma("ivdep")*/
-#else
-	#define MATAZURE_AUTO_VECTORISED _Pragma("ivdep")
-#endif
-
 #ifdef MATAZURE_OPENMP
 	#if defined(_MSC_VER)
 		#define MATAZURE_OPENMP_PARALLEL_FOR(n) __pragma(omp parallel for)
@@ -42,20 +33,6 @@ struct _Is_linear_array<point<_Type, _Rank>>: bool_constant<true> {};
 */
 template <typename _Func>
 inline MATAZURE_GENERAL void for_index(sequence_policy, int_t first, int_t last, _Func fun) {
-	for (int_t i = first; i < last; ++i) {
-		fun(i);
-	}
-}
-
-/**
-* @brief for each linear index, apply fun by the sequence vectorized policy
-* @param first the first index
-* @param last the last index
-* @param fun the functor,  int_t -> value pattern.
-*/
-template <typename _Func>
-inline MATAZURE_GENERAL void for_index(sequence_vectorized_policy policy, int_t first, int_t last, _Func fun) {
-	MATAZURE_AUTO_VECTORISED
 	for (int_t i = first; i < last; ++i) {
 		fun(i);
 	}
@@ -155,74 +132,6 @@ inline MATAZURE_GENERAL void for_index(sequence_policy, pointi<4> origin, pointi
 	for (int_t l = origin[3]; l < end[3]; ++l) {
 		for (int_t k = origin[2]; k < end[2]; ++k) {
 			for (int_t j = origin[1]; j < end[1]; ++j) {
-				for (int_t i = origin[0]; i < end[0]; ++i) {
-					fun(pointi<4>{ {i, j, k, l} });
-				}
-			}
-		}
-	}
-}
-
-/**
-* @brief for each 1-dim array index, apply fun by the sequence vectorized policy
-* @param origin the origin index of the 1-dim range
-* @param end the end index
-* @param fun the functor,  pointi<1> -> value pattern.
-*/
-template <typename _Func>
-inline MATAZURE_GENERAL void for_index(sequence_vectorized_policy, pointi<1> origin, pointi<1> end, _Func fun) {
-	MATAZURE_AUTO_VECTORISED
-	for (int_t i = origin[0]; i < end[0]; ++i) {
-		fun(pointi<1>{ { i } });
-	}
-}
-
-/**
-* @brief for each 2-dim array index, apply fun by the sequence vectorized policy
-* @param origin the origin index of the 2-dim range
-* @param end the end index
-* @param fun the functor,  pointi<2> -> value pattern.
-*/
-template <typename _Func>
-inline MATAZURE_GENERAL void for_index(sequence_vectorized_policy, pointi<2> origin, pointi<2> end, _Func fun) {
-	for (int_t j = origin[1]; j < end[1]; ++j) {
-		MATAZURE_AUTO_VECTORISED
-		for (int_t i = origin[0]; i < end[0]; ++i) {
-			fun(pointi<2>{ { i, j } });
-		}
-	}
-}
-
-/**
-* @brief for each 3-dim array index, apply fun by the sequence vectorized policy
-* @param origin the origin index of the 3-dim range
-* @param end the end index
-* @param fun the functor,  pointi<3> -> value pattern.
-*/
-template <typename _Func>
-inline MATAZURE_GENERAL void for_index(sequence_vectorized_policy, pointi<3> origin, pointi<3> end, _Func fun) {
-	for (int_t k = origin[2]; k < end[2]; ++k) {
-		for (int_t j = origin[1]; j < end[1]; ++j) {
-			MATAZURE_AUTO_VECTORISED
-			for (int_t i = origin[0]; i < end[0]; ++i) {
-				fun(pointi<3>{ { i, j, k } });
-			}
-		}
-	}
-}
-
-/**
-* @brief for each 4-dim array index, apply fun by the sequence vectorized policy
-* @param origin the origin index of the 4-dim range
-* @param end the end index
-* @param fun the functor,  pointi<4> -> value pattern.
-*/
-template <typename _Func>
-inline MATAZURE_GENERAL void for_index(sequence_vectorized_policy, pointi<4> origin, pointi<4> end, _Func fun) {
-	for (int_t l = origin[3]; l < end[3]; ++l) {
-		for (int_t k = origin[2]; k < end[2]; ++k) {
-			for (int_t j = origin[1]; j < end[1]; ++j) {
-				MATAZURE_AUTO_VECTORISED
 				for (int_t i = origin[0]; i < end[0]; ++i) {
 					fun(pointi<4>{ {i, j, k, l} });
 				}
