@@ -12,7 +12,6 @@ int main(){
 
 	tensor<byte, 1> ts_vect(100);
 
-	MATAZURE_AUTO_VECTORISED
 	for (int_t i = 0, size = ts_vect.size(); i < size; ++i){
 		ts_vect[0] += 1;
 	}
