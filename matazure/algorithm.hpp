@@ -220,9 +220,10 @@ inline MATAZURE_GENERAL void for_index(omp_policy, pointi<4> origin, pointi<4> e
 */
 template <typename _Func, int_t _Rank>
 inline MATAZURE_GENERAL void for_index(pointi<_Rank> origin, pointi<_Rank> end, _Func fun) {
-	sequence_vectorized_policy policy{};
+	sequence_policy policy{};
 	for_index(policy, origin, end, fun);
 }
+
 
 template <typename _Func, int_t _Rank>
 inline MATAZURE_GENERAL void for_index(pointi<_Rank> end, _Func fun){
@@ -271,7 +272,7 @@ inline MATAZURE_GENERAL void for_each(_Tensor &&ts, _Fun fun,
 		>::value
 	>* = 0)
 {
-	sequence_vectorized_policy policy{};
+	sequence_policy policy{};
 	for_each(policy, std::forward<_Tensor>(ts), fun);
 }
 
@@ -300,7 +301,7 @@ inline MATAZURE_GENERAL void fill(_Tensor &&ts, typename decay_t<_Tensor>::value
 			>
 		>::value
 	>* = 0) {
-	sequence_vectorized_policy policy{};
+	sequence_policy policy{};
 	fill(policy, std::forward<_Tensor>(ts), v);
 }
 
@@ -337,7 +338,7 @@ inline MATAZURE_GENERAL void copy(_ExectutionPolicy policy, const _TensorSrc &ts
 */
 template <typename _TensorSrc, typename _TensorDst>
 inline MATAZURE_GENERAL void copy(const _TensorSrc &ts_src, _TensorDst &&ts_dst, enable_if_t<none_device_memory<enable_if_t<is_linear_array<decay_t<_TensorSrc>>::value, decay_t<_TensorSrc>>, decay_t<_TensorDst>>::value>* = 0) {
-	sequence_vectorized_policy policy;
+	sequence_policy policy;
 	copy(policy, ts_src, std::forward<_TensorDst>(ts_dst));
 }
 
@@ -378,7 +379,7 @@ inline MATAZURE_GENERAL void transform(_ExectutionPolicy policy, const _TensorSr
 template <typename _TensorSrc, typename _TensorDst, typename _Fun>
 inline MATAZURE_GENERAL void transform(const _TensorSrc &ts_src, _TensorDst &&ts_dst, _Fun fun, enable_if_t<none_device_memory<enable_if_t<is_linear_array<decay_t<_TensorSrc>>::value, decay_t<_TensorSrc>>, decay_t<_TensorDst>>::value>* = 0)
 {
-	sequence_vectorized_policy policy{};
+	sequence_policy policy{};
 	transform(policy, ts_src, std::forward<_TensorDst>(ts_dst), fun);
 }
 
