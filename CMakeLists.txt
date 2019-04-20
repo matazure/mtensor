@@ -67,7 +67,7 @@ if (MSVC)
 endif()
 
 if (UNIX)
-	add_definitions("-x c++")
+	# add_definitions("-x c++")
 endif()
 
 if (WITH_SSE)
