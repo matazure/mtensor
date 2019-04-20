@@ -1,4 +1,4 @@
-#include <bm_config.hpp>
+#include <matazure/bm_config.hpp>
 
 #ifdef USE_CUDA
 

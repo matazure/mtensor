@@ -1,4 +1,4 @@
-#include <bm_config.hpp>
+#include <matazure/bm_config.hpp>
 
 template <typename _Tensor, typename _ValueType>
 void bm_hete_tensor_cast(benchmark::State &state) {

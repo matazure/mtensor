@@ -18,12 +18,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(WITH_OPENCL "With OpenCL" OFF)
 if (WITH_OPENCL)
-    find_package(OPENCL REQUIRED)
+	find_package(OPENCL REQUIRED)
 endif()
 
 option(WITH_CUDA "With CUDA" OFF)
 if(WITH_CUDA)
-    find_package(CUDA REQUIRED)
+	enable_language(CUDA)
+	find_package(CUDA REQUIRED)
 endif()
 
 option(WITH_OPENMP "With OpenMP" OFF)
