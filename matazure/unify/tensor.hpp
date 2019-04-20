@@ -77,7 +77,7 @@ namespace matazure { namespace unify {
 
 	#ifdef MATAZURE_CUDA
 
-		lambda_tensor(const cuda::general_lambda_tensor &glcu_ts) :
+		lambda_tensor(const cuda::general_lambda_tensor<_Rank, _Func, _Layout> &glcu_ts) :
 			shape_(glcu_ts.shape_),
 			layout_(glcu_ts.layout_),
 			functor_(glcu_ts.functor_)
