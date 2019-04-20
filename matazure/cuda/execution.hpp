@@ -93,15 +93,15 @@ inline void configure_grid(execution_policy &exe_policy, __KernelFunc k)
 	int numSMs = props->multiProcessorCount;
 
 	int bsize = 0, minGridSize = 0;
-	assert_occupancy_success(cudaOccMaxPotentialOccupancyBlockSize(&minGridSize, &bsize, &occProp, &occAttrib, &occState, exe_policy.shared_mem_bytes()));
+	verify_occupancy_success(cudaOccMaxPotentialOccupancyBlockSize(&minGridSize, &bsize, &occProp, &occAttrib, &occState, exe_policy.shared_mem_bytes()));
 	exe_policy.block_size(bsize);
 
 	cudaOccResult result;
-	assert_occupancy_success(cudaOccMaxActiveBlocksPerMultiprocessor(&result, &occProp, &occAttrib, &occState, exe_policy.block_size(), exe_policy.shared_mem_bytes()));
+	verify_occupancy_success(cudaOccMaxActiveBlocksPerMultiprocessor(&result, &occProp, &occAttrib, &occState, exe_policy.block_size(), exe_policy.shared_mem_bytes()));
 	exe_policy.grid_size(result.activeBlocksPerMultiprocessor * numSMs);
 
 	int smemGranularity = 0;
-	assert_occupancy_success(cudaOccSMemAllocationGranularity(&smemGranularity, &occProp));
+	verify_occupancy_success(cudaOccSMemAllocationGranularity(&smemGranularity, &occProp));
 	size_t sbytes = internal::availableSharedBytesPerBlock(props->sharedMemPerBlock, attribs.sharedSizeBytes, __occDivideRoundUp(exe_policy.grid_size(), numSMs), smemGranularity);
 
 	exe_policy.shared_mem_bytes(sbytes);
@@ -137,11 +137,11 @@ inline void configure_grid(parallel_execution_policy &exe_policy, __KernelFunc k
 	int numSMs = props->multiProcessorCount;
 
 	int bsize = 0, minGridSize = 0;
-	assert_occupancy_success(cudaOccMaxPotentialOccupancyBlockSize(&minGridSize, &bsize, &occProp, &occAttrib, &occState, exe_policy.shared_mem_bytes()));
+	verify_occupancy_success(cudaOccMaxPotentialOccupancyBlockSize(&minGridSize, &bsize, &occProp, &occAttrib, &occState, exe_policy.shared_mem_bytes()));
 	exe_policy.block_size(bsize);
 
 	cudaOccResult result;
-	assert_occupancy_success(cudaOccMaxActiveBlocksPerMultiprocessor(&result, &occProp, &occAttrib, &occState, exe_policy.block_size(), exe_policy.shared_mem_bytes()));
+	verify_occupancy_success(cudaOccMaxActiveBlocksPerMultiprocessor(&result, &occProp, &occAttrib, &occState, exe_policy.block_size(), exe_policy.shared_mem_bytes()));
 	exe_policy.grid_size(result.activeBlocksPerMultiprocessor * numSMs);
 
 	auto pre_block_size = exe_policy.block_size();
@@ -150,7 +150,7 @@ inline void configure_grid(parallel_execution_policy &exe_policy, __KernelFunc k
 	exe_policy.block_size(std::min(tmp_block_size, pre_block_size));
 
 	int smemGranularity = 0;
-	assert_occupancy_success(cudaOccSMemAllocationGranularity(&smemGranularity, &occProp));
+	verify_occupancy_success(cudaOccSMemAllocationGranularity(&smemGranularity, &occProp));
 	size_t sbytes = internal::availableSharedBytesPerBlock(props->sharedMemPerBlock, attribs.sharedSizeBytes, __occDivideRoundUp(exe_policy.grid_size(), numSMs), smemGranularity);
 
 	exe_policy.shared_mem_bytes(sbytes);
