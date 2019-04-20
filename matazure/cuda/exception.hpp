@@ -32,9 +32,9 @@ private:
 	cudaOccError error_code_;
 };
 
-inline void assert_occupancy_success(cudaOccError result) throw(occupancy_error)
+inline void verify_occupancy_success(cudaOccError result) throw(occupancy_error)
 {
-	if (result != cudaSuccess) {
+	if (result != CUDA_OCC_SUCCESS) {
 		throw occupancy_error(result);
 	}
 }
