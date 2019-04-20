@@ -1,5 +1,5 @@
 ﻿#include <benchmark/benchmark.h>
-#include <bm_config.hpp>
+#include <matazure/bm_config.hpp>
 #include <matazure/tensor>
 
 using namespace matazure;
@@ -268,3 +268,5 @@ void bm_cu_conv_block_overlap_aligned_array_index_unclamp_constant_kernel_with_b
 }
 BENCHMARK_TEMPLATE2(bm_cu_conv_block_overlap_aligned_array_index_unclamp_constant_kernel_with_block_tensor, float, block_16x16)->RangeMultiplier(2)->Range(bm_config::min_shape<float, 1>(), 1 << ((bm_config::max_memory_exponent() - 2) / 2))->UseRealTime();
 BENCHMARK_TEMPLATE2(bm_cu_conv_block_overlap_aligned_array_index_unclamp_constant_kernel_with_block_tensor, float, block_32x32)->RangeMultiplier(2)->Range(bm_config::min_shape<float, 1>(), 1 << ((bm_config::max_memory_exponent() - 2) / 2))->UseRealTime();
+
+BENCHMARK_MAIN()

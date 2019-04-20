@@ -1,5 +1,5 @@
 ﻿#include <benchmark/benchmark.h>
-#include <bm_config.hpp>
+#include <matazure/bm_config.hpp>
 #include <matazure/tensor>
 
 using namespace matazure;
@@ -62,3 +62,5 @@ void bm_cu_prod_block(benchmark::State& state) {
 }
 BENCHMARK_TEMPLATE1(bm_cu_prod_block, float)->RangeMultiplier(2)->Range(bm_config::min_shape<float, 1>(), 1 << 12)->UseRealTime();
 BENCHMARK_TEMPLATE1(bm_cu_prod_block, double)->RangeMultiplier(2)->Range(bm_config::min_shape<float, 1>(), 1 << 11)->UseRealTime();
+
+BENCHMARK_MAIN()

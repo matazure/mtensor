@@ -1,5 +1,5 @@
 #include <benchmark/benchmark.h>
-#include <bm_config.hpp>
+#include <matazure/bm_config.hpp>
 #include <matazure/tensor>
 
 using namespace matazure;
@@ -1172,3 +1172,5 @@ BM_TENSOR_RANK2_CONV_LAZY_ARRAY_INDEX_INSIDE_CLAMP_ZERO_KERNEL3x3(float)
 BM_TENSOR_RANK2_CONV_LAZY_ARRAY_INDEX_INSIDE_CLAMP_ZERO_KERNEL3x3(double)
 BM_TENSOR_RANK2_CONV_LAZY_ARRAY_INDEX_INSIDE_CLAMP_ZERO_KERNEL3x3(point4f)
 BM_TENSOR_RANK2_CONV_LAZY_ARRAY_INDEX_INSIDE_CLAMP_ZERO_KERNEL3x3(hete_float32x4_t)
+
+BENCHMARK_MAIN()
