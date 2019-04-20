@@ -24,7 +24,7 @@ endif()
 option(WITH_CUDA "With CUDA" OFF)
 if(WITH_CUDA)
 	enable_language(CUDA)
-	find_package(CUDA REQUIRED)
+	set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-extended-lambda")
 endif()
 
 option(WITH_OPENMP "With OpenMP" OFF)
@@ -72,26 +72,6 @@ endif()
 
 if (WITH_SSE)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.2")
-endif()
-
-if (WITH_CUDA)
-	find_package(CUDA 9.0 REQUIRED)
-
-	if(NOT(CMAKE_SIZEOF_VOID_P EQUAL 8))
-		message(FATAL_ERROR "Matazure Tensor with CUDA Only support 64 bit platform")
-	endif()
-
-	#--expt-relaxed-constexpr  (don't use this)
-	set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} --expt-extended-lambda --disable-warnings")
-	if (UNIX)
-		set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} --std=c++14")
-	endif()
-	if (MSVC)
-		set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -Xcompiler \"/wd4819 /wd4503\" ")
-	endif()
-
-	#disable sse,because the cuda 9.0 bug with sse
-	#add_definitions(-DMATAZURE_DISABLE_SSE)
 endif()
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
