@@ -26,17 +26,17 @@ namespace matazure { namespace unify {
 		typedef _Layout									layout_type;
 
 		tensor(const matazure::tensor<value_type, rank, layout_type> &ts) :
-			shape_(ts.shape_),
-			layout_(ts.layout_),
-			sp_data_(ts.sp_data_)
+			shape_(ts.shape()),
+			layout_(ts.layout()),
+			sp_data_(ts.shared_data())
 		{ }
 
 	#ifdef MATAZURE_CUDA
 
 		tensor(const cuda::tensor<value_type, rank, layout_type> &cu_tensor) :
-			shape_(cu_tensor.shape_),
-			layout_(cu_tensor.layout_),
-			sp_data(cu_tensor.sp_data_)
+			shape_(cu_tensor.shape()),
+			layout_(cu_tensor.layout()),
+			sp_data_(cu_tensor.shared_data())
 		{ }
 
 	#endif
@@ -78,9 +78,9 @@ namespace matazure { namespace unify {
 	#ifdef MATAZURE_CUDA
 
 		lambda_tensor(const cuda::general_lambda_tensor<_Rank, _Func, _Layout> &glcu_ts) :
-			shape_(glcu_ts.shape_),
-			layout_(glcu_ts.layout_),
-			functor_(glcu_ts.functor_)
+			shape_(glcu_ts.shape()),
+			layout_(glcu_ts.layout()),
+			functor_(glcu_ts.functor())
 		{ }
 
 	#endif
@@ -91,9 +91,9 @@ namespace matazure { namespace unify {
 		const _Func functor_;
 	};
 
-	// template <typename _Rank, typename _Func, typename _Layout>
-	// lambda_tensor<_Rank, _Func, _Layout> make_lambda(const matazure::lambda_tensor<_Rank, _Func, _Layout> lts){
-	// 	return lambda_tensor<_Rank, _Func, _Layout>(lts);
-	// }
+	template <int_t _Rank, typename _Func, typename _Layout>
+	auto make_lambda(const matazure::lambda_tensor<_Rank, _Func, _Layout> lts)->lambda_tensor<_Rank, _Func, _Layout>{
+		return lambda_tensor<_Rank, _Func, _Layout>(lts);
+	}
 
 } }
