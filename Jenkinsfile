@@ -6,8 +6,12 @@ pipeline{
 				
 				stage('linux-x64') {
 					agent { 
-						docker { 
-							image 'matazure/ci4tensor:gcc-ubuntu18.04'  
+						dockerfile {
+							filename 'gcc-ubuntu18.04.dockerfile'
+							dir 'dockerfile'
+							// label 'my-defined-label'
+							// additionalBuildArgs  '--build-arg version=1.0.2'
+							// args '-v /tmp:/tmp'
 						}
 					}
 					environment {
@@ -22,7 +26,8 @@ pipeline{
 						}
 					}
 				}
-				
+
+
 				// stage('linux-x64-cuda') {
 				// 	agent {
 				// 		docker {
