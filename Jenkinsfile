@@ -7,7 +7,7 @@ pipeline{
 				stage('linux-x64') {
 					agent { 
 						dockerfile {
-							filename 'g++-ubuntu18.04.dockerfile'
+							filename 'tensor-dev-ubuntu18.04.dockerfile'
 							dir 'dockerfile'
 							// label 'my-defined-label'
 							// additionalBuildArgs  '--build-arg version=1.0.2'
@@ -31,7 +31,7 @@ pipeline{
 				stage('linux-x64-cuda') {
 					agent {
 						dockerfile {
-							filename 'cuda10.1-ubuntu18.04.dockerfile'
+							filename 'tensor-dev-ubuntu18.04.dockerfile'
 							dir 'dockerfile'
 							args '--runtime=nvidia'
 						}
@@ -59,7 +59,7 @@ pipeline{
 						stage('cross-build') {
 							agent {
 								dockerfile {
-									filename 'g++-aarch64-linux-gnu-ubuntu18.04.dockerfile'
+									filename 'tensor-dev-ubuntu18.04.dockerfile'
 									dir 'dockerfile'
 								}
 							}
@@ -76,7 +76,7 @@ pipeline{
 				stage('linux-armv7') {
 					agent {
 						dockerfile {
-							filename 'g++-arm-linux-gnueabihf-ubuntu18.04.dockerfile'
+							filename 'tensor-dev-ubuntu18.04.dockerfile'
 							dir 'dockerfile'
 						}
 					}
@@ -101,8 +101,9 @@ pipeline{
 				
 				stage('android-armv7') {
 					agent {
-						docker {
-							image 'matazure/ci4tensor:android-ndk-r16b'
+						dockerfile {
+							filename 'tensor-dev-ubuntu18.04.dockerfile'
+							dir 'dockerfile'
 						}
 					}
 					stages {	
@@ -111,7 +112,7 @@ pipeline{
 								sh './script/build_android.sh'
 							}
 						}
-						// stage('test') {
+						// stage('test') {s
 						// 	steps {
 						// 		sh 'echo armv7-test'
 						// 		sh 'sshpass -p admin ssh -o StrictHostKeyChecking=no root@192.168.0.105 "echo lex620"'
