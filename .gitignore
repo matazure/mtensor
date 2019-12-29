@@ -49,3 +49,6 @@ tmp
 bin
 log
 x64
+
+.vscode
+core*

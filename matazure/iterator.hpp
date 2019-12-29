@@ -87,22 +87,22 @@ namespace matazure {
 namespace matazure {
 
 	template <typename _Tensor>
-	auto begin(_Tensor ts) {
+	auto begin(_Tensor ts) -> index_iterator<_Tensor> {
 		return matazure::index_iterator<_Tensor>(ts, 0);
 	}
 
 	template <typename _Tensor>
-	auto end( _Tensor ts) {
+	auto end( _Tensor ts) -> index_iterator<_Tensor> {
 		return matazure::index_iterator<_Tensor>(ts, ts.size());
 	}
 
 	template <typename _Tensor>
-	auto rbegin(_Tensor ts) {
+	auto rbegin(_Tensor ts) -> std::reverse_iterator<index_iterator<_Tensor>> {
 		return std::reverse_iterator<decltype(begin(ts))>(end(ts));
 	}
 
 	template <typename _Tensor>
-	auto rend(_Tensor ts) {
+	auto rend(_Tensor ts) -> std::reverse_iterator<index_iterator<_Tensor>> {
 		return std::reverse_iterator<decltype(end(ts))>(begin(ts));
 	}
 

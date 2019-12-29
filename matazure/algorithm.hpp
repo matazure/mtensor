@@ -418,11 +418,11 @@ inline MATAZURE_GENERAL _VT reduce(const _Tensor &ts, _VT init, _BinaryFunc bina
 	return re;
 }
 
-template <typename _Tensor>
-inline MATAZURE_GENERAL auto sum(const _Tensor &ts) {
-	return reduce(ts, zero<typename _Tensor::value_type>::value(), [](auto lhs, auto rhs) {
-		return lhs + rhs;
-	});
-}
+// template <typename _Tensor>
+// inline MATAZURE_GENERAL auto sum(const _Tensor &ts) {
+// 	return reduce(ts, zero<typename _Tensor::value_type>::value(), [](auto lhs, auto rhs) {
+// 		return lhs + rhs;
+// 	});
+// }
 
 }

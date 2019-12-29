@@ -1,0 +1,13 @@
+# add_subdirectory(host)
+# add_subdirectory(cuda)
+
+add_executable(sample1 sample1.cpp)
+target_link_libraries(sample1 tensor)
+
+add_executable(sample2 sample2.cpp)
+target_link_libraries(sample2 tensor)
+
+if (WITH_CUDA)
+    add_executable(sample3 sample3.cu)
+    target_link_libraries(sample3 tensor)
+endif ()

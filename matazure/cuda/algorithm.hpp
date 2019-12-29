@@ -182,7 +182,7 @@ inline void for_index(pointi<_Rank> origin, pointi<_Rank> end, _Fun fun) {
 
 template <int_t _Rank, typename _Fun>
 inline void for_index(pointi<_Rank> end, _Fun fun){
-	for_index(zero<pointi<_Rank>>::value(), end, fun);
+	cuda::for_index(zero<pointi<_Rank>>::value(), end, fun);
 }
 
 template <typename _BlockDim>

@@ -12,7 +12,7 @@ endif()
 
 project(Matazure.Tensor CXX)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -47,7 +47,7 @@ option(BUILD_BENCHMARK "Build Benchmark" ON)
 
 message("current compiler is ${CMAKE_CXX_COMPILER}")
 
-include_directories(.)
+# include_directories(.)
 set_property( GLOBAL PROPERTY USE_FOLDERS ON)
 
 set(BUILD_SHARED_LIBS OFF)
@@ -91,7 +91,7 @@ add_subdirectory(matazure)
 add_subdirectory(dependency)
 
 if (BUILD_EXAMPLE)
-	add_subdirectory(example)
+	add_subdirectory(sample)
 endif()
 
 if (BUILD_BENCHMARK)

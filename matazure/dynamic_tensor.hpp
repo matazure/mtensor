@@ -61,7 +61,7 @@ namespace matazure {
 		dynamic_tensor(data_type type, shape_type ts_shape) :
 			type_(type),
 			ts_shape_(ts_shape),
-			size_(reduce(ts_shape_, 1, [](auto x0, auto x1){ return x0 * x1; }))
+			size_(reduce(ts_shape_, 1, [](int_t x0, int_t x1){ return x0 * x1; }))
 		{
 			auto p_mem_ = new byte[size_ * element_size()];
 			sp_mem_.reset(p_mem_, [](byte *p) { delete[] p; });
@@ -70,7 +70,7 @@ namespace matazure {
 		dynamic_tensor(data_type type, shape_type ts_shape, shared_ptr<void> sp_mem) :
 			type_(type),
 			ts_shape_(ts_shape),
-			size_(reduce(ts_shape_, 1, [](auto x0, auto x1){ return x0 * x1; })),
+			size_(reduce(ts_shape_, 1, [](int_t x0, int_t x1){ return x0 * x1; })),
 			sp_mem_(std::static_pointer_cast<byte>(sp_mem))
 		{ }
 
@@ -107,13 +107,13 @@ namespace matazure {
 
 		template <typename _Type = byte>
 		shared_ptr<_Type> shared_data() {
-			shared_ptr<_Type> sp_tmp(data<_Type>(), [sp_mem = sp_mem_](auto p) {});
+			shared_ptr<_Type> sp_tmp(data<_Type>(), [sp_mem = sp_mem_](_Type * p) {});
 			return sp_tmp;
 		}
 
 		template <typename _Type = byte>
 		shared_ptr<const _Type> shared_data() const {
-			shared_ptr<const _Type> sp_tmp(data<_Type>(), [sp_mem = sp_mem_](auto p) {});
+			shared_ptr<const _Type> sp_tmp(data<_Type>(), [sp_mem = sp_mem_](const _Type * p) {});
 			return sp_tmp;
 		}
 
@@ -143,7 +143,7 @@ namespace matazure {
 		auto rank = _Tensor::rank;
 		dynamic_tensor::shape_type shape(rank);
 		copy(ts.shape(), shape);
-		shared_ptr<byte> sp_tmp(reinterpret_cast<byte*>(ts.data()), [ts](auto p) {});
+		shared_ptr<byte> sp_tmp(reinterpret_cast<byte*>(ts.data()), [ts](byte * p) {});
 		return dynamic_tensor(get_data_type_traits<typename _Tensor::value_type>::value, shape, sp_tmp);
 	}
 

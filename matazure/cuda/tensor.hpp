@@ -59,19 +59,19 @@ public:
 
 	shared_ptr<value_type> shared_data() const { return sp_data_; }
 
-	 template <typename _Idx>
-	 MATAZURE_GENERAL reference operator()(_Idx idx) const {
-	 	static_assert(std::is_same<_Idx, int_t>::value && rank == 1, "only operator [] support access data by pointi");
-	 	return (*this)[pointi<1>{idx}];
-	 }
+	//  template <typename _Idx>
+	//  MATAZURE_GENERAL reference operator()(_Idx idx) const {
+	//  	static_assert(std::is_same<_Idx, int_t>::value && rank == 1, "only operator [] support access data by pointi");
+	//  	return (*this)[pointi<1>{idx}];
+	//  }
+
+	MATAZURE_GENERAL reference operator[](const pointi<rank> &index) const {
+		return (*this)[layout_.index2offset(index)];
+	}
 
 	template <typename ..._Idx>
 	MATAZURE_GENERAL reference operator()(_Idx... idx) const {
 		return (*this)[pointi<rank>{ idx... }];
-	}
-
-	MATAZURE_GENERAL reference operator[](const pointi<rank> &index) const {
-		return (*this)[layout_.index2offset(index)];
 	}
 
 	MATAZURE_GENERAL reference operator[] (int_t i) const {

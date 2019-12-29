@@ -584,7 +584,7 @@ namespace matazure {
 	}
 
 	template <typename _T, int_t _Rank>
-	inline auto split(tensor<_T, _Rank, first_major_layout<_Rank>> ts) {
+	inline auto split(tensor<_T, _Rank, first_major_layout<_Rank>> ts) -> tensor<tensor<_T, _Rank - 1, first_major_layout<_Rank - 1>>, 1> {
 		const auto slice_ext = slice_point<_Rank - 1>(ts.shape());
 		auto slice_size = cumulative_prod(slice_ext)[slice_ext.size() - 1];
 

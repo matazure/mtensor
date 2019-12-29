@@ -9,14 +9,14 @@
 
 #include <matazure/complex.hpp>
 
-#include <matazure/puzzle/prod.hpp>
-#include <matazure/puzzle/conv.hpp>
-#include <matazure/puzzle/transpose.hpp>
+//#include <matazure/puzzle/prod.hpp>
+//#include <matazure/puzzle/conv.hpp>
+//#include <matazure/puzzle/transpose.hpp>
 
-#ifdef MATAZURE_CUDA
-    #include <matazure/puzzle/cuda/prod.hpp>
-    #include <matazure/puzzle/cuda/conv.hpp>
-#endif
+//#ifdef MATAZURE_CUDA
+//    #include <matazure/puzzle/cuda/prod.hpp>
+//    #include <matazure/puzzle/cuda/conv.hpp>
+//#endif
 
 #include <matazure/simd.hpp>
 
