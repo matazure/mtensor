@@ -86,7 +86,11 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/googletes
 set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Build gtest's sample programs." FORCE)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/third_party/benchmark)
 
-add_subdirectory(matazure)
+add_library(tensor INTERFACE)
+target_include_directories(tensor
+    INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+    INTERFACE $<INSTALL_INTERFACE:include>
+)
 
 add_subdirectory(dependency)
 
@@ -95,9 +99,11 @@ if (BUILD_EXAMPLE)
 endif()
 
 if (BUILD_BENCHMARK)
-	add_subdirectory(benchmark)
+	add_subdirectory(benchmark EXCLUDE_FROM_ALL)
 endif()
 
 if (BUILD_TEST)
 	add_subdirectory(test)
 endif()
+
+install(DIRECTORY include DESTINATION include)
