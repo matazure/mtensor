@@ -92,8 +92,6 @@ target_include_directories(tensor
     INTERFACE $<INSTALL_INTERFACE:include>
 )
 
-add_subdirectory(dependency)
-
 if (BUILD_EXAMPLE)
 	add_subdirectory(sample)
 endif()

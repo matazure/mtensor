@@ -1,12 +1,6 @@
 [submodule "benchmark/vendor/benchmark"]
 	path = third_party/benchmark
 	url = https://github.com/Matazure/benchmark.git
-	shallow = true
 [submodule "test/vendor/googletest"]
 	path = third_party/googletest
 	url = https://github.com/Matazure/googletest.git
-	shallow = true
-[submodule "dependency/cereal"]
-	path = dependency/cereal
-	url = https://github.com/USCiLab/cereal.git
-	shallow = true
