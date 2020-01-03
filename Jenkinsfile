@@ -1,5 +1,8 @@
 pipeline{
 	agent none
+	triggers {
+		cron('H H(0-7) * * *')
+	}
 	stages {
 		stage('TENSOR CI'){
 			parallel {
