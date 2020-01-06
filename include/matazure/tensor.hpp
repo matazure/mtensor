@@ -104,11 +104,11 @@ namespace matazure {
 	public:
 		typedef _Tensor						tensor_type;
 
-		MATAZURE_GENERAL const tensor_type &operator()() const {
+		const tensor_type &operator()() const {
 			return *static_cast<const tensor_type *>(this);
 		}
 
-		MATAZURE_GENERAL tensor_type &operator()() {
+		tensor_type &operator()() {
 			return *static_cast<tensor_type *>(this);
 		}
 

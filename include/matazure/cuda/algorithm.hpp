@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <matazure/point.hpp>
+#include <matazure/tensor.hpp>
 #include <matazure/cuda/execution.hpp>
 
 namespace matazure {
@@ -121,6 +122,7 @@ inline MATAZURE_DEVICE void for_index(pointi<4> origin, pointi<4> extent, _Func 
 
 }
 
+MATAZURE_HD_WARNING_DISABLE
 template <typename Function, typename... Arguments>
 MATAZURE_GLOBAL void kenel(Function f, Arguments... args)
 {
@@ -144,7 +146,7 @@ inline void launch(_ExecutionPolicy exe_policy, _Fun f, _Args... args)
 
 template <typename _ExecutionPolicy, typename _Fun>
 inline void for_index(_ExecutionPolicy policy, int_t first, int_t last, _Fun fun) {
-	launch(policy, [=] MATAZURE_DEVICE() {
+	launch(policy, [=] __device__ () {
 		for (int_t i = first + threadIdx.x + blockIdx.x * blockDim.x; i < last; i += blockDim.x * gridDim.x) {
 			fun(i);
 		}
@@ -169,7 +171,7 @@ inline void for_index(_ExecutionPolicy policy, pointi<_Rank> origin, pointi<_Ran
 	auto stride = matazure::cumulative_prod(extent);
 	auto max_size = index2offset((end - 1), stride, first_major{}) + 1; //要包含最后一个元素
 
-	cuda::for_index(policy, 0, max_size, [=] MATAZURE_DEVICE (int_t i) {
+	cuda::for_index(policy, 0, max_size, [=] __device__ (int_t i) {
 		fun(offset2index(i, stride, first_major{}) + origin);
 	});
 }

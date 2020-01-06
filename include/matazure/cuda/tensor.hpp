@@ -1,5 +1,7 @@
 #pragma once
 
+#pragma hd_warning_disable
+
 #include <cuda_runtime.h>
 #include <matazure/tensor.hpp>
 #include <matazure/cuda/algorithm.hpp>
@@ -11,6 +13,7 @@
 namespace matazure {
 namespace cuda {
 
+#pragma hd_warning_disable
 template <typename _Type, int_t _Rank, typename _Layout = first_major_layout<_Rank>>
 class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout>> {
 public:
@@ -24,22 +27,26 @@ public:
 	typedef _Layout							layout_type;
 	typedef device_tag						memory_type;
 
-	tensor() :
+	MATAZURE_HD_WARNING_DISABLE
+	MATAZURE_GENERAL tensor() :
 		tensor(pointi<rank>::zeros())
 	{}
 
+	MATAZURE_HD_WARNING_DISABLE
 	template <typename ..._Ext,  typename _Tmp = enable_if_t<sizeof...(_Ext) == rank>>
-	explicit tensor(_Ext... ext) :
+	MATAZURE_GENERAL explicit tensor(_Ext... ext) :
 		tensor(pointi<rank>{ext...})
 	{}
 
-	explicit tensor(pointi<rank> ext) :
+	MATAZURE_HD_WARNING_DISABLE
+	MATAZURE_GENERAL explicit tensor(pointi<rank> ext) :
 		shape_(ext),
 		layout_(ext),
 		sp_data_(malloc_shared_memory(layout_.stride()[rank - 1])),
 		data_(sp_data_.get())
 	{ }
 
+	MATAZURE_HD_WARNING_DISABLE
 	explicit tensor(pointi<rank> ext, std::shared_ptr<value_type> sp_data) :
 		shape_(ext),
 		layout_(ext),
@@ -47,8 +54,9 @@ public:
 		data_(sp_data_.get())
 	{ }
 
+	MATAZURE_HD_WARNING_DISABLE
 	template <typename _VT>
-	tensor(const tensor<_VT, _Rank, _Layout> &ts) :
+	MATAZURE_GENERAL tensor(const tensor<_VT, _Rank, _Layout> &ts) :
 		shape_(ts.shape()),
 		layout_(ts.layout_),
 		sp_data_(ts.shared_data()),
@@ -57,6 +65,7 @@ public:
 
 	tensor(std::initializer_list<int_t> v) = delete;
 
+	MATAZURE_GENERAL
 	shared_ptr<value_type> shared_data() const { return sp_data_; }
 
 	//  template <typename _Idx>
@@ -84,6 +93,9 @@ public:
 
 	MATAZURE_GENERAL pointer data() const { return data_; }
 
+	MATAZURE_HD_WARNING_DISABLE
+	MATAZURE_GENERAL ~tensor() { }
+
 private:
 	shared_ptr<value_type> malloc_shared_memory(int_t size) {
 		decay_t<value_type> *data = nullptr;
@@ -97,6 +109,7 @@ private:
 private:
 	const pointi<rank>	shape_;
 	const layout_type	layout_;
+	#pragma hd_warning_disable
 	const shared_ptr<value_type>	sp_data_;
 	const pointer data_;
 };
@@ -120,90 +133,6 @@ template <typename _TensorSrc, typename _TensorSymbol>
 inline void copy_symbol(_TensorSrc src, _TensorSymbol &symbol_dst) {
 	assert_runtime_success(cudaMemcpyToSymbol(symbol_dst, src.data(), src.size() * sizeof(typename _TensorSrc::value_type)));
 }
-
-template <typename _Reference, int_t _Rank, typename _Func, typename _Layout = first_major_layout<_Rank>>
-class device_lambda_tensor : public tensor_expression<device_lambda_tensor<_Reference, _Rank, _Func, _Layout>> {
-public:
-	static const int_t									rank = _Rank;
-	typedef _Reference									reference;
-	typedef remove_reference_t<reference>				value_type;
-	typedef typename matazure::internal::get_functor_accessor_type<_Rank, _Func>::type	index_type;
-	typedef device_tag									memory_type;
-	typedef _Layout										layout_type;
-
-public:
-	device_lambda_tensor() = delete;
-
-	device_lambda_tensor(const pointi<rank> &ext, _Func fun) :
-		shape_(ext),
-		layout_(ext),
-		functor_(fun)
-	{ }
-
-	 template <typename _Idx>
-	 MATAZURE_GENERAL reference operator()(_Idx idx) const {
-	 	static_assert(std::is_same<_Idx, int_t>::value && rank == 1, "only operator [] support access data by pointi");
-	 	return (*this)[pointi<1>{idx}];
-	 }
-
-	template <typename ..._Idx>
-	MATAZURE_DEVICE reference operator()(_Idx... idx) const {
-		return (*this)[pointi<rank>{ idx... }];
-	}
-
-	MATAZURE_DEVICE reference operator[](int_t i) const {
-		return offset_imp<index_type>(i);
-	}
-
-	MATAZURE_DEVICE reference operator[](const pointi<rank> &idx) const {
-		return index_imp<index_type>(idx);
-	}
-
-	template <typename _ExecutionPolicy>
-	tensor<decay_t<value_type>, rank> persist(_ExecutionPolicy policy) const {
-		tensor<decay_t<value_type>, rank> re(this->shape());
-		copy(policy, *this, re);
-		return re;
-	}
-
-	tensor<decay_t<value_type>, rank> persist() const {
-		parallel_execution_policy policy{};
-		return persist(policy);
-	}
-
-	MATAZURE_GENERAL pointi<rank> shape() const { return shape_; }
-	MATAZURE_GENERAL int_t size() const { return layout_.stride()[rank - 1]; }
-
-private:
-	template <typename _Mode>
-	MATAZURE_DEVICE enable_if_t<is_same<_Mode, array_index>::value, reference>
-		index_imp(pointi<rank> index) const {
-		return functor_(index);
-	}
-
-	template <typename _Mode>
-	MATAZURE_DEVICE enable_if_t<is_same<_Mode, linear_index>::value, reference>
-		index_imp(pointi<rank> index) const {
-		return (*this)[layout_.index2offset(index)];
-	}
-
-	template <typename _Mode>
-	MATAZURE_DEVICE enable_if_t<is_same<_Mode, array_index>::value, reference>
-		offset_imp(int_t i) const {
-		return (*this)[layout_.offset2index(i)];
-	}
-
-	template <typename _Mode>
-	MATAZURE_DEVICE enable_if_t<is_same<_Mode, linear_index>::value, reference>
-		offset_imp(int_t i) const {
-		return functor_(i);
-	}
-
-private:
-	const pointi<rank> shape_;
-	const layout_type layout_;
-	const _Func functor_;
-};
 
 template <int_t _Rank, typename _Func, typename _Layout = first_major_layout<_Rank>>
 class general_lambda_tensor : public tensor_expression<general_lambda_tensor<_Rank, _Func, _Layout>> {
@@ -279,9 +208,12 @@ private:
 	const _Func functor_;
 };
 
-template <typename _ValueType, int_t _Rank, typename _Func>
-inline auto make_device_lambda(pointi<_Rank> ext, _Func fun)->cuda::device_lambda_tensor<_ValueType, _Rank, _Func>{
-	return cuda::device_lambda_tensor<_ValueType, _Rank, _Func>(ext, fun);
+template <int_t _Rank, typename _Func, typename _Layout = first_major_layout<_Rank>>
+using device_lambda_tensor = general_lambda_tensor<_Rank, _Func, _Layout>;
+
+template <int_t _Rank, typename _Func>
+inline auto make_device_lambda(pointi<_Rank> ext, _Func fun)->cuda::device_lambda_tensor<_Rank, _Func>{
+	return cuda::device_lambda_tensor<_Rank, _Func>(ext, fun);
 }
 
 template <int_t _Rank, typename _Func>

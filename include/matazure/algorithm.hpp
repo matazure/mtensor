@@ -32,7 +32,7 @@ struct _Is_linear_array<point<_Type, _Rank>>: bool_constant<true> {};
 * @param fun the functor,  int_t -> value pattern.
 */
 template <typename _Func>
-inline MATAZURE_GENERAL void for_index(sequence_policy, int_t first, int_t last, _Func fun) {
+inline void for_index(sequence_policy, int_t first, int_t last, _Func fun) {
 	for (int_t i = first; i < last; ++i) {
 		fun(i);
 	}
@@ -47,7 +47,7 @@ inline MATAZURE_GENERAL void for_index(sequence_policy, int_t first, int_t last,
 * @param fun the functor,  int_t -> value pattern.
 */
 template <typename _Func>
-inline MATAZURE_GENERAL void for_index(omp_policy policy, int_t first, int_t last, _Func fun){
+inline void for_index(omp_policy policy, int_t first, int_t last, _Func fun){
 	MATAZURE_OPENMP_PARALLEL_FOR(1)
 	for (int_t i = first; i < last; ++i) {
 		fun(i);
@@ -63,7 +63,7 @@ inline MATAZURE_GENERAL void for_index(omp_policy policy, int_t first, int_t las
 * @param fun the functor,  int_t -> value pattern.
 */
 template <typename _Func>
-inline MATAZURE_GENERAL void for_index(int_t first, int_t last, _Func fun) {
+inline   void for_index(int_t first, int_t last, _Func fun) {
 	sequence_policy seq{};
 	for_index(seq, first, last, fun);
 }
@@ -72,7 +72,7 @@ inline MATAZURE_GENERAL void for_index(int_t first, int_t last, _Func fun) {
 
 */
 template <typename _Func>
-inline MATAZURE_GENERAL void for_index(int_t last, _Func fun){
+inline   void for_index(int_t last, _Func fun){
 	for_index(0, last, fun);
 }
 
@@ -83,7 +83,7 @@ inline MATAZURE_GENERAL void for_index(int_t last, _Func fun){
 * @param fun the functor,  pointi<1> -> value pattern.
 */
 template <typename _Func>
-inline MATAZURE_GENERAL void for_index(sequence_policy, pointi<1> origin, pointi<1> end, _Func fun) {
+inline   void for_index(sequence_policy, pointi<1> origin, pointi<1> end, _Func fun) {
 	for (int_t i = origin[0]; i < end[0]; ++i) {
 		fun(pointi<1>{ { i } });
 	}
@@ -96,7 +96,7 @@ inline MATAZURE_GENERAL void for_index(sequence_policy, pointi<1> origin, pointi
 * @param fun the functor,  pointi<2> -> value pattern.
 */
 template <typename _Func>
-inline MATAZURE_GENERAL void for_index(sequence_policy, pointi<2> origin, pointi<2> end, _Func fun) {
+inline   void for_index(sequence_policy, pointi<2> origin, pointi<2> end, _Func fun) {
 	for (int_t j = origin[1]; j < end[1]; ++j) {
 		for (int_t i = origin[0]; i < end[0]; ++i) {
 			fun(pointi<2>{ { i, j } });
@@ -111,7 +111,7 @@ inline MATAZURE_GENERAL void for_index(sequence_policy, pointi<2> origin, pointi
 * @param fun the functor,  pointi<3> -> value pattern.
 */
 template <typename _Func>
-inline MATAZURE_GENERAL void for_index(sequence_policy, pointi<3> origin, pointi<3> end, _Func fun) {
+inline   void for_index(sequence_policy, pointi<3> origin, pointi<3> end, _Func fun) {
 	for (int_t k = origin[2]; k < end[2]; ++k) {
 		for (int_t j = origin[1]; j < end[1]; ++j) {
 			for (int_t i = origin[0]; i < end[0]; ++i) {
@@ -128,7 +128,7 @@ inline MATAZURE_GENERAL void for_index(sequence_policy, pointi<3> origin, pointi
 * @param fun the functor,  pointi<4> -> value pattern.
 */
 template <typename _Func>
-inline MATAZURE_GENERAL void for_index(sequence_policy, pointi<4> origin, pointi<4> end, _Func fun) {
+inline   void for_index(sequence_policy, pointi<4> origin, pointi<4> end, _Func fun) {
 	for (int_t l = origin[3]; l < end[3]; ++l) {
 		for (int_t k = origin[2]; k < end[2]; ++k) {
 			for (int_t j = origin[1]; j < end[1]; ++j) {
@@ -149,7 +149,7 @@ inline MATAZURE_GENERAL void for_index(sequence_policy, pointi<4> origin, pointi
 * @param fun the functor,  pointi<1> -> value pattern.
 */
 template <typename _Func>
-inline MATAZURE_GENERAL void for_index(omp_policy, pointi<1> origin, pointi<1> end, _Func fun) {
+inline   void for_index(omp_policy, pointi<1> origin, pointi<1> end, _Func fun) {
 	MATAZURE_OPENMP_PARALLEL_FOR(1)
 	for (int_t i = origin[0]; i < end[0]; ++i) {
 		fun(pointi<1>{ { i } });
@@ -163,7 +163,7 @@ inline MATAZURE_GENERAL void for_index(omp_policy, pointi<1> origin, pointi<1> e
 * @param fun the functor,  pointi<2> -> value pattern.
 */
 template <typename _Func>
-inline MATAZURE_GENERAL void for_index(omp_policy, pointi<2> origin, pointi<2> end, _Func fun) {
+inline   void for_index(omp_policy, pointi<2> origin, pointi<2> end, _Func fun) {
 	MATAZURE_OPENMP_PARALLEL_FOR(2)
 	for (int_t j = origin[1]; j < end[1]; ++j) {
 		for (int_t i = origin[0]; i < end[0]; ++i) {
@@ -179,7 +179,7 @@ inline MATAZURE_GENERAL void for_index(omp_policy, pointi<2> origin, pointi<2> e
 * @param fun the functor,  pointi<3> -> value pattern.
 */
 template <typename _Func>
-inline MATAZURE_GENERAL void for_index(omp_policy, pointi<3> origin, pointi<3> end, _Func fun) {
+inline   void for_index(omp_policy, pointi<3> origin, pointi<3> end, _Func fun) {
 	MATAZURE_OPENMP_PARALLEL_FOR(3)
 	for (int_t k = origin[2]; k < end[2]; ++k) {
 		for (int_t j = origin[1]; j < end[1]; ++j) {
@@ -197,7 +197,7 @@ inline MATAZURE_GENERAL void for_index(omp_policy, pointi<3> origin, pointi<3> e
 * @param fun the functor,  pointi<4> -> value pattern.
 */
 template <typename _Func>
-inline MATAZURE_GENERAL void for_index(omp_policy, pointi<4> origin, pointi<4> end, _Func fun) {
+inline   void for_index(omp_policy, pointi<4> origin, pointi<4> end, _Func fun) {
 	MATAZURE_OPENMP_PARALLEL_FOR(4)
 	for (int_t l = origin[3]; l < end[3]; ++l) {
 		for (int_t k = origin[2]; k < end[2]; ++k) {
@@ -219,14 +219,14 @@ inline MATAZURE_GENERAL void for_index(omp_policy, pointi<4> origin, pointi<4> e
 * @param fun the functor,  pointi -> value pattern.
 */
 template <typename _Func, int_t _Rank>
-inline MATAZURE_GENERAL void for_index(pointi<_Rank> origin, pointi<_Rank> end, _Func fun) {
+inline   void for_index(pointi<_Rank> origin, pointi<_Rank> end, _Func fun) {
 	sequence_policy policy{};
 	for_index(policy, origin, end, fun);
 }
 
-
+MATAZURE_HD_WARNING_DISABLE
 template <typename _Func, int_t _Rank>
-inline MATAZURE_GENERAL void for_index(pointi<_Rank> end, _Func fun){
+inline   void for_index(pointi<_Rank> end, _Func fun){
 	for_index(zero<pointi<_Rank>>::value(), end, fun);
 }
 
@@ -236,8 +236,9 @@ inline MATAZURE_GENERAL void for_index(pointi<_Rank> end, _Func fun){
 * @param ts the source tensor
 * @param fun the functor, (element &) -> none pattern
 */
+MATAZURE_HD_WARNING_DISABLE
 template <typename _ExectutionPolicy, typename _Tensor, typename _Fun>
-inline MATAZURE_GENERAL void for_each(_ExectutionPolicy policy, _Tensor &&ts, _Fun fun, enable_if_t<are_linear_access<decay_t<_Tensor>>::value && none_device_memory<decay_t<_Tensor>>::value>* = 0) {
+inline void for_each(_ExectutionPolicy policy, _Tensor &&ts, _Fun fun, enable_if_t<are_linear_access<decay_t<_Tensor>>::value && none_device_memory<decay_t<_Tensor>>::value>* = 0) {
 	for_index(policy, 0, ts.size(), [&](int_t i) {
 		fun(ts[i]);
 	});
@@ -250,7 +251,7 @@ inline MATAZURE_GENERAL void for_each(_ExectutionPolicy policy, _Tensor &&ts, _F
 * @param fun the functor, (element &) -> none pattern
 */
 template <typename _ExectutionPolicy, typename _Tensor, typename _Fun>
-inline MATAZURE_GENERAL void for_each(_ExectutionPolicy policy, _Tensor &&ts, _Fun fun, enable_if_t<!are_linear_access<decay_t<_Tensor>>::value && none_device_memory<decay_t<_Tensor>>::value>* = 0) {
+inline void for_each(_ExectutionPolicy policy, _Tensor &&ts, _Fun fun, enable_if_t<!are_linear_access<decay_t<_Tensor>>::value && none_device_memory<decay_t<_Tensor>>::value>* = 0) {
 	for_index(policy, pointi<decay_t<_Tensor>::rank>::zeros(), ts.shape(), [&](pointi<decay_t<_Tensor>::rank> idx) {
 		fun(ts[idx]);
 	});
@@ -262,7 +263,7 @@ inline MATAZURE_GENERAL void for_each(_ExectutionPolicy policy, _Tensor &&ts, _F
 * @param fun the functor, (element &) -> none pattern
 */
 template <typename _Tensor, typename _Fun>
-inline MATAZURE_GENERAL void for_each(_Tensor &&ts, _Fun fun,
+inline   void for_each(_Tensor &&ts, _Fun fun,
 	enable_if_t<
 		none_device_memory<
 			enable_if_t<
@@ -283,8 +284,8 @@ inline MATAZURE_GENERAL void for_each(_Tensor &&ts, _Fun fun,
 * @param v the filled value
 */
 template <typename _ExectutionPolicy, typename _Tensor>
-inline MATAZURE_GENERAL void fill(_ExectutionPolicy policy, _Tensor &&ts, typename decay_t<_Tensor>::value_type v, enable_if_t<none_device_memory<decay_t<_Tensor>>::value>* = 0) {
-	for_each(policy, std::forward<_Tensor>(ts), [v](typename decay_t<_Tensor>::value_type &x) { x = v;});
+inline void fill(_ExectutionPolicy policy, _Tensor &&ts, typename decay_t<_Tensor>::value_type v, enable_if_t<none_device_memory<decay_t<_Tensor>>::value>* = 0) {
+	for_each(policy, std::forward<_Tensor>(ts), [v] (typename decay_t<_Tensor>::value_type &x) { x = v;});
 }
 
 /**
@@ -293,7 +294,7 @@ inline MATAZURE_GENERAL void fill(_ExectutionPolicy policy, _Tensor &&ts, typena
 * @param v the filled value
 */
 template <typename _Tensor>
-inline MATAZURE_GENERAL void fill(_Tensor &&ts, typename decay_t<_Tensor>::value_type v, enable_if_t<
+inline void fill(_Tensor &&ts, typename decay_t<_Tensor>::value_type v, enable_if_t<
 		none_device_memory<
 			enable_if_t<
 				is_linear_array<decay_t<_Tensor>>::value,
@@ -312,7 +313,7 @@ inline MATAZURE_GENERAL void fill(_Tensor &&ts, typename decay_t<_Tensor>::value
 * @param ts_dst the dest tensor
 */
 template <typename _ExectutionPolicy, typename _TensorSrc, typename _TensorDst>
-inline MATAZURE_GENERAL void copy(_ExectutionPolicy policy, const _TensorSrc &ts_src, _TensorDst &&ts_dst, enable_if_t<are_linear_access<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value && none_device_memory<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value>* = 0) {
+inline   void copy(_ExectutionPolicy policy, const _TensorSrc &ts_src, _TensorDst &&ts_dst, enable_if_t<are_linear_access<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value && none_device_memory<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value>* = 0) {
 	for_index(policy, 0, ts_src.size(), [&] (int_t i) {
 		ts_dst[i] = ts_src[i];
 	});
@@ -325,7 +326,7 @@ inline MATAZURE_GENERAL void copy(_ExectutionPolicy policy, const _TensorSrc &ts
 * @param ts_dst the dest tensor
 */
 template <typename _ExectutionPolicy, typename _TensorSrc, typename _TensorDst>
-inline MATAZURE_GENERAL void copy(_ExectutionPolicy policy, const _TensorSrc &ts_src, _TensorDst &&ts_dst, enable_if_t<!are_linear_access<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value && none_device_memory<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value>* = 0) {
+inline   void copy(_ExectutionPolicy policy, const _TensorSrc &ts_src, _TensorDst &&ts_dst, enable_if_t<!are_linear_access<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value && none_device_memory<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value>* = 0) {
 	for_index(policy, pointi<_TensorSrc::rank>::zeros(), ts_src.shape(), [&] (pointi<_TensorSrc::rank> idx) {
 		ts_dst[idx] = ts_src[idx];
 	});
@@ -337,7 +338,7 @@ inline MATAZURE_GENERAL void copy(_ExectutionPolicy policy, const _TensorSrc &ts
 * @param ts_dst the dest tensor
 */
 template <typename _TensorSrc, typename _TensorDst>
-inline MATAZURE_GENERAL void copy(const _TensorSrc &ts_src, _TensorDst &&ts_dst, enable_if_t<none_device_memory<enable_if_t<is_linear_array<decay_t<_TensorSrc>>::value, decay_t<_TensorSrc>>, decay_t<_TensorDst>>::value>* = 0) {
+inline   void copy(const _TensorSrc &ts_src, _TensorDst &&ts_dst, enable_if_t<none_device_memory<enable_if_t<is_linear_array<decay_t<_TensorSrc>>::value, decay_t<_TensorSrc>>, decay_t<_TensorDst>>::value>* = 0) {
 	sequence_policy policy;
 	copy(policy, ts_src, std::forward<_TensorDst>(ts_dst));
 }
@@ -350,7 +351,7 @@ inline MATAZURE_GENERAL void copy(const _TensorSrc &ts_src, _TensorDst &&ts_dst,
 * @param fun the functor, (e_src) -> e_dst pattern
 */
 template <typename _ExectutionPolicy, typename _TensorSrc, typename _TensorDst, typename _Fun>
-inline MATAZURE_GENERAL void transform(_ExectutionPolicy policy, const _TensorSrc &ts_src, _TensorDst &&ts_dst, _Fun fun, enable_if_t<are_linear_access<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value && none_device_memory<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value>* = 0) {
+inline   void transform(_ExectutionPolicy policy, const _TensorSrc &ts_src, _TensorDst &&ts_dst, _Fun fun, enable_if_t<are_linear_access<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value && none_device_memory<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value>* = 0) {
 	for_index(policy, 0, ts_src.size(), [&](int_t i) {
 		ts_dst[i] = fun(ts_src[i]);
 	});
@@ -364,7 +365,7 @@ inline MATAZURE_GENERAL void transform(_ExectutionPolicy policy, const _TensorSr
 * @param fun the functor, (e_src) -> e_dst pattern
 */
 template <typename _ExectutionPolicy, typename _TensorSrc, typename _TensorDst, typename _Fun>
-inline MATAZURE_GENERAL void transform(_ExectutionPolicy policy, const _TensorSrc &ts_src, _TensorDst &&ts_dst, _Fun fun, enable_if_t<!are_linear_access<decay_t<_TensorSrc>>::value && none_device_memory<decay_t<_TensorSrc>>::value>* = 0) {
+inline   void transform(_ExectutionPolicy policy, const _TensorSrc &ts_src, _TensorDst &&ts_dst, _Fun fun, enable_if_t<!are_linear_access<decay_t<_TensorSrc>>::value && none_device_memory<decay_t<_TensorSrc>>::value>* = 0) {
 	for_index(policy, pointi<_TensorSrc::rank>::zeros(), ts_src.shape(), [&] (pointi<_TensorSrc::rank> idx) {
 		ts_dst[idx] = fun(ts_src[idx]);
 	});
@@ -377,7 +378,7 @@ inline MATAZURE_GENERAL void transform(_ExectutionPolicy policy, const _TensorSr
 * @param fun the functor, (e_src) -> e_dst pattern
 */
 template <typename _TensorSrc, typename _TensorDst, typename _Fun>
-inline MATAZURE_GENERAL void transform(const _TensorSrc &ts_src, _TensorDst &&ts_dst, _Fun fun, enable_if_t<none_device_memory<enable_if_t<is_linear_array<decay_t<_TensorSrc>>::value, decay_t<_TensorSrc>>, decay_t<_TensorDst>>::value>* = 0)
+inline   void transform(const _TensorSrc &ts_src, _TensorDst &&ts_dst, _Fun fun, enable_if_t<none_device_memory<enable_if_t<is_linear_array<decay_t<_TensorSrc>>::value, decay_t<_TensorSrc>>, decay_t<_TensorDst>>::value>* = 0)
 {
 	sequence_policy policy{};
 	transform(policy, ts_src, std::forward<_TensorDst>(ts_dst), fun);
@@ -392,7 +393,7 @@ inline MATAZURE_GENERAL void transform(const _TensorSrc &ts_src, _TensorDst &&ts
 */
 ///@todo
 // template <typename _ExectutionPolicy, typename _Tensor, typename _VT, typename _BinaryFunc>
-// inline MATAZURE_GENERAL _VT reduce(_ExectutionPolicy policy, _Tensor ts, _VT init, _BinaryFunc binary_fun, enable_if_t<none_device_memory<decay_t<_Tensor>>::value>* = 0) {
+// inline   _VT reduce(_ExectutionPolicy policy, _Tensor ts, _VT init, _BinaryFunc binary_fun, enable_if_t<none_device_memory<decay_t<_Tensor>>::value>* = 0) {
 // 	auto re = init;
 // 	for_each(policy, ts, [&re, binary_fun](decltype(ts[0]) x) {
 // 		re = binary_fun(re, x);
@@ -408,7 +409,7 @@ inline MATAZURE_GENERAL void transform(const _TensorSrc &ts_src, _TensorDst &&ts
 * @param binary_fun the reduce functor, must be (element, element)-> value pattern
 */
 template <typename _Tensor, typename _VT, typename _BinaryFunc>
-inline MATAZURE_GENERAL _VT reduce(const _Tensor &ts, _VT init, _BinaryFunc binary_fun) {
+inline _VT reduce(const _Tensor &ts, _VT init, _BinaryFunc binary_fun) {
 	sequence_policy policy{};
 	auto re = init;
 	for_each(policy, ts, [&re, binary_fun] (decltype(ts[0]) x) {
@@ -419,7 +420,7 @@ inline MATAZURE_GENERAL _VT reduce(const _Tensor &ts, _VT init, _BinaryFunc bina
 }
 
 // template <typename _Tensor>
-// inline MATAZURE_GENERAL auto sum(const _Tensor &ts) {
+// inline   auto sum(const _Tensor &ts) {
 // 	return reduce(ts, zero<typename _Tensor::value_type>::value(), [](auto lhs, auto rhs) {
 // 		return lhs + rhs;
 // 	});

@@ -107,13 +107,15 @@ namespace matazure {
 
 		template <typename _Type = byte>
 		shared_ptr<_Type> shared_data() {
-			shared_ptr<_Type> sp_tmp(data<_Type>(), [sp_mem = sp_mem_](_Type * p) {});
+			auto sp_mem = sp_mem_;
+			shared_ptr<_Type> sp_tmp(data<_Type>(), [sp_mem](_Type * p) {});
 			return sp_tmp;
 		}
 
 		template <typename _Type = byte>
 		shared_ptr<const _Type> shared_data() const {
-			shared_ptr<const _Type> sp_tmp(data<_Type>(), [sp_mem = sp_mem_](const _Type * p) {});
+			auto sp_mem = sp_mem_;
+			shared_ptr<const _Type> sp_tmp(data<_Type>(), [sp_mem](const _Type * p) {});
 			return sp_tmp;
 		}
 

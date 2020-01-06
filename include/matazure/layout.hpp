@@ -1,6 +1,6 @@
 #pragma once
 
-#include <matazure/layout.hpp>
+#include <matazure/config.hpp>
 
 namespace matazure {
 
@@ -13,26 +13,28 @@ namespace matazure {
 	public:
 		const static int_t rank = _Rank;
 
-		first_major_layout(const pointi<rank> &shape) :
+		#pragma hd_warning_disable
+		MATAZURE_GENERAL first_major_layout(const pointi<rank> &shape) :
 			shape_(shape),
 			stride_(get_stride(shape))
 		{
-			for_each(shape_, [](int_t b){
-				if (b < 0) throw invalid_shape{};
-			});
+			// for_each(shape_, [](int_t b){
+			// 	if (b < 0) throw invalid_shape{};
+			// });
 		}
 
-		first_major_layout(const first_major_layout &rhs) :
+		MATAZURE_GENERAL first_major_layout(const first_major_layout &rhs) :
 			first_major_layout(rhs.shape())
 		{ }
 
-		first_major_layout & operator=(const first_major_layout &rhs) {
+		#pragma hd_warning_disable
+		MATAZURE_GENERAL first_major_layout & operator=(const first_major_layout &rhs) {
 			shape_ = rhs.shape();
 			stride_ = get_stride(shape_);
 
-			matazure::for_each(shape_, [](int_t b) {
-				if (b < 0) throw invalid_shape{};
-			});
+			// matazure::for_each(shape_, [](int_t b) {
+			// 	if (b < 0) throw invalid_shape{};
+			// });
 
 			return *this;
 		}
@@ -64,6 +66,8 @@ namespace matazure {
 		MATAZURE_GENERAL pointi<rank> stride() const{
 			return stride_;
 		}
+
+		MATAZURE_GENERAL ~first_major_layout() { }
 
 	private:
 		static pointi<rank> get_stride(pointi<rank> ext) {

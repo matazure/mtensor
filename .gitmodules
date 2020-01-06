@@ -4,3 +4,6 @@
 [submodule "test/vendor/googletest"]
 	path = third_party/googletest
 	url = https://github.com/Matazure/googletest.git
+[submodule "third_party/stb"]
+	path = third_party/stb
+	url = https://github.com/nothings/stb.git

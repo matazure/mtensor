@@ -16,7 +16,7 @@ private:
 	cudaError_t error_code_;
 };
 
-inline void assert_runtime_success(cudaError_t result) throw(runtime_error)
+inline void assert_runtime_success(cudaError_t result)
 {
 	if (result != cudaSuccess) {
 		throw runtime_error(result);
@@ -32,7 +32,7 @@ private:
 	cudaOccError error_code_;
 };
 
-inline void verify_occupancy_success(cudaOccError result) throw(occupancy_error)
+inline void verify_occupancy_success(cudaOccError result)
 {
 	if (result != CUDA_OCC_SUCCESS) {
 		throw occupancy_error(result);

@@ -52,3 +52,6 @@ x64
 
 .vscode
 core*
+*.png
+*.jpg
+*.bmp

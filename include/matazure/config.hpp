@@ -24,11 +24,13 @@
 	#define MATAZURE_DEVICE __device__
 	#define MATAZURE_GLOBAL __global__
 	#define __matazure__ MATAZURE_GENERAL
+	#define MATAZURE_HD_WARNING_DISABLE #pragma nv_exec_check_disable
 #else
 	#define MATAZURE_DEVICE
 	#define MATAZURE_GENERAL
 	#define MATAZURE_GLOBAL
 	#define __matazure__
+	#define MATAZURE_HD_WARNING_DISABLE
 #endif
 
 #ifdef _OPENMP
