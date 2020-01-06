@@ -153,7 +153,7 @@ git clone https://github.com/Matazure/tensor.git
 ## 环境要求
 
 * C++支持需要编译器支持C++11
-* CUDA支持，建议CUDA10.1以上版本
+* CUDA支持，需CUDA10.0及其以上版本
 
 <!-- Tensor的代码规范遵循C++14标准， 所以只需编译器支持C++14即可, 推荐使用g++-7.4.0
 
