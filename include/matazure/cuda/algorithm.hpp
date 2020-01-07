@@ -169,10 +169,12 @@ template <typename _ExecutionPolicy, int_t _Rank, typename _Fun>
 inline void for_index(_ExecutionPolicy policy, pointi<_Rank> origin, pointi<_Rank> end, _Fun fun) {
 	auto extent = end - origin;
 	auto stride = matazure::cumulative_prod(extent);
-	auto max_size = index2offset((end - 1), stride, first_major{}) + 1; //要包含最后一个元素
+
+	first_major_layout<_Rank> layout(extent);
+	auto max_size = layout.index2offset(end - 1) + 1; //要包含最后一个元素
 
 	cuda::for_index(policy, 0, max_size, [=] __device__ (int_t i) {
-		fun(offset2index(i, stride, first_major{}) + origin);
+		fun(layout.offset2index(i) + origin);
 	});
 }
 

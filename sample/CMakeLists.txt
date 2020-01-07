@@ -15,3 +15,6 @@ if (WITH_CUDA)
     target_include_directories(sample4 PUBLIC  ${PROJECT_SOURCE_DIR}/third_party/stb)
     target_link_libraries(sample4 tensor)
 endif ()
+
+add_executable(sample5 sample5.cpp)
+target_link_libraries(sample5 tensor)

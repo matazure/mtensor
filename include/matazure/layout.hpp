@@ -8,6 +8,7 @@ namespace matazure {
 	* \defgroup Tensor Memory Layout
 	* @{
 	*/
+
 	template <int_t _Rank>
 	class first_major_layout{
 	public:
