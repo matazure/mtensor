@@ -140,8 +140,19 @@ namespace matazure {
 		*/
 		explicit tensor(const pointi<rank> &ext, std::shared_ptr<value_type> sp_data) :
 			shape_(ext),
-			layout_(ext),
+			layout_(ext),  //if compile error, make sure you call right constructor
 			sp_data_(sp_data),
+			data_(sp_data_.get())
+		{ }
+
+		/**
+		 *
+		 *
+		 */
+		explicit tensor(const pointi<rank> & shape, const pointi<rank> & origin_padding, const pointi<rank> & end_padding) :
+			shape_(shape),
+			layout_(shape, origin_padding, end_padding),
+			sp_data_(malloc_shared_memory(layout_.stride()[rank - 1])),
 			data_(sp_data_.get())
 		{ }
 
@@ -281,7 +292,7 @@ namespace matazure {
 	};
 
 	using column_major_layout = first_major_layout<2>;
-	using row_major_layout = last_major_layout<2>;
+	// using row_major_layout = last_major_layout<2>;
 
 	/// alias of tensor<static_tensor<_ValueType, _BlockDim>, _BlockDim::size(), _Layout>
 	template <typename _ValueType, typename _BlockDim, typename _Layout = first_major_layout<_BlockDim::size()>>

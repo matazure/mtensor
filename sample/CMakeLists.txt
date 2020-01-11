@@ -16,5 +16,6 @@ if (WITH_CUDA)
     target_link_libraries(sample4 tensor)
 endif ()
 
-add_executable(sample5 sample5.cpp)
-target_link_libraries(sample5 tensor)
+add_executable(sample5_gradient sample5_gradient.cpp)
+target_include_directories(sample5_gradient PUBLIC  ${PROJECT_SOURCE_DIR}/third_party/stb)
+target_link_libraries(sample5_gradient tensor)

@@ -6,6 +6,7 @@
 #include <matazure/meta.hpp>
 #include <matazure/dynamic_tensor.hpp>
 #include <matazure/iterator.hpp>
+#include <matazure/for_border.hpp>
 
 #include <matazure/complex.hpp>
 
