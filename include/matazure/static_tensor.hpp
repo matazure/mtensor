@@ -4,6 +4,42 @@
 
 namespace matazure {
 
+	/**
+	* @brief convert array index to linear index by first marjor
+	* @param id array index
+	* @param stride tensor stride
+	* @param first_major
+	* @return linear index
+	*/
+	template <int_t _Rank>
+	inline MATAZURE_GENERAL typename pointi<_Rank>::value_type index2offset(const pointi<_Rank> &id, const pointi<_Rank> &stride, first_major) {
+		typename pointi<_Rank>::value_type offset = id[0];
+		for (int_t i = 1; i < _Rank; ++i) {
+			offset += id[i] * stride[i - 1];
+		}
+
+		return offset;
+	};
+
+	/**
+	* @brief convert array index to linear index by first marjor
+	* @param offset linear index
+	* @param stride the stride of tensor
+	* @param first_major
+	* @return array index
+	*/
+	template <int_t _Rank>
+	inline MATAZURE_GENERAL pointi<_Rank> offset2index(typename pointi<_Rank>::value_type offset, const pointi<_Rank> &stride, first_major) {
+		pointi<_Rank> id;
+		for (int_t i = _Rank - 1; i > 0; --i) {
+			id[i] = offset / stride[i - 1];
+			offset = offset % stride[i - 1];
+		}
+		id[0] = offset;
+
+		return id;
+	}
+
 	template <int_t... _Values>
 	using dim = meta::array<_Values ...>;
 
@@ -110,7 +146,7 @@ namespace matazure {
 		* @param idx array index
 		* @return element const reference
 		*/
-		MATAZURE_GENERAL constexpr const_reference operator[](const pointi<rank> &idx) const {
+		MATAZURE_GENERAL constexpr const_reference operator()(const pointi<rank> &idx) const {
 			return (*this)[index2offset(idx, stride(), first_major{})];
 		}
 
@@ -119,7 +155,7 @@ namespace matazure {
 		* @param idx array index
 		* @return element reference
 		*/
-		MATAZURE_GENERAL reference operator[](const pointi<rank> &idx) {
+		MATAZURE_GENERAL reference operator()(const pointi<rank> &idx) {
 			return (*this)[index2offset(idx, stride(), first_major{})];
 		}
 
@@ -130,15 +166,9 @@ namespace matazure {
 		*/
 		template <typename ..._Idx>
 		MATAZURE_GENERAL reference operator()(_Idx... idx) {
-			return (*this)[pointi<rank>{ idx... }];
+			return (*this)(pointi<rank>{ idx... });
 		}
 
-		/// prevents operator() const matching with pointi<rank> argument
-		template <typename _Idx>
-		MATAZURE_GENERAL reference operator()(_Idx idx) const {
-			static_assert(std::is_same<_Idx, int_t>::value && rank == 1, "only operator [] support access data by pointi");
-			return (*this)[pointi<1>{idx}];
-		}
 
 		/**
 		* @brief accesses element by array access mode
@@ -147,15 +177,9 @@ namespace matazure {
 		*/
 		template <typename ..._Idx>
 		MATAZURE_GENERAL constexpr const_reference operator()(_Idx... idx) const {
-			return (*this)[pointi<rank>{ idx... }];
+			return (*this)(pointi<rank>{ idx... });
 		}
 
-		/// prevents operator() matching with pointi<rank> argument
-		template <typename _Idx>
-		MATAZURE_GENERAL const_reference operator()(_Idx idx) {
-			static_assert(std::is_same<_Idx, int_t>::value && rank == 1, "only operator [] support access data by pointi");
-			return (*this)[pointi<1>{idx}];
-		}
 
 		/// @return the meta shape instance of tensor
 		MATAZURE_GENERAL static constexpr meta_shape_type meta_shape() {

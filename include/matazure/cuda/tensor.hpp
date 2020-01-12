@@ -47,10 +47,24 @@ public:
 	{ }
 
 	MATAZURE_HD_WARNING_DISABLE
+	MATAZURE_GENERAL
 	explicit tensor(pointi<rank> ext, std::shared_ptr<value_type> sp_data) :
 		shape_(ext),
 		layout_(ext),
 		sp_data_(sp_data),
+		data_(sp_data_.get())
+	{ }
+
+	/**
+	 *
+	 *
+	 */
+	MATAZURE_HD_WARNING_DISABLE
+	MATAZURE_GENERAL
+	explicit tensor(const pointi<rank> & shape, const pointi<rank> & origin_padding, const pointi<rank> & end_padding) :
+		shape_(shape),
+		layout_(shape, origin_padding, end_padding),
+		sp_data_(malloc_shared_memory(layout_.stride()[rank - 1])),
 		data_(sp_data_.get())
 	{ }
 
@@ -87,7 +101,9 @@ public:
 		return data_[i];
 	}
 
+	MATAZURE_HD_WARNING_DISABLE
 	MATAZURE_GENERAL pointi<rank> shape() const { return shape_; }
+
 	MATAZURE_GENERAL pointi<rank> stride() const { return layout_.stride(); }
 	MATAZURE_GENERAL int_t size() const { return layout_.stride()[rank - 1]; }
 
