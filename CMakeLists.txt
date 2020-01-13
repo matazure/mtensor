@@ -27,6 +27,11 @@ endif()
 
 option(WITH_CUDA "With CUDA" OFF)
 if(WITH_CUDA)
+	if (MSVC)
+		#use yourself nvcc version
+		set(CMAKE_CUDA_COMPILER "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v10.0/bin/nvcc.exe")
+	endif()
+
 	enable_language(CUDA)
 	set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-extended-lambda")
 endif()

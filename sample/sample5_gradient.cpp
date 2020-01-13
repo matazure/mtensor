@@ -1,4 +1,4 @@
-#include "image_helper.hpp"
+﻿#include "image_helper.hpp"
 #include <matazure/tensor>
 
 using namespace matazure;

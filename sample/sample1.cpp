@@ -1,10 +1,10 @@
-#include <matazure/tensor>
+﻿#include <matazure/tensor>
 
 using namespace matazure;
 
 int main(int argc, char *argv[]) {
 	//构造一个10x5的二维数组
-	constexpr int rank = 2;
+	const int rank = 2;
 	int col = 10;
 	int row = 5;
 	pointi<rank> shape{col, row};

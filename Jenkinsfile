@@ -96,7 +96,7 @@ pipeline{
 					stages {
 						stage('build'){
 							steps {
-								bat 'call ./script/build_windows.bat'
+								bat 'call ./script/build_windows.bat -DWITH_CUDA=ON'
 							}
 						}
 					}

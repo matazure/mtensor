@@ -1,7 +1,5 @@
 #pragma once
 
-#pragma hd_warning_disable
-
 #include <cuda_runtime.h>
 #include <matazure/tensor.hpp>
 #include <matazure/cuda/algorithm.hpp>
