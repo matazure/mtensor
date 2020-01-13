@@ -41,12 +41,12 @@ int main(int argc, char * argv[]) {
 			sh_ts_block(block_idx.local) = cimg_padding(valid_global_idx);
 		}
 
-		cuda::device::barrier();
+		cuda::sync_threads();
 
 		if (inside_range(block_idx.local, padding, block_idx.block_dim - padding)
 			&& inside_range(valid_global_idx, pointi<2>::zeros(), cimg_padding.shape())) {
 			auto sum = zero<pointf<3>>::value();
-			cuda::device::for_index(pointi<2>::zeros(), ckernel_mean.shape(), [&](const pointi<2> &idx) {
+			for_index(pointi<2>::zeros(), ckernel_mean.shape(), [&](const pointi<2> &idx) {
 				sum += sh_ts_block(block_idx.local + idx - padding) * ckernel_mean(idx);
 			});
 			cimg_mean[valid_global_idx] = sum;

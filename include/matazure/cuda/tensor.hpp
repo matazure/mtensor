@@ -246,13 +246,9 @@ inline void memset(tensor<_ValueType, _Rank> ts, int v) {
 	assert_runtime_success(cudaMemset(ts.shared_data().get(), v, ts.size() * sizeof(_ValueType)));
 }
 
-namespace device {
-
-inline void MATAZURE_DEVICE barrier() {
+inline void MATAZURE_DEVICE sync_threads() {
 	__syncthreads();
 }
-
-} //device
 
 template <typename _Type, int_t _Rank, typename _Layout>
 inline tensor<_Type, _Rank, _Layout> mem_clone(tensor<_Type, _Rank, _Layout> ts, device_tag) {

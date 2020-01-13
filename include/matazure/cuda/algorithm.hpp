@@ -71,57 +71,6 @@ inline MATAZURE_GENERAL pointi<3> dim3_to_pointi(dim3 u) {
 
 }
 
-namespace device {
-
-template <typename _Func>
-inline MATAZURE_DEVICE void for_index(int_t first, int_t last, _Func fun) {
-	for (int_t i = first; i < last; ++i) {
-		fun(i);
-	}
-}
-
-template <typename _Func>
-inline MATAZURE_DEVICE void for_index(pointi<1> origin, pointi<1> extent, _Func fun) {
-	for (int_t i = origin[0]; i < extent[0]; ++i) {
-		fun(pointi<1>{ { i } });
-	}
-}
-
-template <typename _Func>
-inline MATAZURE_DEVICE void for_index(pointi<2> origin, pointi<2> extent, _Func fun) {
-	for (int_t j = origin[1]; j < extent[1]; ++j) {
-		for (int_t i = origin[0]; i < extent[0]; ++i) {
-			fun(pointi<2>{ { i, j } });
-		}
-	}
-}
-
-template <typename _Func>
-inline MATAZURE_DEVICE void for_index(pointi<3> origin, pointi<3> extent, _Func fun) {
-	for (int_t k = origin[2]; k < extent[2]; ++k) {
-		for (int_t j = origin[1]; j < extent[1]; ++j) {
-			for (int_t i = origin[0]; i < extent[0]; ++i) {
-				fun(pointi<3>{ { i, j, k } });
-			}
-		}
-	}
-}
-
-template <typename _Func>
-inline MATAZURE_DEVICE void for_index(pointi<4> origin, pointi<4> extent, _Func fun) {
-	for (int_t l = origin[3]; l < extent[3]; ++l) {
-		for (int_t k = origin[2]; k < extent[2]; ++k) {
-			for (int_t j = origin[1]; j < extent[1]; ++j) {
-				for (int_t i = origin[0]; i < extent[0]; ++i) {
-					fun(pointi<4>{ {i, j, k, l} });
-				}
-			}
-		}
-	}
-}
-
-}
-
 MATAZURE_HD_WARNING_DISABLE
 template <typename Function, typename... Arguments>
 MATAZURE_GLOBAL void kenel(Function f, Arguments... args)
