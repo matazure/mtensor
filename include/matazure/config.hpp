@@ -13,18 +13,29 @@
 
 //for cuda
 #if defined(__CUDACC__) && !defined(MATAZURE_DISABLE_CUDA)
-	#if __CUDACC_VER_MAJOR__ < 9
-		#error CUDA minimum version is 9.0
+	#ifdef __clang__
+		#if __clang_major__ < 9
+			#error clang minimum version is 9 for cuda
+		#endif
+	#else
+		#if __CUDACC_VER_MAJOR__ < 10
+			#error CUDA minimum version is 10.0
+		#endif
 	#endif
 
 	#define MATAZURE_CUDA
 #endif
+
 #ifdef MATAZURE_CUDA
 	#define MATAZURE_GENERAL __host__ __device__
 	#define MATAZURE_DEVICE __device__
 	#define MATAZURE_GLOBAL __global__
 	#define __matazure__ MATAZURE_GENERAL
-	#define MATAZURE_HD_WARNING_DISABLE #pragma nv_exec_check_disable
+	#ifndef __clang__
+		#define MATAZURE_HD_WARNING_DISABLE #pragma nv_exec_check_disable
+	#else
+		#define MATAZURE_HD_WARNING_DISABLE
+	#endif
 #else
 	#define MATAZURE_DEVICE
 	#define MATAZURE_GENERAL
