@@ -12,8 +12,6 @@ int main(int argc, char *argv[]) {
 	fill(ts_a, 1.0f);
 	fill(ts_b, 2.0f);
 
-	std::cout << "cuda major version: " << __clang_major__ << std::endl;
-
 	//构造gpu上的tensor
 	cuda::tensor<float, 2> cts_a(shape);
 	cuda::tensor<float, 2> cts_b(shape);
