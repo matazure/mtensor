@@ -1,9 +1,9 @@
 #!/bin/bash
 
-mkdir -p build/linux/arm
-cd build/linux/arm
+mkdir -p build-linux-arm
+cd build-linux-arm
 
-cmake ../../../ \
+cmake .. \
 	-DCMAKE_TOOLCHAIN_FILE=cmake/gcc-linaro-arm-linux.toolchain.cmake \
 	-DCMAKE_BUILD_TYPE=Release \
 	-DBUILD_TEST=ON \

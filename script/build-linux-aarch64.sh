@@ -1,9 +1,9 @@
 #!/bin/bash
 
-mkdir -p build/linux/aarch64
-cd build/linux/aarch64
+mkdir -p build-linux-aarch64
+cd build-linux-aarch64
 
-cmake ../../../ \
+cmake .. \
 	-DCMAKE_TOOLCHAIN_FILE=cmake/gcc-linaro-aarch64-linux.toolchain.cmake \
 	-DCMAKE_BUILD_TYPE=Release \
 	-DBUILD_TEST=ON \
