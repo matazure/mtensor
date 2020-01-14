@@ -157,6 +157,10 @@ git clone https://github.com/Matazure/tensor.git
     set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-extended-lambda")
 ```
 
+### 问题
+
+* 目前CUDA的tensor编译还有不少warning，可以忽略，后期会逐渐去除
+
 ## 环境要求
 
 * 需要编译器开启C++11的支持\AAA

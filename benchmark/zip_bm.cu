@@ -59,7 +59,7 @@ void bm_zip(benchmark::State &state) {
 //		cuda::execution_policy policy;
 //		cuda::assert_runtime_success(cuda::configure_grid(policy, tensor_operation_gold_kenel<_ValueType>));
 //		tensor_operation_gold_kenel<<< policy.grid_size(),
-//			policy.block_size(),
+//			policy.block_dim(),
 //			policy.shared_mem_bytes(),
 //			policy.stream() >>>(ts_re.data(), ts1.data(), ts2.data(), ts_re.size());
 //	}

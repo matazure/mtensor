@@ -18,9 +18,9 @@ int main(int argc, char * argv[]) {
 	cuda::tensor<pointf<3>, 2> ckernel_mean(kernel_mean.shape());
 	mem_copy(kernel_mean, ckernel_mean);
 
-	typedef dim<16, 16> BLOCK_SIZE;
-	pointi<2> block_size = BLOCK_SIZE::value();
-	auto valid_block_dim = block_size - kernel_mean.shape() + pointi<2>{1, 1};
+	typedef dim<16, 16> BLOCK_DIM;
+	pointi<2> block_dim = BLOCK_DIM::value();
+	auto valid_block_dim = block_dim - kernel_mean.shape() + pointi<2>{1, 1};
 	auto grid_dim = (img_rgb.shape() + valid_block_dim - pointi<2>{1, 1}) / valid_block_dim;
 	auto padding = kernel_mean.shape() / 2;
 
@@ -33,9 +33,9 @@ int main(int argc, char * argv[]) {
 
 	cuda::tensor<pointf<3>, 2> cimg_mean(img_rgb.shape());
 
-	cuda::block_for_index<BLOCK_SIZE>(grid_dim, [=] __device__ (cuda::block_index<BLOCK_SIZE> block_idx) {
+	cuda::block_for_index<BLOCK_DIM>(grid_dim, [=] __device__ (cuda::block_index<BLOCK_DIM> block_idx) {
 		auto valid_global_idx = valid_block_dim * block_idx.block + block_idx.local - padding;
-		__shared__ static_tensor<pointf<3>, BLOCK_SIZE> sh_ts_block;
+		__shared__ static_tensor<pointf<3>, BLOCK_DIM> sh_ts_block;
 
 		if (inside_range(valid_global_idx, -padding, cimg_padding.shape() + padding)) {
 			sh_ts_block(block_idx.local) = cimg_padding(valid_global_idx);
@@ -57,6 +57,7 @@ int main(int argc, char * argv[]) {
 	cuda::transform(cimg_mean, cimg_mean_byte, [] __device__ (pointf<3> pixel) {
 		return point_cast<byte>(pixel);
 	});
+	cuda::device_synchronize();
 
 	tensor<pointb<3>, 2> img_mean(cimg_mean_byte.shape());
 	mem_copy(cimg_mean_byte, img_mean);

@@ -89,7 +89,7 @@ template <typename _ExecutionPolicy, typename _Fun, typename... _Args>
 inline void launch(_ExecutionPolicy exe_policy, _Fun f, _Args... args)
 {
 	configure_grid(exe_policy, kenel<_Fun, _Args...>);
-	kenel <<< exe_policy.grid_size(), exe_policy.block_size(), exe_policy.shared_mem_bytes(), exe_policy.stream() >>> (f, args...);
+	kenel <<< exe_policy.grid_size(), exe_policy.block_dim(), exe_policy.shared_mem_bytes(), exe_policy.stream() >>> (f, args...);
 	assert_runtime_success(cudaGetLastError());
 }
 

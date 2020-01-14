@@ -9,7 +9,7 @@ namespace meta {
 
 namespace __walkground{
 	template <int_t... _Values>
-	constexpr pointi<sizeof...(_Values)> get_pointi() {
+	MATAZURE_GENERAL inline constexpr pointi<sizeof...(_Values)> get_pointi() {
 		return { _Values ... };
 	}
 }

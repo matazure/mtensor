@@ -19,6 +19,9 @@ if (WITH_CUDA)
 
     add_executable(sample6_convolution sample6_convolution.cu)
     target_link_libraries(sample6_convolution tensor image_helper)
+
+    add_executable(sample7_matrix_mul sample7_matrix_mul.cu)
+    target_link_libraries(sample7_matrix_mul tensor image_helper)
 endif ()
 
 add_executable(sample5_gradient sample5_gradient.cpp)

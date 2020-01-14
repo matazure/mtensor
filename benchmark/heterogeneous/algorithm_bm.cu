@@ -18,7 +18,7 @@ void bm_gold_cu_tensor_rank1_fill(benchmark::State& state) {
 		policy.total_size(ts_src.size());
 		cuda::configure_grid(policy, gold_tensor_rank1_fill_kernel<_ValueType>);
 		gold_tensor_rank1_fill_kernel<<< policy.grid_size(),
-			policy.block_size(),
+			policy.block_dim(),
 			policy.shared_mem_bytes(),
 			policy.stream() >>>(ts_src.data(), ts_src.size(), zero<_ValueType>::value());
 		cuda::device_synchronize();
@@ -62,7 +62,7 @@ void bm_gold_cu_copy_rank1_fill(benchmark::State& state) {
 		policy.total_size(ts_src.size());
 		cuda::configure_grid(policy, gold_tensor_rank1_copy_kernel<_ValueType>);
 		gold_tensor_rank1_copy_kernel<<< policy.grid_size(),
-			policy.block_size(),
+			policy.block_dim(),
 			policy.shared_mem_bytes(),
 			policy.stream() >>>(ts_src.data(), ts_dst.data(), ts_src.size());
 

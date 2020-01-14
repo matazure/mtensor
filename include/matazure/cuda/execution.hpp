@@ -52,8 +52,8 @@ public:
 	int grid_size() const		{ return grid_size_; }
 	void grid_size(int arg)		{ grid_size_ = arg; }
 
-	int block_size() const		{ return block_size_; }
-	void block_size(int arg)	{block_size_ = arg; }
+	int block_dim() const		{ return block_size_; }
+	void block_dim(int arg)	{block_size_ = arg; }
 
 	size_t shared_mem_bytes() const		{ return shared_mem_bytes_; }
 	void shared_mem_bytes(size_t arg)	{ shared_mem_bytes_ = arg; }
@@ -94,10 +94,10 @@ inline void configure_grid(execution_policy &exe_policy, __KernelFunc k)
 
 	int bsize = 0, minGridSize = 0;
 	verify_occupancy_success(cudaOccMaxPotentialOccupancyBlockSize(&minGridSize, &bsize, &occProp, &occAttrib, &occState, exe_policy.shared_mem_bytes()));
-	exe_policy.block_size(bsize);
+	exe_policy.block_dim(bsize);
 
 	cudaOccResult result;
-	verify_occupancy_success(cudaOccMaxActiveBlocksPerMultiprocessor(&result, &occProp, &occAttrib, &occState, exe_policy.block_size(), exe_policy.shared_mem_bytes()));
+	verify_occupancy_success(cudaOccMaxActiveBlocksPerMultiprocessor(&result, &occProp, &occAttrib, &occState, exe_policy.block_dim(), exe_policy.shared_mem_bytes()));
 	exe_policy.grid_size(result.activeBlocksPerMultiprocessor * numSMs);
 
 	int smemGranularity = 0;
@@ -138,16 +138,16 @@ inline void configure_grid(parallel_execution_policy &exe_policy, __KernelFunc k
 
 	int bsize = 0, minGridSize = 0;
 	verify_occupancy_success(cudaOccMaxPotentialOccupancyBlockSize(&minGridSize, &bsize, &occProp, &occAttrib, &occState, exe_policy.shared_mem_bytes()));
-	exe_policy.block_size(bsize);
+	exe_policy.block_dim(bsize);
 
 	cudaOccResult result;
-	verify_occupancy_success(cudaOccMaxActiveBlocksPerMultiprocessor(&result, &occProp, &occAttrib, &occState, exe_policy.block_size(), exe_policy.shared_mem_bytes()));
+	verify_occupancy_success(cudaOccMaxActiveBlocksPerMultiprocessor(&result, &occProp, &occAttrib, &occState, exe_policy.block_dim(), exe_policy.shared_mem_bytes()));
 	exe_policy.grid_size(result.activeBlocksPerMultiprocessor * numSMs);
 
-	auto pre_block_size = exe_policy.block_size();
+	auto pre_block_size = exe_policy.block_dim();
 	auto tmp_block_size = __occDivideRoundUp(exe_policy.total_size(), exe_policy.grid_size());
 	tmp_block_size = __occRoundUp(tmp_block_size, 128);
-	exe_policy.block_size(std::min(tmp_block_size, pre_block_size));
+	exe_policy.block_dim(std::min(tmp_block_size, pre_block_size));
 
 	int smemGranularity = 0;
 	verify_occupancy_success(cudaOccSMemAllocationGranularity(&smemGranularity, &occProp));

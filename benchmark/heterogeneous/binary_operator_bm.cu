@@ -25,7 +25,7 @@ void bm_gold_cu_tensor_rank1_mul(benchmark::State& state) {
 		cuda::execution_policy policy;
 		cuda::configure_grid(policy, gold_tensor_rank1_mul_kenel<_ValueType>);
 		gold_tensor_rank1_mul_kenel<<< policy.grid_size(),
-			policy.block_size(),
+			policy.block_dim(),
 			policy.shared_mem_bytes(),
 			policy.stream() >>>(ts_re.data(), ts0.data(), ts1.data(), ts_re.size());
 		cuda::device_synchronize();
