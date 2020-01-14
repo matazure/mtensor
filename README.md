@@ -148,17 +148,21 @@ git clone https://github.com/Matazure/tensor.git
 
 ## 如何在你的项目中集成
 
-将Tensor项目的根目录加入到目标项目的头文件路径即可，无第三方库和动态库依赖。 对于CUDA项目，需要nvcc的编译参数需要加入"--expt-extended-lambda -std=c++11"。 CUDA的官方文档有nvcc编译参数设置的详细说明，也可参考本项目的CMakeLists.txt。
+在你的项目的头文件路径中包含include目录路径即可，无第三方库和动态库依赖。
+
+对于CUDA项目，需要nvcc加入编译参数"--expt-extended-lambda"和"-std=c++11"。 CUDA的官方文档有nvcc编译参数设置的详细说明，也可参考本项目的CMakeLists.txt。
+
+```cmake
+    set(CMAKE_CUDA_STANDARD 11)
+    set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-extended-lambda")
+```
 
 ## 环境要求
 
-* C++支持需要编译器支持C++11
-* CUDA支持，需CUDA10.0及其以上版本
+* 需要编译器开启C++11的支持\AAA
+* 需要CUDA的编译器（a，需CUDA10.0及其以上版本
 
-<!-- Tensor的代码规范遵循C++14标准， 所以只需编译器支持C++14即可, 推荐使用g++-7.4.0
-
-### CUDA支持
-
+<!-- Tensor的代码规范遵循C++14标准， 所以只需编译器支持C++14即可, 推荐使用g++-7I
 在符合CPU支持的基础上，需要安装[至少CUDA 10.1](https://developer.nvidia.com/cuda-downloads)，详情可查看[CUDA官方文档](http://docs.nvidia.com/cuda/index.html#axzz4kQuxAvUe) -->
 
 <!-- ## 性能
