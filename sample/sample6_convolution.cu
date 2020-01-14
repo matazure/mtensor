@@ -19,7 +19,7 @@ int main(int argc, char * argv[]) {
 	mem_copy(kernel_mean, ckernel_mean);
 
 	typedef dim<16, 16> BLOCK_SIZE;
-	pointi<2> block_size{16, 16};
+	pointi<2> block_size = BLOCK_SIZE::value();
 	auto valid_block_dim = block_size - kernel_mean.shape() + pointi<2>{1, 1};
 	auto grid_dim = (img_rgb.shape() + valid_block_dim - pointi<2>{1, 1}) / valid_block_dim;
 	auto padding = kernel_mean.shape() / 2;
