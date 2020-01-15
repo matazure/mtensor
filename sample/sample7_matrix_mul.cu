@@ -3,7 +3,6 @@
 using namespace matazure;
 
 int main(int argc, char * argv[]) {
-
 	const int BLOCK_SIZE = 16;
 	typedef dim<BLOCK_SIZE, BLOCK_SIZE> BLOCK_DIM;
 	pointi<2> block_dim = BLOCK_DIM::value();
