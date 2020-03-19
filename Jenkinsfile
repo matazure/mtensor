@@ -12,9 +12,6 @@ pipeline{
 						dockerfile {
 							filename 'tensor-dev-ubuntu18.04.dockerfile'
 							dir 'dockerfile'
-							// label 'my-defined-label'
-							// additionalBuildArgs  '--build-arg version=1.0.2'
-							// args '-v /tmp:/tmp'
 						}
 					}
 					environment {

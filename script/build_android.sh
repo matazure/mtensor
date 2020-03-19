@@ -13,7 +13,8 @@ else
 fi
 
 if [ -z "$ANDROID_ABI" ]; then
-    export ANDROID_ABI="armeabi-v7a"
+    # export ANDROID_ABI="armeabi-v7a"
+    export ANDROID_ABI="arm64-v8a"
     echo "Set ANDROID_ABI $ANDROID_ABI"
 fi
 

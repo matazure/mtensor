@@ -268,10 +268,20 @@ namespace matazure {
 	private:
 		shared_ptr<value_type> malloc_shared_memory(int_t size) {
 			size = size > 0 ? size : 1;
-			value_type *data = new decay_t<value_type>[size];
+			// value_type *data = new decay_t<value_type>[size];
+		#ifdef __GNUC__
+			value_type * data;
+			auto tmp = posix_memalign((void**)&data, 32, size * sizeof(value_type));
 			return shared_ptr<value_type>(data, [](value_type *ptr) {
-				delete[] ptr;
+				free(ptr);
 			});
+		#else
+			value_type * data;
+			data = static_cast<value_type *>(_aligned_malloc(size * sizeof(value_type), 32));
+			return shared_ptr<value_type>(data, [](value_type * ptr) {
+				_aligned_free(ptr);
+			});
+		#endif
 		}
 
 	#ifdef MATAZURE_CUDA

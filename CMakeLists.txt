@@ -12,10 +12,13 @@ endif()
 
 project(Matazure.Tensor CXX)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+if (NOT CMAKE_BUILD_TYPE) 
+	set(CMAKE_BUILD_TYPE Release)
+endif()
 
 set(CMAKE_CUDA_STANDARD ${CMAKE_CXX_STANDARD})
 set(CMAKE_CUDA_STANDARD_REQUIRED ON)
@@ -49,6 +52,8 @@ if(WITH_OPENMP)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
 	endif()
 endif()
+
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
 
 option(BUILD_EXAMPLE "Build Example" ON)
 option(BUILD_TEST "Build Test" ON)
@@ -106,7 +111,7 @@ if (BUILD_EXAMPLE)
 endif()
 
 if (BUILD_BENCHMARK)
-	add_subdirectory(benchmark EXCLUDE_FROM_ALL)
+	add_subdirectory(benchmark)
 endif()
 
 if (BUILD_TEST)

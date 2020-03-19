@@ -10,12 +10,13 @@
 	#if defined(_MSC_VER)
 		#define MATAZURE_OPENMP_PARALLEL_FOR(n) __pragma(omp parallel for)
 	#else
-		#if _OPENMP >= 200805
-			// #define PRIVATE_MATAZURE_PARALLEL_FOR(n) "omp parallel for schedule(dynamic, 1) collapse(" #n ")"
-		 	#define MATAZURE_OPENMP_PARALLEL_FOR(n) _Pragma(MATAZURE_STRINGIFY(omp parallel for schedule(dynamic, 1) collapse(n)))
-		#else
+		// omp collapse will effect the memory continues 
+		// #if _OPENMP >= 200805
+		// 	// #define PRIVATE_MATAZURE_PARALLEL_FOR(n) "omp parallel for schedule(dynamic, 1) collapse(" #n ")"
+		//  	#define MATAZURE_OPENMP_PARALLEL_FOR(n) _Pragma(MATAZURE_STRINGIFY(omp parallel for schedule(dynamic, 1) collapse(n)))
+		// #else
 		 	#define MATAZURE_OPENMP_PARALLEL_FOR(n) _Pragma("omp parallel for")
-		#endif
+		// #endif
 	#endif
 #endif
 
@@ -201,7 +202,7 @@ inline   void for_index(omp_policy, pointi<3> origin, pointi<3> end, _Func fun) 
 * @param fun the functor,  pointi<4> -> value pattern.
 */
 template <typename _Func>
-inline   void for_index(omp_policy, pointi<4> origin, pointi<4> end, _Func fun) {
+inline void for_index(omp_policy, pointi<4> origin, pointi<4> end, _Func fun) {
 	MATAZURE_OPENMP_PARALLEL_FOR(4)
 	for (int_t l = origin[3]; l < end[3]; ++l) {
 		for (int_t k = origin[2]; k < end[2]; ++k) {
