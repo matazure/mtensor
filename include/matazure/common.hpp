@@ -8,6 +8,7 @@
 #endif
 
 #include <matazure/unary.hpp>
+#include <matazure/geometry.hpp>
 
 namespace matazure {
 
@@ -312,7 +313,7 @@ public:
 	{}
 
 	MATAZURE_GENERAL auto operator()(pointi<_Tensor::rank> idx) const->decltype(zero<decay_t<typename _Tensor::value_type>>::value()) {
-		if (MATAZURE_LIKELY(inside_range(idx, pointi<_Tensor::rank>::zeros(), ts_.shape()))) {
+		if (MATAZURE_LIKELY(inside_rect(idx, pointi<_Tensor::rank>::zeros(), ts_.shape()))) {
 			return ts_[idx];
 		}
 		else {

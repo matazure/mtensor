@@ -4,6 +4,23 @@
 
 namespace matazure {
 
+	/**
+	* @brief detect whether a point is inside_rect of a rect (left close, right open)
+	* @param idx point position
+	* @param origin the lef top index of the rect
+	* @param rect the rect
+	* @return returns true if the point is inside_rect of the rect
+	*/
+	template <typename _ValueType, int_t _Rank>
+	inline MATAZURE_GENERAL bool inside_rect(point<_ValueType, _Rank> idx, point<_ValueType, _Rank> origin, point<_ValueType, _Rank> rect) {
+		for (int_t i = 0; i < _Rank; ++i) {
+			if (idx[i] - origin[i] >= rect[i])
+				return false;
+		}
+
+		return true;
+	}
+
 	template <typename _Func>
 	inline void for_border(const pointi<2> & extent, const pointi<2> & origin_padding, const pointi<2> & end_padding, _Func fun) {
 		//top

@@ -37,13 +37,13 @@ int main(int argc, char * argv[]) {
 		auto valid_global_idx = valid_block_dim * block_idx.block + block_idx.local - padding;
 		__shared__ static_tensor<pointf<3>, BLOCK_DIM> sh_ts_block;
 
-		if (inside_range(valid_global_idx, -padding, cimg_padding.shape() + padding)) {
+		if (inside_rect(valid_global_idx, -padding, cimg_padding.shape() + padding * 2)) {
 			sh_ts_block(block_idx.local) = cimg_padding(valid_global_idx);
 		}
 
 		cuda::sync_threads();
 
-		if (inside_range(block_idx.local, padding, block_idx.block_dim - padding) && inside_range(valid_global_idx, pointi<2>::zeros(), cimg_padding.shape())) {
+		if (inside_rect(block_idx.local, padding, block_idx.block_dim - 2 * padding) && inside_rect(valid_global_idx, pointi<2>::zeros(), cimg_padding.shape())) {
 			auto sum = zero<pointf<3>>::value();
 			for_index(pointi<2>::zeros(), ckernel_mean.shape(), [&](const pointi<2> & idx) {
 				sum += sh_ts_block(block_idx.local + idx - padding) * ckernel_mean(idx);
