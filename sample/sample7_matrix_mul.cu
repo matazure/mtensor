@@ -26,8 +26,8 @@ int main(int argc, char * argv[]) {
 		auto global_row = block_idx.global[0];
 		auto global_col = block_idx.global[1];
 
-		__shared__ static_tensor<float, BLOCK_DIM> local_a;
-		__shared__ static_tensor<float, BLOCK_DIM> local_b;
+		__shared__ local_tensor<float, BLOCK_DIM> local_a;
+		__shared__ local_tensor<float, BLOCK_DIM> local_b;
 
 		float sum = 0.0f;
 		for (int_t i = 0; i < K; i += BLOCK_SIZE) {

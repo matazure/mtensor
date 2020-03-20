@@ -35,7 +35,7 @@ int main(int argc, char * argv[]) {
 
 	cuda::block_for_index<BLOCK_DIM>(grid_dim, [=] __device__ (cuda::block_index<BLOCK_DIM> block_idx) {
 		auto valid_global_idx = valid_block_dim * block_idx.block + block_idx.local - padding;
-		__shared__ static_tensor<pointf<3>, BLOCK_DIM> sh_ts_block;
+		__shared__ local_tensor<pointf<3>, BLOCK_DIM> sh_ts_block;
 
 		if (inside_rect(valid_global_idx, -padding, cimg_padding.shape() + padding * 2)) {
 			sh_ts_block(block_idx.local) = cimg_padding(valid_global_idx);

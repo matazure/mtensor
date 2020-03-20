@@ -49,7 +49,7 @@ namespace matazure {
 	* @tparam _Ext a fixed shape, must be dim(meta::array) type
 	*/
 	template <typename _ValueType, typename _Ext>
-	class static_tensor {
+	class local_tensor {
 	private:
 		template <int_t ..._Values>
 		struct traits;
@@ -219,18 +219,18 @@ namespace matazure {
 		value_type			elements_[traits_t::size()];
 	};
 
-	static_assert(std::is_pod<static_tensor<float, dim<3,3>>>::value, "static_tensor should be pod type");
+	static_assert(std::is_pod<local_tensor<float, dim<3,3>>>::value, "local_tensor should be pod type");
 
-	/// alias of static_tensor<_ValueType, 2>
+	/// alias of local_tensor<_ValueType, 2>
 	template <typename _ValueType, typename _Ext, typename _Tmp = enable_if_t<_Ext::size() == 2>>
-	using static_matrix = static_tensor<_ValueType, _Ext>;
+	using static_matrix = local_tensor<_ValueType, _Ext>;
 
-	/// alias of static_tensor<_ValueType, 1>
+	/// alias of local_tensor<_ValueType, 1>
 	template <typename _ValueType, typename _Ext, typename _Tmp = enable_if_t<_Ext::size() == 1>>
-	using static_vector = static_tensor<_ValueType, _Ext>;
+	using static_vector = local_tensor<_ValueType, _Ext>;
 
-	/// special for static_tensor
+	/// special for local_tensor
 	template <typename _ValueType, typename _Ext>
-	struct is_tensor<static_tensor<_ValueType, _Ext>> : bool_constant<true> {};
+	struct is_tensor<local_tensor<_ValueType, _Ext>> : bool_constant<true> {};
 
 }

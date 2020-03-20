@@ -129,7 +129,7 @@ private:
 };
 
 template <typename _Type, typename _BlockDim, typename _Layout = first_major_layout<_BlockDim::size()>>
-using block_tensor = tensor<static_tensor<_Type, _BlockDim>, _BlockDim::size(), _Layout>;
+using block_tensor = tensor<local_tensor<_Type, _BlockDim>, _BlockDim::size(), _Layout>;
 
 template <typename _ValueType, typename _Layout = column_major_layout>
 using matrix = tensor<_ValueType, 2, _Layout>;

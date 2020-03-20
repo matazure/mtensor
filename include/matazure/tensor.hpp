@@ -11,7 +11,7 @@
 #include <matazure/cuda/exception.hpp>
 #endif
 #include <matazure/layout.hpp>
-#include <matazure/static_tensor.hpp>
+#include <matazure/local_tensor.hpp>
 
 ///  matazure is the top namespace for all classes and functions
 namespace matazure {
@@ -304,9 +304,9 @@ namespace matazure {
 	using column_major_layout = first_major_layout<2>;
 	// using row_major_layout = last_major_layout<2>;
 
-	/// alias of tensor<static_tensor<_ValueType, _BlockDim>, _BlockDim::size(), _Layout>
+	/// alias of tensor<local_tensor<_ValueType, _BlockDim>, _BlockDim::size(), _Layout>
 	template <typename _ValueType, typename _BlockDim, typename _Layout = first_major_layout<_BlockDim::size()>>
-	using block_tensor = tensor<static_tensor<_ValueType, _BlockDim>, _BlockDim::size(), _Layout>;
+	using block_tensor = tensor<local_tensor<_ValueType, _BlockDim>, _BlockDim::size(), _Layout>;
 
 	template <typename _Type, int_t _Rank, typename _Layout = first_major_layout<_Rank>>
 	auto make_tensor(pointi<_Rank> ext, _Type *p_data)->tensor<_Type, _Rank, _Layout>{
