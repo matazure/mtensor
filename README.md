@@ -18,7 +18,7 @@ Tensor主要用于多维数组及其计算，其可以便利高效的在CPU/GPU�
 Tensor会提供泛型多维数组的数据结构及相应的算法，其遵行Modern C++的编程风格
 
 ```c++
-#include <matazure/tensor>
+#include <mtensor.hpp>
 
 using namespace matazure;
 
@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
 我们使用Lambda Tensor来延迟计算技术，Lambda Tensor是一个抽象的多维数组，该数组不会指向具体的存储而是通过一个关于坐标的函数（算子）来描述。
 
 ```c++
-#include <matazure/tensor>
+#include <mtensor.hpp>
 
 using namespace matazure;
 
@@ -91,7 +91,7 @@ int main(int argc, char *argv[]) {
 
 ```c++
 #include <iostream>
-#include <matazure/tensor>
+#include <mtensor.hpp>
 
 using namespace matazure;
 

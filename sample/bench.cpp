@@ -1,6 +1,6 @@
 #include <chrono>
 #include <vector>
-#include <matazure/tensor>
+#include <mtensor.hpp>
 #include <xmmintrin.h>
 
 using namespace std;

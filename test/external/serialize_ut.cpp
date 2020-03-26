@@ -1,6 +1,6 @@
 ﻿
 #include <gtest/gtest.h>
-#include <matazure/tensor>
+#include <mtensor.hpp>
 
 TEST(SerializationTest, SerializeTensorByCereal) {
 

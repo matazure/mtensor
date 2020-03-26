@@ -24,6 +24,11 @@ pipeline{
 								sh './script/build_native.sh'
 							}
 						}
+						stage('test') {
+							steps {
+								sh './build/bin/bm_copy --benchmark_min_time=1'
+							}
+						}
 					}
 				}
 
@@ -55,19 +60,27 @@ pipeline{
 				}
 
 				stage('linux-aarch64') {
+					agent {
+						dockerfile {
+							filename 'tensor-dev-ubuntu18.04.dockerfile'
+							dir 'dockerfile'
+							args '-v /root/.ssh:/root/.ssh'
+						}
+					}
+					environment {
+						GCC_LINARO_TOOLCHAIN = '/gcc-linaro-7.4.1-2019.02-x86_64_aarch64-linux-gnu'
+					}
 					stages {	
-						stage('cross-build') {
-							agent {
-								dockerfile {
-									filename 'tensor-dev-ubuntu18.04.dockerfile'
-									dir 'dockerfile'
-								}
-							}
-							environment {
-								GCC_LINARO_TOOLCHAIN = '/gcc-linaro-7.4.1-2019.02-x86_64_aarch64-linux-gnu'
-							}
+						stage('build') {
 							steps {
 								sh './script/build-linux-aarch64.sh'
+							}
+						}
+						stage('test') {
+							steps {
+								sh "ssh rk3399 mkdir -p \\~/tensor_ci/${env.GIT_COMMIT}"
+								sh "scp -r ./build-linux-aarch64 rk3399:~/tensor_ci/${env.GIT_COMMIT}/"
+								sh "ssh rk3399 'cd ~/tensor_ci/${env.GIT_COMMIT}/build-linux-aarch64 && ./bin/bm_copy --benchmark_min_time=1'"
 							}
 						}
 					}
@@ -78,11 +91,23 @@ pipeline{
 						dockerfile {
 							filename 'tensor-dev-ubuntu18.04.dockerfile'
 							dir 'dockerfile'
+							args '-v /root/.ssh:/root/.ssh'
 						}
 					}
 
-					steps {
-						sh './script/build-linux-arm.sh'
+					stages {	
+						stage('build') {
+							steps {
+								sh './script/build-linux-armv7.sh'
+							}
+						}
+						stage('test') {
+							steps {
+								sh "ssh rpi4 mkdir -p \\~/tensor_ci/${env.GIT_COMMIT}"
+								sh "scp -r ./build-linux-armv7 rpi4:~/tensor_ci/${env.GIT_COMMIT}/"
+								sh "ssh rpi4 'cd ~/tensor_ci/${env.GIT_COMMIT}/build-linux-armv7 && ./bin/bm_copy --benchmark_min_time=2'"
+							}
+						}
 					}
 				}
 				 				

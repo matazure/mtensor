@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <matazure/tensor>
+#include <mtensor.hpp>
 #include <benchmark/benchmark.h>
 #include <cmath>
 
@@ -44,7 +44,7 @@ using point4f = pointf<4>;
 #define HETE_TAG host_tag
 #define HETE_SYNCHRONIZE
 
-#if defined(MATAZURE_SSE) 
+#if defined(MATAZURE_SSE)
 using hete_float32x4_t = sse_vector<float, 4> ;
 #elif defined(MATAZURE_NEON)
 using hete_float32x4_t = neon_vector<float, 4>;
@@ -62,7 +62,7 @@ using hete_float32x4_t = pointf<4>;
 
 #else
 
-#if defined(MATAZURE_SSE) 
+#if defined(MATAZURE_SSE)
 using hete_float32x4_t = sse_vector<float, 4>;
 #elif defined(MATAZURE_NEON)
 using hete_float32x4_t = neon_vector<float, 4>;

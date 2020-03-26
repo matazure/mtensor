@@ -1,5 +1,5 @@
 ﻿#include "image_helper.hpp"
-#include <matazure/tensor>
+#include <mtensor.hpp>
 
 using namespace matazure;
 

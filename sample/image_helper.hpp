@@ -6,7 +6,7 @@
 #include <string>
 #include <stb_image.h>
 #include <stb_image_write.h>
-#include <matazure/tensor>
+#include <mtensor.hpp>
 
 using namespace matazure;
 

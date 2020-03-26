@@ -1,6 +1,6 @@
 #include <benchmark/benchmark.h>
 #include <matazure/bm_config.hpp>
-#include <matazure/tensor>
+#include <mtensor.hpp>
 
 using namespace matazure;
 

@@ -1,4 +1,4 @@
-﻿#include <matazure/tensor>
+﻿#include <mtensor.hpp>
 
 using namespace matazure;
 

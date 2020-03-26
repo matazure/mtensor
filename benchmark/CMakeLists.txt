@@ -31,20 +31,6 @@
 # 	set_property(TARGET hete_cu_tensor_benchmark PROPERTY FOLDER "benchmark")
 # endif()
 
-add_executable(bm_image_split_channel bm_image_split_channel.cpp)
-target_link_libraries(bm_image_split_channel tensor benchmark)
-
-if (CMAKE_SYSTEM_PROCESSOR EQUAL aarch64)
-
-add_executable(bm_conv bm_conv.cpp)
-target_link_libraries(bm_conv tensor benchmark)
-
-add_executable(bm_matrix_multiply bm_matrix_multiply.cpp)
-target_link_libraries(bm_matrix_multiply tensor benchmark)
-
-add_executable(bm_cpu_fp bm_cpu_fp.cpp)
-target_link_libraries(bm_cpu_fp tensor benchmark)
-
-endif()
 
 
+add_subdirectory(host)

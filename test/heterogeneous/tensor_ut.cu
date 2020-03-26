@@ -1,4 +1,4 @@
-﻿#include <matazure/tensor>
+﻿#include <mtensor.hpp>
 #include <gtest/gtest.h>
 
 using namespace matazure;

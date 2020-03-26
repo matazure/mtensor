@@ -1,7 +1,7 @@
 #!/bin/bash
 
-mkdir -p build-linux-arm
-cd build-linux-arm
+mkdir -p build-linux-armv7
+cd build-linux-armv7
 
 cmake .. \
 	-DCMAKE_TOOLCHAIN_FILE=cmake/gcc-linaro-arm-linux.toolchain.cmake \
