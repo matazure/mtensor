@@ -121,6 +121,11 @@ pipeline{
 								bat 'call ./script/build_windows.bat -DWITH_CUDA=ON'
 							}
 						}
+						stage('test') {
+							steps {
+								powershell './build_win/bin/Release/bm_copy.exe --benchmark_min_time=1'
+							}
+						}
 					}
 				}
 				
@@ -137,27 +142,8 @@ pipeline{
 								sh './script/build_android.sh'
 							}
 						}
-						// stage('test') {s
-						// 	steps {
-						// 		sh 'echo armv7-test'
-						// 		sh 'sshpass -p admin ssh -o StrictHostKeyChecking=no root@192.168.0.105 "echo lex620"'
-						// 	}
-						// }	
 					}
 				}
-				
-				// stage('macos-x64') {
-				// 	agent {
-				// 		label 'macos-x64'
-				// 	}
-				// 	stages {
-				// 		stage('build') {
-				// 			steps {
-				// 				sh './script/build_native.sh'
-				// 			}
-				// 		}
-				// 	}
-				// }
 			}
 		}
 	}
