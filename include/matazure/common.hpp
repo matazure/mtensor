@@ -250,38 +250,6 @@ struct resize_op {
     }
 };
 
-template <typename... _Tensors>
-struct zip_op;
-
-template <typename _Tensor0, typename _Tensor1>
-struct zip_op<_Tensor0, _Tensor1> {
-   private:
-    _Tensor0 ts0_;
-    _Tensor1 ts1_;
-
-   public:
-    zip_op(_Tensor0 ts0, _Tensor1 ts1) : ts0_(ts0), ts1_(ts1) {}
-
-    MATAZURE_GENERAL auto operator()(int_t i) const -> decltype(tie(ts0_[0], ts1_[0])) {
-        return tie(ts0_[i], ts1_[i]);
-    }
-};
-
-template <typename _Tensor0, typename _Tensor1, typename _Tensor2>
-struct zip_op<_Tensor0, _Tensor1, _Tensor2> {
-   private:
-    _Tensor0 ts0_;
-    _Tensor1 ts1_;
-    _Tensor2 ts2_;
-
-   public:
-    zip_op(_Tensor0 ts0, _Tensor1 ts1, _Tensor2 ts2) : ts0_(ts0), ts1_(ts1), ts2_(ts2) {}
-
-    MATAZURE_GENERAL auto operator()(int_t i) const -> decltype(tie(ts0_[0], ts1_[0], ts2_[0])) {
-        return tie(ts0_[i], ts1_[i], ts2_[i]);
-    }
-};
-
 // pointi<2>
 template <int_t _SliceDimIdx>
 inline pointi<1> slice_point(pointi<2> pt);
@@ -339,23 +307,6 @@ struct clamp_zero_op {
         } else {
             return zero<typename _Tensor::value_type>::value();
         }
-    }
-};
-
-template <typename _Tensor>
-struct global_view_op {
-   private:
-    _Tensor ts_;
-    typedef typename _Tensor::value_type block_type;
-
-   public:
-    global_view_op(_Tensor ts) : ts_(ts) {}
-
-    MATAZURE_GENERAL auto operator()(pointi<_Tensor::rank> idx) const -> decltype((ts_[0][0])) {
-        auto block_dim = meta::array_to_pointi(block_type::meta_shape());
-        auto block_idx = idx / block_dim;
-        auto local_idx = idx % block_dim;
-        return ts_[block_idx][local_idx];
     }
 };
 
@@ -554,65 +505,5 @@ inline auto clamp_zero(_Tensor ts)
                             typename _Tensor::memory_type{})) {
     return make_lambda(ts.shape(), internal::clamp_zero_op<decay_t<_Tensor>>(ts),
                        typename _Tensor::memory_type{});
-}
-
-/**
- * @todo
- */
-template <typename _Tensor>
-inline auto global_view(_Tensor ts)
-    -> decltype(make_lambda(ts.shape() * ts[0].shape(),
-                            internal::global_view_op<decay_t<_Tensor>>(ts),
-                            typename _Tensor::memory_type{})) {
-    auto block_dim = meta::array_to_pointi(_Tensor::value_type::meta_shape());
-    return make_lambda(ts.shape() * block_dim, internal::global_view_op<decay_t<_Tensor>>(ts),
-                       typename _Tensor::memory_type{});
-}
-
-/**
- * @brief  zip the source tensors
- * @param ts0 the first source tensor
- * @param ts1 the second source tensor
- * @return a zipped lambda_tensor whose value_type is tuple<_Tensor0::value_type &,
- * _Tensor1::value_type &>
- * @todo maybe exits a better implement
- */
-template <typename _Tensor0, typename _Tensor1>
-inline auto zip(_Tensor0 ts0, _Tensor1 ts1)
-    -> decltype(make_lambda(ts0.shape(), internal::zip_op<_Tensor0, _Tensor1>(ts0, ts1))) {
-    MATAZURE_ASSERT(equal(ts0.shape(), ts1.shape()), "unmatched shape");
-    return make_lambda(ts0.shape(), internal::zip_op<_Tensor0, _Tensor1>(ts0, ts1));
-}
-
-/**
- *
- */
-template <typename _Tensor0, typename _Tensor1, typename _Tensor2>
-inline auto zip(_Tensor0 ts0, _Tensor1 ts1, _Tensor2 ts2)
-    -> decltype(make_lambda(ts0.shape(),
-                            internal::zip_op<_Tensor0, _Tensor1, _Tensor2>(ts0, ts1, ts2))) {
-    MATAZURE_ASSERT(equal(ts0.shape(), ts1.shape()), "unmatched shape");
-    MATAZURE_ASSERT(equal(ts2.shape(), ts1.shape()), "unmatched shape");
-    return make_lambda(ts0.shape(), internal::zip_op<_Tensor0, _Tensor1, _Tensor2>(ts0, ts1, ts2));
-}
-
-// TODO: use packed parameters
-// template <typename ..._Tensors>
-// inline auto zip(_Tensors... tensors){
-// 	auto tuple_tensors = make_tuple(tensors);
-// 	auto ext = get<0>(tuple_tensors).shape();
-// 	return make_lambda(ext, [=](int_t i){
-// 		return tie(tensors...[i]);
-// 	});
-// }
-
-/**
- * @brief view a zipped source tensor as point value_type
- * @param ts the source type
- * @returns  a lambda_tensor whose value_type is point_viewer
- */
-template <typename _Tensor>
-inline auto point_view(_Tensor ts) -> decltype(cast<point_viewer<decltype(ts[0])>>(ts)) {
-    return cast<point_viewer<decltype(ts[0])>>(ts);
 }
 }
