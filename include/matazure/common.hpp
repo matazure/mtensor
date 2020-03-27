@@ -7,7 +7,6 @@
 #include <matazure/cuda/tensor.hpp>
 #endif
 
-#include <matazure/unary.hpp>
 #include <matazure/geometry.hpp>
 
 namespace matazure {
