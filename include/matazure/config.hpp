@@ -1,105 +1,104 @@
 ﻿#pragma once
 
-#include <cstdlib>
+#include <algorithm>
 #include <cassert>
+#include <cstdlib>
 #include <cstring>
-#include <type_traits>
-#include <stdexcept>
 #include <limits>
 #include <memory>
-#include <tuple>
+#include <stdexcept>
 #include <string>
-#include <algorithm>
+#include <tuple>
+#include <type_traits>
 
-//for cuda
+// for cuda
 #if defined(__CUDACC__) && !defined(MATAZURE_DISABLE_CUDA)
-	#ifdef __clang__
-		#if __clang_major__ < 9
-			#error clang minimum version is 9 for cuda
-		#endif
-	#else
-		#if __CUDACC_VER_MAJOR__ < 10
-			#error CUDA minimum version is 10.0
-		#endif
-	#endif
+#ifdef __clang__
+#if __clang_major__ < 9
+#error clang minimum version is 9 for cuda
+#endif
+#else
+#if __CUDACC_VER_MAJOR__ < 10
+#error CUDA minimum version is 10.0
+#endif
+#endif
 
-	#define MATAZURE_CUDA
+#define MATAZURE_CUDA
 #endif
 
 #ifdef MATAZURE_CUDA
-	#define MATAZURE_GENERAL __host__ __device__
-	#define MATAZURE_DEVICE __device__
-	#define MATAZURE_GLOBAL __global__
-	#define __matazure__ MATAZURE_GENERAL
-	#ifndef __clang__
-		#define MATAZURE_HD_WARNING_DISABLE #pragma nv_exec_check_disable
-	#else
-		#define MATAZURE_HD_WARNING_DISABLE
-	#endif
+#define MATAZURE_GENERAL __host__ __device__
+#define MATAZURE_DEVICE __device__
+#define MATAZURE_GLOBAL __global__
+#define __matazure__ MATAZURE_GENERAL
+#ifndef __clang__
+#define MATAZURE_HD_WARNING_DISABLE #pragma nv_exec_check_disable
 #else
-	#define MATAZURE_DEVICE
-	#define MATAZURE_GENERAL
-	#define MATAZURE_GLOBAL
-	#define __matazure__
-	#define MATAZURE_HD_WARNING_DISABLE
+#define MATAZURE_HD_WARNING_DISABLE
+#endif
+#else
+#define MATAZURE_DEVICE
+#define MATAZURE_GENERAL
+#define MATAZURE_GLOBAL
+#define __matazure__
+#define MATAZURE_HD_WARNING_DISABLE
 #endif
 
 #ifdef _OPENMP
-	#define MATAZURE_OPENMP
+#define MATAZURE_OPENMP
 #endif
 
-
-//for using
+// for using
 namespace matazure {
 
 typedef int int_t;
 
-using std::shared_ptr;
 using std::make_shared;
-using std::unique_ptr;
 using std::move;
+using std::shared_ptr;
+using std::unique_ptr;
 
 typedef unsigned char byte;
 
 using std::decay;
-using std::remove_const;
-using std::remove_reference;
-using std::remove_cv;
-using std::remove_all_extents;
 using std::forward;
+using std::remove_all_extents;
+using std::remove_const;
+using std::remove_cv;
+using std::remove_reference;
 
-using std::is_same;
 using std::conditional;
 using std::enable_if;
 using std::integral_constant;
 using std::is_integral;
+using std::is_same;
 using std::numeric_limits;
 
-using std::tuple;
-using std::make_tuple;
-using std::tuple_size;
-using std::tuple_element;
-using std::tie;
 using std::get;
+using std::make_tuple;
+using std::tie;
+using std::tuple;
+using std::tuple_element;
+using std::tuple_size;
 
 using std::string;
 
-template<bool _Val>
+template <bool _Val>
 using bool_constant = integral_constant<bool, _Val>;
 
-template<typename _Ty>
+template <typename _Ty>
 using decay_t = typename decay<_Ty>::type;
 
-template<typename _Ty>
+template <typename _Ty>
 using remove_reference_t = typename remove_reference<_Ty>::type;
 
-template<bool _Test, class _Ty = void>
+template <bool _Test, class _Ty = void>
 using enable_if_t = typename enable_if<_Test, _Ty>::type;
 
-template<bool _Test, class _Ty1, class _Ty2>
+template <bool _Test, class _Ty1, class _Ty2>
 using conditional_t = typename conditional<_Test, _Ty1, _Ty2>::type;
 
-template<typename _Ty>
+template <typename _Ty>
 using remove_const_t = typename remove_const<_Ty>::type;
 
 template <typename _Ty>
@@ -107,17 +106,22 @@ using remove_cv_t = typename remove_cv<_Ty>::type;
 
 struct blank_t {};
 
-}
+}  // namespace matazure
 
-//for assert
-#define MATAZURE_STATIC_ASSERT_DIM_MATCHED(T1, T2) static_assert(T1::rank == T2::rank, "the rank is not matched")
+// for assert
+#define MATAZURE_STATIC_ASSERT_DIM_MATCHED(T1, T2) \
+    static_assert(T1::rank == T2::rank, "the rank is not matched")
 
-#define MATAZURE_STATIC_ASSERT_VALUE_TYPE_MATCHED(T1, T2) static_assert(std::is_same<typename T1::value_type, typename T2::value_type>::value, \
-"the value type is not matched")
+#define MATAZURE_STATIC_ASSERT_VALUE_TYPE_MATCHED(T1, T2)                                \
+    static_assert(std::is_same<typename T1::value_type, typename T2::value_type>::value, \
+                  "the value type is not matched")
 
-#define MATAZURE_STATIC_ASSERT_MEMORY_TYPE_MATCHED(T1, T2) static_assert(std::is_same<typename T1::memory_type, typename T2::memory_type>::value, "the memory type is not matched")
+#define MATAZURE_STATIC_ASSERT_MEMORY_TYPE_MATCHED(T1, T2)                                 \
+    static_assert(std::is_same<typename T1::memory_type, typename T2::memory_type>::value, \
+                  "the memory type is not matched")
 
-#define MATAZURE_STATIC_ASSERT_MATRIX_RANK(T) static_assert(T::rank == 2, "the matrix rank should be 2")
+#define MATAZURE_STATIC_ASSERT_MATRIX_RANK(T) \
+    static_assert(T::rank == 2, "the matrix rank should be 2")
 
 #define MATAZURE_CURRENT_FUNCTION "(unknown)"
 
@@ -140,24 +144,23 @@ struct blank_t {};
 
 #else
 
-namespace matazure
-{
+namespace matazure {
 
-class assert_failed: public std::runtime_error{
-public:
-
-	assert_failed(const std::string &msg) :
-		std::runtime_error(msg)
-	{ }
-
+class assert_failed : public std::runtime_error {
+   public:
+    assert_failed(const std::string& msg) : std::runtime_error(msg) {}
 };
 
-inline void assertion_failed(char const * expr, char const * msg, char const * function, char const * file, long line) {
-	throw assert_failed(std::string(msg));
+inline void assertion_failed(char const* expr, char const* msg, char const* function,
+                             char const* file, long line) {
+    throw assert_failed(std::string(msg));
 }
 
-}
+}  // namespace matazure
 
-#define MATAZURE_ASSERT(expr, msg) (MATAZURE_LIKELY(!!(expr))? ((void)0): ::matazure::assertion_failed(#expr, msg, MATAZURE_CURRENT_FUNCTION, __FILE__, __LINE__))
+#define MATAZURE_ASSERT(expr, msg)                             \
+    (MATAZURE_LIKELY(!!(expr)) ? ((void)0)                     \
+                               : ::matazure::assertion_failed( \
+                                     #expr, msg, MATAZURE_CURRENT_FUNCTION, __FILE__, __LINE__))
 
 #endif

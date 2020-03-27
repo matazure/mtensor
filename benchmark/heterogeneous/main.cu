@@ -4,8 +4,8 @@
 
 int main(int argc, char** argv) {
 #ifdef USE_CUDA
-	matazure::cuda::set_device(0);
+    matazure::cuda::set_device(0);
 #endif
-	::benchmark::Initialize(&argc, argv);
-	::benchmark::RunSpecifiedBenchmarks();
+    ::benchmark::Initialize(&argc, argv);
+    ::benchmark::RunSpecifiedBenchmarks();
 }

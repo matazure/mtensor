@@ -1,24 +1,25 @@
 ﻿#pragma once
 
+#include <matazure/cuda/execution.hpp>
 #include <matazure/point.hpp>
 #include <matazure/tensor.hpp>
-#include <matazure/cuda/execution.hpp>
 
 namespace matazure {
 namespace cuda {
 
-namespace internal{
+namespace internal {
 
 inline MATAZURE_GENERAL uint3 pointi_to_uint3(pointi<1> p) {
-	return{ static_cast<unsigned int>(p[0]), 0, 0 };
+    return {static_cast<unsigned int>(p[0]), 0, 0};
 }
 
 inline MATAZURE_GENERAL uint3 pointi_to_uint3(pointi<2> p) {
-	return{ static_cast<unsigned int>(p[0]), static_cast<unsigned int>(p[1]), 0 };
+    return {static_cast<unsigned int>(p[0]), static_cast<unsigned int>(p[1]), 0};
 }
 
 inline MATAZURE_GENERAL uint3 pointi_to_uint3(pointi<3> p) {
-	return{ static_cast<unsigned int>(p[0]), static_cast<unsigned int>(p[1]), static_cast<unsigned int>(p[2]) };
+    return {static_cast<unsigned int>(p[0]), static_cast<unsigned int>(p[1]),
+            static_cast<unsigned int>(p[2])};
 }
 
 template <int_t _Rank>
@@ -26,29 +27,30 @@ inline MATAZURE_GENERAL pointi<_Rank> uint3_to_pointi(uint3 u);
 
 template <>
 inline MATAZURE_GENERAL pointi<1> uint3_to_pointi(uint3 u) {
-	return{ static_cast<int_t>(u.x) };
+    return {static_cast<int_t>(u.x)};
 }
 
 template <>
 inline MATAZURE_GENERAL pointi<2> uint3_to_pointi(uint3 u) {
-	return{ static_cast<int_t>(u.x), static_cast<int>(u.y) };
+    return {static_cast<int_t>(u.x), static_cast<int>(u.y)};
 }
 
 template <>
 inline MATAZURE_GENERAL pointi<3> uint3_to_pointi(uint3 u) {
-	return{ static_cast<int>(u.x), static_cast<int>(u.y), static_cast<int>(u.z) };
+    return {static_cast<int>(u.x), static_cast<int>(u.y), static_cast<int>(u.z)};
 }
 
 inline MATAZURE_GENERAL dim3 pointi_to_dim3(pointi<1> p) {
-	return{ static_cast<unsigned int>(p[0]), 1, 1 };
+    return {static_cast<unsigned int>(p[0]), 1, 1};
 }
 
 inline MATAZURE_GENERAL dim3 pointi_to_dim3(pointi<2> p) {
-	return{ static_cast<unsigned int>(p[0]), static_cast<unsigned int>(p[1]), 1 };
+    return {static_cast<unsigned int>(p[0]), static_cast<unsigned int>(p[1]), 1};
 }
 
 inline MATAZURE_GENERAL dim3 pointi_to_dim3(pointi<3> p) {
-	return{ static_cast<unsigned int>(p[0]), static_cast<unsigned int>(p[1]), static_cast<unsigned int>(p[2]) };
+    return {static_cast<unsigned int>(p[0]), static_cast<unsigned int>(p[1]),
+            static_cast<unsigned int>(p[2])};
 }
 
 template <int_t _Rank>
@@ -56,231 +58,249 @@ inline MATAZURE_GENERAL pointi<_Rank> dim3_to_pointi(dim3 u);
 
 template <>
 inline MATAZURE_GENERAL pointi<1> dim3_to_pointi(dim3 u) {
-	return{ static_cast<int_t>(u.x) };
+    return {static_cast<int_t>(u.x)};
 }
 
 template <>
 inline MATAZURE_GENERAL pointi<2> dim3_to_pointi(dim3 u) {
-	return{ static_cast<int_t>(u.x), static_cast<int>(u.y) };
+    return {static_cast<int_t>(u.x), static_cast<int>(u.y)};
 }
 
 template <>
 inline MATAZURE_GENERAL pointi<3> dim3_to_pointi(dim3 u) {
-	return{ static_cast<int>(u.x), static_cast<int>(u.y), static_cast<int>(u.z) };
+    return {static_cast<int>(u.x), static_cast<int>(u.y), static_cast<int>(u.z)};
 }
 
-}
+}  // namespace internal
 
 MATAZURE_HD_WARNING_DISABLE
 template <typename Function, typename... Arguments>
-MATAZURE_GLOBAL void kenel(Function f, Arguments... args)
-{
-	f(args...);
+MATAZURE_GLOBAL void kenel(Function f, Arguments... args) {
+    f(args...);
 }
 
 template <typename _Fun, typename... _Args>
-inline void launch(_Fun f, _Args... args)
-{
-	execution_policy exe_policy;
-	launch(exe_policy, f, args...);
+inline void launch(_Fun f, _Args... args) {
+    execution_policy exe_policy;
+    launch(exe_policy, f, args...);
 }
 
 template <typename _ExecutionPolicy, typename _Fun, typename... _Args>
-inline void launch(_ExecutionPolicy exe_policy, _Fun f, _Args... args)
-{
-	configure_grid(exe_policy, kenel<_Fun, _Args...>);
-	kenel <<< exe_policy.grid_size(), exe_policy.block_dim(), exe_policy.shared_mem_bytes(), exe_policy.stream() >>> (f, args...);
-	assert_runtime_success(cudaGetLastError());
+inline void launch(_ExecutionPolicy exe_policy, _Fun f, _Args... args) {
+    configure_grid(exe_policy, kenel<_Fun, _Args...>);
+    kenel<<<exe_policy.grid_size(), exe_policy.block_dim(), exe_policy.shared_mem_bytes(),
+            exe_policy.stream()>>>(f, args...);
+    assert_runtime_success(cudaGetLastError());
 }
 
 template <typename _ExecutionPolicy, typename _Fun>
 inline void for_index(_ExecutionPolicy policy, int_t first, int_t last, _Fun fun) {
-	launch(policy, [=] __device__ () {
-		for (int_t i = first + threadIdx.x + blockIdx.x * blockDim.x; i < last; i += blockDim.x * gridDim.x) {
-			fun(i);
-		}
-	});
+    launch(policy, [=] __device__() {
+        for (int_t i = first + threadIdx.x + blockIdx.x * blockDim.x; i < last;
+             i += blockDim.x * gridDim.x) {
+            fun(i);
+        }
+    });
 }
 
 template <typename _Fun>
 inline void for_index(int_t first, int_t last, _Fun fun) {
-	parallel_execution_policy policy;
-	policy.total_size(last - first);
-	cuda::for_index(policy, first, last, fun);
+    parallel_execution_policy policy;
+    policy.total_size(last - first);
+    cuda::for_index(policy, first, last, fun);
 }
 
 template <typename _Fun>
-inline void for_index(int_t last, _Fun fun){
-	for_index(0, last, fun);
+inline void for_index(int_t last, _Fun fun) {
+    for_index(0, last, fun);
 }
 
 template <typename _ExecutionPolicy, int_t _Rank, typename _Fun>
 inline void for_index(_ExecutionPolicy policy, pointi<_Rank> origin, pointi<_Rank> end, _Fun fun) {
-	auto extent = end - origin;
-	auto stride = matazure::cumulative_prod(extent);
+    auto extent = end - origin;
+    auto stride = matazure::cumulative_prod(extent);
 
-	first_major_layout<_Rank> layout(extent);
-	auto max_size = layout.index2offset(end - 1) + 1; //要包含最后一个元素
+    first_major_layout<_Rank> layout(extent);
+    auto max_size = layout.index2offset(end - 1) + 1;  //要包含最后一个元素
 
-	cuda::for_index(policy, 0, max_size, [=] __device__ (int_t i) {
-		fun(layout.offset2index(i) + origin);
-	});
+    cuda::for_index(policy, 0, max_size,
+                    [=] __device__(int_t i) { fun(layout.offset2index(i) + origin); });
 }
 
 template <int_t _Rank, typename _Fun>
 inline void for_index(pointi<_Rank> origin, pointi<_Rank> end, _Fun fun) {
-	execution_policy p;
-	cuda::for_index(p, origin, end, fun);
+    execution_policy p;
+    cuda::for_index(p, origin, end, fun);
 }
 
 template <int_t _Rank, typename _Fun>
-inline void for_index(pointi<_Rank> end, _Fun fun){
-	cuda::for_index(zero<pointi<_Rank>>::value(), end, fun);
+inline void for_index(pointi<_Rank> end, _Fun fun) {
+    cuda::for_index(zero<pointi<_Rank>>::value(), end, fun);
 }
 
 template <typename _BlockDim>
-class block_index{
-public:
-	const static int_t rank = _BlockDim::size();
+class block_index {
+   public:
+    const static int_t rank = _BlockDim::size();
 
-	MATAZURE_GENERAL block_index(pointi<rank> grid_extent, pointi<rank> local_idx, pointi<rank> block_idx, pointi<rank> global_idx) :
-		block_dim(_BlockDim::value()),
-		grid_dim(grid_extent),
-		global_dim(block_dim * grid_extent),
-		local(local_idx),
-		block(block_idx),
-		global(global_idx)
-	{}
+    MATAZURE_GENERAL block_index(pointi<rank> grid_extent, pointi<rank> local_idx,
+                                 pointi<rank> block_idx, pointi<rank> global_idx)
+        : block_dim(_BlockDim::value()),
+          grid_dim(grid_extent),
+          global_dim(block_dim * grid_extent),
+          local(local_idx),
+          block(block_idx),
+          global(global_idx) {}
 
-public:
-	const pointi<rank> block_dim;
-	const pointi<rank> grid_dim;
-	const pointi<rank> global_dim;
-	const pointi<rank> local;
-	const pointi<rank> block;
-	const pointi<rank> global;
+   public:
+    const pointi<rank> block_dim;
+    const pointi<rank> grid_dim;
+    const pointi<rank> global_dim;
+    const pointi<rank> local;
+    const pointi<rank> block;
+    const pointi<rank> global;
 };
 
 template <typename _Ext, typename _Fun>
 inline void block_for_index(pointi<_Ext::size()> grid_ext, _Fun fun) {
-	auto grid_dim = internal::pointi_to_dim3(grid_ext);
-	auto block_dim = internal::pointi_to_dim3(_Ext::value());
-	kenel <<<grid_dim, block_dim>>> ([=] MATAZURE_DEVICE() {
-		auto local = internal::uint3_to_pointi<_Ext::size()>(threadIdx);
-		auto block = internal::uint3_to_pointi<_Ext::size()>(blockIdx);
-		auto block_dim = internal::dim3_to_pointi<_Ext::size()>(blockDim);
-		auto global = block * block_dim + local;
-		block_index<_Ext> block_idx(grid_ext, local, block, global);
-		fun(block_idx);
-	});
+    auto grid_dim = internal::pointi_to_dim3(grid_ext);
+    auto block_dim = internal::pointi_to_dim3(_Ext::value());
+    kenel<<<grid_dim, block_dim>>>([=] MATAZURE_DEVICE() {
+        auto local = internal::uint3_to_pointi<_Ext::size()>(threadIdx);
+        auto block = internal::uint3_to_pointi<_Ext::size()>(blockIdx);
+        auto block_dim = internal::dim3_to_pointi<_Ext::size()>(blockDim);
+        auto global = block * block_dim + local;
+        block_index<_Ext> block_idx(grid_ext, local, block, global);
+        fun(block_idx);
+    });
 
-	assert_runtime_success(cudaGetLastError());
+    assert_runtime_success(cudaGetLastError());
 }
 
 template <typename _ExecutionPolicy, typename _Tensor, typename _Fun>
-inline void for_each(_ExecutionPolicy policy, _Tensor ts, _Fun fun, enable_if_t<are_device_memory<_Tensor>::value && are_linear_access<_Tensor>::value>* = 0) {
-	cuda::for_index(policy, 0, ts.size(), [=] MATAZURE_DEVICE(int_t i) {
-		fun(ts[i]);
-	});
+inline void for_each(
+    _ExecutionPolicy policy, _Tensor ts, _Fun fun,
+    enable_if_t<are_device_memory<_Tensor>::value && are_linear_access<_Tensor>::value>* = 0) {
+    cuda::for_index(policy, 0, ts.size(), [=] MATAZURE_DEVICE(int_t i) { fun(ts[i]); });
 }
 
 template <typename _ExecutionPolicy, typename _Tensor, typename _Fun>
-inline void for_each(_ExecutionPolicy policy, _Tensor ts, _Fun fun, enable_if_t<are_device_memory<decay_t<_Tensor>>::value && !are_linear_access<decay_t<_Tensor>>::value>* = 0) {
-	cuda::for_index(policy, zero<pointi<_Tensor::rank>>::value(), ts.shape(), [=] MATAZURE_DEVICE (pointi<_Tensor::rank> idx) {
-		fun(ts[idx]);
-	});
+inline void for_each(_ExecutionPolicy policy, _Tensor ts, _Fun fun,
+                     enable_if_t<are_device_memory<decay_t<_Tensor>>::value &&
+                                 !are_linear_access<decay_t<_Tensor>>::value>* = 0) {
+    cuda::for_index(policy, zero<pointi<_Tensor::rank>>::value(), ts.shape(),
+                    [=] MATAZURE_DEVICE(pointi<_Tensor::rank> idx) { fun(ts[idx]); });
 }
 
 template <typename _Tensor, typename _Fun>
-inline void for_each(_Tensor ts, _Fun fun, enable_if_t<are_device_memory<enable_if_t<is_tensor<decay_t<_Tensor>>::value, _Tensor>>::value>* = 0) {
-	parallel_execution_policy policy;
-	policy.total_size(ts.size());
-	for_each(policy, ts, fun);
+inline void for_each(
+    _Tensor ts, _Fun fun,
+    enable_if_t<
+        are_device_memory<enable_if_t<is_tensor<decay_t<_Tensor>>::value, _Tensor>>::value>* = 0) {
+    parallel_execution_policy policy;
+    policy.total_size(ts.size());
+    for_each(policy, ts, fun);
 }
 
 template <typename _ExecutionPolicy, typename _Tensor>
-inline void fill(_ExecutionPolicy policy, _Tensor ts, typename _Tensor::value_type v, enable_if_t<are_device_memory<enable_if_t<is_tensor<decay_t<_Tensor>>::value, _Tensor>>::value>* = 0) {
-	for_each(policy, ts, [v] MATAZURE_DEVICE (typename _Tensor::value_type &element) {
-		element = v;
-	});
+inline void fill(
+    _ExecutionPolicy policy, _Tensor ts, typename _Tensor::value_type v,
+    enable_if_t<
+        are_device_memory<enable_if_t<is_tensor<decay_t<_Tensor>>::value, _Tensor>>::value>* = 0) {
+    for_each(policy, ts,
+             [v] MATAZURE_DEVICE(typename _Tensor::value_type & element) { element = v; });
 }
 
 template <typename _Tensor>
-inline void fill(_Tensor ts, typename _Tensor::value_type v, enable_if_t<are_device_memory<enable_if_t<is_tensor<decay_t<_Tensor>>::value, _Tensor>>::value>* = 0) {
-	parallel_execution_policy policy;
-	policy.total_size(ts.size());
-	fill(policy, ts, v);
+inline void fill(
+    _Tensor ts, typename _Tensor::value_type v,
+    enable_if_t<
+        are_device_memory<enable_if_t<is_tensor<decay_t<_Tensor>>::value, _Tensor>>::value>* = 0) {
+    parallel_execution_policy policy;
+    policy.total_size(ts.size());
+    fill(policy, ts, v);
 }
 
 template <typename _ExecutionPolicy, typename _T1, typename _T2>
-void copy(_ExecutionPolicy policy, _T1 lhs, _T2 rhs, enable_if_t<are_linear_access<_T1, _T2>::value && are_device_memory<_T1, _T2>::value>* = 0) {
-	cuda::for_index(policy, 0, lhs.size(), [=] MATAZURE_DEVICE (int_t i) {
-		rhs[i] = lhs[i];
-	});
+void copy(
+    _ExecutionPolicy policy, _T1 lhs, _T2 rhs,
+    enable_if_t<are_linear_access<_T1, _T2>::value && are_device_memory<_T1, _T2>::value>* = 0) {
+    cuda::for_index(policy, 0, lhs.size(), [=] MATAZURE_DEVICE(int_t i) { rhs[i] = lhs[i]; });
 }
 
 template <typename _ExecutionPolicy, typename _T1, typename _T2>
-void copy(_ExecutionPolicy policy, _T1 lhs, _T2 rhs, enable_if_t<!are_linear_access<_T1, _T2>::value && are_device_memory<_T1, _T2>::value>* = 0) {
-	cuda::for_index(policy, zero<pointi<_T1::rank>>::value(), lhs.shape(), [=] MATAZURE_DEVICE (pointi<_T1::rank> idx) {
-		rhs[idx] = lhs[idx];
-	});
+void copy(
+    _ExecutionPolicy policy, _T1 lhs, _T2 rhs,
+    enable_if_t<!are_linear_access<_T1, _T2>::value && are_device_memory<_T1, _T2>::value>* = 0) {
+    cuda::for_index(policy, zero<pointi<_T1::rank>>::value(), lhs.shape(),
+                    [=] MATAZURE_DEVICE(pointi<_T1::rank> idx) { rhs[idx] = lhs[idx]; });
 }
 
 template <typename _T1, typename _T2>
-void copy(_T1 lhs, _T2 rhs, enable_if_t<are_device_memory<enable_if_t<is_tensor<_T1>::value, _T1>, _T2>::value>* = 0) {
-	parallel_execution_policy policy;
-	policy.total_size(lhs.size());
-	copy(policy, lhs, rhs);
+void copy(
+    _T1 lhs, _T2 rhs,
+    enable_if_t<are_device_memory<enable_if_t<is_tensor<_T1>::value, _T1>, _T2>::value>* = 0) {
+    parallel_execution_policy policy;
+    policy.total_size(lhs.size());
+    copy(policy, lhs, rhs);
 }
 
 /**
-* @brief transform a linear indexing cuda tensor to another by the fun
-* @param policy the execution policy
-* @param ts_src the source tensor
-* @param ts_dst the destination tensor
-* @param fun the functor, (e_src) -> e_dst pattern
-*/
+ * @brief transform a linear indexing cuda tensor to another by the fun
+ * @param policy the execution policy
+ * @param ts_src the source tensor
+ * @param ts_dst the destination tensor
+ * @param fun the functor, (e_src) -> e_dst pattern
+ */
 template <typename _ExectutionPolicy, typename _TensorSrc, typename _TensorDst, typename _Fun>
-inline MATAZURE_GENERAL void transform(_ExectutionPolicy policy, _TensorSrc ts_src, _TensorDst ts_dst, _Fun fun, enable_if_t<!are_linear_access<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value && are_device_memory<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value>* = 0) {
-	cuda::for_index(policy, 0, ts_src.size(), [=] MATAZURE_DEVICE (int_t i) {
-		ts_dst[i] = fun(ts_src[i]);
-	});
+inline MATAZURE_GENERAL void transform(
+    _ExectutionPolicy policy, _TensorSrc ts_src, _TensorDst ts_dst, _Fun fun,
+    enable_if_t<!are_linear_access<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value &&
+                are_device_memory<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value>* = 0) {
+    cuda::for_index(policy, 0, ts_src.size(),
+                    [=] MATAZURE_DEVICE(int_t i) { ts_dst[i] = fun(ts_src[i]); });
 }
 
 /**
-* @brief transform a array indexing cuda tensor to another by the fun
-* @param policy the execution policy
-* @param ts_src the source tensor
-* @param ts_dst the destination tensor
-* @param fun the functor, (e_src) -> e_dst pattern
-*/
+ * @brief transform a array indexing cuda tensor to another by the fun
+ * @param policy the execution policy
+ * @param ts_src the source tensor
+ * @param ts_dst the destination tensor
+ * @param fun the functor, (e_src) -> e_dst pattern
+ */
 template <typename _ExectutionPolicy, typename _TensorSrc, typename _TensorDst, typename _Fun>
-inline MATAZURE_GENERAL void transform(_ExectutionPolicy policy, _TensorSrc ts_src, _TensorDst ts_dst, _Fun fun, enable_if_t<are_linear_access<decay_t<_TensorSrc>>::value && are_device_memory<decay_t<_TensorSrc>>::value>* = 0) {
-	cuda::for_index(policy, pointi<_TensorSrc::rank>::zeros(), ts_src.shape(), [=] MATAZURE_DEVICE (pointi<_TensorSrc::rank> idx) {
-		ts_dst[idx] = fun(ts_src[idx]);
-	});
+inline MATAZURE_GENERAL void transform(
+    _ExectutionPolicy policy, _TensorSrc ts_src, _TensorDst ts_dst, _Fun fun,
+    enable_if_t<are_linear_access<decay_t<_TensorSrc>>::value &&
+                are_device_memory<decay_t<_TensorSrc>>::value>* = 0) {
+    cuda::for_index(
+        policy, pointi<_TensorSrc::rank>::zeros(), ts_src.shape(),
+        [=] MATAZURE_DEVICE(pointi<_TensorSrc::rank> idx) { ts_dst[idx] = fun(ts_src[idx]); });
 }
 
 /**
-* @brief transform a cuda tensor to another by the fun
-* @param ts_src the source tensor
-* @param ts_dst the destination tensor
-* @param fun the functor, (e_src) -> e_dst pattern
-*/
+ * @brief transform a cuda tensor to another by the fun
+ * @param ts_src the source tensor
+ * @param ts_dst the destination tensor
+ * @param fun the functor, (e_src) -> e_dst pattern
+ */
 template <typename _TensorSrc, typename _TensorDst, typename _Fun>
-inline MATAZURE_GENERAL void transform(const _TensorSrc ts_src, _TensorDst ts_dst, _Fun fun, enable_if_t<are_device_memory<enable_if_t<is_tensor<decay_t<_TensorSrc>>::value, decay_t<_TensorSrc>>, decay_t<_TensorDst>>::value>* = 0)
-{
-	parallel_execution_policy policy;
-	policy.total_size(ts_src.size());
-	transform(policy, ts_src, ts_dst, fun);
+inline MATAZURE_GENERAL void transform(
+    const _TensorSrc ts_src, _TensorDst ts_dst, _Fun fun,
+    enable_if_t<
+        are_device_memory<enable_if_t<is_tensor<decay_t<_TensorSrc>>::value, decay_t<_TensorSrc>>,
+                          decay_t<_TensorDst>>::value>* = 0) {
+    parallel_execution_policy policy;
+    policy.total_size(ts_src.size());
+    transform(policy, ts_src, ts_dst, fun);
 }
 
-}
+}  // namespace cuda
 
-//use in matazure
-using cuda::for_each;
-using cuda::fill;
+// use in matazure
 using cuda::copy;
+using cuda::fill;
+using cuda::for_each;
 using cuda::transform;
 
-}
+}  // namespace matazure

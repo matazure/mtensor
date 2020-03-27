@@ -1,14 +1,10 @@
 #include <matazure/config.hpp>
 
-namespace matazure{
+namespace matazure {
 
-	class invalid_shape: public std::runtime_error{
-	public:
+class invalid_shape : public std::runtime_error {
+   public:
+    invalid_shape() : std::runtime_error("the shape is inavlid") {}
+};
 
-		invalid_shape() :
-			std::runtime_error("the shape is inavlid")
-		{ }
-
-	};
-
-}
+}  // namespace matazure
