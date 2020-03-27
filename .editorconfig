@@ -9,13 +9,13 @@ insert_final_newline = true
 [*.{c,cpp,hpp,h,cu,cl,metal,jenkinsfile}]
 end_of_line = lf
 charset = utf-8
-indent_style = tab
+indent_style = space
 indent_size = 4
 trim_trailing_whitespace = true
 
 [{{*.cmake}, CMakeLists.txt}]
 end_of_line = lf
 charset = utf-8
-indent_style = tab
+indent_style = space
 indent_size = 4
 trim_trailing_whitespace = true
