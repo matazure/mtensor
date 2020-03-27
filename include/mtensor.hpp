@@ -5,6 +5,7 @@
 #include <matazure/geometry.hpp>
 #include <matazure/io.hpp>
 #include <matazure/meta.hpp>
+#include <matazure/view/view.hpp>
 
 #ifdef MATAZURE_CUDA
 #include <matazure/cuda/algorithm.hpp>
