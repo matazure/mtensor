@@ -1,6 +1,6 @@
-﻿#include "image_helper.hpp"
-#include <mtensor.hpp>
+﻿#include <mtensor.hpp>
 #include <stdexcept>
+#include "image_helper.hpp"
 
 using namespace matazure;
 

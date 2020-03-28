@@ -85,22 +85,22 @@ template <int_t _Rank, typename _Func>
 inline auto make_lambda(
     pointi<_Rank> ext, _Func fun, device_tag,
     enable_if_t<!MATAZURE_IS_D_LAMBDA(_Func) && !MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)
-    -> decltype(cuda::make_general_lambda(ext, fun)) {
-    return cuda::make_general_lambda(ext, fun);
+    -> decltype(cuda::make_lambda(ext, fun)) {
+    return cuda::make_lambda(ext, fun);
 }
 
 template <int_t _Rank, typename _Func>
 inline auto make_lambda(pointi<_Rank> ext, _Func fun,
                         enable_if_t<MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)
-    -> decltype(cuda::make_general_lambda(ext, fun)) {
-    return cuda::make_general_lambda(ext, fun);
+    -> decltype(cuda::make_lambda(ext, fun)) {
+    return cuda::make_lambda(ext, fun);
 }
 
 template <int_t _Rank, typename _Func>
 inline auto make_lambda(pointi<_Rank> ext, _Func fun, device_tag,
                         enable_if_t<MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)
-    -> decltype(cuda::make_general_lambda(ext, fun)) {
-    return cuda::make_general_lambda(ext, fun);
+    -> decltype(cuda::make_lambda(ext, fun)) {
+    return cuda::make_lambda(ext, fun);
 }
 
 template <int_t _Rank, typename _Func>

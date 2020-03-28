@@ -53,6 +53,7 @@ class general_lambda_tensor
     MATAZURE_GENERAL int_t size() const { return layout_.stride()[rank - 1]; }
 
    public:
+#pragma nv_exec_check_disable
     template <typename _Mode>
     MATAZURE_GENERAL enable_if_t<is_same<_Mode, array_index>::value, reference> index_imp(
         pointi<rank> index) const {
@@ -93,8 +94,7 @@ inline auto make_device_lambda(pointi<_Rank> ext, _Func fun)
 }
 
 template <int_t _Rank, typename _Func>
-inline auto make_general_lambda(pointi<_Rank> ext, _Func fun)
-    -> general_lambda_tensor<_Rank, _Func> {
+inline auto make_lambda(pointi<_Rank> ext, _Func fun) -> general_lambda_tensor<_Rank, _Func> {
     return general_lambda_tensor<_Rank, _Func>(ext, fun);
 }
 

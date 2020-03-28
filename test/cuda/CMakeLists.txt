@@ -1,0 +1,3 @@
+
+add_executable(ut_lambda_tensor ut_lambda_tensor.cu)
+target_link_libraries(ut_lambda_tensor mtensor gtest gtest_main)
