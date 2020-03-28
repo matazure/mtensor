@@ -1,9 +1,11 @@
 ﻿#pragma once
 
 #include <matazure/algorithm.hpp>
+#include <matazure/lambda_tensor.hpp>
 #include <matazure/tensor.hpp>
 
 #ifdef MATAZURE_CUDA
+#include <matazure/cuda/lambda_tensor.hpp>
 #include <matazure/cuda/tensor.hpp>
 #endif
 

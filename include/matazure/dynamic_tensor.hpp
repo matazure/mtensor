@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include <matazure/lambda_tensor.hpp>
 #include <matazure/tensor.hpp>
 
 namespace matazure {

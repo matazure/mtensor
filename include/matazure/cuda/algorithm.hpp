@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <matazure/cuda/execution.hpp>
+#include <matazure/lambda_tensor.hpp>
 #include <matazure/point.hpp>
 #include <matazure/tensor.hpp>
 

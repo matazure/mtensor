@@ -1,6 +1,7 @@
 #pragma once
 
 #include <matazure/config.hpp>
+#include <matazure/point.hpp>
 
 namespace matazure {
 
