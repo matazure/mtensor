@@ -74,16 +74,10 @@ inline MATAZURE_GENERAL pointi<3> dim3_to_pointi(dim3 u) {
 
 }  // namespace internal
 
-MATAZURE_HD_WARNING_DISABLE
+#pragma nv_exec_check_disable
 template <typename Function, typename... Arguments>
 MATAZURE_GLOBAL void kenel(Function f, Arguments... args) {
     f(args...);
-}
-
-template <typename _Fun, typename... _Args>
-inline void launch(_Fun f, _Args... args) {
-    execution_policy exe_policy;
-    launch(exe_policy, f, args...);
 }
 
 template <typename _ExecutionPolicy, typename _Fun, typename... _Args>
@@ -94,14 +88,30 @@ inline void launch(_ExecutionPolicy exe_policy, _Fun f, _Args... args) {
     assert_runtime_success(cudaGetLastError());
 }
 
-template <typename _ExecutionPolicy, typename _Fun>
-inline void for_index(_ExecutionPolicy policy, int_t first, int_t last, _Fun fun) {
-    launch(policy, [=] __device__() {
+template <typename _Fun, typename... _Args>
+inline void launch(_Fun f, _Args... args) {
+    execution_policy exe_policy;
+    launch(exe_policy, f, args...);
+}
+
+template <typename _Fun>
+struct for_index_functor {
+    int first;
+    int last;
+    _Fun fun;
+
+    __device__ void operator()() {
         for (int_t i = first + threadIdx.x + blockIdx.x * blockDim.x; i < last;
              i += blockDim.x * gridDim.x) {
             fun(i);
-        }
-    });
+        };
+    }
+};
+
+template <typename _ExecutionPolicy, typename _Fun>
+inline void for_index(_ExecutionPolicy policy, int_t first, int_t last, _Fun fun) {
+    for_index_functor<_Fun> func{first, last, fun};
+    launch(policy, func);
 }
 
 template <typename _Fun>
