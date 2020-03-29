@@ -49,10 +49,12 @@ void bm_aa_tensor2f_copy(benchmark::State& state) {
     state.SetBytesProcessed(state.iterations() * ts_dst.size() * sizeof(float));
 }
 
-BENCHMARK(bm_gold_tensor2f_copy)->Arg(10000);
-BENCHMARK(bm_la_tensor2f_copy)->Arg(10000);
-BENCHMARK(bm_aa_tensor2f_copy)->Arg(10000);
+BENCHMARK(bm_gold_tensor2f_copy)->Arg(10_K);
+BENCHMARK(bm_la_tensor2f_copy)->Arg(10_K);
+BENCHMARK(bm_aa_tensor2f_copy)->Arg(10_K);
 
 // BENCHMARK
 
 BENCHMARK_MAIN();
+
+// int main() { return 0; }
