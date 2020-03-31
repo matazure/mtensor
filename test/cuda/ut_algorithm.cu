@@ -22,11 +22,9 @@ TEST(LauchTest, OnlySupportDeviceLambda) {
 
 TEST(ForIndexTest, Lambda) {
     cuda::for_index(0, 10, [] __matazure__(int i) { printf("%d,", i); });
-    cuda::device_synchronize();
     printf("\n");
 
     cuda::for_index(0, 10, [] __device__(int i) { printf("%d,", i); });
-    cuda::device_synchronize();
     printf("\n");
 
     // if use device code in host, will do none
@@ -34,6 +32,5 @@ TEST(ForIndexTest, Lambda) {
     printf("\n");
 
     // cuda::for_index(0, 10, print_op{});
-    // cuda::device_synchronize();
     // printf("\n");
 }

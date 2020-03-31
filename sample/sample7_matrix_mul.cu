@@ -18,7 +18,6 @@ int main(int argc, char* argv[]) {
 
     cuda::fill(cmat_a, 1.0f);
     cuda::fill(cmat_b, 2.0f);
-    cuda::device_synchronize();
 
     cuda::block_for_index<BLOCK_DIM>(grid_dim,
                                      [=] __device__(cuda::block_index<BLOCK_DIM> block_idx) {

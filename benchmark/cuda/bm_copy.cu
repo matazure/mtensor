@@ -57,13 +57,8 @@ void bm_tensor_copy(benchmark::State& state) {
     tensor_type ts_src(shape);
     tensor_type ts_dst(shape);
 
-    cuda::parallel_execution_policy policy;
-    policy.total_size(ts_src.size());
-    cuda::configure_grid(policy, raw1f_copy_kernel);
-
     while (state.KeepRunning()) {
         cuda::copy(ts_src, ts_dst);
-        cuda::device_synchronize();
     }
 
     state.SetBytesProcessed(state.iterations() * static_cast<size_t>(ts_src.size()) *
@@ -90,7 +85,6 @@ void bm_tensor_ac_copy(benchmark::State& state) {
         cuda::for_index(
             shape, [ts_src, ts_dst] __matazure__(pointi<rank> idx) { ts_dst(idx) = ts_src(idx); });
         // cuda::copy(ts_src, ts_dst);
-        cuda::device_synchronize();
     }
 
     state.SetBytesProcessed(state.iterations() * static_cast<size_t>(ts_src.size()) *

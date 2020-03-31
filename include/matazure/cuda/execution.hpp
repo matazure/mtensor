@@ -58,6 +58,8 @@ class execution_policy {
     cudaStream_t stream() const { return stream_; }
     void stream(cudaStream_t stream) { stream_ = stream; }
 
+    ~execution_policy() { cudaStreamSynchronize(stream_); }
+
    protected:
     int grid_size_ = 0;
     int block_size_ = 0;

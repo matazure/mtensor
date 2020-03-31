@@ -1,5 +1,5 @@
-﻿#include "image_helper.hpp"
-#include <mtensor.hpp>
+﻿#include <mtensor.hpp>
+#include "image_helper.hpp"
 
 using namespace matazure;
 
@@ -29,7 +29,6 @@ int main(int argc, char* argv[]) {
     cuda::for_index(cimg_rgb.shape(), [=] __device__(pointi<2> idx) {
         cimg_padding(idx) = point_cast<float>(cimg_rgb(idx));
     });
-    cuda::device_synchronize();
 
     cuda::tensor<pointf<3>, 2> cimg_mean(img_rgb.shape());
 
@@ -53,12 +52,10 @@ int main(int argc, char* argv[]) {
                 cimg_mean[valid_global_idx] = sum;
             }
         });
-    cuda::device_synchronize();
 
     cuda::tensor<pointb<3>, 2> cimg_mean_byte(cimg_mean.shape());
     cuda::transform(cimg_mean, cimg_mean_byte,
                     [] __device__(pointf<3> pixel) { return point_cast<byte>(pixel); });
-    cuda::device_synchronize();
 
     tensor<pointb<3>, 2> img_mean(cimg_mean_byte.shape());
     mem_copy(cimg_mean_byte, img_mean);
