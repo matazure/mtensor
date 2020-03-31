@@ -94,6 +94,8 @@ inline void launch(_Fun f, _Args... args) {
     launch(exe_policy, f, args...);
 }
 
+namespace internal {
+
 template <typename _Fun>
 struct for_index_functor {
     int first;
@@ -108,9 +110,11 @@ struct for_index_functor {
     }
 };
 
+}  // namespace internal
+
 template <typename _ExecutionPolicy, typename _Fun>
 inline void for_index(_ExecutionPolicy policy, int_t first, int_t last, _Fun fun) {
-    for_index_functor<_Fun> func{first, last, fun};
+    internal::for_index_functor<_Fun> func{first, last, fun};
     launch(policy, func);
 }
 
@@ -126,6 +130,19 @@ inline void for_index(int_t last, _Fun fun) {
     for_index(0, last, fun);
 }
 
+namespace internal {
+
+template <typename _Fun, int_t _Rank>
+struct for_index_array_access_functor {
+    __device__ void operator()(int_t i) { fun(layout.offset2index(i) + origin); }
+
+    _Fun fun;
+    first_major_layout<_Rank> layout;
+    pointi<_Rank> origin;
+};
+
+}  // namespace internal
+
 template <typename _ExecutionPolicy, int_t _Rank, typename _Fun>
 inline void for_index(_ExecutionPolicy policy, pointi<_Rank> origin, pointi<_Rank> end, _Fun fun) {
     auto extent = end - origin;
@@ -134,8 +151,9 @@ inline void for_index(_ExecutionPolicy policy, pointi<_Rank> origin, pointi<_Ran
     first_major_layout<_Rank> layout(extent);
     auto max_size = layout.index2offset(end - 1) + 1;  //要包含最后一个元素
 
-    cuda::for_index(policy, 0, max_size,
-                    [=] __device__(int_t i) { fun(layout.offset2index(i) + origin); });
+    internal::for_index_array_access_functor<_Fun, _Rank> functor{fun, layout, origin};
+
+    cuda::for_index(policy, 0, max_size, functor);
 }
 
 template <int_t _Rank, typename _Fun>
