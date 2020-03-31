@@ -113,13 +113,6 @@ class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout>> {
     const pointer data_;
 };
 
-#ifndef MATAZURE_DISABLE_MATRIX_VECTOR_ALIAS
-template <typename _ValueType, typename _Layout = column_major_layout<2>>
-using matrix = tensor<_ValueType, 2, _Layout>;
-template <typename _ValueType, typename _Layout = column_major_layout<1>>
-using vector = tensor<_ValueType, 1, _Layout>;
-#endif
-
 template <typename _TensorSrc, typename _TensorDst>
 inline void mem_copy(_TensorSrc ts_src, _TensorDst cts_dst,
                      enable_if_t<!are_host_memory<_TensorSrc, _TensorDst>::value &&
@@ -183,6 +176,26 @@ inline auto reshape(cuda::tensor<_ValueType, _Rank, _Layout> ts, pointi<_OutDim>
     cuda::tensor<_ValueType, _OutDim, _OutLayout> re(ext, ts.shared_data());
     return re;
 }
+
+#ifndef MATAZURE_DISABLE_MATRIX_VECTOR_ALIAS
+template <typename _ValueType, typename _Layout = column_major_layout<1>>
+using vector = tensor<_ValueType, 1, _Layout>;
+template <typename _ValueType, typename _Layout = column_major_layout<2>>
+using matrix = tensor<_ValueType, 2, _Layout>;
+template <typename _ValueType, typename _Layout = column_major_layout<3>>
+using volume = tensor<_ValueType, 3, _Layout>;
+#endif
+
+template <int_t _Rank, typename _Layout = column_major_layout<_Rank>>
+using tensorb = tensor<byte, _Rank, column_major_layout<_Rank>>;
+template <int_t _Rank, typename _Layout = column_major_layout<_Rank>>
+using tensors = tensor<short, _Rank, column_major_layout<_Rank>>;
+template <int_t _Rank, typename _Layout = column_major_layout<_Rank>>
+using tensori = tensor<int_t, _Rank, column_major_layout<_Rank>>;
+template <int_t _Rank, typename _Layout = column_major_layout<_Rank>>
+using tensorf = tensor<float, _Rank, column_major_layout<_Rank>>;
+template <int_t _Rank, typename _Layout = column_major_layout<_Rank>>
+using tensord = tensor<double, _Rank, column_major_layout<_Rank>>;
 
 namespace __walkaround {
 

@@ -346,10 +346,12 @@ inline auto split(tensor<_T, _Rank, column_major_layout<_Rank>> ts)
 }
 
 #ifndef MATAZURE_DISABLE_MATRIX_VECTOR_ALIAS
-template <typename _ValueType, typename _Layout = column_major_layout<2>>
-using matrix = tensor<_ValueType, 2, _Layout>;
 template <typename _ValueType, typename _Layout = column_major_layout<1>>
 using vector = tensor<_ValueType, 1, _Layout>;
+template <typename _ValueType, typename _Layout = column_major_layout<2>>
+using matrix = tensor<_ValueType, 2, _Layout>;
+template <typename _ValueType, typename _Layout = column_major_layout<3>>
+using volume = tensor<_ValueType, 3, _Layout>;
 #endif
 
 template <int_t _Rank, typename _Layout = column_major_layout<_Rank>>
@@ -362,50 +364,5 @@ template <int_t _Rank, typename _Layout = column_major_layout<_Rank>>
 using tensorf = tensor<float, _Rank, column_major_layout<_Rank>>;
 template <int_t _Rank, typename _Layout = column_major_layout<_Rank>>
 using tensord = tensor<double, _Rank, column_major_layout<_Rank>>;
-
-using tensor1b = tensor<byte, 1>;
-using tensor2b = tensor<byte, 2>;
-using tensor3b = tensor<byte, 3>;
-using tensor4b = tensor<byte, 4>;
-
-using tensor1s = tensor<short, 1>;
-using tensor2s = tensor<short, 2>;
-using tensor3s = tensor<short, 3>;
-using tensor4s = tensor<short, 4>;
-
-using tensor1us = tensor<unsigned short, 1>;
-using tensor2us = tensor<unsigned short, 2>;
-using tensor3us = tensor<unsigned short, 4>;
-using tensor4us = tensor<unsigned short, 4>;
-
-using tensor1i = tensor<int_t, 1>;
-using tensor2i = tensor<int_t, 2>;
-using tensor3i = tensor<int_t, 3>;
-using tensor4i = tensor<int_t, 4>;
-
-using tensor1ui = tensor<unsigned int, 1>;
-using tensor2ui = tensor<unsigned int, 2>;
-using tensor3ui = tensor<unsigned int, 3>;
-using tensor4ui = tensor<unsigned int, 4>;
-
-using tensor1l = tensor<long, 1>;
-using tensor2l = tensor<long, 2>;
-using tensor3l = tensor<long, 3>;
-using tensor4l = tensor<long, 4>;
-
-using tensor1ul = tensor<unsigned long, 1>;
-using tensor2ul = tensor<unsigned long, 2>;
-using tensor3ul = tensor<unsigned long, 3>;
-using tensor4ul = tensor<unsigned long, 4>;
-
-using tensor1f = tensor<float, 1>;
-using tensor2f = tensor<float, 2>;
-using tensor3f = tensor<float, 3>;
-using tensor4f = tensor<float, 4>;
-
-using tensor1d = tensor<double, 1>;
-using tensor2d = tensor<double, 2>;
-using tensor3d = tensor<double, 3>;
-using tensor4d = tensor<double, 4>;
 
 }  // namespace matazure
