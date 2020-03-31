@@ -7,6 +7,10 @@
 #include <matazure/meta.hpp>
 #include <matazure/view/view.hpp>
 
+#ifdef MATAZURE_OPENMP
+#include <matazure/omp_for_index.hpp>
+#endif
+
 #ifdef MATAZURE_CUDA
 #include <matazure/cuda/algorithm.hpp>
 #include <matazure/cuda/exception.hpp>
