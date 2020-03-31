@@ -294,43 +294,10 @@ inline pointi<3> cat_point<2>(pointi<2> pt, int_t cat_i) {
     return pointi<3>{get<0>(pt), get<1>(pt), cat_i};
 }
 
-/**
- * @brief a wrapper for tuple to cast with point each other
- *
- * tuple<byte, byte, byte> and point<int, 3> can represent a rgb pixel, but they could not cast each
- * other point_viewer make it work
- *
- * @tparam _Typle  the tuple type, such as tuple<int, int, int>
- * @tparap the size of tuple elements
- */
-template <typename _Tuple, int_t rank = tuple_size<_Tuple>::value>
-class point_viewer;
+template <int_t _Rank>
+using index = pointi<_Rank>;
 
-/// special point_viewer for tuple<_T, 3>
-template <typename _Tuple>
-class point_viewer<_Tuple, 3> : public _Tuple {
-   public:
-    static_assert(tuple_size<_Tuple>::value == 3, "");
-    const static int_t rank = 3;
-    typedef decay_t<typename tuple_element<0, _Tuple>::type> value_type;
-    typedef point<value_type, rank> point_type;
-
-    point_viewer(const _Tuple& tp) : _Tuple(tp) {}
-
-    point_viewer& operator=(const point_type& tp) {
-        get<0>(*static_cast<_Tuple*>(this)) = tp[0];
-        get<1>(*static_cast<_Tuple*>(this)) = tp[1];
-        get<2>(*static_cast<_Tuple*>(this)) = tp[2];
-
-        return *this;
-    }
-
-    operator point_type() const {
-        point_type re;
-        re[0] = get<0>(*static_cast<_Tuple*>(this));
-        re[1] = get<1>(*static_cast<_Tuple*>(this));
-        re[2] = get<2>(*static_cast<_Tuple*>(this));
-    }
-};
+template <int_t _Rank>
+using shape = pointi<_Rank>;
 
 }  // namespace matazure
