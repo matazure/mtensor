@@ -11,23 +11,23 @@ namespace matazure {
  */
 
 template <int_t _Rank>
-class first_major_layout {
+class column_major_layout {
    public:
     const static int_t rank = _Rank;
 
 #pragma hd_warning_disable
-    MATAZURE_GENERAL first_major_layout(const pointi<rank>& shape) : shape_(shape) {
+    MATAZURE_GENERAL column_major_layout(const pointi<rank>& shape) : shape_(shape) {
         stride_[0] = shape[0];
         for (int_t i = 1; i < rank; ++i) {
             stride_[i] = shape[i] * stride_[i - 1];
         }
     }
 
-    MATAZURE_GENERAL first_major_layout(const first_major_layout& rhs)
-        : first_major_layout(rhs.shape()) {}
+    MATAZURE_GENERAL column_major_layout(const column_major_layout& rhs)
+        : column_major_layout(rhs.shape()) {}
 
 #pragma hd_warning_disable
-    MATAZURE_GENERAL first_major_layout& operator=(const first_major_layout& rhs) {
+    MATAZURE_GENERAL column_major_layout& operator=(const column_major_layout& rhs) {
         shape_ = rhs.shape();
         stride_ = rhs.stride();
         return *this;
@@ -57,7 +57,7 @@ class first_major_layout {
 
     MATAZURE_GENERAL pointi<rank> stride() const { return stride_; }
 
-    MATAZURE_GENERAL ~first_major_layout() {}
+    MATAZURE_GENERAL ~column_major_layout() {}
 
    private:
     pointi<rank> shape_;

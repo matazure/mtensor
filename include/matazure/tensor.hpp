@@ -45,7 +45,7 @@ class tensor_expression {
 @ tparam _Rank the rank of tensor
 @ tparam _Layout the memory layout of tensor, the default is first major
 */
-template <typename _ValueType, int_t _Rank, typename _Layout = first_major_layout<_Rank>>
+template <typename _ValueType, int_t _Rank, typename _Layout = column_major_layout<_Rank>>
 class tensor : public tensor_expression<tensor<_ValueType, _Rank, _Layout>> {
    public:
     // static_assert(std::is_pod<_ValueType>::value, "only supports pod type now");
@@ -270,15 +270,7 @@ class tensor : public tensor_expression<tensor<_ValueType, _Rank, _Layout>> {
     value_type* data_;
 };
 
-using column_major_layout = first_major_layout<2>;
-// using row_major_layout = last_major_layout<2>;
-
-/// alias of tensor<local_tensor<_ValueType, _BlockDim>, _BlockDim::size(), _Layout>
-template <typename _ValueType, typename _BlockDim,
-          typename _Layout = first_major_layout<_BlockDim::size()>>
-using block_tensor = tensor<local_tensor<_ValueType, _BlockDim>, _BlockDim::size(), _Layout>;
-
-template <typename _Type, int_t _Rank, typename _Layout = first_major_layout<_Rank>>
+template <typename _Type, int_t _Rank, typename _Layout = column_major_layout<_Rank>>
 auto make_tensor(pointi<_Rank> ext, _Type* p_data) -> tensor<_Type, _Rank, _Layout> {
     std::shared_ptr<_Type> sp_data(p_data, [](_Type* p) {});
     return tensor<_Type, _Rank, _Layout>(ext, sp_data);
@@ -338,12 +330,12 @@ inline auto reshape(tensor<_ValueType, _Rank, _Layout> ts, pointi<_OutDim> ext,
 }
 
 template <typename _T, int_t _Rank>
-inline auto split(tensor<_T, _Rank, first_major_layout<_Rank>> ts)
-    -> tensor<tensor<_T, _Rank - 1, first_major_layout<_Rank - 1>>, 1> {
+inline auto split(tensor<_T, _Rank, column_major_layout<_Rank>> ts)
+    -> tensor<tensor<_T, _Rank - 1, column_major_layout<_Rank - 1>>, 1> {
     const auto slice_ext = slice_point<_Rank - 1>(ts.shape());
     auto slice_size = cumulative_prod(slice_ext)[slice_ext.size() - 1];
 
-    using splitted_tensor_t = tensor<_T, _Rank - 1, first_major_layout<_Rank - 1>>;
+    using splitted_tensor_t = tensor<_T, _Rank - 1, column_major_layout<_Rank - 1>>;
     tensor<splitted_tensor_t, 1> ts_splitted(ts.shape()[_Rank - 1]);
     for (int_t i = 0; i < ts_splitted.size(); ++i) {
         ts_splitted[i] = splitted_tensor_t(
@@ -354,25 +346,25 @@ inline auto split(tensor<_T, _Rank, first_major_layout<_Rank>> ts)
 }
 
 /// alias of tensor<_ValueType, 2>
-template <typename _ValueType, typename _Layout = column_major_layout>
+template <typename _ValueType, typename _Layout = column_major_layout<2>>
 using matrix = tensor<_ValueType, 2, _Layout>;
 
 #ifdef MATAZURE_ENABLE_VECTOR_ALIAS
 /// alias of tensor <_ValueType, 1>
-template <typename _ValueType, typename _Layout = first_major_layout<1>>
+template <typename _ValueType, typename _Layout = column_major_layout<1>>
 using vector = tensor<_ValueType, 1, _Layout>;
 #endif
 
-template <int_t _Rank, typename _Layout = column_major_layout>
-using tensorb = tensor<byte, _Rank, column_major_layout>;
-template <int_t _Rank, typename _Layout = column_major_layout>
-using tensors = tensor<short, _Rank, column_major_layout>;
-template <int_t _Rank, typename _Layout = column_major_layout>
-using tensori = tensor<int_t, _Rank, column_major_layout>;
-template <int_t _Rank, typename _Layout = column_major_layout>
-using tensorf = tensor<float, _Rank, column_major_layout>;
-template <int_t _Rank, typename _Layout = column_major_layout>
-using tensord = tensor<double, _Rank, column_major_layout>;
+template <int_t _Rank, typename _Layout = column_major_layout<_Rank>>
+using tensorb = tensor<byte, _Rank, column_major_layout<_Rank>>;
+template <int_t _Rank, typename _Layout = column_major_layout<_Rank>>
+using tensors = tensor<short, _Rank, column_major_layout<_Rank>>;
+template <int_t _Rank, typename _Layout = column_major_layout<_Rank>>
+using tensori = tensor<int_t, _Rank, column_major_layout<_Rank>>;
+template <int_t _Rank, typename _Layout = column_major_layout<_Rank>>
+using tensorf = tensor<float, _Rank, column_major_layout<_Rank>>;
+template <int_t _Rank, typename _Layout = column_major_layout<_Rank>>
+using tensord = tensor<double, _Rank, column_major_layout<_Rank>>;
 
 using tensor1b = tensor<byte, 1>;
 using tensor2b = tensor<byte, 2>;

@@ -8,7 +8,7 @@
 namespace matazure {
 namespace cuda {
 
-template <int_t _Rank, typename _Func, typename _Layout = first_major_layout<_Rank>>
+template <int_t _Rank, typename _Func, typename _Layout = column_major_layout<_Rank>>
 class general_lambda_tensor
     : public tensor_expression<general_lambda_tensor<_Rank, _Func, _Layout>> {
     typedef function_traits<_Func> functor_traits;
@@ -84,7 +84,7 @@ class general_lambda_tensor
     const _Func functor_;
 };
 
-template <int_t _Rank, typename _Func, typename _Layout = first_major_layout<_Rank>>
+template <int_t _Rank, typename _Func, typename _Layout = column_major_layout<_Rank>>
 using device_lambda_tensor = general_lambda_tensor<_Rank, _Func, _Layout>;
 
 template <int_t _Rank, typename _Func>

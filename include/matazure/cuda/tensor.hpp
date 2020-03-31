@@ -12,7 +12,7 @@ namespace matazure {
 namespace cuda {
 
 #pragma hd_warning_disable
-template <typename _Type, int_t _Rank, typename _Layout = first_major_layout<_Rank>>
+template <typename _Type, int_t _Rank, typename _Layout = column_major_layout<_Rank>>
 class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout>> {
    public:
     static_assert(std::is_pod<_Type>::value, "only supports pod type now");
@@ -113,13 +113,9 @@ class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout>> {
     const pointer data_;
 };
 
-template <typename _Type, typename _BlockDim,
-          typename _Layout = first_major_layout<_BlockDim::size()>>
-using block_tensor = tensor<local_tensor<_Type, _BlockDim>, _BlockDim::size(), _Layout>;
-
-template <typename _ValueType, typename _Layout = column_major_layout>
+template <typename _ValueType, typename _Layout = column_major_layout<2>>
 using matrix = tensor<_ValueType, 2, _Layout>;
-template <typename _ValueType, typename _Layout = first_major_layout<1>>
+template <typename _ValueType, typename _Layout = column_major_layout<1>>
 using vector = tensor<_ValueType, 1, _Layout>;
 
 template <typename _TensorSrc, typename _TensorDst>
