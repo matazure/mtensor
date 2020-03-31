@@ -113,10 +113,12 @@ class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout>> {
     const pointer data_;
 };
 
+#ifndef MATAZURE_DISABLE_MATRIX_VECTOR_ALIAS
 template <typename _ValueType, typename _Layout = column_major_layout<2>>
 using matrix = tensor<_ValueType, 2, _Layout>;
 template <typename _ValueType, typename _Layout = column_major_layout<1>>
 using vector = tensor<_ValueType, 1, _Layout>;
+#endif
 
 template <typename _TensorSrc, typename _TensorDst>
 inline void mem_copy(_TensorSrc ts_src, _TensorDst cts_dst,

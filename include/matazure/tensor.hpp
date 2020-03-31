@@ -345,12 +345,9 @@ inline auto split(tensor<_T, _Rank, column_major_layout<_Rank>> ts)
     return ts_splitted;
 }
 
-/// alias of tensor<_ValueType, 2>
+#ifndef MATAZURE_DISABLE_MATRIX_VECTOR_ALIAS
 template <typename _ValueType, typename _Layout = column_major_layout<2>>
 using matrix = tensor<_ValueType, 2, _Layout>;
-
-#ifdef MATAZURE_ENABLE_VECTOR_ALIAS
-/// alias of tensor <_ValueType, 1>
 template <typename _ValueType, typename _Layout = column_major_layout<1>>
 using vector = tensor<_ValueType, 1, _Layout>;
 #endif
