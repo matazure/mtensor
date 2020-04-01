@@ -2,8 +2,6 @@
 
 #include <matazure/cuda/block_for_index.hpp>
 #include <matazure/cuda/for_index.hpp>
-#include <matazure/lambda_tensor.hpp>
-#include <matazure/point.hpp>
 
 namespace matazure {
 namespace cuda {

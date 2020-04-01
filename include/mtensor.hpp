@@ -15,6 +15,7 @@
 #include <matazure/cuda/algorithm.hpp>
 #include <matazure/cuda/exception.hpp>
 #include <matazure/cuda/execution.hpp>
+#include <matazure/cuda/lambda_tensor.hpp>
 #include <matazure/cuda/runtime.hpp>
 #include <matazure/cuda/tensor.hpp>
 #endif

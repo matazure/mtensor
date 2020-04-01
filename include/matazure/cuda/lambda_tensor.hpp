@@ -2,8 +2,11 @@
 
 #include <cuda_runtime.h>
 #include <matazure/cuda/algorithm.hpp>
+#include <matazure/cuda/lambda_tensor.hpp>
 #include <matazure/cuda/runtime.hpp>
 #include <matazure/cuda/tensor.hpp>
+#include <matazure/lambda_tensor.hpp>
+#include <matazure/type_traits.hpp>
 
 namespace matazure {
 namespace cuda {
