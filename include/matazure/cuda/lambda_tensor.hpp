@@ -100,4 +100,11 @@ inline auto make_lambda(pointi<_Rank> ext, _Func fun) -> lambda_tensor<_Rank, _F
 }
 
 }  // namespace cuda
+
+template <int_t _Rank, typename _Func>
+inline auto make_lambda(pointi<_Rank> ext, _Func fun, device_tag)
+    -> decltype(cuda::make_lambda(ext, fun)) {
+    return cuda::make_lambda(ext, fun);
+}
+
 }  // namespace matazure

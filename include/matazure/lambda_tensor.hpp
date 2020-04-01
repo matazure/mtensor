@@ -161,4 +161,24 @@ class lambda_tensor : public tensor_expression<lambda_tensor<_Rank, _Func, _Layo
     const _Func functor_;
 };
 
+/**
+ * @brief make a lambda_tensor
+ * @param the shape
+ * @param the functor, a index -> value pattern
+ */
+template <int_t _Rank, typename _Func>
+inline auto make_lambda(pointi<_Rank> extent, _Func fun) -> lambda_tensor<_Rank, _Func> {
+    return lambda_tensor<_Rank, _Func>(extent, fun);
+}
+
+/**
+ * @brief make a lambda_tensor
+ * @param the shape
+ * @param the functor, a index -> value pattern
+ */
+template <int_t _Rank, typename _Func>
+inline auto make_lambda(pointi<_Rank> extent, _Func fun, host_tag) -> lambda_tensor<_Rank, _Func> {
+    return lambda_tensor<_Rank, _Func>(extent, fun);
+}
+
 }  // namespace matazure

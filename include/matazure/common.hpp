@@ -13,105 +13,6 @@
 
 namespace matazure {
 
-#ifndef MATAZURE_CUDA
-
-/**
- * @brief make a lambda_tensor
- * @param the shape
- * @param the functor, a index -> value pattern
- */
-template <int_t _Rank, typename _Func>
-inline auto make_lambda(pointi<_Rank> extent, _Func fun) -> lambda_tensor<_Rank, _Func> {
-    return lambda_tensor<_Rank, _Func>(extent, fun);
-}
-
-/**
- * @brief make a lambda_tensor
- * @param the shape
- * @param the functor, a index -> value pattern
- */
-template <int_t _Rank, typename _Func>
-inline auto make_lambda(pointi<_Rank> extent, _Func fun, host_tag) -> lambda_tensor<_Rank, _Func> {
-    return lambda_tensor<_Rank, _Func>(extent, fun);
-}
-
-/**
- * @brief make a lambda_tensor
- * @param the shape
- * @param the functor, a index -> value pattern
- */
-template <int_t _Rank, typename _Func>
-inline auto make_host_lambda(pointi<_Rank> extent, _Func fun) -> lambda_tensor<_Rank, _Func> {
-    return lambda_tensor<_Rank, _Func>(extent, fun);
-}
-
-#else
-
-/**
- * @brief make a lambda_tensor
- * @param the shape
- * @param the functor, a index -> value pattern
- */
-template <int_t _Rank, typename _Func>
-inline auto make_host_lambda(pointi<_Rank> extent, _Func fun) -> lambda_tensor<_Rank, _Func> {
-    return lambda_tensor<_Rank, _Func>(extent, fun);
-}
-
-/**
- * @brief make a lambda_tensor
- * @param the shape
- * @param the functor, should be a host functor a index -> value pattern
- */
-template <int_t _Rank, typename _Func>
-inline auto make_lambda(
-    pointi<_Rank> ext, _Func fun,
-    enable_if_t<!MATAZURE_IS_D_LAMBDA(_Func) && !MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)
-    -> decltype(make_host_lambda(ext, fun)) {
-    return make_host_lambda(ext, fun);
-}
-
-template <int_t _Rank, typename _Func>
-inline auto make_lambda(
-    pointi<_Rank> ext, _Func fun, host_tag,
-    enable_if_t<!MATAZURE_IS_D_LAMBDA(_Func) && !MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)
-    -> decltype(make_host_lambda(ext, fun)) {
-    return make_host_lambda(ext, fun);
-}
-
-/**
- * @todo: not support device struct operator, it's diffcult to do this.
- */
-template <int_t _Rank, typename _Func>
-inline auto make_lambda(
-    pointi<_Rank> ext, _Func fun, device_tag,
-    enable_if_t<!MATAZURE_IS_D_LAMBDA(_Func) && !MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)
-    -> decltype(cuda::make_lambda(ext, fun)) {
-    return cuda::make_lambda(ext, fun);
-}
-
-template <int_t _Rank, typename _Func>
-inline auto make_lambda(pointi<_Rank> ext, _Func fun,
-                        enable_if_t<MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)
-    -> decltype(cuda::make_lambda(ext, fun)) {
-    return cuda::make_lambda(ext, fun);
-}
-
-template <int_t _Rank, typename _Func>
-inline auto make_lambda(pointi<_Rank> ext, _Func fun, device_tag,
-                        enable_if_t<MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)
-    -> decltype(cuda::make_lambda(ext, fun)) {
-    return cuda::make_lambda(ext, fun);
-}
-
-template <int_t _Rank, typename _Func>
-inline auto make_lambda(pointi<_Rank> ext, _Func fun, host_tag,
-                        enable_if_t<MATAZURE_IS_HD_LAMBDA(_Func)>* = nullptr)
-    -> decltype(make_host_lambda(ext, fun)) {
-    return make_host_lambda(ext, fun);
-}
-
-#endif
-
 template <typename _Tensor, typename _Func>
 struct linear_map_op {
    private:
@@ -347,4 +248,4 @@ inline auto clamp_zero(_Tensor ts)
     return make_lambda(ts.shape(), clamp_zero_op<decay_t<_Tensor>>(ts),
                        typename _Tensor::memory_type{});
 }
-}
+}  // namespace matazure
