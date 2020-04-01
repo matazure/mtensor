@@ -21,8 +21,8 @@ struct crop_functor {
     crop_functor(_Tensor ts, pointi<_Tensor::rank> offset) : ts_(ts), offset_(offset) {}
 
     MATAZURE_GENERAL auto operator()(pointi<_Tensor::rank> idx) const
-        -> decltype((ts_[idx + offset_])) {
-        return ts_[idx + offset_];
+        -> decltype((ts_(idx + offset_))) {
+        return ts_(idx + offset_);
     }
 };
 

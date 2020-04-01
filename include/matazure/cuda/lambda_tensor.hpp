@@ -30,7 +30,7 @@ class general_lambda_tensor
 
     MATAZURE_GENERAL reference operator[](int_t i) const { return offset_imp<index_type>(i); }
 
-    MATAZURE_GENERAL reference operator[](const pointi<rank>& idx) const {
+    MATAZURE_GENERAL reference operator()(const pointi<rank>& idx) const {
         return index_imp<index_type>(idx);
     }
 

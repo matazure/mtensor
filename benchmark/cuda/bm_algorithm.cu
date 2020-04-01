@@ -9,7 +9,6 @@ void bm_cuda_cudaMemcpy(benchmark::State& state) {
     while (state.KeepRunning()) {
         cudaMemcpy(cts_dst.data(), cts_src.data(), sizeof(cts_src[0]) * cts_src.size(),
                    cudaMemcpyDefault);
-        cudaDeviceSynchronize();
     }
 
     state.SetBytesProcessed(state.iterations() * static_cast<size_t>(cts_src.size()) *

@@ -62,7 +62,7 @@ void copy(
     _ExecutionPolicy policy, _T1 lhs, _T2 rhs,
     enable_if_t<!are_linear_index<_T1, _T2>::value && are_device_memory<_T1, _T2>::value>* = 0) {
     cuda::for_index(policy, zero<pointi<_T1::rank>>::value(), lhs.shape(),
-                    [=] MATAZURE_DEVICE(pointi<_T1::rank> idx) { rhs[idx] = lhs[idx]; });
+                    [=] MATAZURE_DEVICE(pointi<_T1::rank> idx) { rhs(idx) = lhs(idx); });
 }
 
 template <typename _T1, typename _T2>

@@ -99,7 +99,7 @@ inline void copy(
     enable_if_t<!are_linear_index<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value &&
                 none_device_memory<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value>* = 0) {
     for_index(policy, pointi<_TensorSrc::rank>::zeros(), ts_src.shape(),
-              [&](pointi<_TensorSrc::rank> idx) { ts_dst[idx] = ts_src[idx]; });
+              [&](pointi<_TensorSrc::rank> idx) { ts_dst(idx) = ts_src(idx); });
 }
 
 /**

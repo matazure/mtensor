@@ -21,8 +21,8 @@ struct stride_functor {
     stride_functor(_Tensor ts, _StrideType stride) : ts_(ts), stride_(stride) {}
 
     MATAZURE_GENERAL auto operator()(pointi<_Tensor::rank> idx) const
-        -> decltype((ts_[idx * stride_])) {
-        return ts_[idx * stride_];
+        -> decltype((ts_(idx * stride_))) {
+        return ts_(idx * stride_);
     }
 };
 

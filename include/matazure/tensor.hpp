@@ -191,15 +191,6 @@ class tensor : public tensor_expression<tensor<_ValueType, _Rank, _Layout>> {
      * @param idx array index
      * @return element const reference
      */
-    reference operator[](const pointi<rank>& idx) const {
-        return (*this)[layout_.index2offset(idx)];
-    }
-
-    /**
-     * @brief accesses element by array access mode
-     * @param idx array index
-     * @return element const reference
-     */
     reference operator()(const pointi<rank>& idx) const {
         return (*this)[layout_.index2offset(idx)];
     }
