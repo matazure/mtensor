@@ -86,8 +86,8 @@ struct _Is_linear_array : bool_constant<is_tensor<_Type>::value> {};
 
 MATAZURE_DEFINE_ARE_TAG(are_host_memory, memory_type, host_tag)
 MATAZURE_DEFINE_ARE_TAG(are_device_memory, memory_type, device_tag)
-MATAZURE_DEFINE_ARE_TAG(are_linear_access, index_type, linear_index)
-MATAZURE_DEFINE_ARE_TAG(are_array_access, index_type, array_index)
+MATAZURE_DEFINE_ARE_TAG(are_linear_index, index_type, linear_index)
+MATAZURE_DEFINE_ARE_TAG(are_array_index, index_type, array_index)
 
 // none tag
 #define MATAZURE_DEFINE_NONE_TAG(name, tag_name, tag)                       \
@@ -104,7 +104,7 @@ MATAZURE_DEFINE_ARE_TAG(are_array_access, index_type, array_index)
 
 MATAZURE_DEFINE_NONE_TAG(none_host_memory, memory_type, host_tag)
 MATAZURE_DEFINE_NONE_TAG(none_device_memory, memory_type, device_tag)
-MATAZURE_DEFINE_NONE_TAG(none_linear_access, index_type, linear_index)
+MATAZURE_DEFINE_NONE_TAG(none_are_linear_index, index_type, linear_index)
 MATAZURE_DEFINE_NONE_TAG(none_array_access, index_type, array_index)
 
 }  // namespace matazure

@@ -13,7 +13,7 @@ namespace matazure {
 MATAZURE_HD_WARNING_DISABLE
 template <typename _ExectutionPolicy, typename _Tensor, typename _Fun>
 inline void for_each(_ExectutionPolicy policy, _Tensor&& ts, _Fun fun,
-                     enable_if_t<are_linear_access<decay_t<_Tensor>>::value &&
+                     enable_if_t<are_linear_index<decay_t<_Tensor>>::value &&
                                  none_device_memory<decay_t<_Tensor>>::value>* = 0) {
     for_index(policy, 0, ts.size(), [&](int_t i) { fun(ts[i]); });
 }
@@ -26,7 +26,7 @@ inline void for_each(_ExectutionPolicy policy, _Tensor&& ts, _Fun fun,
  */
 template <typename _ExectutionPolicy, typename _Tensor, typename _Fun>
 inline void for_each(_ExectutionPolicy policy, _Tensor&& ts, _Fun fun,
-                     enable_if_t<!are_linear_access<decay_t<_Tensor>>::value &&
+                     enable_if_t<!are_linear_index<decay_t<_Tensor>>::value &&
                                  none_device_memory<decay_t<_Tensor>>::value>* = 0) {
     for_index(policy, pointi<decay_t<_Tensor>::rank>::zeros(), ts.shape(),
               [&](pointi<decay_t<_Tensor>::rank> idx) { fun(ts[idx]); });
@@ -82,7 +82,7 @@ inline void fill(
 template <typename _ExectutionPolicy, typename _TensorSrc, typename _TensorDst>
 inline void copy(
     _ExectutionPolicy policy, const _TensorSrc& ts_src, _TensorDst&& ts_dst,
-    enable_if_t<are_linear_access<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value &&
+    enable_if_t<are_linear_index<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value &&
                 none_device_memory<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value>* = 0) {
     for_index(policy, 0, ts_src.size(), [&](int_t i) { ts_dst[i] = ts_src[i]; });
 }
@@ -96,7 +96,7 @@ inline void copy(
 template <typename _ExectutionPolicy, typename _TensorSrc, typename _TensorDst>
 inline void copy(
     _ExectutionPolicy policy, const _TensorSrc& ts_src, _TensorDst&& ts_dst,
-    enable_if_t<!are_linear_access<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value &&
+    enable_if_t<!are_linear_index<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value &&
                 none_device_memory<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value>* = 0) {
     for_index(policy, pointi<_TensorSrc::rank>::zeros(), ts_src.shape(),
               [&](pointi<_TensorSrc::rank> idx) { ts_dst[idx] = ts_src[idx]; });
@@ -126,7 +126,7 @@ inline void copy(const _TensorSrc& ts_src, _TensorDst&& ts_dst,
 template <typename _ExectutionPolicy, typename _TensorSrc, typename _TensorDst, typename _Fun>
 inline void transform(
     _ExectutionPolicy policy, const _TensorSrc& ts_src, _TensorDst&& ts_dst, _Fun fun,
-    enable_if_t<are_linear_access<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value &&
+    enable_if_t<are_linear_index<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value &&
                 none_device_memory<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value>* = 0) {
     for_index(policy, 0, ts_src.size(), [&](int_t i) { ts_dst[i] = fun(ts_src[i]); });
 }
@@ -141,7 +141,7 @@ inline void transform(
 template <typename _ExectutionPolicy, typename _TensorSrc, typename _TensorDst, typename _Fun>
 inline void transform(_ExectutionPolicy policy, const _TensorSrc& ts_src, _TensorDst&& ts_dst,
                       _Fun fun,
-                      enable_if_t<!are_linear_access<decay_t<_TensorSrc>>::value &&
+                      enable_if_t<!are_linear_index<decay_t<_TensorSrc>>::value &&
                                   none_device_memory<decay_t<_TensorSrc>>::value>* = 0) {
     for_index(policy, pointi<_TensorSrc::rank>::zeros(), ts_src.shape(),
               [&](pointi<_TensorSrc::rank> idx) { ts_dst[idx] = fun(ts_src[idx]); });

@@ -9,14 +9,14 @@ namespace cuda {
 template <typename _ExecutionPolicy, typename _Tensor, typename _Fun>
 inline void for_each(
     _ExecutionPolicy policy, _Tensor ts, _Fun fun,
-    enable_if_t<are_device_memory<_Tensor>::value && are_linear_access<_Tensor>::value>* = 0) {
+    enable_if_t<are_device_memory<_Tensor>::value && are_linear_index<_Tensor>::value>* = 0) {
     cuda::for_index(policy, 0, ts.size(), [=] MATAZURE_DEVICE(int_t i) { fun(ts[i]); });
 }
 
 template <typename _ExecutionPolicy, typename _Tensor, typename _Fun>
 inline void for_each(_ExecutionPolicy policy, _Tensor ts, _Fun fun,
                      enable_if_t<are_device_memory<decay_t<_Tensor>>::value &&
-                                 !are_linear_access<decay_t<_Tensor>>::value>* = 0) {
+                                 !are_linear_index<decay_t<_Tensor>>::value>* = 0) {
     cuda::for_index(policy, zero<pointi<_Tensor::rank>>::value(), ts.shape(),
                     [=] MATAZURE_DEVICE(pointi<_Tensor::rank> idx) { fun(ts[idx]); });
 }
@@ -53,14 +53,14 @@ inline void fill(
 template <typename _ExecutionPolicy, typename _T1, typename _T2>
 void copy(
     _ExecutionPolicy policy, _T1 lhs, _T2 rhs,
-    enable_if_t<are_linear_access<_T1, _T2>::value && are_device_memory<_T1, _T2>::value>* = 0) {
+    enable_if_t<are_linear_index<_T1, _T2>::value && are_device_memory<_T1, _T2>::value>* = 0) {
     cuda::for_index(policy, 0, lhs.size(), [=] MATAZURE_DEVICE(int_t i) { rhs[i] = lhs[i]; });
 }
 
 template <typename _ExecutionPolicy, typename _T1, typename _T2>
 void copy(
     _ExecutionPolicy policy, _T1 lhs, _T2 rhs,
-    enable_if_t<!are_linear_access<_T1, _T2>::value && are_device_memory<_T1, _T2>::value>* = 0) {
+    enable_if_t<!are_linear_index<_T1, _T2>::value && are_device_memory<_T1, _T2>::value>* = 0) {
     cuda::for_index(policy, zero<pointi<_T1::rank>>::value(), lhs.shape(),
                     [=] MATAZURE_DEVICE(pointi<_T1::rank> idx) { rhs[idx] = lhs[idx]; });
 }
@@ -84,7 +84,7 @@ void copy(
 template <typename _ExectutionPolicy, typename _TensorSrc, typename _TensorDst, typename _Fun>
 inline void transform(
     _ExectutionPolicy policy, _TensorSrc ts_src, _TensorDst ts_dst, _Fun fun,
-    enable_if_t<!are_linear_access<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value &&
+    enable_if_t<!are_linear_index<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value &&
                 are_device_memory<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value>* = 0) {
     cuda::for_index(policy, 0, ts_src.size(),
                     [=] MATAZURE_DEVICE(int_t i) { ts_dst[i] = fun(ts_src[i]); });
@@ -99,7 +99,7 @@ inline void transform(
  */
 template <typename _ExectutionPolicy, typename _TensorSrc, typename _TensorDst, typename _Fun>
 inline void transform(_ExectutionPolicy policy, _TensorSrc ts_src, _TensorDst ts_dst, _Fun fun,
-                      enable_if_t<are_linear_access<decay_t<_TensorSrc>>::value &&
+                      enable_if_t<are_linear_index<decay_t<_TensorSrc>>::value &&
                                   are_device_memory<decay_t<_TensorSrc>>::value>* = 0) {
     cuda::for_index(
         policy, pointi<_TensorSrc::rank>::zeros(), ts_src.shape(),
