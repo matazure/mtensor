@@ -181,62 +181,62 @@ namespace matazure {
     template <typename _TS1, typename _TS2>                                                        \
     inline enable_if_t<                                                                            \
         are_device_memory<_TS1, _TS2>::value && are_linear_index<_TS1, _TS2>::value,               \
-        cuda::general_lambda_tensor<_TS1::rank, __##name##_are_linear_index_tensor__<_TS1, _TS2>>> \
+        cuda::lambda_tensor<_TS1::rank, __##name##_are_linear_index_tensor__<_TS1, _TS2>>>         \
     operator op(const tensor_expression<_TS1>& e_lhs, const tensor_expression<_TS2>& e_rhs) {      \
         return make_lambda(e_lhs().shape(),                                                        \
                            __##name##_are_linear_index_tensor__<_TS1, _TS2>(e_lhs(), e_rhs()),     \
                            device_tag{});                                                          \
     }                                                                                              \
     template <typename _TS1, typename _TS2>                                                        \
-    inline enable_if_t<                                                                            \
-        are_device_memory<_TS1, _TS2>::value && !are_linear_index<_TS1, _TS2>::value,              \
-        cuda::general_lambda_tensor<_TS1::rank, __##name##_array_indexensor__<_TS1, _TS2>>>        \
+    inline enable_if_t<are_device_memory<_TS1, _TS2>::value &&                                     \
+                           !are_linear_index<_TS1, _TS2>::value,                                   \
+                       cuda::lambda_tensor<_TS1::rank, __##name##_array_indexensor__<_TS1, _TS2>>> \
     operator op(const tensor_expression<_TS1>& e_lhs, const tensor_expression<_TS2>& e_rhs) {      \
         return make_lambda(e_lhs().shape(),                                                        \
                            __##name##_array_indexensor__<_TS1, _TS2>(e_lhs(), e_rhs()),            \
                            device_tag{});                                                          \
     }
 
-#define CU_TENSOR_WITH_VALUE_BINARY_OPERATOR(name, op)                                         \
-                                                                                               \
-    template <typename _TS>                                                                    \
-    inline enable_if_t<are_device_memory<_TS>::value && are_linear_index<_TS>::value,          \
-                       cuda::general_lambda_tensor<                                            \
-                           _TS::rank, __##name##_are_linear_index_tensor_with_value__<_TS>>>   \
-    operator op(const tensor_expression<_TS>& e_ts, typename _TS::value_type v) {              \
-        return make_lambda(e_ts().shape(),                                                     \
-                           __##name##_are_linear_index_tensor_with_value__<_TS>(e_ts(), v),    \
-                           device_tag{});                                                      \
-    }                                                                                          \
-                                                                                               \
-    template <typename _TS>                                                                    \
-    inline enable_if_t<are_device_memory<_TS>::value && are_linear_index<_TS>::value,          \
-                       cuda::general_lambda_tensor<                                            \
-                           _TS::rank, __##name##_value_with_are_linear_index_tensor__<_TS>>>   \
-    operator op(typename _TS::value_type v, const tensor_expression<_TS>& e_ts) {              \
-        return make_lambda(e_ts().shape(),                                                     \
-                           __##name##_value_with_are_linear_index_tensor__<_TS>(v, e_ts()),    \
-                           device_tag{});                                                      \
-    }                                                                                          \
-                                                                                               \
-    template <typename _TS>                                                                    \
-    inline enable_if_t<                                                                        \
-        are_device_memory<_TS>::value && !are_linear_index<_TS>::value,                        \
-        cuda::general_lambda_tensor<_TS::rank, __##name##_array_indexensor_with_value__<_TS>>> \
-    operator op(const tensor_expression<_TS>& e_ts, typename _TS::value_type v) {              \
-        return make_lambda(e_ts().shape(),                                                     \
-                           __##name##_array_indexensor_with_value__<_TS>(e_ts(), v),           \
-                           device_tag{});                                                      \
-    }                                                                                          \
-                                                                                               \
-    template <typename _TS>                                                                    \
-    inline enable_if_t<                                                                        \
-        are_device_memory<_TS>::value && !are_linear_index<_TS>::value,                        \
-        cuda::general_lambda_tensor<_TS::rank, __##name##_value_with_array_indexensor__<_TS>>> \
-    operator op(typename _TS::value_type v, const tensor_expression<_TS>& e_ts) {              \
-        return make_lambda(e_ts().shape(),                                                     \
-                           __##name##_value_with_array_indexensor__<_TS>(v, e_ts()),           \
-                           device_tag{});                                                      \
+#define CU_TENSOR_WITH_VALUE_BINARY_OPERATOR(name, op)                                        \
+                                                                                              \
+    template <typename _TS>                                                                   \
+    inline enable_if_t<                                                                       \
+        are_device_memory<_TS>::value && are_linear_index<_TS>::value,                        \
+        cuda::lambda_tensor<_TS::rank, __##name##_are_linear_index_tensor_with_value__<_TS>>> \
+    operator op(const tensor_expression<_TS>& e_ts, typename _TS::value_type v) {             \
+        return make_lambda(e_ts().shape(),                                                    \
+                           __##name##_are_linear_index_tensor_with_value__<_TS>(e_ts(), v),   \
+                           device_tag{});                                                     \
+    }                                                                                         \
+                                                                                              \
+    template <typename _TS>                                                                   \
+    inline enable_if_t<                                                                       \
+        are_device_memory<_TS>::value && are_linear_index<_TS>::value,                        \
+        cuda::lambda_tensor<_TS::rank, __##name##_value_with_are_linear_index_tensor__<_TS>>> \
+    operator op(typename _TS::value_type v, const tensor_expression<_TS>& e_ts) {             \
+        return make_lambda(e_ts().shape(),                                                    \
+                           __##name##_value_with_are_linear_index_tensor__<_TS>(v, e_ts()),   \
+                           device_tag{});                                                     \
+    }                                                                                         \
+                                                                                              \
+    template <typename _TS>                                                                   \
+    inline enable_if_t<                                                                       \
+        are_device_memory<_TS>::value && !are_linear_index<_TS>::value,                       \
+        cuda::lambda_tensor<_TS::rank, __##name##_array_indexensor_with_value__<_TS>>>        \
+    operator op(const tensor_expression<_TS>& e_ts, typename _TS::value_type v) {             \
+        return make_lambda(e_ts().shape(),                                                    \
+                           __##name##_array_indexensor_with_value__<_TS>(e_ts(), v),          \
+                           device_tag{});                                                     \
+    }                                                                                         \
+                                                                                              \
+    template <typename _TS>                                                                   \
+    inline enable_if_t<                                                                       \
+        are_device_memory<_TS>::value && !are_linear_index<_TS>::value,                       \
+        cuda::lambda_tensor<_TS::rank, __##name##_value_with_array_indexensor__<_TS>>>        \
+    operator op(typename _TS::value_type v, const tensor_expression<_TS>& e_ts) {             \
+        return make_lambda(e_ts().shape(),                                                    \
+                           __##name##_value_with_array_indexensor__<_TS>(v, e_ts()),          \
+                           device_tag{});                                                     \
     }
 
 // Arithmetic

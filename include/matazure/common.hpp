@@ -110,20 +110,6 @@ inline auto make_lambda(pointi<_Rank> ext, _Func fun, host_tag,
     return make_host_lambda(ext, fun);
 }
 
-template <typename _ValueType, typename _Access, int_t _Rank, typename _Func>
-inline auto make_lambda(pointi<_Rank> ext, _Func fun,
-                        enable_if_t<MATAZURE_IS_D_LAMBDA(_Func)>* = nullptr)
-    -> decltype(cuda::make_device_lambda<_ValueType, _Access>(ext, fun)) {
-    return cuda::make_device_lambda<_ValueType>(ext, fun);
-}
-
-template <typename _ValueType, typename _Access, int_t _Rank, typename _Func>
-inline auto make_lambda(pointi<_Rank> ext, _Func fun, device_tag,
-                        enable_if_t<MATAZURE_IS_D_LAMBDA(_Func)>* = nullptr)
-    -> decltype(cuda::make_device_lambda<_ValueType, _Access>(ext, fun)) {
-    return cuda::make_device_lambda<_ValueType>(ext, fun);
-}
-
 #endif
 
 template <typename _Tensor, typename _Func>

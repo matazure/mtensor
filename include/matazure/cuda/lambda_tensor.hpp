@@ -12,8 +12,7 @@ namespace matazure {
 namespace cuda {
 
 template <int_t _Rank, typename _Func, typename _Layout = column_major_layout<_Rank>>
-class general_lambda_tensor
-    : public tensor_expression<general_lambda_tensor<_Rank, _Func, _Layout>> {
+class lambda_tensor : public tensor_expression<lambda_tensor<_Rank, _Func, _Layout>> {
     typedef function_traits<_Func> functor_traits;
 
    public:
@@ -25,8 +24,7 @@ class general_lambda_tensor
     typedef _Layout layout_type;
 
    public:
-    general_lambda_tensor(const pointi<rank>& ext, _Func fun)
-        : shape_(ext), layout_(ext), functor_(fun) {}
+    lambda_tensor(const pointi<rank>& ext, _Func fun) : shape_(ext), layout_(ext), functor_(fun) {}
 
     MATAZURE_GENERAL reference operator[](int_t i) const { return offset_imp<index_type>(i); }
 
@@ -88,7 +86,7 @@ class general_lambda_tensor
 };
 
 template <int_t _Rank, typename _Func, typename _Layout = column_major_layout<_Rank>>
-using device_lambda_tensor = general_lambda_tensor<_Rank, _Func, _Layout>;
+using device_lambda_tensor = lambda_tensor<_Rank, _Func, _Layout>;
 
 template <int_t _Rank, typename _Func>
 inline auto make_device_lambda(pointi<_Rank> ext, _Func fun)
@@ -97,8 +95,8 @@ inline auto make_device_lambda(pointi<_Rank> ext, _Func fun)
 }
 
 template <int_t _Rank, typename _Func>
-inline auto make_lambda(pointi<_Rank> ext, _Func fun) -> general_lambda_tensor<_Rank, _Func> {
-    return general_lambda_tensor<_Rank, _Func>(ext, fun);
+inline auto make_lambda(pointi<_Rank> ext, _Func fun) -> lambda_tensor<_Rank, _Func> {
+    return lambda_tensor<_Rank, _Func>(ext, fun);
 }
 
 }  // namespace cuda
