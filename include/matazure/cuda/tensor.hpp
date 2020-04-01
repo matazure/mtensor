@@ -11,7 +11,6 @@
 namespace matazure {
 namespace cuda {
 
-#pragma hd_warning_disable
 template <typename _Type, int_t _Rank, typename _Layout = column_major_layout<_Rank>>
 class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout>> {
    public:
@@ -25,21 +24,17 @@ class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout>> {
     typedef _Layout layout_type;
     typedef device_tag memory_type;
 
-    MATAZURE_HD_WARNING_DISABLE
     MATAZURE_GENERAL tensor() : tensor(pointi<rank>::zeros()) {}
 
-    MATAZURE_HD_WARNING_DISABLE
     template <typename... _Ext, typename _Tmp = enable_if_t<sizeof...(_Ext) == rank>>
     MATAZURE_GENERAL explicit tensor(_Ext... ext) : tensor(pointi<rank>{ext...}) {}
 
-    MATAZURE_HD_WARNING_DISABLE
     MATAZURE_GENERAL explicit tensor(pointi<rank> ext)
         : shape_(ext),
           layout_(ext),
           sp_data_(malloc_shared_memory(layout_.stride()[rank - 1])),
           data_(sp_data_.get()) {}
 
-    MATAZURE_HD_WARNING_DISABLE
     MATAZURE_GENERAL
     explicit tensor(pointi<rank> ext, std::shared_ptr<value_type> sp_data)
         : shape_(ext), layout_(ext), sp_data_(sp_data), data_(sp_data_.get()) {}
@@ -48,7 +43,6 @@ class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout>> {
      *
      *
      */
-    MATAZURE_HD_WARNING_DISABLE
     MATAZURE_GENERAL
     explicit tensor(const pointi<rank>& shape, const pointi<rank>& origin_padding,
                     const pointi<rank>& end_padding)
@@ -57,7 +51,6 @@ class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout>> {
           sp_data_(malloc_shared_memory(layout_.stride()[rank - 1])),
           data_(sp_data_.get()) {}
 
-    MATAZURE_HD_WARNING_DISABLE
     template <typename _VT>
     MATAZURE_GENERAL tensor(const tensor<_VT, _Rank, _Layout>& ts)
         : shape_(ts.shape()), layout_(ts.layout_), sp_data_(ts.shared_data()), data_(ts.data()) {}
@@ -84,7 +77,6 @@ class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout>> {
 
     MATAZURE_GENERAL reference operator[](int_t i) const { return data_[i]; }
 
-    MATAZURE_HD_WARNING_DISABLE
     MATAZURE_GENERAL pointi<rank> shape() const { return shape_; }
 
     MATAZURE_GENERAL pointi<rank> stride() const { return layout_.stride(); }
@@ -92,7 +84,6 @@ class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout>> {
 
     MATAZURE_GENERAL pointer data() const { return data_; }
 
-    MATAZURE_HD_WARNING_DISABLE
     MATAZURE_GENERAL ~tensor() {}
 
    private:
@@ -108,7 +99,6 @@ class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout>> {
    private:
     const pointi<rank> shape_;
     const layout_type layout_;
-#pragma hd_warning_disable
     const shared_ptr<value_type> sp_data_;
     const pointer data_;
 };
@@ -246,7 +236,7 @@ using tensor4d = tensor<double, 1>;
 
 }  // namespace __walkaround
 
-}  // cuda
+}  // namespace cuda
 
 using cuda::mem_clone;
 using cuda::mem_copy;
