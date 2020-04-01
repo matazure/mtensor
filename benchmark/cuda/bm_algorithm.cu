@@ -1,9 +1,7 @@
 
-#include "../bm_config.hpp"
+#include "../bm_algorithm.hpp"
 
-#include <chrono>
-
-void bm_cuda_mem_copy(benchmark::State& state) {
+void bm_cuda_cudaMemcpy(benchmark::State& state) {
     int ts_size = state.range(0);
     cuda::tensor<float, 1> cts_src(ts_size);
     cuda::tensor<float, 1> cts_dst(ts_size);
@@ -44,35 +42,16 @@ void bm_cuda_raw1f_copy(benchmark::State& state) {
     state.SetItemsProcessed(state.iterations() * static_cast<size_t>(cts_src.size()));
 }
 
-BENCHMARK(bm_cuda_mem_copy)->Arg(1_G)->UseRealTime();
-BENCHMARK(bm_cuda_raw1f_copy)->Arg(1_G)->UseRealTime();
+BENCHMARK(bm_cuda_cudaMemcpy)->Arg(1_G);
+BENCHMARK(bm_cuda_raw1f_copy)->Arg(1_G);
+
+auto bm_cuda_tensor1f_copy = bm_tensor_copy<cuda::tensor<float, 1>>;
+auto bm_cuda_tensor2f_copy = bm_tensor_copy<cuda::tensor<float, 2>>;
+BENCHMARK(bm_cuda_tensor1f_copy)->Arg(1_G);
+BENCHMARK(bm_cuda_tensor2f_copy)->Arg(32_K);
 
 template <typename tensor_type>
-void bm_tensor_copy(benchmark::State& state) {
-    int ts_size = state.range(0);
-    constexpr int_t rank = tensor_type::rank;
-    pointi<rank> shape;
-    fill(shape, ts_size);
-
-    tensor_type ts_src(shape);
-    tensor_type ts_dst(shape);
-
-    while (state.KeepRunning()) {
-        cuda::copy(ts_src, ts_dst);
-    }
-
-    state.SetBytesProcessed(state.iterations() * static_cast<size_t>(ts_src.size()) *
-                            sizeof(ts_src[0]));
-    state.SetItemsProcessed(state.iterations() * static_cast<size_t>(ts_src.size()));
-}
-
-auto bm_tensor1f_copy = bm_tensor_copy<cuda::tensor<float, 1>>;
-auto bm_tensor2f_copy = bm_tensor_copy<cuda::tensor<float, 2>>;
-BENCHMARK(bm_tensor1f_copy)->Arg(1_G);
-BENCHMARK(bm_tensor2f_copy)->Arg(32_K);
-
-template <typename tensor_type>
-void bm_tensor_ac_copy(benchmark::State& state) {
+inline void bm_tensor_array_index_copy(benchmark::State& state) {
     int ts_size = state.range(0);
     constexpr int_t rank = tensor_type::rank;
     pointi<rank> shape;
@@ -85,6 +64,7 @@ void bm_tensor_ac_copy(benchmark::State& state) {
         cuda::for_index(
             shape, [ts_src, ts_dst] __matazure__(pointi<rank> idx) { ts_dst(idx) = ts_src(idx); });
         // cuda::copy(ts_src, ts_dst);
+        benchmark::DoNotOptimize(ts_dst.data());
     }
 
     state.SetBytesProcessed(state.iterations() * static_cast<size_t>(ts_src.size()) *
@@ -92,10 +72,10 @@ void bm_tensor_ac_copy(benchmark::State& state) {
     state.SetItemsProcessed(state.iterations() * static_cast<size_t>(ts_src.size()));
 }
 
-auto bm_tensor1f_ac_copy = bm_tensor_ac_copy<cuda::tensor<float, 1>>;
-auto bm_tensor2f_ac_copy = bm_tensor_ac_copy<cuda::tensor<float, 2>>;
-BENCHMARK(bm_tensor1f_ac_copy)->Arg(1_G);
+auto bm_cuda_tensor1f_array_index_copy = bm_tensor_array_index_copy<cuda::tensor<float, 1>>;
+auto bm_cuda_tensor2f_array_index_copy = bm_tensor_array_index_copy<cuda::tensor<float, 2>>;
+BENCHMARK(bm_cuda_tensor1f_array_index_copy)->Arg(1_G);
 // cuda中二维的坐标是会耗时更多， 大概有2%的损耗，说明编译器无法将数组访问形式的代码优化点
-BENCHMARK(bm_tensor2f_ac_copy)->Arg(32_K);
+BENCHMARK(bm_cuda_tensor2f_array_index_copy)->Arg(32_K);
 
 BENCHMARK_MAIN();

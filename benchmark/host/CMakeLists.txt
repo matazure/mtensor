@@ -1,3 +1,3 @@
 
-add_executable(bm_copy bm_copy.cpp)
-target_link_libraries(bm_copy mtensor benchmark)
+add_executable(bm_mtensor_host bm_algorithm.cpp)
+target_link_libraries(bm_mtensor_host mtensor benchmark)
