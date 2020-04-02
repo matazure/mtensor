@@ -1,4 +1,4 @@
-#include "../bm_config.hpp"
+#include "bm_config.hpp"
 
 void bm_host_raw1f_copy(benchmark::State& state) {
     auto ts_size = state.range(0);

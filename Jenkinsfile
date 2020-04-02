@@ -26,6 +26,11 @@ pipeline{
                         }
                         stage('test') {
                             steps {
+                                sh './build/bin/ut_mtensor_host'
+                            }
+                        }
+                        stage('benchmark') {
+                            steps {
                                 sh './build/bin/bm_mtensor_host --benchmark_min_time=1'
                             }
                         }
@@ -54,6 +59,10 @@ pipeline{
                         stage('test') {
                             steps {
                                 sh './build/bin/ut_cuda'
+                            }
+                        }
+                        stage('benchmark') {
+                            steps {
                                 sh './build/bin/bm_mtensor_cuda'
                             }
                         }
@@ -81,6 +90,11 @@ pipeline{
                             steps {
                                 sh "ssh rk3399 mkdir -p \\~/tensor_ci/${env.GIT_COMMIT}"
                                 sh "scp -r ./build-linux-aarch64 rk3399:~/tensor_ci/${env.GIT_COMMIT}/"
+                                sh "ssh rk3399 'cd ~/tensor_ci/${env.GIT_COMMIT}/build-linux-aarch64 && ./bin/ut_mtensor_host'"
+                            }
+                        }
+                        stage('benchmark') {
+                            steps {
                                 sh "ssh rk3399 'cd ~/tensor_ci/${env.GIT_COMMIT}/build-linux-aarch64 && ./bin/bm_mtensor_host --benchmark_min_time=1'"
                             }
                         }
@@ -106,7 +120,12 @@ pipeline{
                             steps {
                                 sh "ssh rpi4 mkdir -p \\~/tensor_ci/${env.GIT_COMMIT}"
                                 sh "scp -r ./build-linux-armv7 rpi4:~/tensor_ci/${env.GIT_COMMIT}/"
-                                sh "ssh rpi4 'cd ~/tensor_ci/${env.GIT_COMMIT}/build-linux-armv7 && ./bin/bm_mtensor_host --benchmark_min_time=2'"
+                                sh "ssh rpi4 'cd ~/tensor_ci/${env.GIT_COMMIT}/build-linux-armv7 && ./bin/ut_mtensor_host'"
+                            }
+                        }
+                        stage('benchmark') {
+                            steps {
+                                sh "ssh rpi4 'cd ~/tensor_ci/${env.GIT_COMMIT}/build-linux-armv7 && ./bin/bm_mtensor_host --benchmark_min_time=1'"
                             }
                         }
                     }
@@ -125,6 +144,11 @@ pipeline{
                             }
                         }
                         stage('test') {
+                            steps {
+                                powershell './build_win/bin/Release/ut_mtensor_host.exe'
+                            }
+                        }
+                        stage('benchmark') {
                             steps {
                                 powershell './build_win/bin/Release/bm_mtensor_host.exe --benchmark_min_time=1'
                             }

@@ -1,4 +1,4 @@
-#include "../bm_algorithm.hpp"
+#include "bm_algorithm.hpp"
 
 void bm_host_memcpy(benchmark::State& state) {
     int ts_size = state.range(0);
