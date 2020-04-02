@@ -1,6 +1,9 @@
 #pragma once
 
-#include <matazure/common.hpp>
+#include <matazure/lambda_tensor.hpp>
+#ifdef MATAZURE_CUDA
+#include <matazure/cuda/lambda_tensor.hpp>
+#endif
 
 namespace matazure {
 
