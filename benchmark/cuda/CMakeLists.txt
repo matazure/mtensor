@@ -1,4 +1,5 @@
 add_executable(bm_mtensor_cuda 
+    bm_binary_operator.cu
     bm_for_index.cu
     bm_algorithm.cu
     bm_view.cu
