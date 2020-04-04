@@ -6,12 +6,15 @@
 
 #include <matazure/algorithm.hpp>
 #include <matazure/exception.hpp>
+#include <matazure/for_index.hpp>
+#include <matazure/layout.hpp>
+#include <matazure/local_tensor.hpp>
+#include <matazure/tensor_initializer.hpp>
 #include <matazure/type_traits.hpp>
+
 #ifdef MATAZURE_CUDA
 #include <matazure/cuda/exception.hpp>
 #endif
-#include <matazure/layout.hpp>
-#include <matazure/local_tensor.hpp>
 
 ///  matazure is the top namespace for all classes and functions
 namespace matazure {
@@ -156,8 +159,12 @@ class tensor : public tensor_expression<tensor<_ValueType, _Rank, _Layout>> {
     tensor(const tensor<_VT, rank, layout_type>& ts)
         : shape_(ts.shape()), layout_(ts.shape()), sp_data_(ts.shared_data()), data_(ts.data()) {}
 
-    /// prevents constructing tensor by {...}, such as tensor<int,3> ts({10, 10});
-    tensor(std::initializer_list<int_t> v) = delete;
+    tensor(typename nested_initializer_list<value_type, rank>::type init)
+        : tensor(nested_initializer_list<value_type, rank>::shape(init)) {
+        for_index(shape(), [&](pointi<rank> idx) {
+            (*this)(idx) = nested_initializer_list<value_type, rank>::access(init, idx);
+        });
+    }
 
     /**
      * @brief shallowly assign operator

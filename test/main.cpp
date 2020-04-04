@@ -1,4 +1,5 @@
-﻿#include "test_foundation.hpp"
+﻿#include "ut_foundation.hpp"
+#include "ut_tensor.hpp"
 #include "view/ut_crop.hpp"
 
 int main(int argc, char* argv[]) {
