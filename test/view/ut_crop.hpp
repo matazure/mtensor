@@ -1,7 +1,7 @@
 #include "../ut_foundation.hpp"
 
 TEST(ViewTests, Crop) {
-    tensor<float, 2> ts(shape<2>{4, 4});
+    tensor<float, 2> ts(pointi<2>{4, 4});
     ts(0, 0) = 1;
     ts(0, 1) = 2;
     ts(0, 2) = 3;

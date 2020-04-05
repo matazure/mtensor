@@ -321,10 +321,4 @@ inline pointi<3> cat_point<2>(pointi<2> pt, int_t cat_i) {
     return pointi<3>{get<0>(pt), get<1>(pt), cat_i};
 }
 
-template <int_t _Rank>
-using index = pointi<_Rank>;
-
-template <int_t _Rank>
-using shape = pointi<_Rank>;
-
 }  // namespace matazure
