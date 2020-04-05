@@ -116,7 +116,7 @@ class parallel_execution_policy : public execution_policy {
     void total_size(int_t size) { total_size_ = size; }
 
    protected:
-    int_t total_size_;
+    int_t total_size_ = 0;
 };
 
 template <typename __KernelFunc>
