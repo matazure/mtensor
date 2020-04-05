@@ -1,6 +1,5 @@
 ﻿#include <iostream>
-#include <matazure/cuda/algorithm.hpp>
-#include <matazure/cuda/tensor.hpp>
+#include <mtensor.hpp>
 
 using namespace matazure;
 
