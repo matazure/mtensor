@@ -1,4 +1,5 @@
 add_executable(bm_mtensor_host 
+    bm_main.cpp
     bm_binary_operator.cpp
     bm_for_index.cpp
     bm_algorithm.cpp

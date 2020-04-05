@@ -29,7 +29,3 @@ BENCHMARK(bm_host_tensor2f_for_each)->Arg(10_K);
 
 auto bm_host_tensor2f_transform = bm_tensor_transform<tensor<float, 2>>;
 BENCHMARK(bm_host_tensor2f_transform)->Arg(10_K);
-
-BENCHMARK_MAIN();
-
-// int main() { return 0; }
