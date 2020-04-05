@@ -103,15 +103,6 @@ class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout>> {
     const pointer data_;
 };
 
-template <typename _ValueType, int_t _Rank, typename _Layout, int_t _OutDim,
-          typename _OutLayout = _Layout>
-inline auto reshape(cuda::tensor<_ValueType, _Rank, _Layout> ts, pointi<_OutDim> ext,
-                    _OutLayout* = nullptr) -> cuda::tensor<_ValueType, _OutDim, _OutLayout> {
-    /// TODO: assert size equal
-    cuda::tensor<_ValueType, _OutDim, _OutLayout> re(ext, ts.shared_data());
-    return re;
-}
-
 #ifndef MATAZURE_DISABLE_MATRIX_VECTOR_ALIAS
 template <typename _ValueType, typename _Layout = column_major_layout<1>>
 using vector = tensor<_ValueType, 1, _Layout>;
@@ -182,7 +173,5 @@ using tensor4d = tensor<double, 1>;
 }  // namespace __walkaround
 
 }  // namespace cuda
-
-using cuda::reshape;
 
 }  // namespace matazure

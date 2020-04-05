@@ -6,6 +6,7 @@
 #include <matazure/io.hpp>
 #include <matazure/mem_copy.hpp>
 #include <matazure/meta.hpp>
+#include <matazure/reshape.hpp>
 #include <matazure/view/view.hpp>
 
 #ifdef MATAZURE_OPENMP
@@ -13,11 +14,14 @@
 #endif
 
 #ifdef MATAZURE_CUDA
+
 #include <matazure/cuda/algorithm.hpp>
 #include <matazure/cuda/exception.hpp>
 #include <matazure/cuda/execution.hpp>
 #include <matazure/cuda/lambda_tensor.hpp>
 #include <matazure/cuda/mem_copy.hpp>
+#include <matazure/cuda/reshape.hpp>
 #include <matazure/cuda/runtime.hpp>
 #include <matazure/cuda/tensor.hpp>
+
 #endif

@@ -274,21 +274,6 @@ auto make_tensor(pointi<_Rank> ext, _Type* p_data) -> tensor<_Type, _Rank, _Layo
     return tensor<_Type, _Rank, _Layout>(ext, sp_data);
 }
 
-/**
- * @brief reshapes a tensor
- * @param ts source tensor
- * @param ext a valid new shape
- * @return a new ext shape tensor which uses the source tensor memory
- */
-template <typename _ValueType, int_t _Rank, typename _Layout, int_t _OutDim,
-          typename _OutLayout = _Layout>
-inline auto reshape(tensor<_ValueType, _Rank, _Layout> ts, pointi<_OutDim> ext,
-                    _OutLayout* = nullptr) -> tensor<_ValueType, _OutDim, _OutLayout> {
-    tensor<_ValueType, _OutDim, _OutLayout> re(ext, ts.shared_data());
-    MATAZURE_ASSERT(re.size() == ts.size(), "reshape need the size is the same");
-    return re;
-}
-
 #ifndef MATAZURE_DISABLE_MATRIX_VECTOR_ALIAS
 template <typename _ValueType, typename _Layout = column_major_layout<1>>
 using vector = tensor<_ValueType, 1, _Layout>;
