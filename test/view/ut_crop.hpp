@@ -22,4 +22,6 @@ TEST(ViewTests, Crop) {
     auto ts_re = view::stride(ts, 2).persist();
 
     for_each(ts_re, [](float e) { printf("%f, ", e); });
+
+    printf("\n");
 }

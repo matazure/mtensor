@@ -48,8 +48,9 @@ class tensor_expression {
 @ tparam _Rank the rank of tensor
 @ tparam _Layout the memory layout of tensor, the default is first major
 */
-template <typename _ValueType, int_t _Rank, typename _Layout = column_major_layout<_Rank>>
-class tensor : public tensor_expression<tensor<_ValueType, _Rank, _Layout>> {
+template <typename _ValueType, int_t _Rank, typename _Layout = column_major_layout<_Rank>,
+          typename _Allocator = std::allocator<_ValueType>>
+class tensor : public tensor_expression<tensor<_ValueType, _Rank, _Layout, _Allocator>> {
    public:
     // static_assert(std::is_pod<_ValueType>::value, "only supports pod type now");
     /// the rank of tensor
@@ -67,12 +68,11 @@ class tensor : public tensor_expression<tensor<_ValueType, _Rank, _Layout>> {
     typedef linear_index index_type;
     /// host memory type
     typedef host_tag memory_type;
+    typedef _Allocator allocator_type;
 
    public:
     /// default constructor
     tensor() : tensor(pointi<rank>::zeros()) {}
-
-#ifndef MATZURE_CUDA
 
     /**
      * @brief constructs by the shape
@@ -83,38 +83,6 @@ class tensor : public tensor_expression<tensor<_ValueType, _Rank, _Layout>> {
           layout_(ext),
           sp_data_(malloc_shared_memory(layout_.stride()[rank - 1])),
           data_(sp_data_.get()) {}
-
-#else
-
-    /**
-     * @brief constructs by the shape. alloc host pinned memory when with cuda by default
-     * @param ext the shape of tensor
-     */
-    explicit tensor(pointi<rank> ext) : tensor(ext, pinned{}) {}
-
-    /**
-     * @brief constructs by the shape. alloc host pinned memory when with cuda
-     * @param ext the shape of tensor
-     * @param pinned_v  the instance of pinned
-     */
-    explicit tensor(pointi<rank> ext, pinned pinned_v)
-        : shape_(ext),
-          layout_(ext),
-          sp_data_(malloc_shared_memory(layout_.stride()[rank - 1], pinned_v)),
-          data_(sp_data_.get()) {}
-
-    /**
-     * @brief constructs by the shape. alloc host unpinned memory when with cuda
-     * @param ext the shape of tensor
-     * @param pinned_v  the instance of unpinned
-     */
-    explicit tensor(pointi<rank> ext, unpinned)
-        : shape_(ext),
-          layout_(ext),
-          sp_data_(malloc_shared_memory(layout_.stride()[rank - 1])),
-          data_(sp_data_.get()) {}
-
-#endif
 
     /**
      * @brief constructs by the shape
@@ -129,10 +97,7 @@ class tensor : public tensor_expression<tensor<_ValueType, _Rank, _Layout>> {
      * @param sp_data the shared_ptr of host memory
      */
     explicit tensor(const pointi<rank>& ext, std::shared_ptr<value_type> sp_data)
-        : shape_(ext),
-          layout_(ext),  // if compile error, make sure you call right constructor
-          sp_data_(sp_data),
-          data_(sp_data_.get()) {}
+        : shape_(ext), layout_(ext), sp_data_(sp_data), data_(sp_data_.get()) {}
 
     /**
      *
@@ -156,8 +121,12 @@ class tensor : public tensor_expression<tensor<_ValueType, _Rank, _Layout>> {
      * @tparam _VT the value type of the source tensor, should be value_type or const value_type
      */
     template <typename _VT>
-    tensor(const tensor<_VT, rank, layout_type>& ts)
-        : shape_(ts.shape()), layout_(ts.shape()), sp_data_(ts.shared_data()), data_(ts.data()) {}
+    tensor(const tensor<_VT, rank, layout_type, allocator_type>& ts)
+        : allocator_(ts.allocator_),
+          shape_(ts.shape()),
+          layout_(ts.shape()),
+          sp_data_(ts.shared_data()),
+          data_(ts.data()) {}
 
     tensor(typename nested_initializer_list<value_type, rank>::type init)
         : tensor(nested_initializer_list<value_type, rank>::shape(init)) {
@@ -236,32 +205,24 @@ class tensor : public tensor_expression<tensor<_ValueType, _Rank, _Layout>> {
 
     layout_type layout() const { return layout_; }
 
+    allocator_type get_allocator() const { return allocator_; }
+
    private:
     shared_ptr<value_type> malloc_shared_memory(int_t size) {
-        size = size > 0 ? size : 1;
-        // value_type *data = new decay_t<value_type>[size];
-#ifdef __GNUC__
-        value_type* data;
-        auto tmp = posix_memalign((void**)&data, 32, size * sizeof(value_type));
-        return shared_ptr<value_type>(data, [](value_type* ptr) { free(ptr); });
-#else
-        value_type* data;
-        data = static_cast<value_type*>(_aligned_malloc(size * sizeof(value_type), 32));
-        return shared_ptr<value_type>(data, [](value_type* ptr) { _aligned_free(ptr); });
-#endif
-    }
-
-#ifdef MATAZURE_CUDA
-    shared_ptr<value_type> malloc_shared_memory(int_t size, pinned) {
-        decay_t<value_type>* data = nullptr;
-        cuda::assert_runtime_success(cudaMallocHost(&data, size * sizeof(value_type)));
-        return shared_ptr<value_type>(data, [](value_type* ptr) {
-            cuda::assert_runtime_success(cudaFreeHost(const_cast<decay_t<value_type>*>(ptr)));
+        value_type* data = allocator_.allocate(size);
+        for (int_t i = 0; i < size; ++i) {
+            allocator_.construct(data + i);
+        }
+        return shared_ptr<value_type>(data, [=](value_type* ptr) {
+            for (int_t i = 0; i < size; ++i) {
+                allocator_.destroy(data + i);
+            }
+            allocator_.deallocate(data, size);
         });
     }
-#endif
 
    public:
+    allocator_type allocator_;
     pointi<rank> shape_;
     layout_type layout_;
     shared_ptr<value_type> sp_data_;

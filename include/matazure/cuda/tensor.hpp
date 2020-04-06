@@ -2,6 +2,7 @@
 
 #include <cuda_runtime.h>
 #include <matazure/cuda/algorithm.hpp>
+#include <matazure/cuda/allocator.hpp>
 #include <matazure/cuda/runtime.hpp>
 #include <matazure/tensor.hpp>
 
@@ -11,8 +12,9 @@
 namespace matazure {
 namespace cuda {
 
-template <typename _Type, int_t _Rank, typename _Layout = column_major_layout<_Rank>>
-class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout>> {
+template <typename _Type, int_t _Rank, typename _Layout = column_major_layout<_Rank>,
+          typename _Allocator = cuda::allocator<_Type>>
+class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout, _Allocator>> {
    public:
     static_assert(std::is_pod<_Type>::value, "only supports pod type now");
 
@@ -23,6 +25,7 @@ class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout>> {
     typedef linear_index index_type;
     typedef _Layout layout_type;
     typedef device_tag memory_type;
+    typedef _Allocator allocator_type;
 
     MATAZURE_GENERAL tensor() : tensor(pointi<rank>::zeros()) {}
 
@@ -53,18 +56,16 @@ class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout>> {
 
     template <typename _VT>
     MATAZURE_GENERAL tensor(const tensor<_VT, _Rank, _Layout>& ts)
-        : shape_(ts.shape()), layout_(ts.layout_), sp_data_(ts.shared_data()), data_(ts.data()) {}
+        : allocator_(ts.allocator_),
+          shape_(ts.shape()),
+          layout_(ts.layout_),
+          sp_data_(ts.shared_data()),
+          data_(ts.data()) {}
 
     tensor(std::initializer_list<int_t> v) = delete;
 
     MATAZURE_GENERAL
     shared_ptr<value_type> shared_data() const { return sp_data_; }
-
-    //  template <typename _Idx>
-    //  MATAZURE_GENERAL reference operator()(_Idx idx) const {
-    //  	static_assert(std::is_same<_Idx, int_t>::value && rank == 1, "only operator []
-    //  support access data by pointi"); 	return (*this)[pointi<1>{idx}];
-    //  }
 
     MATAZURE_GENERAL reference operator[](const pointi<rank>& index) const {
         return (*this)[layout_.index2offset(index)];
@@ -84,23 +85,23 @@ class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout>> {
 
     MATAZURE_GENERAL pointer data() const { return data_; }
 
+    allocator_type get_allocator() const { return allocator_; }
+
     MATAZURE_GENERAL ~tensor() {}
 
    private:
     shared_ptr<value_type> malloc_shared_memory(int_t size) {
-        decay_t<value_type>* data = nullptr;
-        size = size > 0 ? size : 1;
-        assert_runtime_success(cudaMalloc(&data, size * sizeof(value_type)));
-        return shared_ptr<value_type>(data, [](value_type* ptr) {
-            assert_runtime_success(cudaFree(const_cast<decay_t<value_type>*>(ptr)));
-        });
+        value_type* data = allocator_.allocate(size);
+        return shared_ptr<value_type>(data,
+                                      [=](value_type* ptr) { allocator_.deallocate(data, size); });
     }
 
    private:
-    const pointi<rank> shape_;
-    const layout_type layout_;
-    const shared_ptr<value_type> sp_data_;
-    const pointer data_;
+    allocator_type allocator_;
+    pointi<rank> shape_;
+    layout_type layout_;
+    shared_ptr<value_type> sp_data_;
+    pointer data_;
 };
 
 #ifndef MATAZURE_DISABLE_MATRIX_VECTOR_ALIAS

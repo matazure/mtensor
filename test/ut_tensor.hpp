@@ -15,3 +15,29 @@ TEST(TensorTests, ConstructByInitializerList) {
     EXPECT_EQ(ts(pointi<2>{1, 2}), 8);
     EXPECT_EQ(ts(pointi<2>{2, 2}), 9);
 }
+
+TEST(TensorTests, ConstructByZero) {
+    {
+        tensor<int, 2> ts(pointi<2>{0, 0});
+        for (int i = 0; i < ts.shape().size(); ++i) {
+            const auto& shape = ts.shape();
+            EXPECT_EQ(shape[i], 0);
+        }
+    }
+
+    {
+        tensor<int, 2> ts;
+        for (int i = 0; i < ts.shape().size(); ++i) {
+            const auto& shape = ts.shape();
+            EXPECT_EQ(shape[i], 0);
+        }
+    }
+
+    {
+        tensor<int, 2> ts{};
+        for (int i = 0; i < ts.shape().size(); ++i) {
+            const auto& shape = ts.shape();
+            EXPECT_EQ(shape[i], 0);
+        }
+    }
+}
