@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <map>
 #include <matazure/cuda/exception.hpp>
+#include <matazure/point.hpp>
 #include <mutex>
 
 namespace matazure {
@@ -46,11 +47,11 @@ inline size_t availableSharedBytesPerBlock(size_t sharedMemPerMultiprocessor,
 
 class execution_policy {
    public:
-    int grid_dim() const { return grid_size_; }
-    void grid_dim(int arg) { grid_size_ = arg; }
+    pointi<3> grid_dim() const { return grid_dim_; }
+    void grid_dim(pointi<3> arg) { grid_dim_ = arg; }
 
-    int block_dim() const { return block_size_; }
-    void block_dim(int arg) { block_size_ = arg; }
+    pointi<3> block_dim() const { return block_dim_; }
+    void block_dim(pointi<3> arg) { block_dim_ = arg; }
 
     size_t shared_mem_bytes() const { return shared_mem_bytes_; }
     void shared_mem_bytes(size_t arg) { shared_mem_bytes_ = arg; }
@@ -61,8 +62,8 @@ class execution_policy {
     ~execution_policy() { cudaStreamSynchronize(stream_); }
 
    protected:
-    int grid_size_ = 0;
-    int block_size_ = 0;
+    pointi<3> grid_dim_ = {0, 1, 1};
+    pointi<3> block_dim_ = {0, 1, 1};
     size_t shared_mem_bytes_ = 0;
     cudaStream_t stream_ = nullptr;
 };
@@ -93,19 +94,19 @@ inline void configure_grid(execution_policy& exe_policy, __KernelFunc k) {
     int bsize = 0, minGridSize = 0;
     verify_occupancy_success(cudaOccMaxPotentialOccupancyBlockSize(
         &minGridSize, &bsize, &occProp, &occAttrib, &occState, exe_policy.shared_mem_bytes()));
-    exe_policy.block_dim(bsize);
+    exe_policy.block_dim({bsize, 1, 1});
 
     cudaOccResult result;
     verify_occupancy_success(cudaOccMaxActiveBlocksPerMultiprocessor(
-        &result, &occProp, &occAttrib, &occState, exe_policy.block_dim(),
+        &result, &occProp, &occAttrib, &occState, exe_policy.block_dim()[0],
         exe_policy.shared_mem_bytes()));
-    exe_policy.grid_dim(result.activeBlocksPerMultiprocessor * numSMs);
+    exe_policy.grid_dim({result.activeBlocksPerMultiprocessor * numSMs, 1, 1});
 
     int smemGranularity = 0;
     verify_occupancy_success(cudaOccSMemAllocationGranularity(&smemGranularity, &occProp));
     size_t sbytes = internal::availableSharedBytesPerBlock(
         props->sharedMemPerBlock, attribs.sharedSizeBytes,
-        __occDivideRoundUp(exe_policy.grid_dim(), numSMs), smemGranularity);
+        __occDivideRoundUp(exe_policy.grid_dim()[0], numSMs), smemGranularity);
 
     exe_policy.shared_mem_bytes(sbytes);
 }
@@ -140,24 +141,24 @@ inline void configure_grid(parallel_execution_policy& exe_policy, __KernelFunc k
     int bsize = 0, minGridSize = 0;
     verify_occupancy_success(cudaOccMaxPotentialOccupancyBlockSize(
         &minGridSize, &bsize, &occProp, &occAttrib, &occState, exe_policy.shared_mem_bytes()));
-    exe_policy.block_dim(bsize);
+    exe_policy.block_dim({bsize, 1, 1});
 
     cudaOccResult result;
     verify_occupancy_success(cudaOccMaxActiveBlocksPerMultiprocessor(
-        &result, &occProp, &occAttrib, &occState, exe_policy.block_dim(),
+        &result, &occProp, &occAttrib, &occState, exe_policy.block_dim()[0],
         exe_policy.shared_mem_bytes()));
-    exe_policy.grid_dim(result.activeBlocksPerMultiprocessor * numSMs);
+    exe_policy.grid_dim({result.activeBlocksPerMultiprocessor * numSMs, 1, 1});
 
-    auto pre_block_size = exe_policy.block_dim();
-    auto tmp_block_size = __occDivideRoundUp(exe_policy.total_size(), exe_policy.grid_dim());
+    auto pre_block_size = exe_policy.block_dim()[0];
+    auto tmp_block_size = __occDivideRoundUp(exe_policy.total_size(), exe_policy.grid_dim()[0]);
     tmp_block_size = __occRoundUp(tmp_block_size, 128);
-    exe_policy.block_dim(std::min(tmp_block_size, pre_block_size));
+    exe_policy.block_dim({std::min(tmp_block_size, pre_block_size), 1, 1});
 
     int smemGranularity = 0;
     verify_occupancy_success(cudaOccSMemAllocationGranularity(&smemGranularity, &occProp));
     size_t sbytes = internal::availableSharedBytesPerBlock(
         props->sharedMemPerBlock, attribs.sharedSizeBytes,
-        __occDivideRoundUp(exe_policy.grid_dim(), numSMs), smemGranularity);
+        __occDivideRoundUp(exe_policy.grid_dim()[0], numSMs), smemGranularity);
 
     exe_policy.shared_mem_bytes(sbytes);
 }

@@ -20,7 +20,7 @@ void bm_cuda_lauch_kernel_freq(benchmark::State& state) {
     cuda::configure_grid(policy, kernel_freq);
 
     while (state.KeepRunning()) {
-        kernel_freq<<<policy.grid_dim(), policy.block_dim(), policy.shared_mem_bytes(),
+        kernel_freq<<<policy.grid_dim()[0], policy.block_dim()[0], policy.shared_mem_bytes(),
                       policy.stream()>>>(ts_src.data(), ts_dst.data(), ts_src.size());
         cudaDeviceSynchronize();
     }

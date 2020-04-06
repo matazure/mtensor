@@ -16,7 +16,7 @@ void bm_cuda_raw1f_for_copy(benchmark::State& state) {
     cuda::configure_grid(policy, raw1f_copy_kernel);
 
     while (state.KeepRunning()) {
-        raw1f_copy_kernel<<<policy.grid_dim(), policy.block_dim(), policy.shared_mem_bytes(),
+        raw1f_copy_kernel<<<policy.grid_dim()[0], policy.block_dim()[0], policy.shared_mem_bytes(),
                             policy.stream()>>>(cts_src.data(), cts_dst.data(), cts_src.size());
         cudaDeviceSynchronize();
 

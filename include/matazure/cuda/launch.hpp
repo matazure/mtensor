@@ -16,7 +16,8 @@ MATAZURE_GLOBAL void kenel(Function f, Arguments... args) {
 template <typename _ExecutionPolicy, typename _Fun, typename... _Args>
 inline void launch(_ExecutionPolicy exe_policy, _Fun f, _Args... args) {
     configure_grid(exe_policy, kenel<_Fun, _Args...>);
-    kenel<<<exe_policy.grid_dim(), exe_policy.block_dim(), exe_policy.shared_mem_bytes(),
+    kenel<<<cuda::internal::pointi_to_dim3(exe_policy.grid_dim()),
+            cuda::internal::pointi_to_dim3(exe_policy.block_dim()), exe_policy.shared_mem_bytes(),
             exe_policy.stream()>>>(f, args...);
     assert_runtime_success(cudaGetLastError());
 }
