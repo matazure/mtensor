@@ -41,8 +41,8 @@ void bm_zip(benchmark::State& state) {
 
 // template <typename _ValueType>
 //__global__ void zip_dim2_gold_kenel(_ValueType *p_dst, _ValueType *p1, _ValueType *p2, int_t
-//count){ 	for (int_t i = threadIdx.x + blockIdx.x * blockDim.x; i < count; i += blockDim.x *
-//gridDim.x) { 		p_dst[i] = p1[i] * p2[i];
+// count){ 	for (int_t i = threadIdx.x + blockIdx.x * blockDim.x; i < count; i += blockDim.x *
+// gridDim.x) { 		p_dst[i] = p1[i] * p2[i];
 //	}
 //}
 //
@@ -57,8 +57,8 @@ void bm_zip(benchmark::State& state) {
 //		cuda::tensor<float, 1> ts_re(ts1.shape());
 //		cuda::execution_policy policy;
 //		cuda::assert_runtime_success(cuda::configure_grid(policy,
-//tensor_operation_gold_kenel<_ValueType>)); 		tensor_operation_gold_kenel<<<
-//policy.grid_size(), 			policy.block_dim(),
+// tensor_operation_gold_kenel<_ValueType>)); 		tensor_operation_gold_kenel<<<
+// policy.grid_dim(), 			policy.block_dim(),
 //			policy.shared_mem_bytes(),
 //			policy.stream() >>>(ts_re.data(), ts1.data(), ts2.data(), ts_re.size());
 //	}

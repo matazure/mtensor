@@ -2,7 +2,7 @@
 
 __global__ void raw1f_copy_kernel(float* p_src, float* p_dst, int_t size) {
     for (int_t i = threadIdx.x + blockIdx.x * blockDim.x; i < size; i += blockDim.x * gridDim.x) {
-        p_src[i] = p_dst[i];
+        p_dst[i] = p_src[i];
     }
 }
 
@@ -16,9 +16,11 @@ void bm_cuda_raw1f_for_copy(benchmark::State& state) {
     cuda::configure_grid(policy, raw1f_copy_kernel);
 
     while (state.KeepRunning()) {
-        raw1f_copy_kernel<<<policy.grid_size(), policy.block_dim(), policy.shared_mem_bytes(),
+        raw1f_copy_kernel<<<policy.grid_dim(), policy.block_dim(), policy.shared_mem_bytes(),
                             policy.stream()>>>(cts_src.data(), cts_dst.data(), cts_src.size());
         cudaDeviceSynchronize();
+
+        benchmark::DoNotOptimize(cts_dst.data());
     }
 
     state.SetBytesProcessed(state.iterations() * static_cast<size_t>(cts_src.size()) *
