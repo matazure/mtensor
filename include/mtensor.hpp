@@ -17,7 +17,7 @@
 
 #include <matazure/cuda/algorithm.hpp>
 #include <matazure/cuda/exception.hpp>
-#include <matazure/cuda/execution.hpp>
+#include <matazure/cuda/execution_policy.hpp>
 #include <matazure/cuda/lambda_tensor.hpp>
 #include <matazure/cuda/mem_copy.hpp>
 #include <matazure/cuda/reshape.hpp>

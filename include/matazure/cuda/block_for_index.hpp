@@ -1,6 +1,6 @@
 #pragma once
 
-#include <matazure/cuda/execution.hpp>
+#include <matazure/cuda/execution_policy.hpp>
 #include <matazure/layout.hpp>
 #include <matazure/point.hpp>
 
