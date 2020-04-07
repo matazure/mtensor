@@ -1,4 +1,4 @@
-add_executable(bm_mtensor_cuda 
+add_executable(bm_cuda_mtensor 
     bm_main.cu
     bm_binary_operator.cu
     bm_for_index.cu
@@ -6,4 +6,4 @@ add_executable(bm_mtensor_cuda
     bm_view.cu
     bm_execution_policy.cu
 )
-target_link_libraries(bm_mtensor_cuda mtensor benchmark)
+target_link_libraries(bm_cuda_mtensor mtensor benchmark)

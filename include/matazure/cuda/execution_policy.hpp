@@ -47,6 +47,17 @@ inline size_t availableSharedBytesPerBlock(size_t sharedMemPerMultiprocessor,
 
 class execution_policy {
    public:
+    execution_policy(pointi<3> grid_dim = {0, 1, 1}, pointi<3> block_dim = {0, 1, 1},
+                     size_t shared_mem_bytes = 0, cudaStream_t stream = nullptr)
+        : grid_dim_(grid_dim),
+          block_dim_(block_dim),
+          shared_mem_bytes_(shared_mem_bytes),
+          stream_(stream) {
+        if (!stream_) {
+            assert_runtime_success(cudaStreamCreate(&stream_));
+        }
+    }
+
     pointi<3> grid_dim() const { return grid_dim_; }
     pointi<3> block_dim() const { return block_dim_; }
     size_t shared_mem_bytes() const { return shared_mem_bytes_; }

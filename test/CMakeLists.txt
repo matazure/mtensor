@@ -1,7 +1,7 @@
-add_executable(ut_mtensor_host
+add_executable(ut_host_mtensor
     main.cpp
 )
-target_link_libraries(ut_mtensor_host gtest mtensor)
+target_link_libraries(ut_host_mtensor gtest mtensor)
 
 
 if (WITH_CUDA)

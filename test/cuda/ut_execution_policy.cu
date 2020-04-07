@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 #include <mtensor.hpp>
-// #include <nvfunctional>
 
 using namespace matazure;
 using namespace testing;

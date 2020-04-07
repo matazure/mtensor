@@ -26,12 +26,12 @@ pipeline{
                         }
                         stage('test') {
                             steps {
-                                sh './build/bin/ut_mtensor_host'
+                                sh './build/bin/ut_host_mtensor'
                             }
                         }
                         stage('benchmark') {
                             steps {
-                                sh './build/bin/bm_mtensor_host --benchmark_min_time=1'
+                                sh './build/bin/bm_host_mtensor --benchmark_min_time=1'
                             }
                         }
                     }
@@ -58,12 +58,12 @@ pipeline{
                         }
                         stage('test') {
                             steps {
-                                sh './build/bin/ut_mtensor_cuda'
+                                sh './build/bin/ut_cuda_mtensor'
                             }
                         }
                         stage('benchmark') {
                             steps {
-                                sh './build/bin/bm_mtensor_cuda'
+                                sh './build/bin/bm_cuda_mtensor'
                             }
                         }
                     }
@@ -90,12 +90,12 @@ pipeline{
                             steps {
                                 sh "ssh rk3399 mkdir -p \\~/tensor_ci/${env.GIT_COMMIT}"
                                 sh "scp -r ./build-linux-aarch64 rk3399:~/tensor_ci/${env.GIT_COMMIT}/"
-                                sh "ssh rk3399 'cd ~/tensor_ci/${env.GIT_COMMIT}/build-linux-aarch64 && ./bin/ut_mtensor_host'"
+                                sh "ssh rk3399 'cd ~/tensor_ci/${env.GIT_COMMIT}/build-linux-aarch64 && ./bin/ut_host_mtensor'"
                             }
                         }
                         stage('benchmark') {
                             steps {
-                                sh "ssh rk3399 'cd ~/tensor_ci/${env.GIT_COMMIT}/build-linux-aarch64 && ./bin/bm_mtensor_host --benchmark_min_time=1'"
+                                sh "ssh rk3399 'cd ~/tensor_ci/${env.GIT_COMMIT}/build-linux-aarch64 && ./bin/bm_host_mtensor --benchmark_min_time=1'"
                             }
                         }
                     }
@@ -120,12 +120,12 @@ pipeline{
                             steps {
                                 sh "ssh rpi4 mkdir -p \\~/tensor_ci/${env.GIT_COMMIT}"
                                 sh "scp -r ./build-linux-armv7 rpi4:~/tensor_ci/${env.GIT_COMMIT}/"
-                                sh "ssh rpi4 'cd ~/tensor_ci/${env.GIT_COMMIT}/build-linux-armv7 && ./bin/ut_mtensor_host'"
+                                sh "ssh rpi4 'cd ~/tensor_ci/${env.GIT_COMMIT}/build-linux-armv7 && ./bin/ut_host_mtensor'"
                             }
                         }
                         stage('benchmark') {
                             steps {
-                                sh "ssh rpi4 'cd ~/tensor_ci/${env.GIT_COMMIT}/build-linux-armv7 && ./bin/bm_mtensor_host --benchmark_min_time=1'"
+                                sh "ssh rpi4 'cd ~/tensor_ci/${env.GIT_COMMIT}/build-linux-armv7 && ./bin/bm_host_mtensor --benchmark_min_time=1'"
                             }
                         }
                     }
@@ -145,12 +145,12 @@ pipeline{
                         }
                         stage('test') {
                             steps {
-                                powershell './build_win/bin/Release/ut_mtensor_host.exe'
+                                powershell './build_win/bin/Release/ut_host_mtensor.exe'
                             }
                         }
                         stage('benchmark') {
                             steps {
-                                powershell './build_win/bin/Release/bm_mtensor_host.exe --benchmark_min_time=1'
+                                powershell './build_win/bin/Release/bm_host_mtensor.exe --benchmark_min_time=1'
                             }
                         }
                     }
