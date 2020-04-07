@@ -42,7 +42,6 @@ int main(int argc, char* argv[]) {
 
                                          cmat_c(block_idx.global) = sum;
                                      });
-    cuda::device_synchronize();
 
     return 0;
 }

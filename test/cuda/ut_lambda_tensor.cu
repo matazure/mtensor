@@ -40,8 +40,6 @@ TEST(MakeCudaLambdaTensor, TestMakeByLambda) {
                          .persist();
     auto clt_test2 = cuda::make_lambda(pointi<2>{1000, 1000}, test_op{}).persist();
 
-    cuda::device_synchronize();
-
     // compile error!
     // type traits not work
     // auto clt_test3 = cuda::make_lambda(pointi<2>{1000, 1000},

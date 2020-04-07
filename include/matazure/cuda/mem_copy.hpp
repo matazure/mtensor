@@ -35,8 +35,6 @@ inline void copy_symbol(_TensorSrc src, _TensorSymbol& symbol_dst) {
         symbol_dst, src.data(), src.size() * sizeof(typename _TensorSrc::value_type)));
 }
 
-inline void device_synchronize() { assert_runtime_success(cudaDeviceSynchronize()); }
-
 template <typename _ValueType, int_t _Rank>
 inline void memset(tensor<_ValueType, _Rank> ts, int v) {
     assert_runtime_success(cudaMemset(ts.shared_data().get(), v, ts.size() * sizeof(_ValueType)));

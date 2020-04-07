@@ -17,7 +17,6 @@ struct print_op {
 
 TEST(LauchTest, OnlySupportDeviceLambda) {
     cuda::launch([] __device__() { /*printf("thread x: %d\n", threadIdx.x);*/ });
-    cuda::device_synchronize();
 }
 
 TEST(ForIndexTest, Lambda) {
