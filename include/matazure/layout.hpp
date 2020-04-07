@@ -64,63 +64,56 @@ class column_major_layout {
     pointi<rank> stride_;
 };
 
-// template <int_t _Rank>
-// class last_major_layout{
-// public:
-// 	const static int_t rank = _Rank;
+template <int_t _Rank>
+class row_major_layout {
+   public:
+    const static int_t rank = _Rank;
 
-// 	last_major_layout(const pointi<rank> &shape) :
-// 		shape_(shape)
-// 	{
-// 		stride_[0] = shape[0];
-// 		for (int_t i = 1; i < rank; ++i) {
-// 			stride_[i] = shape[i] * stride_[i - 1];
-// 		}
-// 	}
+    MATAZURE_GENERAL row_major_layout(const pointi<rank>& shape) : shape_(shape) {
+        stride_[0] = shape[0];
+        for (int_t i = 1; i < rank; ++i) {
+            stride_[i] = shape[i] * stride_[i - 1];
+        }
+    }
 
-// 	MATAZURE_GENERAL last_major_layout(const last_major_layout &rhs) :
-// 		last_major_layout(rhs.shape())
-// 	{ }
+    MATAZURE_GENERAL row_major_layout(const row_major_layout& rhs)
+        : row_major_layout(rhs.shape()) {}
 
-// 	#pragma hd_warning_disable
-// 	MATAZURE_GENERAL last_major_layout & operator=(const last_major_layout &rhs) {
-// 		shape_ = rhs.shape();
-// 		stride_ = rhs.stride();
-// 		return *this;
-// 	}
+#pragma hd_warning_disable
+    MATAZURE_GENERAL row_major_layout& operator=(const row_major_layout& rhs) {
+        shape_ = rhs.shape();
+        stride_ = rhs.stride();
+        return *this;
+    }
 
-// 	MATAZURE_GENERAL int_t index2offset(const pointi<rank> &id) const {
-// 		typename pointi<rank>::value_type offset = id[rank - 1];
-// 		for (int_t i = 1; i < rank; ++i) {
-// 			offset += id[rank - 1 - i] * stride_[i - 1];
-// 		}
+    MATAZURE_GENERAL int_t index2offset(const pointi<rank>& id) const {
+        typename pointi<rank>::value_type offset = id[rank - 1];
+        for (int_t i = 1; i < rank; ++i) {
+            offset += id[rank - 1 - i] * stride_[i - 1];
+        }
 
-// 		return offset;
-// 	};
+        return offset;
+    };
 
-// 	MATAZURE_GENERAL pointi<rank> offset2index(int_t offset) const {
-// 		pointi<rank> id{};
-// 		for (int_t i = rank - 1; i > 0; --i) {
-// 			id[rank - 1 - i] = offset / stride_[i - 1];
-// 			offset = offset % stride_[i - 1];
-// 		}
-// 		id[rank - 1] = offset;
+    MATAZURE_GENERAL pointi<rank> offset2index(int_t offset) const {
+        pointi<rank> id{};
+        for (int_t i = rank - 1; i > 0; --i) {
+            id[rank - 1 - i] = offset / stride_[i - 1];
+            offset = offset % stride_[i - 1];
+        }
+        id[rank - 1] = offset;
 
-// 		return id;
-// 	}
+        return id;
+    }
 
-// 	pointi<rank> shape() const{
-// 		return shape_;
-// 	}
+    MATAZURE_GENERAL pointi<rank> shape() const { return shape_; }
 
-// 	pointi<rank> stride() const{
-// 		return stride_;
-// 	}
+    MATAZURE_GENERAL pointi<rank> stride() const { return stride_; }
 
-// private:
-// 	pointi<rank> shape_;
-// 	pointi<rank> stride_;
-// };
+   private:
+    pointi<rank> shape_;
+    pointi<rank> stride_;
+};
 
 template <int_t _Rank>
 class padding_layout {
@@ -143,6 +136,8 @@ class padding_layout {
             stride_[i] = step[i] * stride_[i - 1];
         }
     }
+
+    MATAZURE_GENERAL padding_layout(const pointi<rank>& shape) : padding_layout(shape, {1}, {1}) {}
 
     MATAZURE_GENERAL padding_layout(const padding_layout& rhs)
         : shape_(rhs.shape_),

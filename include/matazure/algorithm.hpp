@@ -4,6 +4,20 @@
 
 namespace matazure {
 
+namespace internal {
+
+template <int_t _Rank>
+pointi<_Rank> get_array_index_by_layout(pointi<_Rank> pt, column_major_layout<_Rank>) {
+    return pt;
+}
+
+template <int_t _Rank>
+pointi<_Rank> get_array_index_by_layout(pointi<_Rank> pt, row_major_layout<_Rank>) {
+    return inverse(pt);
+}
+
+}  // namespace internal
+
 /**
  * @brief for each element of a linear indexing tensor, apply fun
  * @param policy the execution policy
@@ -29,7 +43,9 @@ inline void for_each(_ExectutionPolicy policy, _Tensor&& ts, _Fun fun,
                      enable_if_t<!are_linear_index<decay_t<_Tensor>>::value &&
                                  none_device_memory<decay_t<_Tensor>>::value>* = 0) {
     for_index(policy, pointi<decay_t<_Tensor>::rank>::zeros(), ts.shape(),
-              [&](pointi<decay_t<_Tensor>::rank> idx) { fun(ts[idx]); });
+              [&](pointi<decay_t<_Tensor>::rank> idx) {
+                  fun(ts(internal::get_array_index_by_layout(idx, ts.layout())));
+              });
 }
 
 /**
@@ -99,7 +115,9 @@ inline void copy(
     enable_if_t<!are_linear_index<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value &&
                 none_device_memory<decay_t<_TensorSrc>, decay_t<_TensorDst>>::value>* = 0) {
     for_index(policy, pointi<_TensorSrc::rank>::zeros(), ts_src.shape(),
-              [&](pointi<_TensorSrc::rank> idx) { ts_dst(idx) = ts_src(idx); });
+              [&](pointi<_TensorSrc::rank> idx) {
+                  ts_dst(idx) = ts_src(internal::get_array_index_by_layout(idx, ts_src.layout()));
+              });
 }
 
 /**
@@ -144,7 +162,10 @@ inline void transform(_ExectutionPolicy policy, const _TensorSrc& ts_src, _Tenso
                       enable_if_t<!are_linear_index<decay_t<_TensorSrc>>::value &&
                                   none_device_memory<decay_t<_TensorSrc>>::value>* = 0) {
     for_index(policy, pointi<_TensorSrc::rank>::zeros(), ts_src.shape(),
-              [&](pointi<_TensorSrc::rank> idx) { ts_dst[idx] = fun(ts_src[idx]); });
+              [&](pointi<_TensorSrc::rank> idx) {
+                  ts_dst[idx] =
+                      fun(ts_src(internal::get_array_index_by_layout(idx, ts_src.layout())));
+              });
 }
 
 /**
