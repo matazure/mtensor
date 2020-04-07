@@ -48,22 +48,33 @@ inline size_t availableSharedBytesPerBlock(size_t sharedMemPerMultiprocessor,
 class execution_policy {
    public:
     pointi<3> grid_dim() const { return grid_dim_; }
-    void grid_dim(pointi<3> arg) { grid_dim_ = arg; }
-
     pointi<3> block_dim() const { return block_dim_; }
-    void block_dim(pointi<3> arg) { block_dim_ = arg; }
-
     size_t shared_mem_bytes() const { return shared_mem_bytes_; }
+    cudaStream_t stream() const { return stream_; }
+
+    void grid_dim(pointi<3> arg) { grid_dim_ = arg; }
+    void block_dim(pointi<3> arg) { block_dim_ = arg; }
     void shared_mem_bytes(size_t arg) { shared_mem_bytes_ = arg; }
 
-    cudaStream_t stream() const { return stream_; }
     void stream(cudaStream_t stream) { stream_ = stream; }
 
+    // not use virtual, just for inherit
     ~execution_policy() { cudaStreamSynchronize(stream_); }
 
    protected:
     pointi<3> grid_dim_ = {0, 1, 1};
     pointi<3> block_dim_ = {0, 1, 1};
+    // 0 represents not use dynamic shared memory
+    size_t shared_mem_bytes_ = 0;
+    cudaStream_t stream_ = nullptr;
+};
+
+class default_execution_policy : public execution_policy {
+   public:
+   protected:
+    pointi<3> grid_dim_ = {0, 1, 1};
+    pointi<3> block_dim_ = {0, 1, 1};
+    // 0 represents not use dynamic shared memory
     size_t shared_mem_bytes_ = 0;
     cudaStream_t stream_ = nullptr;
 };
@@ -74,7 +85,7 @@ inline void configure_grid(_ExePolicy& exe_policy, _KernelFunc kernel) {
 }
 
 template <typename __KernelFunc>
-inline void configure_grid(execution_policy& exe_policy, __KernelFunc k) {
+inline void configure_grid(default_execution_policy& exe_policy, __KernelFunc k) {
     cudaDeviceProp* props;
     props = &internal::device_properties_cache::get();
 
@@ -111,7 +122,7 @@ inline void configure_grid(execution_policy& exe_policy, __KernelFunc k) {
     exe_policy.shared_mem_bytes(sbytes);
 }
 
-class parallel_execution_policy : public execution_policy {
+class for_index_execution_policy : public execution_policy {
    public:
     int_t total_size() const { return total_size_; }
     void total_size(int_t size) { total_size_ = size; }
@@ -121,7 +132,7 @@ class parallel_execution_policy : public execution_policy {
 };
 
 template <typename __KernelFunc>
-inline void configure_grid(parallel_execution_policy& exe_policy, __KernelFunc k) {
+inline void configure_grid(for_index_execution_policy& exe_policy, __KernelFunc k) {
     cudaDeviceProp* props;
     props = &internal::device_properties_cache::get();
 

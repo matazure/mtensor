@@ -58,7 +58,7 @@ pipeline{
                         }
                         stage('test') {
                             steps {
-                                sh './build/bin/ut_cuda'
+                                sh './build/bin/ut_mtensor_cuda'
                             }
                         }
                         stage('benchmark') {

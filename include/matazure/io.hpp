@@ -2,10 +2,23 @@
 
 #include <fstream>
 #include <iostream>
-#include <matazure/type_traits.hpp>
+#include <matazure/tensor.hpp>
 
 namespace matazure {
-namespace io {
+
+template <class _ValueType, int_t _Rank>
+inline std::ostream& operator<<(std::ostream& out, const point<_ValueType, _Rank>& p) {
+    out << "{";
+    for (int_t i = 0; i < p.size(); ++i) {
+        out << p[i];
+        if (i != p.size() - 1) {
+            out << ", ";
+        }
+    }
+    out << "}";
+
+    return out;
+}
 
 /**
  * @brief read the binary raw data of a data container(such as tensor, std::vector) from an istream
@@ -58,5 +71,4 @@ void write_raw_data(const std::string& path, const _T& container) {
     ofs.close();
 }
 
-}  // namespace io
 }  // namespace matazure

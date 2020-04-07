@@ -11,7 +11,7 @@ void bm_cuda_raw1f_for_copy(benchmark::State& state) {
     cuda::tensor<float, 1> cts_src(ts_size);
     cuda::tensor<float, 1> cts_dst(ts_size);
 
-    cuda::parallel_execution_policy policy;
+    cuda::for_index_execution_policy policy;
     policy.total_size(cts_src.size());
     cuda::configure_grid(policy, raw1f_copy_kernel);
 

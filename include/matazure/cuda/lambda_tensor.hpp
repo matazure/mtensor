@@ -45,7 +45,7 @@ class lambda_tensor : public tensor_expression<lambda_tensor<_Rank, _Func, _Layo
     }
 
     tensor<decay_t<value_type>, rank> persist() const {
-        parallel_execution_policy policy{};
+        for_index_execution_policy policy{};
         policy.total_size(this->size());
         return persist(policy);
     }

@@ -24,7 +24,7 @@ inline void launch(_ExecutionPolicy exe_policy, _Fun f, _Args... args) {
 
 template <typename _Fun, typename... _Args>
 inline void launch(_Fun f, _Args... args) {
-    execution_policy exe_policy;
+    default_execution_policy exe_policy;
     launch(exe_policy, f, args...);
 }
 

@@ -55,7 +55,7 @@ void bm_zip(benchmark::State& state) {
 //
 //	while (state.KeepRunning()) {
 //		cuda::tensor<float, 1> ts_re(ts1.shape());
-//		cuda::execution_policy policy;
+//		cuda::default_execution_policy policy;
 //		cuda::assert_runtime_success(cuda::configure_grid(policy,
 // tensor_operation_gold_kenel<_ValueType>)); 		tensor_operation_gold_kenel<<<
 // policy.grid_dim(), 			policy.block_dim(),

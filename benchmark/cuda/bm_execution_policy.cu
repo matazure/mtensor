@@ -10,12 +10,12 @@ __global__ void kernel_freq(float* p_src, float* p_dst, int_t size) {
     }
 }
 
-void bm_cuda_lauch_kernel_freq(benchmark::State& state) {
+void bm_cuda_for_index_execution_policy_flops(benchmark::State& state) {
     int ts_size = state.range(0);
     cuda::tensor<float, 1> ts_src(ts_size);
     cuda::tensor<float, 1> ts_dst(ts_size);
 
-    cuda::parallel_execution_policy policy;
+    cuda::for_index_execution_policy policy;
     policy.total_size(ts_src.size());
     cuda::configure_grid(policy, kernel_freq);
 
@@ -28,4 +28,44 @@ void bm_cuda_lauch_kernel_freq(benchmark::State& state) {
     state.SetItemsProcessed(state.iterations() * static_cast<size_t>(ts_src.size()) * 1000000);
 }
 
-BENCHMARK(bm_cuda_lauch_kernel_freq)->Arg(1_M);
+BENCHMARK(bm_cuda_for_index_execution_policy_flops)->Arg(1_M);
+
+void bm_cuda_default_exectution_policy_flops(benchmark::State& state) {
+    int ts_size = state.range(0);
+    cuda::tensor<float, 1> ts_src(ts_size);
+    cuda::tensor<float, 1> ts_dst(ts_size);
+
+    cuda::default_execution_policy policy;
+    cuda::configure_grid(policy, kernel_freq);
+
+    while (state.KeepRunning()) {
+        kernel_freq<<<policy.grid_dim()[0], policy.block_dim()[0], policy.shared_mem_bytes(),
+                      policy.stream()>>>(ts_src.data(), ts_dst.data(), ts_src.size());
+        cudaDeviceSynchronize();
+    }
+
+    state.SetItemsProcessed(state.iterations() * static_cast<size_t>(ts_src.size()) * 1000000);
+}
+
+BENCHMARK(bm_cuda_default_exectution_policy_flops)->Arg(1_M);
+
+void bm_cuda_exectution_policy_flops(benchmark::State& state) {
+    int ts_size = state.range(0);
+    cuda::tensor<float, 1> ts_src(ts_size);
+    cuda::tensor<float, 1> ts_dst(ts_size);
+
+    cuda::execution_policy policy;
+    policy.block_dim({1024, 1, 1});
+    policy.grid_dim({34, 1, 1});
+    cuda::configure_grid(policy, kernel_freq);
+
+    while (state.KeepRunning()) {
+        kernel_freq<<<policy.grid_dim()[0], policy.block_dim()[0], policy.shared_mem_bytes(),
+                      policy.stream()>>>(ts_src.data(), ts_dst.data(), ts_src.size());
+        cudaDeviceSynchronize();
+    }
+
+    state.SetItemsProcessed(state.iterations() * static_cast<size_t>(ts_src.size()) * 1000000);
+}
+
+BENCHMARK(bm_cuda_exectution_policy_flops)->Arg(1_M);

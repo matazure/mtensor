@@ -34,7 +34,7 @@ inline void for_index(_ExecutionPolicy policy, int_t first, int_t last, _Fun fun
 
 template <typename _Fun>
 inline void for_index(int_t first, int_t last, _Fun fun) {
-    parallel_execution_policy policy;
+    for_index_execution_policy policy;
     policy.total_size(last - first);
     cuda::for_index(policy, first, last, fun);
 }
@@ -72,7 +72,7 @@ inline void for_index(_ExecutionPolicy policy, pointi<_Rank> origin, pointi<_Ran
 
 template <int_t _Rank, typename _Fun>
 inline void for_index(pointi<_Rank> origin, pointi<_Rank> end, _Fun fun) {
-    execution_policy p;
+    default_execution_policy p;
     cuda::for_index(p, origin, end, fun);
 }
 

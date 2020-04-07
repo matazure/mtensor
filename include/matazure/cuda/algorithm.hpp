@@ -26,7 +26,7 @@ inline void for_each(
     _Tensor ts, _Fun fun,
     enable_if_t<
         are_device_memory<enable_if_t<is_tensor<decay_t<_Tensor>>::value, _Tensor>>::value>* = 0) {
-    parallel_execution_policy policy;
+    for_index_execution_policy policy;
     policy.total_size(ts.size());
     for_each(policy, ts, fun);
 }
@@ -45,7 +45,7 @@ inline void fill(
     _Tensor ts, typename _Tensor::value_type v,
     enable_if_t<
         are_device_memory<enable_if_t<is_tensor<decay_t<_Tensor>>::value, _Tensor>>::value>* = 0) {
-    parallel_execution_policy policy;
+    for_index_execution_policy policy;
     policy.total_size(ts.size());
     fill(policy, ts, v);
 }
@@ -69,7 +69,7 @@ template <typename _T1, typename _T2>
 void copy(
     _T1 lhs, _T2 rhs,
     enable_if_t<are_device_memory<enable_if_t<is_tensor<_T1>::value, _T1>, _T2>::value>* = 0) {
-    parallel_execution_policy policy;
+    for_index_execution_policy policy;
     policy.total_size(lhs.size());
     copy(policy, lhs, rhs);
 }
@@ -118,7 +118,7 @@ inline void transform(
     enable_if_t<
         are_device_memory<enable_if_t<is_tensor<decay_t<_TensorSrc>>::value, decay_t<_TensorSrc>>,
                           decay_t<_TensorDst>>::value>* = 0) {
-    parallel_execution_policy policy;
+    for_index_execution_policy policy;
     policy.total_size(ts_src.size());
     transform(policy, ts_src, ts_dst, fun);
 }
