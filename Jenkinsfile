@@ -1,5 +1,9 @@
 pipeline{
     agent none
+    
+    options {
+        timeout(time: 1, unit: 'HOURS') 
+    }
     triggers {
         cron('H H(0-7) * * *')
     }
@@ -86,6 +90,14 @@ pipeline{
                                 sh './script/build-linux-aarch64.sh'
                             }
                         }
+                        stage('clean-remote') {
+                            when {
+                                triggeredBy "TimerTrigger"
+                            }
+                            steps {
+                                sh "ssh rk3399 rm -rf ~/tensor_ci"
+                            }
+                        }
                         stage('test') {
                             steps {
                                 sh "ssh rk3399 mkdir -p \\~/tensor_ci/${env.GIT_COMMIT}"
@@ -114,6 +126,14 @@ pipeline{
                         stage('build') {
                             steps {
                                 sh './script/build-linux-armv7.sh'
+                            }
+                        }
+                        stage('clean-remote') {
+                            when {
+                                triggeredBy "TimerTrigger"
+                            }
+                            steps {
+                                sh "ssh rpi4 rm -rf ~/tensor_ci"
                             }
                         }
                         stage('test') {
