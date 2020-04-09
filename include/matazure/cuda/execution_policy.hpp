@@ -54,7 +54,8 @@ class execution_policy {
           shared_mem_bytes_(shared_mem_bytes),
           stream_(stream) {
         if (!stream_) {
-            assert_runtime_success(cudaStreamCreate(&stream_));
+            // TODO: has bug, refactor it
+            // assert_runtime_success(cudaStreamCreate(&stream_));
         }
     }
 
