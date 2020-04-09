@@ -95,19 +95,19 @@ pipeline{
                                 triggeredBy "TimerTrigger"
                             }
                             steps {
-                                sh "ssh rk3399 rm -rf ~/tensor_ci"
+                                sh "ssh rk3399 rm -rf /home/pi/tensor_ci"
                             }
                         }
                         stage('test') {
                             steps {
-                                sh "ssh rk3399 mkdir -p \\~/tensor_ci/${env.GIT_COMMIT}"
-                                sh "scp -r ./build-linux-aarch64 rk3399:~/tensor_ci/${env.GIT_COMMIT}/"
-                                sh "ssh rk3399 'cd ~/tensor_ci/${env.GIT_COMMIT}/build-linux-aarch64 && ./bin/ut_host_mtensor'"
+                                sh "ssh rk3399 mkdir -p \\/home/pi/tensor_ci/${env.GIT_COMMIT}"
+                                sh "scp -r ./build-linux-aarch64 rk3399:/home/pi/tensor_ci/${env.GIT_COMMIT}/"
+                                sh "ssh rk3399 'cd /home/pi/tensor_ci/${env.GIT_COMMIT}/build-linux-aarch64 && ./bin/ut_host_mtensor'"
                             }
                         }
                         stage('benchmark') {
                             steps {
-                                sh "ssh rk3399 'cd ~/tensor_ci/${env.GIT_COMMIT}/build-linux-aarch64 && ./bin/bm_host_mtensor --benchmark_min_time=1'"
+                                sh "ssh rk3399 'cd /home/pi/tensor_ci/${env.GIT_COMMIT}/build-linux-aarch64 && ./bin/bm_host_mtensor --benchmark_min_time=1'"
                             }
                         }
                     }
@@ -133,19 +133,19 @@ pipeline{
                                 triggeredBy "TimerTrigger"
                             }
                             steps {
-                                sh "ssh rpi4 rm -rf ~/tensor_ci"
+                                sh "ssh rpi4 rm -rf /home/pi/tensor_ci"
                             }
                         }
                         stage('test') {
                             steps {
-                                sh "ssh rpi4 mkdir -p \\~/tensor_ci/${env.GIT_COMMIT}"
-                                sh "scp -r ./build-linux-armv7 rpi4:~/tensor_ci/${env.GIT_COMMIT}/"
-                                sh "ssh rpi4 'cd ~/tensor_ci/${env.GIT_COMMIT}/build-linux-armv7 && ./bin/ut_host_mtensor'"
+                                sh "ssh rpi4 mkdir -p \\/home/pi/tensor_ci/${env.GIT_COMMIT}"
+                                sh "scp -r ./build-linux-armv7 rpi4:/home/pi/tensor_ci/${env.GIT_COMMIT}/"
+                                sh "ssh rpi4 'cd /home/pi/tensor_ci/${env.GIT_COMMIT}/build-linux-armv7 && ./bin/ut_host_mtensor'"
                             }
                         }
                         stage('benchmark') {
                             steps {
-                                sh "ssh rpi4 'cd ~/tensor_ci/${env.GIT_COMMIT}/build-linux-armv7 && ./bin/bm_host_mtensor --benchmark_min_time=1'"
+                                sh "ssh rpi4 'cd /home/pi/tensor_ci/${env.GIT_COMMIT}/build-linux-armv7 && ./bin/bm_host_mtensor --benchmark_min_time=1'"
                             }
                         }
                     }

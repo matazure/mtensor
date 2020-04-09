@@ -47,13 +47,23 @@ inline size_t availableSharedBytesPerBlock(size_t sharedMemPerMultiprocessor,
 
 class execution_policy {
    public:
-    execution_policy(pointi<3> grid_dim = {0, 1, 1}, pointi<3> block_dim = {0, 1, 1},
-                     size_t shared_mem_bytes = 0, cudaStream_t stream = nullptr)
+    execution_policy(
+        pointi<3> grid_dim = {0, 1, 1}, pointi<3> block_dim = {0, 1, 1},
+        size_t shared_mem_bytes = 0,
+        std::shared_ptr<cudaStream_t> sp_stream = std::make_shared<cudaStream_t>(nullptr))
         : grid_dim_(grid_dim),
           block_dim_(block_dim),
           shared_mem_bytes_(shared_mem_bytes),
-          stream_(stream) {
-        if (!stream_) {
+          sp_stream_(sp_stream) {
+        if (*sp_stream_ == 0) {
+            cudaStream_t stream;
+            assert_runtime_success(cudaStreamCreate(&stream));
+            sp_stream_.reset(new cudaStream_t(stream), [](cudaStream_t* p) {
+                cudaStreamSynchronize(*p);
+                cudaStreamDestroy(*p);
+                delete p;
+            });
+
             // TODO: has bug, refactor it
             // assert_runtime_success(cudaStreamCreate(&stream_));
         }
@@ -62,23 +72,18 @@ class execution_policy {
     pointi<3> grid_dim() const { return grid_dim_; }
     pointi<3> block_dim() const { return block_dim_; }
     size_t shared_mem_bytes() const { return shared_mem_bytes_; }
-    cudaStream_t stream() const { return stream_; }
+    cudaStream_t stream() const { return *sp_stream_; }
 
     void grid_dim(pointi<3> arg) { grid_dim_ = arg; }
     void block_dim(pointi<3> arg) { block_dim_ = arg; }
     void shared_mem_bytes(size_t arg) { shared_mem_bytes_ = arg; }
-
-    void stream(cudaStream_t stream) { stream_ = stream; }
-
-    // not use virtual, just for inherit
-    ~execution_policy() { cudaStreamSynchronize(stream_); }
 
    protected:
     pointi<3> grid_dim_ = {0, 1, 1};
     pointi<3> block_dim_ = {0, 1, 1};
     // 0 represents not use dynamic shared memory
     size_t shared_mem_bytes_ = 0;
-    cudaStream_t stream_ = nullptr;
+    std::shared_ptr<cudaStream_t> sp_stream_ = nullptr;
 };
 
 class default_execution_policy : public execution_policy {
