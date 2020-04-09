@@ -47,7 +47,7 @@ pipeline{
                         dockerfile {
                             filename 'tensor-dev-ubuntu18.04.dockerfile'
                             dir 'dockerfile'
-                            args '--runtime=nvidia'
+                            args '--gpus all'
                         }
                     }
                     environment {
