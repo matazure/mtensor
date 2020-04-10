@@ -27,18 +27,17 @@ class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout, _Allocator
     typedef device_tag memory_type;
     typedef _Allocator allocator_type;
 
-    MATAZURE_GENERAL tensor() : tensor(zero<pointi<rank>>::value()) {}
+    tensor() : tensor(zero<pointi<rank>>::value()) {}
 
     template <typename... _Ext, typename _Tmp = enable_if_t<sizeof...(_Ext) == rank>>
-    MATAZURE_GENERAL explicit tensor(_Ext... ext) : tensor(pointi<rank>{ext...}) {}
+    explicit tensor(_Ext... ext) : tensor(pointi<rank>{ext...}) {}
 
-    MATAZURE_GENERAL explicit tensor(pointi<rank> ext)
+    explicit tensor(pointi<rank> ext)
         : shape_(ext),
           layout_(ext),
           sp_data_(malloc_shared_memory(layout_.stride()[rank - 1])),
           data_(sp_data_.get()) {}
 
-    MATAZURE_GENERAL
     explicit tensor(pointi<rank> ext, std::shared_ptr<value_type> sp_data)
         : shape_(ext), layout_(ext), sp_data_(sp_data), data_(sp_data_.get()) {}
 
@@ -46,7 +45,7 @@ class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout, _Allocator
      *
      *
      */
-    MATAZURE_GENERAL
+
     explicit tensor(const pointi<rank>& shape, const pointi<rank>& origin_padding,
                     const pointi<rank>& end_padding)
         : shape_(shape),
@@ -55,7 +54,7 @@ class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout, _Allocator
           data_(sp_data_.get()) {}
 
     template <typename _VT>
-    MATAZURE_GENERAL tensor(const tensor<_VT, _Rank, _Layout>& ts)
+    tensor(const tensor<_VT, _Rank, _Layout>& ts)
         : allocator_(ts.allocator_),
           shape_(ts.shape()),
           layout_(ts.layout_),
@@ -87,7 +86,7 @@ class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout, _Allocator
 
     allocator_type get_allocator() const { return allocator_; }
 
-    MATAZURE_GENERAL ~tensor() {}
+    ~tensor() {}
 
    private:
     shared_ptr<value_type> malloc_shared_memory(int_t size) {

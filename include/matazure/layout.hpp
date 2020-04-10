@@ -15,7 +15,6 @@ class column_major_layout {
    public:
     const static int_t rank = _Rank;
 
-#pragma hd_warning_disable
     MATAZURE_GENERAL column_major_layout(const pointi<rank>& shape) : shape_(shape) {
         stride_[0] = shape[0];
         for (int_t i = 1; i < rank; ++i) {
@@ -26,7 +25,6 @@ class column_major_layout {
     MATAZURE_GENERAL column_major_layout(const column_major_layout& rhs)
         : column_major_layout(rhs.shape()) {}
 
-#pragma hd_warning_disable
     MATAZURE_GENERAL column_major_layout& operator=(const column_major_layout& rhs) {
         shape_ = rhs.shape();
         stride_ = rhs.stride();
@@ -79,7 +77,6 @@ class row_major_layout {
     MATAZURE_GENERAL row_major_layout(const row_major_layout& rhs)
         : row_major_layout(rhs.shape()) {}
 
-#pragma hd_warning_disable
     MATAZURE_GENERAL row_major_layout& operator=(const row_major_layout& rhs) {
         shape_ = rhs.shape();
         stride_ = rhs.stride();

@@ -17,6 +17,7 @@ struct _Is_linear_array<point<_Type, _Rank>> : bool_constant<true> {};
  * @param last the last index
  * @param fun the functor,  int_t -> value pattern.
  */
+MATAZURE_NV_EXE_CHECK_DISABLE
 template <typename _Func>
 MATAZURE_GENERAL inline void for_index(sequence_policy, int_t first, int_t last, _Func fun) {
     for (int_t i = first; i < last; ++i) {
@@ -30,6 +31,7 @@ MATAZURE_GENERAL inline void for_index(sequence_policy, int_t first, int_t last,
  * @param last the last index
  * @param fun the functor,  int_t -> value pattern.
  */
+MATAZURE_NV_EXE_CHECK_DISABLE
 template <typename _Func>
 MATAZURE_GENERAL inline void for_index(int_t first, int_t last, _Func fun) {
     sequence_policy seq{};
@@ -39,6 +41,7 @@ MATAZURE_GENERAL inline void for_index(int_t first, int_t last, _Func fun) {
 /**
 
 */
+MATAZURE_NV_EXE_CHECK_DISABLE
 template <typename _Func>
 MATAZURE_GENERAL inline void for_index(int_t last, _Func fun) {
     for_index(0, last, fun);
@@ -50,6 +53,7 @@ MATAZURE_GENERAL inline void for_index(int_t last, _Func fun) {
  * @param end the end index
  * @param fun the functor,  pointi<1> -> value pattern.
  */
+MATAZURE_NV_EXE_CHECK_DISABLE
 template <typename _Func>
 MATAZURE_GENERAL inline void for_index(sequence_policy, pointi<1> origin, pointi<1> end,
                                        _Func fun) {
@@ -64,6 +68,7 @@ MATAZURE_GENERAL inline void for_index(sequence_policy, pointi<1> origin, pointi
  * @param end the end index
  * @param fun the functor,  pointi<2> -> value pattern.
  */
+MATAZURE_NV_EXE_CHECK_DISABLE
 template <typename _Func>
 MATAZURE_GENERAL inline void for_index(sequence_policy, pointi<2> origin, pointi<2> end,
                                        _Func fun) {
@@ -80,6 +85,7 @@ MATAZURE_GENERAL inline void for_index(sequence_policy, pointi<2> origin, pointi
  * @param end the end index
  * @param fun the functor,  pointi<3> -> value pattern.
  */
+MATAZURE_NV_EXE_CHECK_DISABLE
 template <typename _Func>
 MATAZURE_GENERAL inline void for_index(sequence_policy, pointi<3> origin, pointi<3> end,
                                        _Func fun) {
@@ -98,6 +104,7 @@ MATAZURE_GENERAL inline void for_index(sequence_policy, pointi<3> origin, pointi
  * @param end the end index
  * @param fun the functor,  pointi<4> -> value pattern.
  */
+MATAZURE_NV_EXE_CHECK_DISABLE
 template <typename _Func>
 MATAZURE_GENERAL inline void for_index(sequence_policy, pointi<4> origin, pointi<4> end,
                                        _Func fun) {
@@ -118,16 +125,16 @@ MATAZURE_GENERAL inline void for_index(sequence_policy, pointi<4> origin, pointi
  * @param end the end index
  * @param fun the functor,  pointi -> value pattern.
  */
-// MATAZURE_HD_WARNING_DISABLE
+MATAZURE_NV_EXE_CHECK_DISABLE
 template <typename _Func, int_t _Rank>
 MATAZURE_GENERAL inline void for_index(pointi<_Rank> origin, pointi<_Rank> end, _Func fun) {
     sequence_policy policy{};
     for_index(policy, origin, end, fun);
 }
 
-MATAZURE_HD_WARNING_DISABLE
+MATAZURE_NV_EXE_CHECK_DISABLE
 template <typename _Func, int_t _Rank>
-inline void for_index(pointi<_Rank> end, _Func fun) {
+MATAZURE_GENERAL inline void for_index(pointi<_Rank> end, _Func fun) {
     for_index(zero<pointi<_Rank>>::value(), end, fun);
 }
 

@@ -32,16 +32,16 @@
 #define MATAZURE_GLOBAL __global__
 #define __matazure__ MATAZURE_GENERAL
 #ifndef __clang__
-#define MATAZURE_HD_WARNING_DISABLE #pragma nv_exec_check_disable
+#define MATAZURE_NV_EXE_CHECK_DISABLE #pragma nv_exec_check_disable
 #else
-#define MATAZURE_HD_WARNING_DISABLE
+#define MATAZURE_NV_EXE_CHECK_DISABLE
 #endif
 #else
 #define MATAZURE_DEVICE
 #define MATAZURE_GENERAL
 #define MATAZURE_GLOBAL
 #define __matazure__
-#define MATAZURE_HD_WARNING_DISABLE
+#define MATAZURE_NV_EXE_CHECK_DISABLE
 #endif
 
 #ifdef _OPENMP

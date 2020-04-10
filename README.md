@@ -158,12 +158,14 @@ git clone https://github.com/Matazure/tensor.git
 
 ### 问题
 
-* 目前CUDA的tensor编译还有不少warning，可以忽略，后期会逐渐去除
+* 目前CUDA的tensor编译还有几个关于主机设备函数调用的warning， 主要是std::shared_ptr和std::allocator产生， 可以忽略
 
 ## 环境要求
 
 * 需要编译器开启C++11的支持
-* 需CUDA10.0及其以上版本, 并加入编译参数"--expt-extended-lambda"和"-std=c++11|c++14"
+* GPU上运行，需CUDA10.0及其以上版本, 并加入编译参数"--expt-extended-lambda"和"-std=c++11"
+* 
+
 
 <!-- Tensor的代码规范遵循C++14标准， 所以只需编译器支持C++14即可, 推荐使用g++-7I
 在符合CPU支持的基础上，需要安装[至少CUDA 10.1](https://developer.nvidia.com/cuda-downloads)，详情可查看[CUDA官方文档](http://docs.nvidia.com/cuda/index.html#axzz4kQuxAvUe) -->
