@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
             sh_ts_block(block_idx.local) = zero<pointf<3>>::value();
         }
 
-        cuda::sync_threads();
+        cuda::syncthreads();
 
         if (inside_rect(block_idx.local, padding,
                         block_idx.block_dim - ckernel_mean.shape() + pointi<2>{1, 1}) &&

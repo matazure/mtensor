@@ -20,12 +20,11 @@ int main(int argc, char* argv[]) {
     mem_copy(ts_a, cts_a);
     mem_copy(ts_b, cts_b);
 
+    //使用cuda  lambda算子 需要申明__device__ __host__
     auto functor = [cts_a, cts_b, cts_c] __device__ __host__(pointi<2> index) {
         cts_c(index) = cts_a(index) + cts_b(index);
     };
 
-    //在gpu上执行加法操作，这里使用了__device__ lambda,
-    //需要加上nvcc的编译参数--expt-extended-lambda，
     cuda::for_index(shape, functor);
     //阻塞等待执行完毕， 这是必须的
 
