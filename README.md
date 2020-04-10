@@ -133,6 +133,8 @@ int main(int argc, char *argv[]) {
 
 ### GPU的分块计算block_for_index
 
+下面是一个卷积实现,该实现仅为了展示block_for_index,其每个块的边界是无效值
+
 ```c++
 #include <mtensor.hpp>
 #include "image_helper.hpp"
