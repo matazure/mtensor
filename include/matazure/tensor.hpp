@@ -72,7 +72,7 @@ class tensor : public tensor_expression<tensor<_ValueType, _Rank, _Layout, _Allo
 
    public:
     /// default constructor
-    tensor() : tensor(pointi<rank>::zeros()) {}
+    tensor() : tensor(zero<pointi<rank>>::value()) {}
 
     /**
      * @brief constructs by the shape

@@ -27,7 +27,7 @@ class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout, _Allocator
     typedef device_tag memory_type;
     typedef _Allocator allocator_type;
 
-    MATAZURE_GENERAL tensor() : tensor(pointi<rank>::zeros()) {}
+    MATAZURE_GENERAL tensor() : tensor(zero<pointi<rank>>::value()) {}
 
     template <typename... _Ext, typename _Tmp = enable_if_t<sizeof...(_Ext) == rank>>
     MATAZURE_GENERAL explicit tensor(_Ext... ext) : tensor(pointi<rank>{ext...}) {}

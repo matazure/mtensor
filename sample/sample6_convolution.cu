@@ -34,29 +34,29 @@ int main(int argc, char* argv[]) {
 
     cuda::tensor<pointf<3>, 2> cimg_mean(img_rgb.shape());
 
-    cuda::block_for_index<BLOCK_DIM>(
-        grid_dim, [=] __device__(cuda::block_index<BLOCK_DIM> block_idx) {
-            auto valid_global_idx = valid_block_dim * block_idx.block + block_idx.local - padding;
-            __shared__ local_tensor<pointf<3>, BLOCK_DIM> sh_ts_block;
+    cuda::block_for_index<BLOCK_DIM>(grid_dim, [=] __device__(
+                                                   cuda::block_index<BLOCK_DIM> block_idx) {
+        auto valid_global_idx = valid_block_dim * block_idx.block + block_idx.local - padding;
+        __shared__ local_tensor<pointf<3>, BLOCK_DIM> sh_ts_block;
 
-            if (inside_rect(valid_global_idx, -padding, cimg_padding_view.shape() + padding * 2)) {
-                sh_ts_block(block_idx.local) = cimg_padding_view(valid_global_idx);
-            } else {
-                sh_ts_block(block_idx.local) = zero<pointf<3>>::value();
-            }
+        if (inside_rect(valid_global_idx, -padding, cimg_padding_view.shape() + padding * 2)) {
+            sh_ts_block(block_idx.local) = cimg_padding_view(valid_global_idx);
+        } else {
+            sh_ts_block(block_idx.local) = zero<pointf<3>>::value();
+        }
 
-            cuda::sync_threads();
+        cuda::sync_threads();
 
-            if (inside_rect(block_idx.local, padding,
-                            block_idx.block_dim - ckernel_mean.shape() + pointi<2>{1, 1}) &&
-                inside_rect(valid_global_idx, pointi<2>::zeros(), cimg_padding_view.shape())) {
-                auto sum = zero<pointf<3>>::value();
-                for_index(pointi<2>::zeros(), ckernel_mean.shape(), [&](const pointi<2>& idx) {
-                    sum += sh_ts_block(block_idx.local + idx - padding) * ckernel_mean(idx);
-                });
-                cimg_mean[valid_global_idx] = sum;
-            }
-        });
+        if (inside_rect(block_idx.local, padding,
+                        block_idx.block_dim - ckernel_mean.shape() + pointi<2>{1, 1}) &&
+            inside_rect(valid_global_idx, zero<pointi<2>>::value(), cimg_padding_view.shape())) {
+            auto sum = zero<pointf<3>>::value();
+            for_index(zero<pointi<2>>::value(), ckernel_mean.shape(), [&](const pointi<2>& idx) {
+                sum += sh_ts_block(block_idx.local + idx - padding) * ckernel_mean(idx);
+            });
+            cimg_mean[valid_global_idx] = sum;
+        }
+    });
 
     cuda::tensor<pointb<3>, 2> cimg_mean_byte(cimg_mean.shape());
     cuda::transform(cimg_mean, cimg_mean_byte,

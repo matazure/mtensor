@@ -41,9 +41,6 @@ class point {
     /// return the length of point
     MATAZURE_GENERAL constexpr int_t size() const { return rank; }
 
-    /// return a zero point
-    MATAZURE_GENERAL static constexpr point zeros() { return {0}; }
-
     /// return a point whose elements are v
     MATAZURE_GENERAL static point all(value_type v) {
         point re{};
