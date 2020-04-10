@@ -59,8 +59,8 @@ class execution_policy {
             cudaStream_t stream;
             assert_runtime_success(cudaStreamCreate(&stream));
             sp_stream_.reset(new cudaStream_t(stream), [](cudaStream_t* p) {
-                cudaStreamSynchronize(*p);
-                cudaStreamDestroy(*p);
+                assert_runtime_success(cudaStreamSynchronize(*p));
+                assert_runtime_success(cudaStreamDestroy(*p));
                 delete p;
             });
 
@@ -77,6 +77,8 @@ class execution_policy {
     void grid_dim(pointi<3> arg) { grid_dim_ = arg; }
     void block_dim(pointi<3> arg) { block_dim_ = arg; }
     void shared_mem_bytes(size_t arg) { shared_mem_bytes_ = arg; }
+
+    void synchronize() { assert_runtime_success(cudaStreamSynchronize(stream())); }
 
    protected:
     pointi<3> grid_dim_ = {0, 1, 1};
