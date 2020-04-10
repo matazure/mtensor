@@ -14,7 +14,6 @@
 #endif
 
 #ifdef MATAZURE_CUDA
-
 #include <matazure/cuda/algorithm.hpp>
 #include <matazure/cuda/exception.hpp>
 #include <matazure/cuda/execution_policy.hpp>
@@ -23,5 +22,4 @@
 #include <matazure/cuda/reshape.hpp>
 #include <matazure/cuda/runtime.hpp>
 #include <matazure/cuda/tensor.hpp>
-
 #endif
