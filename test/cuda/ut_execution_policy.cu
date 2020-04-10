@@ -26,7 +26,7 @@ TEST(CudaExecutionTest, DefaultExecutionPolicy) {
     }
 }
 
-TEST(CudaExecutionTest, ForIndexExecutionPolicy) {
+TEST(CudaExecutionTests, ForIndexExecutionPolicy) {
     {
         cuda::for_index_execution_policy policy;
         policy.total_size(64);

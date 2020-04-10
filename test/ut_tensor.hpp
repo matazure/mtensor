@@ -1,9 +1,5 @@
 #include "ut_foundation.hpp"
 
-#include <vector>
-
-using std::vector;
-
 TEST(TensorTests, ConstructByInitializerList) {
     tensor<int, 2> ts = {{1, 2, 3},  //
                          {4, 5, 6},

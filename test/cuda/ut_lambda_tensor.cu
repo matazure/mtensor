@@ -18,7 +18,7 @@ struct host_functor {
     __host__ int operator()(pointi<2> idx) const { return 3; }
 };
 
-TEST(CudaLambdaTensor, MakeByLambdaFunctor) {
+TEST(CudaLambdaTensorTests, MakeByLambdaFunctor) {
     pointi<2> shape{10, 10};
     auto ts_test1 =
         cuda::make_lambda(shape, [] __host__ __device__(pointi<2> idx) -> int { return idx[0]; })
@@ -33,7 +33,7 @@ TEST(CudaLambdaTensor, MakeByLambdaFunctor) {
     auto ts_test3 = cuda::make_lambda(shape, device_functor{}).persist();
 }
 
-TEST(CudaLambdaTensor, MakeByStructFunctor) {
+TEST(CudaLambdaTensorTests, MakeByStructFunctor) {
     pointi<2> shape{10, 10};
     auto ts_test1 = cuda::make_lambda(shape, device_functor{}).persist();
     auto ts_test2 = cuda::make_lambda(shape, general_functor{}).persist();
@@ -42,7 +42,7 @@ TEST(CudaLambdaTensor, MakeByStructFunctor) {
     // cuda::make_lambda(shape, host_functor{}).persist();  // Run Error, unspecial launch failure
 }
 
-TEST(CudaLambdaTensor, MakeByArrayAndLinearIndex) {
+TEST(CudaLambdaTensorTests, MakeByArrayAndLinearIndex) {
     pointi<2> shape{10, 10};
     auto ts_test1 =
         cuda::make_lambda(shape, [] __host__ __device__(pointi<2> idx) -> int { return idx[0]; })

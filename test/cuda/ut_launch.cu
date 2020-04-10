@@ -28,19 +28,19 @@ __host__ void host_function_functor() {
 }
 __device__ __host__ void general_function_functor() {}
 
-TEST(LaunchTest, LambdaFunctor) {
+TEST(CudaLaunchTests, LambdaFunctor) {
     cuda::launch([] __device__() {});
     cuda::launch([] __host__ __device__() {});  // Compile Warning
     // cuda::launch([]() {}); //Compile Error
 }
 
-TEST(LaunchTest, StructFunctor) {
+TEST(CudaLaunchTests, StructFunctor) {
     cuda::launch(device_functor{});
     cuda::launch(general_functor{});
     // cuda::launch(host_functor{}); //Compiler Error
 }
 
-TEST(LaunchTest, FunctionFunctor) {
+TEST(CudaLaunchTests, FunctionFunctor) {
     //  cuda::launch(device_function_functor); //Compile OK, RUN with an illegal memory access
     // cuda::launch(&device_function_functor); //Compile OK, RUN with an illegal memory access
     // cuda::launch(host_function_functor)); //Compile OK, RUN with an illegal memory access
