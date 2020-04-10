@@ -124,54 +124,27 @@ using tensorf = tensor<float, _Rank, column_major_layout<_Rank>>;
 template <int_t _Rank, typename _Layout = column_major_layout<_Rank>>
 using tensord = tensor<double, _Rank, column_major_layout<_Rank>>;
 
-namespace __walkaround {
-
-using tensor1b = tensor<byte, 1>;
-using tensor2b = tensor<byte, 2>;
-using tensor3b = tensor<byte, 3>;
-using tensor4b = tensor<byte, 4>;
-
-using tensor1s = tensor<short, 1>;
-using tensor2s = tensor<short, 2>;
-using tensor3s = tensor<short, 3>;
-using tensor4s = tensor<short, 4>;
-
-using tensor1us = tensor<unsigned short, 1>;
-using tensor2us = tensor<unsigned short, 2>;
-using tensor3us = tensor<unsigned short, 4>;
-using tensor4us = tensor<unsigned short, 4>;
-
-using tensor1i = tensor<int, 1>;
-using tensor2i = tensor<int, 2>;
-using tensor3i = tensor<int, 3>;
-using tensor4i = tensor<int, 4>;
-
-using tensor1ui = tensor<unsigned int, 1>;
-using tensor2ui = tensor<unsigned int, 2>;
-using tensor3ui = tensor<unsigned int, 3>;
-using tensor4ui = tensor<unsigned int, 4>;
-
-using tensor1l = tensor<long, 1>;
-using tensor2l = tensor<long, 2>;
-using tensor3l = tensor<long, 3>;
-using tensor4l = tensor<long, 4>;
-
-using tensor1ul = tensor<unsigned long, 1>;
-using tensor2ul = tensor<unsigned long, 2>;
-using tensor3ul = tensor<unsigned long, 3>;
-using tensor4ul = tensor<unsigned long, 4>;
-
-using tensor1f = tensor<float, 1>;
-using tensor2f = tensor<float, 2>;
-using tensor3f = tensor<float, 3>;
-using tensor4f = tensor<float, 4>;
-
-using tensor1d = tensor<double, 1>;
-using tensor2d = tensor<double, 1>;
-using tensor3d = tensor<double, 1>;
-using tensor4d = tensor<double, 1>;
-
-}  // namespace __walkaround
+// nvcc walkaround, sometimes you need declare the cuda::tensor_type before using
+using tensor1b = tensorb<1>;
+using tensor2b = tensorb<2>;
+using tensor3b = tensorb<3>;
+using tensor4b = tensorb<4>;
+using tensor1s = tensors<1>;
+using tensor2s = tensors<2>;
+using tensor3s = tensors<3>;
+using tensor4s = tensors<4>;
+using tensor1i = tensori<1>;
+using tensor2i = tensori<2>;
+using tensor3i = tensori<3>;
+using tensor4i = tensori<4>;
+using tensor1f = tensorf<1>;
+using tensor2f = tensorf<2>;
+using tensor3f = tensorf<3>;
+using tensor4f = tensorf<4>;
+using tensor1d = tensord<1>;
+using tensor2d = tensord<2>;
+using tensor3d = tensord<3>;
+using tensor4d = tensord<4>;
 
 }  // namespace cuda
 

@@ -255,4 +255,25 @@ using tensorf = tensor<float, _Rank, column_major_layout<_Rank>>;
 template <int_t _Rank, typename _Layout = column_major_layout<_Rank>>
 using tensord = tensor<double, _Rank, column_major_layout<_Rank>>;
 
+using tensor1b = tensorb<1>;
+using tensor2b = tensorb<2>;
+using tensor3b = tensorb<3>;
+using tensor4b = tensorb<4>;
+using tensor1s = tensors<1>;
+using tensor2s = tensors<2>;
+using tensor3s = tensors<3>;
+using tensor4s = tensors<4>;
+using tensor1i = tensori<1>;
+using tensor2i = tensori<2>;
+using tensor3i = tensori<3>;
+using tensor4i = tensori<4>;
+using tensor1f = tensorf<1>;
+using tensor2f = tensorf<2>;
+using tensor3f = tensorf<3>;
+using tensor4f = tensorf<4>;
+using tensor1d = tensord<1>;
+using tensor2d = tensord<2>;
+using tensor3d = tensord<3>;
+using tensor4d = tensord<4>;
+
 }  // namespace matazure

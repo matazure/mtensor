@@ -228,6 +228,27 @@ using pointf = point<float, _Rank>;
 template <int_t _Rank>
 using pointd = point<float, _Rank>;
 
+using point1b = pointb<1>;
+using point2b = pointb<2>;
+using point3b = pointb<3>;
+using point4b = pointb<4>;
+using point1s = points<1>;
+using point2s = points<2>;
+using point3s = points<3>;
+using point4s = points<4>;
+using point1i = pointi<1>;
+using point2i = pointi<2>;
+using point3i = pointi<3>;
+using point4i = pointi<4>;
+using point1f = pointf<1>;
+using point2f = pointf<2>;
+using point3f = pointf<3>;
+using point4f = pointf<4>;
+using point1d = pointd<1>;
+using point2d = pointd<2>;
+using point3d = pointd<3>;
+using point4d = pointd<4>;
+
 /// if two points are equal elementwise, return true, others false.
 template <typename _Ty, int_t _Rank>
 inline MATAZURE_GENERAL bool equal(const point<_Ty, _Rank>& lhs, const point<_Ty, _Rank>& rhs) {
