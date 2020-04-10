@@ -2,13 +2,14 @@
 
 Tensor是一个C++实现的<!--异构-->多维数组计算库
 
-## 介绍
+## 基本功能
 
 Tensor主要用于多维数组及其计算，其可以便利高效的在CPU/GPU上实现遍历，滤波，转换等多种操作。也便于数据在CPU与GPU之间的传输交互。Tensor提供以下核心功能
 
-* 泛型多维数组
-* 延迟计算
-* 并行计算
+* 支持CPU和GPU端的tensor，lambda_tensor等的多维数组
+* 支持CPU和GPU端的延迟计算技术
+* 包含基本的fill, for_each, copy, transform等算法
+* 基于延迟计算，在view名字空间下实现了crop， stride， clamp， slice等算子
 <!-- * 向量化指令集 -->
 
 ## 示例
@@ -135,30 +136,44 @@ int main(int argc, char *argv[]) {
 
 ## 编译
 
-需先安装[git](https://git-scm.com/)和[CMake](https://cmake.org/)及相应的编译工具，然后运行script下对应的编译脚本即可。  
+需先安装[git](https://git-scm.com/)和[CMake](https://cmake.org/)及相应的编译工具g++/clang
+
+也可以构建本项目的docker环境作为开发环境
+
+```bash
+docker build . -f dockerfile/tensor-dev-ubuntu18.04.dockerfile -t tensor-dev
+```
+
+从github上克隆代码
 
 ```bash
 git clone https://github.com/Matazure/tensor.git
 ```
 
-* build_windows.bat编译windows版本
-* build_native.sh编译unix版本(linux及mac)
-* build_android.sh可以在linux主机编译android版本。
+使用编译脚本编译相关代码
+
+* ./script/build_windows.bat编译windows版本
+* ./script/build_native.sh编译unix版本(linux及mac)
+* ./script/build_android.sh可以在linux主机编译android版本。
+
+还可以添加参数来选择是否编译CUDA版本
+
+```bash
+./script/build_native.sh -DWITH_CUDA=ON
+```
+
+目前CUDA的tensor编译还有几个关于主机设备函数调用的warning， 主要是std::shared_ptr和std::allocator产生， 可以忽略
 
 ## 如何在你的项目中集成
 
 在你的项目的头文件路径中包含include目录路径即可，无第三方库和动态库依赖。
 
-对于CUDA项目，需要nvcc加入编译参数"--expt-extended-lambda"和"-std=c++11"。 CUDA的官方文档有nvcc编译参数设置的详细说明，也可参考本项目的CMakeLists.txt。
+对于CUDA项目，需要nvcc加入编译参数"--expt-extended-lambda"和"-std=c++11", CUDA的官方文档有nvcc编译参数设置的详细说明, 若使用CMake构建项目, 也可参考本项目的CMakeLists.txt。
 
 ```cmake
     set(CMAKE_CUDA_STANDARD 11)
     set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-extended-lambda")
 ```
-
-### 问题
-
-* 目前CUDA的tensor编译还有几个关于主机设备函数调用的warning， 主要是std::shared_ptr和std::allocator产生， 可以忽略
 
 ## 环境要求
 
@@ -166,19 +181,10 @@ git clone https://github.com/Matazure/tensor.git
 * GPU上运行，需CUDA10.0及其以上版本, 并加入编译参数"--expt-extended-lambda"和"-std=c++11"
 * 
 
+## 和其他开源库的比较
 
-<!-- Tensor的代码规范遵循C++14标准， 所以只需编译器支持C++14即可, 推荐使用g++-7I
-在符合CPU支持的基础上，需要安装[至少CUDA 10.1](https://developer.nvidia.com/cuda-downloads)，详情可查看[CUDA官方文档](http://docs.nvidia.com/cuda/index.html#axzz4kQuxAvUe) -->
+* mtensor的延迟计算技术比Eigen，xtensor等更加简洁，lambda_tensor的函数式实现比模板表达式更加通用简介
+* mtensor支持CUDA版本的tensor和延迟计算，对于CUDA这种经常卡在显存带宽的计算设备来说是效果很好的
+* mtensor围绕着多维坐标来设计算法，Nvidia的thrust是围绕着迭代器来实现的，迭代器是有顺序依赖的，其并不适用于并行计算
+* mtensor是一个标准的现代C++风格的计算库，其在内存管理，接口设计等多方面都吸取了现代C++的优点
 
-<!-- ## 性能
-
-Tensor编写了大量性能测试用例来确保其优异的性能，可以在目标平台上运行生成的benchmark程来评估性能情况。 直接运行tensor_benchmark, hete_host_tensor_benchmark或者hete_cu_tensor_benchmark. -->
-
-<!-- ## 平台支持情况
-
-| 设备   | Windows | Linux | OSX  | Android | IOS  |
-| ------ | ------- | ----- | ---- | ------- | ---- |
-| C++    | 支持    | 支持  | 支持 | 支持    | 支持 |
-| CUDA   | 支持    | 支持  | 支持 |         |      |
-| OpenMP | 支持    | 支持  | 支持 | 支持    | 支持 |
-| 向量化 | 支持    | 支持  | 支持 | 支持    | 支持 | --> |
