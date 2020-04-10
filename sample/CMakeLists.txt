@@ -17,6 +17,9 @@ if (WITH_CUDA)
     add_executable(sample4 sample4.cu)
     target_link_libraries(sample4 mtensor image_helper)
 
+    add_executable(sample6_convolution_halo sample6_convolution_halo.cu)
+    target_link_libraries(sample6_convolution_halo mtensor image_helper)
+
     add_executable(sample6_convolution sample6_convolution.cu)
     target_link_libraries(sample6_convolution mtensor image_helper)
 

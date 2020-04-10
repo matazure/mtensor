@@ -52,6 +52,7 @@
 namespace matazure {
 
 typedef int int_t;
+typedef unsigned int uint_t;
 
 using std::make_shared;
 using std::move;

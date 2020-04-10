@@ -1,5 +1,5 @@
-﻿#include "image_helper.hpp"
-#include <mtensor.hpp>
+﻿#include <mtensor.hpp>
+#include "image_helper.hpp"
 
 using namespace matazure;
 
@@ -12,17 +12,19 @@ int main(int argc, char* argv[]) {
 
     tensor<byte, 2> img_gray = read_gray_image(argv[1]);
     pointi<2> padding{1, 1};  //需要padding1 避免越界
-    tensor<byte, 2, padding_layout<2>> img_padding(img_gray.shape(), padding,
-                                                   padding);  //构造有padding的图像tensor
-    for_border(img_padding.shape(), padding, padding,
-               [=](pointi<2> idx) { img_padding(idx) = 0; });  //将边界置零
+    tensor<byte, 2> img_padding_container(img_gray.shape() + 3);
+    auto img_padding_view = view::crop(img_padding_container, padding, img_gray.shape());
+    for_border(img_padding_view.shape(), padding, padding,
+               [=](pointi<2> idx) { img_padding_view(idx) = 0; });  //将边界置零
+    for_index(img_padding_view.shape(),
+              [=](pointi<2> idx) { img_padding_view(idx) = img_gray(idx); });
 
-    for_index(img_padding.shape(), [=](pointi<2> idx) { img_padding(idx) = img_gray(idx); });
-
-    tensor<byte, 2> img_grad(img_padding.shape());
-    for_index(img_padding.shape(), [=](pointi<2> idx) {
-        auto grad_x = img_padding(idx + pointi<2>{1, 0}) - img_padding(idx - pointi<2>{1, 0});
-        auto grad_y = img_padding(idx + pointi<2>{0, 1}) - img_padding(idx - pointi<2>{0, 1});
+    tensor<byte, 2> img_grad(img_padding_view.shape());
+    for_index(img_padding_view.shape(), [=](pointi<2> idx) {
+        auto grad_x =
+            img_padding_view(idx + pointi<2>{1, 0}) - img_padding_view(idx - pointi<2>{1, 0});
+        auto grad_y =
+            img_padding_view(idx + pointi<2>{0, 1}) - img_padding_view(idx - pointi<2>{0, 1});
         img_grad(idx) = std::abs(grad_x) + std::abs(grad_y);
     });
 
