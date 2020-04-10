@@ -1,6 +1,6 @@
 # [Tensor](https://github.com/Matazure/tensor) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/Matazure/tensor/blob/master/LICENSE)
 
-Tensor是一个C++实现的<!--异构-->多维数组计算库
+mtensor是一个支持延迟计算的多维数组计算库, 同时支持C++和CUDA平台
 
 ## 基本功能
 
