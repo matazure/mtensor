@@ -3,6 +3,7 @@
 #include <benchmark/benchmark.h>
 #include <cmath>
 #include <mtensor.hpp>
+#include "padding_layout.hpp"
 
 using namespace matazure;
 

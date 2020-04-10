@@ -14,3 +14,12 @@ BENCHMARK(bm_cuda_tensor2f_for_each)->Arg(32_K);
 
 auto bm_cuda_tensor2f_transform = bm_tensor_transform<cuda::tensor<float, 2>>;
 BENCHMARK(bm_cuda_tensor2f_transform)->Arg(32_K);
+
+auto bm_cuda_tensor2f_column_major_layout_copy =
+    bm_tensor_copy<cuda::tensor<float, 2, column_major_layout<2>>>;
+BENCHMARK(bm_cuda_tensor2f_column_major_layout_copy)->Arg(32_K);
+auto bm_cuda_tensor2f_row_layout_copy = bm_tensor_copy<cuda::tensor<float, 2, row_major_layout<2>>>;
+BENCHMARK(bm_cuda_tensor2f_row_layout_copy)->Arg(32_K);
+auto bm_cuda_tensor2f_padding_layout_copy =
+    bm_tensor_copy<cuda::tensor<float, 2, padding_layout<2>>>;
+BENCHMARK(bm_cuda_tensor2f_padding_layout_copy)->Arg(32_K);
