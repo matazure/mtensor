@@ -188,3 +188,9 @@ git clone https://github.com/matazure/tensor.git
 * mtensor围绕着多维坐标来设计算法，Nvidia的thrust是围绕着迭代器来实现的，迭代器是有顺序依赖的，其并不适用于并行计算
 * mtensor是一个标准的现代C++风格的计算库，其在内存管理，接口设计等多方面都吸取了现代C++的优点
 
+## 联系方式
+
+有建议或者问题可以联系
+
+* 邮箱 p3.1415@qq.com
+* 微信 zhangzhimin-tju
