@@ -1,4 +1,4 @@
-# [Tensor](https://github.com/Matazure/tensor) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/Matazure/tensor/blob/master/LICENSE)
+# [mtensor](https://github.com/matazure/tensor) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/matazure/tensor/blob/master/LICENSE) [![jenkins](http://www.matazure.com:5193/job/mtensor/job/master/badge/icon)](http://www.matazure.com:5193/blue/organizations/jenkins/mtensor/activity)
 
 mtensor是一个支持延迟计算的多维数组计算库, 同时支持C++和CUDA平台
 
@@ -147,7 +147,7 @@ docker build . -f dockerfile/tensor-dev-ubuntu18.04.dockerfile -t tensor-dev
 从github上克隆代码
 
 ```bash
-git clone https://github.com/Matazure/tensor.git
+git clone https://github.com/matazure/tensor.git
 ```
 
 使用编译脚本编译相关代码
