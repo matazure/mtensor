@@ -6,21 +6,48 @@
 using namespace matazure;
 using namespace testing;
 
-struct test_op {
-    int __device__ __host__ operator()(pointi<2> idx) const { return 3; }
+struct device_functor {
+    __device__ int operator()(pointi<2> idx) const { return 3; }
 };
 
-TEST(MakeCudaLambdaTensor, TestMakeByLambda) {
-    auto clt_test1 = cuda::make_lambda(pointi<2>{1000, 1000},
-                                       [] __matazure__(pointi<2> idx) -> int { return idx[0]; })
-                         .persist();
-    auto clt_test2 = cuda::make_lambda(pointi<2>{1000, 1000}, test_op{}).persist();
+struct general_functor {
+    __host__ __device__ int operator()(pointi<2> idx) const { return 3; }
+};
 
-    // compile error!
-    // type traits not work
-    // auto clt_test3 = cuda::make_lambda(pointi<2>{1000, 1000},
-    //                                    [] __device__(pointi<2> idx) -> int { return idx[0]; })
+struct host_functor {
+    __host__ int operator()(pointi<2> idx) const { return 3; }
+};
+
+TEST(CudaLambdaTensor, MakeByLambdaFunctor) {
+    pointi<2> shape{10, 10};
+    auto ts_test1 =
+        cuda::make_lambda(shape, [] __host__ __device__(pointi<2> idx) -> int { return idx[0]; })
+            .persist();
+
+    // Compiler Error, need __host__ __device__
+    // auto ts_test2 = cuda::make_lambda(shape,
+    //                                    [] __device__(pointi<2> idx) -> int { return idx[0];
+    //                                    })
     //                      .persist();
 
-    // nvstd::function<int(void)> t = test_op{};
+    auto ts_test3 = cuda::make_lambda(shape, device_functor{}).persist();
+}
+
+TEST(CudaLambdaTensor, MakeByStructFunctor) {
+    pointi<2> shape{10, 10};
+    auto ts_test1 = cuda::make_lambda(shape, device_functor{}).persist();
+    auto ts_test2 = cuda::make_lambda(shape, general_functor{}).persist();
+
+    // auto ts_test3 =
+    // cuda::make_lambda(shape, host_functor{}).persist();  // Run Error, unspecial launch failure
+}
+
+TEST(CudaLambdaTensor, MakeByArrayAndLinearIndex) {
+    pointi<2> shape{10, 10};
+    auto ts_test1 =
+        cuda::make_lambda(shape, [] __host__ __device__(pointi<2> idx) -> int { return idx[0]; })
+            .persist();
+
+    auto ts_test2 =
+        cuda::make_lambda(shape, [] __host__ __device__(int_t i) -> int { return i; }).persist();
 }
