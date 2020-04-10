@@ -26,7 +26,6 @@ int main(int argc, char* argv[]) {
     };
 
     cuda::for_index(shape, functor);
-    //阻塞等待执行完毕， 这是必须的
 
     //将gpu上数据拷贝会cpu
     mem_copy(cts_c, ts_c);
