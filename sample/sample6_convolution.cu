@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
             for_index(zero<pointi<2>>::value(), ckernel_mean.shape(), [&](const pointi<2>& idx) {
                 sum += sh_ts_block(block_idx.local + idx - padding) * ckernel_mean(idx);
             });
-            cimg_mean[valid_global_idx] = sum;
+            cimg_mean(valid_global_idx) = sum;
         }
     });
 

@@ -66,13 +66,13 @@ class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout, _Allocator
     MATAZURE_GENERAL
     shared_ptr<value_type> shared_data() const { return sp_data_; }
 
-    MATAZURE_GENERAL reference operator[](const pointi<rank>& index) const {
+    MATAZURE_GENERAL reference operator()(const pointi<rank>& index) const {
         return (*this)[layout_.index2offset(index)];
     }
 
     template <typename... _Idx>
     MATAZURE_GENERAL reference operator()(_Idx... idx) const {
-        return (*this)[pointi<rank>{idx...}];
+        return (*this)(pointi<rank>{idx...});
     }
 
     MATAZURE_GENERAL reference operator[](int_t i) const { return data_[i]; }

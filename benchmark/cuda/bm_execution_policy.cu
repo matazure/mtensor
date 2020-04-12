@@ -2,11 +2,11 @@
 
 __global__ void kernel_1M_flops(float* p_src, float* p_dst, int_t size) {
     for (int_t i = threadIdx.x + blockIdx.x * blockDim.x; i < size; i += blockDim.x * gridDim.x) {
-        auto tmp = p_dst[i];
+        auto tmp = p_src[i];
         for (int_t k = 0; k < 1000000; ++k) {
             tmp *= 1.01f;
         }
-        p_src[i] = tmp;
+        p_dst[i] = tmp;
     }
 }
 

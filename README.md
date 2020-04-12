@@ -187,7 +187,7 @@ int main(int argc, char* argv[]) {
             for_index(pointi<2>{0, 0}, ckernel_mean.shape(), [&](const pointi<2>& idx) {
                 sum += sh_ts_block(block_idx.local + idx - padding) * ckernel_mean(idx);
             });
-            cimg_mean[block_idx.global] = sum;
+            cimg_mean(block_idx.global) = sum;
         }
     });
 

@@ -7,5 +7,6 @@ add_executable(bm_cuda_mtensor
     bm_execution_policy.cu
     bm_mem_copy.cu
     bm_conv.cu
+    bm_block_for_index.cu
 )
 target_link_libraries(bm_cuda_mtensor mtensor benchmark)

@@ -103,7 +103,7 @@ inline void transform(_ExectutionPolicy policy, _TensorSrc ts_src, _TensorDst ts
                                   are_device_memory<decay_t<_TensorSrc>>::value>* = 0) {
     cuda::for_index(
         policy, zero<pointi<_TensorSrc::rank>>::value(), ts_src.shape(),
-        [=] MATAZURE_DEVICE(pointi<_TensorSrc::rank> idx) { ts_dst[idx] = fun(ts_src[idx]); });
+        [=] MATAZURE_DEVICE(pointi<_TensorSrc::rank> idx) { ts_dst(idx) = fun(ts_src(idx)); });
 }
 
 /**
