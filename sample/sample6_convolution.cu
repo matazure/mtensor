@@ -24,14 +24,6 @@ int main(int argc, char* argv[]) {
     auto grid_dim = (img_rgb.shape() + valid_block_dim - pointi<2>{1, 1}) / valid_block_dim;
     auto padding = kernel_mean.shape() / 2;
 
-    //拷贝padding的图像
-    cuda::tensor<pointf<3>, 2> cimg_padding_container(cimg_rgb.shape() + ckernel_mean.shape() -
-                                                      pointi<2>{1, 1});
-    auto cimg_padding_view = view::crop(cimg_padding_container, padding, cimg_rgb.shape());
-    cuda::for_index(cimg_rgb.shape(), [=] __device__(pointi<2> idx) {
-        cimg_padding_view(idx) = point_cast<float>(cimg_rgb(idx));
-    });
-
     cuda::tensor<pointf<3>, 2> cimg_mean(img_rgb.shape());
 
     cuda::block_for_index<BLOCK_DIM>(grid_dim, [=] __device__(
@@ -39,8 +31,8 @@ int main(int argc, char* argv[]) {
         auto valid_global_idx = valid_block_dim * block_idx.block + block_idx.local - padding;
         __shared__ local_tensor<pointf<3>, BLOCK_DIM> sh_ts_block;
 
-        if (inside_rect(valid_global_idx, -padding, cimg_padding_view.shape() + padding * 2)) {
-            sh_ts_block(block_idx.local) = cimg_padding_view(valid_global_idx);
+        if (inside_rect(valid_global_idx, pointi<2>{0, 0}, cimg_rgb.shape())) {
+            sh_ts_block(block_idx.local) = point_cast<float>(cimg_rgb(valid_global_idx));
         } else {
             sh_ts_block(block_idx.local) = zero<pointf<3>>::value();
         }
@@ -49,7 +41,7 @@ int main(int argc, char* argv[]) {
 
         if (inside_rect(block_idx.local, padding,
                         block_idx.block_dim - ckernel_mean.shape() + pointi<2>{1, 1}) &&
-            inside_rect(valid_global_idx, zero<pointi<2>>::value(), cimg_padding_view.shape())) {
+            inside_rect(valid_global_idx, zero<pointi<2>>::value(), cimg_rgb.shape())) {
             auto sum = zero<pointf<3>>::value();
             for_index(zero<pointi<2>>::value(), ckernel_mean.shape(), [&](const pointi<2>& idx) {
                 sum += sh_ts_block(block_idx.local + idx - padding) * ckernel_mean(idx);
