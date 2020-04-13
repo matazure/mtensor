@@ -138,4 +138,16 @@ MATAZURE_GENERAL inline void for_index(pointi<_Rank> end, _Func fun) {
     for_index(zero<pointi<_Rank>>::value(), end, fun);
 }
 
+MATAZURE_NV_EXE_CHECK_DISABLE
+template <typename _Policy, typename _Func>
+MATAZURE_GENERAL inline void for_index(_Policy policy, int_t last, _Func fun) {
+    for_index(policy, 0, last, fun);
+}
+
+MATAZURE_NV_EXE_CHECK_DISABLE
+template <typename _Policy, typename _Func, int_t _Rank>
+MATAZURE_GENERAL inline void for_index(_Policy policy, pointi<_Rank> end, _Func fun) {
+    for_index(policy, zero<pointi<_Rank>>::value(), end, fun);
+}
+
 }  // namespace matazure

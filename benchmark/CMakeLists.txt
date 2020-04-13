@@ -6,6 +6,7 @@ add_executable(bm_host_mtensor
     bm_view.cpp
     bm_mem_copy.cpp
     bm_conv.cpp
+    bm_omp_for_index.cpp
 )
 target_link_libraries(bm_host_mtensor mtensor benchmark)
 
