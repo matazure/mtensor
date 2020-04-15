@@ -35,14 +35,15 @@ template <typename _Ext, typename _Fun, typename _ExecutionPolicy>
 inline void block_for_index(_ExecutionPolicy policy, pointi<_Ext::size()> grid_ext, _Fun fun) {
     auto grid_dim = internal::pointi_to_dim3(grid_ext);
     auto block_dim = internal::pointi_to_dim3(_Ext::value());
-    kernel<<<grid_dim, block_dim, policy.shared_mem_bytes, policy.stream>>>([=] MATAZURE_DEVICE() {
-        auto local = internal::uint3_to_pointi<_Ext::size()>(threadIdx);
-        auto block = internal::uint3_to_pointi<_Ext::size()>(blockIdx);
-        auto block_dim = internal::dim3_to_pointi<_Ext::size()>(blockDim);
-        auto global = block * block_dim + local;
-        block_index<_Ext> block_idx(grid_ext, local, block, global);
-        fun(block_idx);
-    });
+    kernel<<<grid_dim, block_dim, policy.shared_mem_bytes(), policy.stream()>>>(
+        [=] MATAZURE_DEVICE() {
+            auto local = internal::uint3_to_pointi<_Ext::size()>(threadIdx);
+            auto block = internal::uint3_to_pointi<_Ext::size()>(blockIdx);
+            auto block_dim = internal::dim3_to_pointi<_Ext::size()>(blockDim);
+            auto global = block * block_dim + local;
+            block_index<_Ext> block_idx(grid_ext, local, block, global);
+            fun(block_idx);
+        });
 
     cudaStreamSynchronize(nullptr);
 

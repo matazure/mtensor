@@ -21,9 +21,17 @@ void bm_cuda_tensor_block_conv_halo(benchmark::State& state) {
     cuda::tensor<float, 2> ts_kernel(pointi<2>{3, 3});
     auto padding = ts_kernel.shape() / 2;
 
+    cuda::execution_policy policy;
+
     while (state.KeepRunning()) {
-        cuda::block_for_index<BLOCK_DIM>(grid_dim, [=] __device__(
-                                                       cuda::block_index<BLOCK_DIM> block_idx) {
+        cudaEvent_t events[2];
+        cudaEventCreate(&events[0]);
+        cudaEventCreate(&events[1]);
+
+        cudaEventRecord(events[0], nullptr);
+
+        cuda::block_for_index<
+            BLOCK_DIM>(policy, grid_dim, [=] __device__(cuda::block_index<BLOCK_DIM> block_idx) {
             //  使用shared memory以获取更好的速度
             __shared__ local_tensor<float, BLOCK_DIM> sh_ts_block;
             //  若是无效区域则填充0
@@ -46,6 +54,18 @@ void bm_cuda_tensor_block_conv_halo(benchmark::State& state) {
                 ts_dst(block_idx.global) = re;
             }
         });
+
+        cudaEventRecord(events[1], nullptr);
+
+        policy.synchronize();
+
+        float avg_ms;
+        cudaEventElapsedTime(&avg_ms, events[0], events[1]);
+
+        state.SetIterationTime(avg_ms / 1000.0f);
+
+        cudaEventDestroy(events[0]);
+        cudaEventDestroy(events[1]);
     }
 
     state.SetBytesProcessed(state.iterations() * static_cast<size_t>(ts_src.size()) *
