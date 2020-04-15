@@ -207,6 +207,16 @@ int main(int argc, char* argv[]) {
 
 [sample](sample)下有更多的示例可供参考
 
+## 环境要求
+
+* 需要编译器开启C++11的支持
+* GPU上运行，需CUDA10.0及其以上版本, 并加入编译参数"--expt-extended-lambda"和"-std=c++11"
+
+## 环境要求
+
+* 需要编译器开启C++11的支持
+* GPU上运行，需CUDA10.0及其以上版本, 并加入编译参数"--expt-extended-lambda"和"-std=c++11"
+
 ## 编译
 
 需先安装[git](https://git-scm.com/)和[CMake](https://cmake.org/)及相应的编译工具g++/clang
@@ -247,12 +257,6 @@ git clone https://github.com/matazure/tensor.git
     set(CMAKE_CUDA_STANDARD 11)
     set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-extended-lambda")
 ```
-
-## 环境要求
-
-* 需要编译器开启C++11的支持
-* GPU上运行，需CUDA10.0及其以上版本, 并加入编译参数"--expt-extended-lambda"和"-std=c++11"
-* 
 
 ## 和其他开源库的比较
 

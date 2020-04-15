@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <matazure/for_index.hpp>
+#include <matazure/layout.hpp>
 
 namespace matazure {
 
