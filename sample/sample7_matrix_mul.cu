@@ -38,6 +38,7 @@ int main(int argc, char* argv[]) {
                                              for (int_t N = 0; N < BLOCK_SIZE; N++) {
                                                  sum += local_a(row, N) * local_b(N, col);
                                              }
+                                             cuda::syncthreads();
                                          }
 
                                          cmat_c(block_idx.global) = sum;

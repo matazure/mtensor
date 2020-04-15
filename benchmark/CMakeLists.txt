@@ -9,7 +9,9 @@ set(bm_host_srcs
     bm_conv.cpp
 )
 
-list(APPEND bm_host_srcs bm_omp_for_index.cpp)
+if (WITH_OPENMP)
+    list(APPEND bm_host_srcs bm_omp_for_index.cpp)
+endif()
 
 add_executable(bm_host_mtensor 
 ${bm_host_srcs}

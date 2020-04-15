@@ -36,10 +36,11 @@ if(WITH_CUDA)
 	endif()
 
 	enable_language(CUDA)
-	set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-extended-lambda")
+	set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-extended-lambda -arch=sm_75")
+
 endif()
 
-option(WITH_OPENMP "With OpenMP" ON)
+option(WITH_OPENMP "With OpenMP" OFF)
 if(WITH_OPENMP)
 	find_package(OpenMP REQUIRED)
 	# clang not surpport
