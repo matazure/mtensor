@@ -52,7 +52,6 @@ template <typename _ValueType, int_t _Rank, typename _Layout = column_major_layo
           typename _Allocator = std::allocator<_ValueType>>
 class tensor : public tensor_expression<tensor<_ValueType, _Rank, _Layout, _Allocator>> {
    public:
-    // static_assert(std::is_pod<_ValueType>::value, "only supports pod type now");
     /// the rank of tensor
     static const int_t rank = _Rank;
     /**

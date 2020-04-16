@@ -16,8 +16,6 @@ template <typename _Type, int_t _Rank, typename _Layout = column_major_layout<_R
           typename _Allocator = cuda::allocator<_Type>>
 class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout, _Allocator>> {
    public:
-    static_assert(std::is_pod<_Type>::value, "only supports pod type now");
-
     static const int_t rank = _Rank;
     typedef _Type value_type;
     typedef value_type& reference;
