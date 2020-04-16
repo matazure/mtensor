@@ -67,6 +67,8 @@ class padding_layout {
 
     MATAZURE_GENERAL pointi<rank> stride() const { return stride_; }
 
+    MATAZURE_GENERAL int_t size() const { return stride_[rank - 1]; };
+
     MATAZURE_GENERAL pointi<rank> origin_padding() const { return origin_padding_; }
 
     MATAZURE_GENERAL pointi<rank> end_padding() const { return end_padding_; }

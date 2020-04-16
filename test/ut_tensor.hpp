@@ -41,3 +41,19 @@ TEST(TensorTests, ConstructByZero) {
         }
     }
 }
+
+TEST(TensorTests, Layout) {
+    tensor<float, 2, column_major_layout<2>> ts_column{{00, 01, 02}, {10, 11, 12}};
+    std::cout << "column major layout: " << std::endl;
+    for (int_t i = 0; i < ts_column.size(); ++i) {
+        std::cout << ts_column[i] << ", ";
+    }
+    std::cout << std::endl;
+
+    tensor<float, 2, row_major_layout<2>> ts_row{{00, 01, 02}, {10, 11, 12}};
+    std::cout << "row major layout: " << std::endl;
+    for (int_t i = 0; i < ts_row.size(); ++i) {
+        std::cout << ts_row[i] << ", ";
+    }
+    std::cout << std::endl;
+}

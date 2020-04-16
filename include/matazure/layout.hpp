@@ -55,6 +55,8 @@ class column_major_layout {
 
     MATAZURE_GENERAL pointi<rank> stride() const { return stride_; }
 
+    MATAZURE_GENERAL int_t size() const { return stride_[rank - 1]; };
+
     MATAZURE_GENERAL ~column_major_layout() {}
 
    private:
@@ -68,9 +70,9 @@ class row_major_layout {
     const static int_t rank = _Rank;
 
     MATAZURE_GENERAL row_major_layout(const pointi<rank>& shape) : shape_(shape) {
-        stride_[0] = shape[0];
-        for (int_t i = 1; i < rank; ++i) {
-            stride_[i] = shape[i] * stride_[i - 1];
+        stride_[rank - 1] = shape[rank - 1];
+        for (int_t i = rank - 2; i >= 0; --i) {
+            stride_[i] = shape[i] * stride_[i + 1];
         }
     }
 
@@ -85,23 +87,24 @@ class row_major_layout {
 
     MATAZURE_GENERAL int_t index2offset(const pointi<rank>& id) const {
         typename pointi<rank>::value_type offset = id[rank - 1];
-        for (int_t i = 1; i < rank; ++i) {
-            offset += id[rank - 1 - i] * stride_[i - 1];
+        for (int_t i = rank - 2; i >= 0; --i) {
+            offset += id[i] * stride_[i + 1];
         }
-
         return offset;
     };
 
     MATAZURE_GENERAL pointi<rank> offset2index(int_t offset) const {
-        pointi<rank> id{};
-        for (int_t i = rank - 1; i > 0; --i) {
-            id[rank - 1 - i] = offset / stride_[i - 1];
-            offset = offset % stride_[i - 1];
+        pointi<rank> id;
+        for (int_t i = 0; i < rank - 1; ++i) {
+            id[i] = offset / stride_[i + 1];
+            offset = offset % stride_[i + 1];
         }
         id[rank - 1] = offset;
 
         return id;
     }
+
+    MATAZURE_GENERAL int_t size() const { return stride_[0]; }
 
     MATAZURE_GENERAL pointi<rank> shape() const { return shape_; }
 

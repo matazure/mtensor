@@ -81,7 +81,7 @@ class tensor : public tensor_expression<tensor<_ValueType, _Rank, _Layout, _Allo
     explicit tensor(pointi<rank> ext)
         : shape_(ext),
           layout_(ext),
-          sp_data_(malloc_shared_memory(layout_.stride()[rank - 1])),
+          sp_data_(malloc_shared_memory(layout_.size())),
           data_(sp_data_.get()) {}
 
     /**
@@ -107,7 +107,7 @@ class tensor : public tensor_expression<tensor<_ValueType, _Rank, _Layout, _Allo
                     const pointi<rank>& end_padding)
         : shape_(shape),
           layout_(shape, origin_padding, end_padding),
-          sp_data_(malloc_shared_memory(layout_.stride()[rank - 1])),
+          sp_data_(malloc_shared_memory(layout_.size())),
           data_(sp_data_.get()) {}
 
     /**
@@ -193,7 +193,7 @@ class tensor : public tensor_expression<tensor<_ValueType, _Rank, _Layout, _Allo
     pointi<rank> shape() const { return shape_; }
 
     /// return the total size of tensor elements
-    int_t size() const { return layout_.stride()[rank - 1]; }
+    int_t size() const { return layout_.size(); }
 
     /// return the shared point of tensor elements
     shared_ptr<value_type> shared_data() const { return sp_data_; }

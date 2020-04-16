@@ -51,7 +51,7 @@ class lambda_tensor : public tensor_expression<lambda_tensor<_Rank, _Func, _Layo
     }
 
     MATAZURE_GENERAL pointi<rank> shape() const { return shape_; }
-    MATAZURE_GENERAL int_t size() const { return layout_.stride()[rank - 1]; }
+    MATAZURE_GENERAL int_t size() const { return layout_.size(); }
 
    public:
 #pragma nv_exec_check_disable

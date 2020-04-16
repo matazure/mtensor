@@ -110,7 +110,7 @@ class lambda_tensor : public tensor_expression<lambda_tensor<_Rank, _Func, _Layo
     pointi<rank> shape() const { return shape_; }
 
     /// return the total size of lambda_tensor elements
-    int_t size() const { return layout_.stride()[rank - 1]; }
+    int_t size() const { return layout_.size(); }
 
     /**
      * @brief perisits a lambdd_tensor to a tensor with memory

@@ -35,7 +35,7 @@ class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout, _Allocator
     explicit tensor(pointi<rank> ext)
         : shape_(ext),
           layout_(ext),
-          sp_data_(malloc_shared_memory(layout_.stride()[rank - 1])),
+          sp_data_(malloc_shared_memory(layout_.size())),
           data_(sp_data_.get()) {}
 
     explicit tensor(pointi<rank> ext, std::shared_ptr<value_type> sp_data)
@@ -50,7 +50,7 @@ class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout, _Allocator
                     const pointi<rank>& end_padding)
         : shape_(shape),
           layout_(shape, origin_padding, end_padding),
-          sp_data_(malloc_shared_memory(layout_.stride()[rank - 1])),
+          sp_data_(malloc_shared_memory(layout_.size())),
           data_(sp_data_.get()) {}
 
     template <typename _VT>
@@ -80,7 +80,7 @@ class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout, _Allocator
     MATAZURE_GENERAL pointi<rank> shape() const { return shape_; }
 
     MATAZURE_GENERAL pointi<rank> stride() const { return layout_.stride(); }
-    MATAZURE_GENERAL int_t size() const { return layout_.stride()[rank - 1]; }
+    MATAZURE_GENERAL int_t size() const { return layout_.size(); }
 
     MATAZURE_GENERAL pointer data() const { return data_; }
 
