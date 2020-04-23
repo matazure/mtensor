@@ -36,7 +36,7 @@ void bm_omp_for_index_array(benchmark::State& state) {
     tensor<float, _Rank> ts2(ts1.shape());
     while (state.KeepRunning()) {
         for_index(_ExecutionPolicy{}, pointi<_Rank>{0}, ts1.shape(), [=](pointi<_Rank> idx) {
-            ts2[idx] = std::sin(ts1[idx]) / ts2[idx] + std::sqrt(ts2[idx]) * ts1[idx];
+            ts2(idx) = std::sin(ts1(idx)) / ts2(idx) + std::sqrt(ts2(idx)) * ts1(idx);
         });
     }
 

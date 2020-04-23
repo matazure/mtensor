@@ -22,7 +22,7 @@ struct clamp_op {
     MATAZURE_GENERAL auto operator()(pointi<_Tensor::rank> idx) const
         -> decltype(zero<decay_t<typename _Tensor::value_type>>::value()) {
         if (MATAZURE_LIKELY(inside_rect(idx, zero<pointi<_Tensor::rank>>::value(), ts_.shape()))) {
-            return ts_[idx];
+            return ts_(idx);
         } else {
             return zero<typename _Tensor::value_type>::value();
         }
@@ -35,8 +35,9 @@ struct clamp_op {
  * @return a clamped indexing lambda_tensor
  */
 template <typename _Tensor>
-inline auto clamp(_Tensor ts) -> decltype(make_lambda(ts.shape(), clamp_op<decay_t<_Tensor>>(ts),
-                                                      typename _Tensor::memory_type{})) {
+inline auto clamp_zero(_Tensor ts)
+    -> decltype(make_lambda(ts.shape(), clamp_op<decay_t<_Tensor>>(ts),
+                            typename _Tensor::memory_type{})) {
     return make_lambda(ts.shape(), clamp_op<decay_t<_Tensor>>(ts), typename _Tensor::memory_type{});
 }
 

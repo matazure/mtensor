@@ -18,7 +18,7 @@ inline void for_each(_ExecutionPolicy policy, _Tensor ts, _Fun fun,
                      enable_if_t<are_device_memory<decay_t<_Tensor>>::value &&
                                  !are_linear_index<decay_t<_Tensor>>::value>* = 0) {
     cuda::for_index(policy, zero<pointi<_Tensor::rank>>::value(), ts.shape(),
-                    [=] MATAZURE_DEVICE(pointi<_Tensor::rank> idx) { fun(ts[idx]); });
+                    [=] MATAZURE_DEVICE(pointi<_Tensor::rank> idx) { fun(ts(idx)); });
 }
 
 template <typename _Tensor, typename _Fun>

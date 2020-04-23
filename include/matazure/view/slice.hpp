@@ -21,8 +21,8 @@ struct slice_functor {
     slice_functor(_Tensor ts, int_t slice_i) : ts_(ts), slice_i_(slice_i) {}
 
     MATAZURE_GENERAL auto operator()(pointi<_Tensor::rank - 1> idx) const
-        -> decltype((ts_[cat_point<_SliceDimIdx>(idx, slice_i_)])) {
-        return ts_[cat_point<_SliceDimIdx>(idx, slice_i_)];
+        -> decltype((ts_(cat_point<_SliceDimIdx>(idx, slice_i_)))) {
+        return ts_(cat_point<_SliceDimIdx>(idx, slice_i_));
     }
 };
 

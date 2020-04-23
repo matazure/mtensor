@@ -30,3 +30,6 @@ endif ()
 add_executable(sample5_gradient sample5_gradient.cpp)
 target_link_libraries(sample5_gradient mtensor image_helper)
 
+add_executable(sample_level_set sample_level_set.cpp)
+target_link_libraries(sample_level_set mtensor image_helper)
+

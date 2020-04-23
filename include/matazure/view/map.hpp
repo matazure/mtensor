@@ -1,3 +1,17 @@
+
+#pragma once
+
+#include <matazure/algorithm.hpp>
+#include <matazure/lambda_tensor.hpp>
+#include <matazure/tensor.hpp>
+
+#ifdef MATAZURE_CUDA
+#include <matazure/cuda/tensor.hpp>
+#endif
+
+namespace matazure {
+namespace view {
+
 template <typename _Tensor, typename _Func>
 struct linear_map_op {
    private:
@@ -22,8 +36,8 @@ struct array_map_op {
     array_map_op(_Tensor ts, _Func fun) : ts_(ts), functor_(fun) {}
 
     MATAZURE_GENERAL auto operator()(pointi<_Tensor::rank> idx) const
-        -> decltype(this->functor_(this->ts_[idx])) {
-        return functor_(ts_[idx]);
+        -> decltype(this->functor_(this->ts_(idx))) {
+        return functor_(ts_(idx));
     }
 };
 
@@ -54,3 +68,6 @@ inline auto map(_Tensor ts, _Func fun,
     return make_lambda(ts.shape(), array_map_op<_Tensor, _Func>(ts, fun),
                        typename _Tensor::memory_type{});
 }
+
+}  // namespace view
+}  // namespace matazure

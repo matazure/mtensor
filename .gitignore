@@ -57,3 +57,5 @@ core*
 *.bmp
 
 lenna.png
+
+*.raw

@@ -1,12 +1,6 @@
 #pragma once
 
-#include <matazure/algorithm.hpp>
-#include <matazure/lambda_tensor.hpp>
-#include <matazure/tensor.hpp>
-
-#ifdef MATAZURE_CUDA
-#include <matazure/cuda/tensor.hpp>
-#endif
+#include <matazure/view/map.hpp>
 
 namespace matazure {
 namespace view {
@@ -39,8 +33,8 @@ struct cast_functor<point<_OutPointValueType, _Rank>> {
  */
 template <typename _ValueType, typename _Tensor>
 inline auto cast(_Tensor tensor, enable_if_t<is_tensor<_Tensor>::value>* = 0)
-    -> decltype(apply(tensor, cast_functor<_ValueType>())) {
-    return apply(tensor, cast_functor<_ValueType>());
+    -> decltype(map(tensor, cast_functor<_ValueType>())) {
+    return map(tensor, cast_functor<_ValueType>());
 }
 
 }  // namespace view

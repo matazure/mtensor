@@ -43,7 +43,7 @@ template <typename _ExectutionPolicy, typename _Tensor, typename _Fun>
 inline void for_each(_ExectutionPolicy policy, _Tensor&& ts, _Fun fun,
                      enable_if_t<!are_linear_index<decay_t<_Tensor>>::value &&
                                  none_device_memory<decay_t<_Tensor>>::value>* = 0) {
-    for_index(policy, zero<pointi<decay_t<_Tensor>::rank>>::values(), ts.shape(),
+    for_index(policy, zero<pointi<decay_t<_Tensor>::rank>>::value(), ts.shape(),
               [&](pointi<decay_t<_Tensor>::rank> idx) {
                   fun(ts(internal::get_array_index_by_layout(idx, ts.layout())));
               });
@@ -164,7 +164,7 @@ inline void transform(_ExectutionPolicy policy, const _TensorSrc& ts_src, _Tenso
                                   none_device_memory<decay_t<_TensorSrc>>::value>* = 0) {
     for_index(policy, zero<pointi<_TensorSrc::rank>>::value(), ts_src.shape(),
               [&](pointi<_TensorSrc::rank> idx) {
-                  ts_dst[idx] =
+                  ts_dst(idx) =
                       fun(ts_src(internal::get_array_index_by_layout(idx, ts_src.layout())));
               });
 }

@@ -39,8 +39,8 @@ namespace matazure {
         MATAZURE_GENERAL name(_T1 x1, _T2 x2) : x1_(x1), x2_(x2) {}          \
                                                                              \
         MATAZURE_GENERAL auto operator()(const pointi<_T1::rank>& idx) const \
-            -> decltype(this->x1_[idx] op this->x2_[idx]) {                  \
-            return x1_[idx] op x2_[idx];                                     \
+            -> decltype(this->x1_(idx) op this->x2_(idx)) {                  \
+            return x1_(idx) op x2_(idx);                                     \
         }                                                                    \
     };
 
@@ -74,8 +74,8 @@ namespace matazure {
         name(_T x, value_type v) : x_(x), v_(v) {}                          \
                                                                             \
         MATAZURE_GENERAL auto operator()(const pointi<_T::rank>& idx) const \
-            -> decltype(this->x_[idx] op this->v_) {                        \
-            return x_[idx] op v_;                                           \
+            -> decltype(this->x_(idx) op this->v_) {                        \
+            return x_(idx) op v_;                                           \
         }                                                                   \
     };
 
@@ -92,7 +92,7 @@ namespace matazure {
         name(value_type v, _T x) : v_(v), x_(x) {}                           \
                                                                              \
         MATAZURE_GENERAL auto operator()(const int_t& i) const               \
-            -> decltype((this->_v)op(this->x_[i])) {                         \
+            -> decltype((this->v_)op(this->x_[i])) {                         \
             return v_ op x_[i];                                              \
         }                                                                    \
     };
@@ -110,8 +110,8 @@ namespace matazure {
         name(_T x, value_type v) : v_(v), x_(x) {}                          \
                                                                             \
         MATAZURE_GENERAL auto operator()(const pointi<_T::rank>& idx) const \
-            -> decltype(this->v_ op this->x_[idx]) {                        \
-            return v_ op x_[idx];                                           \
+            -> decltype(this->v_ op this->x_(idx)) {                        \
+            return v_ op x_(idx);                                           \
         }                                                                   \
     };
 
@@ -176,7 +176,7 @@ namespace matazure {
                        lambda_tensor<_TS::rank, __##name##_value_with_array_indexensor__<_TS>>> \
     operator op(typename _TS::value_type v, const tensor_expression<_TS>& e_ts) {               \
         return make_lambda(e_ts().shape(),                                                      \
-                           __##name##_value_with_array_indexensor__<_TS>(v, e_ts()));           \
+                           __##name##_value_with_array_indexensor__<_TS>(e_ts(), v));           \
     }
 
 // device tensor operations

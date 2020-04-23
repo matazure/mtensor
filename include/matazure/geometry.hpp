@@ -15,9 +15,8 @@ template <int_t _Rank>
 inline MATAZURE_GENERAL bool inside_rect(point<int_t, _Rank> idx, point<int_t, _Rank> origin,
                                          point<int_t, _Rank> rect) {
     for (int_t i = 0; i < _Rank; ++i) {
-        if (idx[i] < origin[i] || idx[i] >= origin[i] + rect[i]) return false;
-        // if (static_cast<uint_t>(idx[i] - origin[i]) >= static_cast<uint_t>(rect[i])) return
-        // false;
+        // if (idx[i] < origin[i] || idx[i] >= origin[i] + rect[i]) return false;
+        if (static_cast<uint_t>(idx[i] - origin[i]) >= static_cast<uint_t>(rect[i])) return false;
     }
 
     return true;
