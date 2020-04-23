@@ -6,58 +6,86 @@
 namespace matazure {
 namespace view {
 
+template <typename _Tensor>
+struct gradient_op {
+    __matazure__ point<typename _Tensor::value_type, _Tensor::rank> operator()(point2i idx) const {
+        point<typename _Tensor::value_type, 2> re;
+        re[0] = image(idx + point2i{1, 0}) - image(idx + point2i{-1, 0});
+        re[1] = image(idx + point2i{0, 1}) - image(idx + point2i{0, -1});
+
+        return re;
+    }
+
+    _Tensor image;
+};
+
 template <typename image_type>
-inline auto gradient(image_type image) {
+inline auto gradient(image_type image)
+    -> decltype(make_lambda(image.shape(), gradient_op<image_type>{image},
+                            typename image_type::memory_type{})) {
     using value_type = typename image_type::value_type;
     static const int_t rank = image_type::rank;
 
-    return make_lambda(image.shape(), [=](pointi<rank> idx) {
-        point<value_type, rank> re;
-        re[0] = image(idx + pointi<rank>{1, 0}) - image(idx + pointi<rank>{-1, 0});
-        re[1] = image(idx + pointi<rank>{0, 1}) - image(idx + pointi<rank>{0, -1});
-
-        return re;
-    });
+    return make_lambda(image.shape(), gradient_op<image_type>{image},
+                       typename image_type::memory_type{});
 }
 
+template <typename _Tensor>
+struct div_op {
+    __matazure__ typename _Tensor::value_type::value_type operator()(point2i idx) const {
+        auto nxx = field(idx + point2i{1, 0})[0] - field(idx + point2i{-1, 0})[0];
+        auto nyy = field(idx + point2i{0, 1})[1] - field(idx + point2i{0, -1})[1];
+        return nxx + nyy;
+    }
+
+    _Tensor field;
+};
+
 template <typename field_type>
-inline auto div(field_type field) {
+inline auto div(field_type field) -> decltype(make_lambda(field.shape(), div_op<field_type>{field},
+                                                          typename field_type::memory_type{})) {
     static const int_t rank = field_type::rank;
     typedef typename field_type::value_type field_value_type;
     typedef typename field_value_type::value_type value_type;
 
-    return make_lambda(field.shape(), [=](pointi<rank> idx) {
-        auto nxx = field(idx + point2i{1, 0})[0] - field(idx + point2i{-1, 0})[0];
-        auto nyy = field(idx + point2i{0, 1})[1] - field(idx + point2i{0, -1})[1];
-        return nxx + nyy;
-    });
+    return make_lambda(field.shape(), div_op<field_type>{field},
+                       typename field_type::memory_type{});
 }
 
-template <typename image_type>
-auto laplace(image_type image) {
-    using value_type = typename image_type::value_type;
-    static const int_t rank = image_type::rank;
-    return make_lambda(image.shape(), [=](pointi<rank> idx) {
+template <typename _Tensor>
+struct laplace_op {
+    __matazure__ typename _Tensor::value_type operator()(point2i idx) const {
         auto tmp = -4 * image(idx);
         tmp = tmp + image(idx + pointi<2>{-1, 0});
         tmp = tmp + image(idx + pointi<2>{1, 0});
         tmp = tmp + image(idx + pointi<2>{0, -1});
         tmp = tmp + image(idx + pointi<2>{0, 1});
         return tmp;
-    });
+    }
+
+    _Tensor image;
+};
+
+template <typename image_type>
+auto laplace(image_type image) -> decltype(make_lambda(image.shape(), laplace_op<image_type>{image},
+                                                       typename image_type::memory_type{})) {
+    using value_type = typename image_type::value_type;
+    static const int_t rank = image_type::rank;
+    return make_lambda(image.shape(), laplace_op<image_type>{image},
+                       typename image_type::memory_type{});
 }
 
 }  // namespace view
 }  // namespace matazure
 
 template <typename _ValueType, int_t _Rank>
-inline auto normalize(const point<_ValueType, _Rank>& vec) {
+MATAZURE_GENERAL inline auto normalize(const point<_ValueType, _Rank>& vec) {
     _ValueType sum_norm2 = 0;
     for (int_t i = 0; i < _Rank; ++i) {
         sum_norm2 += vec[i] * vec[i];
     }
 
-    _ValueType scale = std::sqrt(sum_norm2);
+    _ValueType scale = sqrt(sum_norm2);
 
     point<_ValueType, _Rank> re;
     for (int_t i = 0; i < _Rank; ++i) {
@@ -68,51 +96,41 @@ inline auto normalize(const point<_ValueType, _Rank>& vec) {
 }
 
 template <typename image_type>
-inline image_type make_border_copy(image_type img, int_t border) {
+inline image_type make_border_copy(image_type img) {
     //
     static const int_t rank = image_type::rank;
     pointi<rank> padding;
-    fill(padding, border);
+    fill(padding, 1);
 
     image_type img_border(img.shape() + padding * 2);
     copy(img, view::crop(img_border, padding, img.shape()));
 
     auto shape = img_border.shape();
-
-    // top
-    for_index(point2i{0, 0}, point2i{shape[0], border},
-              [=](point2i idx) { img_border(idx) = img_border(idx[0], border); });
-
-    // bottom
-    for_index(point2i{0, shape[1] - border}, shape,
-              [=](point2i idx) { img_border(idx) = img_border(idx[0], shape[1] - 1 - border); });
-
-    // left
-    for_index(point2i{0, 0}, point2i{border, shape[1]},
-              [=](point2i idx) { img_border(idx) = img_border(border, idx[1]); });
-
-    // right
-    for_index(point2i{shape[0] - border, 0}, shape,
-              [=](point2i idx) { img_border(idx) = img_border(shape[0] - 1 - border, idx[1]); });
+    copy(view::slice<0>(img_border, 1), view::slice<0>(img_border, 0));
+    copy(view::slice<0>(img_border, shape[0] - 2), view::slice<0>(img_border, shape[0] - 1));
+    copy(view::slice<1>(img_border, 1), view::slice<1>(img_border, 0));
+    copy(view::slice<1>(img_border, shape[1] - 2), view::slice<1>(img_border, shape[1] - 1));
 
     return img_border;
 }
 
 template <typename image_type>
-inline auto gradient(image_type image) {
-    auto image_with_border = make_border_copy(image, 1);
+inline auto gradient(image_type image)
+    -> decltype(view::gradient(view::crop(image, point2i{1, 1}, image.shape())).persist()) {
+    auto image_with_border = make_border_copy(image);
     return view::gradient(view::crop(image_with_border, point2i{1, 1}, image.shape())).persist();
 }
 
 template <typename field_type>
-inline auto div(field_type field) {
-    auto field_with_border = make_border_copy(field, 1);
+inline auto div(field_type field)
+    -> decltype(view::div(view::crop(field, point2i{1, 1}, field.shape())).persist()) {
+    auto field_with_border = make_border_copy(field);
     return view::div(view::crop(field_with_border, point2i{1, 1}, field.shape())).persist();
 }
 
 template <typename image_type>
-inline auto laplace(image_type image) {
-    auto image_with_border = make_border_copy(image, 1);
+inline image_type laplace(image_type image) {
+    auto image_with_border = make_border_copy(image);
     return view::laplace(view::crop(image_with_border, point2i{1, 1}, image.shape())).persist();
 }
 
@@ -126,11 +144,11 @@ inline void neumann_bound_conf(image_type image) {
     copy(view::slice<1>(image, 2), view::slice<1>(image, 0));
     copy(view::slice<1>(image, end[1] - 2), view::slice<1>(image, end[1]));
 
-    //corner
-    image(0,      0)        = image(2,          2);
-    image(end[0], 0)        = image(end[0] - 2, 2);
-    image(0,      end[1])   = image(2,          end[1] - 2);
-    image(end[0], end[1])   = image(end[0] - 2, end[1] - 2);
+    //corner bug with cuda, not effect result
+    // image(0,      0)        = image(2,          2);
+    // image(end[0], 0)        = image(end[0] - 2, 2);
+    // image(0,      end[1])   = image(2,          end[1] - 2);
+    // image(end[0], end[1])   = image(end[0] - 2, end[1] - 2);
     // clang-format on
 }
 
@@ -146,30 +164,23 @@ image_type drlse_edge(image_type mat_phi0, image_type mat_g, float lambda, float
     auto mat_g_grad = gradient(mat_g);
     auto mat_phi = mem_clone(mat_phi0, typename image_type::memory_type{});
 
-    write_raw_data("mat_g.raw", mat_g);
-
     while (counter--) {
-        // compute the curvature
         neumann_bound_conf(mat_phi);
         auto mat_phi_grad = gradient(mat_phi);
         auto mat_normalized_gradient_phi =
-            view::map(mat_phi_grad, [](auto p) { return normalize(p); }).persist();
+            view::map(mat_phi_grad,
+                      [] __matazure__(point<value_type, rank> p) { return normalize(p); })
+                .persist();
         auto mat_curvature = div(mat_normalized_gradient_phi);
-
-        write_raw_data("mat_phi_curv.raw", mat_curvature);
-
         auto mat_dist_term = laplace(mat_phi) - mat_curvature;
-
-        write_raw_data("mat_dist.raw", mat_dist_term.persist());
-
-        auto mat_dirac_phi = view::map(mat_phi, [sigma = epsilon](value_type x) {
-            if (std::abs(x) > sigma) return 0.0f;
-            return (1.0f / (2 * sigma)) * (1.0f + std::cos(3.1415926f * x / sigma));
+        auto mat_dirac_phi = view::map(mat_phi, [epsilon] __matazure__(value_type x) {
+            if (std::abs(x) > epsilon) return 0.0f;
+            return (1.0f / (2 * epsilon)) * (1.0f + std::cos(3.1415926f * x / epsilon));
         });
 
         auto mat_area_term = mat_dirac_phi * mat_g;
         auto mat_temp = mat_g_grad * mat_phi_grad;
-        auto mat_temp_sum = view::map(mat_temp, [](auto x) {
+        auto mat_temp_sum = view::map(mat_temp, [] __matazure__(point<value_type, rank> x) {
             auto tmp = zero<value_type>::value();
             for (int_t i = 0; i < x.size(); ++i) {
                 tmp = tmp + x[i];

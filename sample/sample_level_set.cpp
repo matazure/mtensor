@@ -1,5 +1,7 @@
 #include "sample_level_set.hpp"
 
+#include <chrono>
+
 int main(int argc, char* argv[]) {
     if (argc < 2) {
         std::cout << "sample_level_set input_image" << std::endl;
@@ -15,9 +17,6 @@ int main(int argc, char* argv[]) {
                            })
                      .persist();
 
-    std::cout << "img shape: " << mat_g.shape() << std::endl;
-    write_raw_data("mat_g.raw", mat_g);
-
     tensor<float, 2> mat_phi0(img_float.shape());
     float c0 = 2.0f;
     fill(mat_phi0, c0);
@@ -29,9 +28,13 @@ int main(int argc, char* argv[]) {
     float epsilon = 1.5f;
     float timestep = 1;
     float mu = 0.2 / timestep;
+
+    auto t0 = std::chrono::high_resolution_clock::now();
+
     auto mat_phi = drlse_edge(mat_phi0, mat_g, lambda, mu, alfa, epsilon, timestep, 100);
 
-    mat_phi = drlse_edge(mat_phi, mat_g, lambda, mu, 0.0f, epsilon, timestep, 100);
+    auto t1 = std::chrono::high_resolution_clock::now();
+    std::cout << "cost time " << (t1 - t0).count() << " ns" << std::endl;
 
     tensor<byte, 2> img_phi(mat_phi.shape());
     transform(mat_phi, img_phi, [](float v) {
@@ -39,7 +42,6 @@ int main(int argc, char* argv[]) {
     });
 
     write_gray_png("phi.png", img_phi);
-    // write_raw_data("mat_phi.raw", mat_phi);
 
     return 0;
 }
