@@ -1,7 +1,8 @@
 #pragma once
 
 #include <mtensor.hpp>
-#include "image_helper.hpp"
+
+using namespace matazure;
 
 namespace matazure {
 namespace view {

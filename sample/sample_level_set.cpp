@@ -1,6 +1,6 @@
 #include "sample_level_set.hpp"
-
 #include <chrono>
+#include "image_helper.hpp"
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
