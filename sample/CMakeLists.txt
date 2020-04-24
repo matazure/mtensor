@@ -16,6 +16,7 @@ target_link_libraries(sample5_gradient mtensor image_helper)
 add_executable(sample_level_set sample_level_set.cpp)
 target_link_libraries(sample_level_set mtensor image_helper)
 
+
 if (WITH_CUDA)
     add_executable(sample3 sample3.cu)
     target_link_libraries(sample3 mtensor)
@@ -34,6 +35,9 @@ if (WITH_CUDA)
 
     add_executable(sample_cuda_level_set sample_level_set.cu)
     target_link_libraries(sample_cuda_level_set mtensor image_helper)
+
+    add_executable(bm_cuda_level_set bm_level_set.cu)
+    target_link_libraries(bm_cuda_level_set mtensor benchmark)
 endif ()
 
 
