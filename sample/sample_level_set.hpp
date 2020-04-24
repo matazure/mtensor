@@ -173,12 +173,13 @@ image_type drlse_edge(image_type mat_phi0, image_type mat_g, float lambda, float
                 .persist();
         auto mat_curvature = div(mat_normalized_gradient_phi);
         auto mat_dist_term = laplace(mat_phi) - mat_curvature;
+
         auto mat_dirac_phi = view::map(mat_phi, [epsilon] __matazure__(value_type x) {
             if (std::abs(x) > epsilon) return 0.0f;
             return (1.0f / (2 * epsilon)) * (1.0f + std::cos(3.1415926f * x / epsilon));
         });
-
         auto mat_area_term = mat_dirac_phi * mat_g;
+
         auto mat_temp = mat_g_grad * mat_phi_grad;
         auto mat_temp_sum = view::map(mat_temp, [] __matazure__(point<value_type, rank> x) {
             auto tmp = zero<value_type>::value();
@@ -188,9 +189,10 @@ image_type drlse_edge(image_type mat_phi0, image_type mat_g, float lambda, float
             return tmp;
         });
         auto mat_edge_term = mat_dirac_phi * mat_temp_sum + mat_area_term * mat_curvature;
-        auto mat_phi_old = mem_clone(mat_phi, typename image_type::memory_type{});
-        auto mat_phi_next = mat_phi_old + timestep * (mu * mat_dist_term + lambda * mat_edge_term +
-                                                      alpha * mat_area_term);
+
+        auto mat_phi_next = (mat_phi + timestep * (mu * mat_dist_term + lambda * mat_edge_term +
+                                                   alpha * mat_area_term))
+                                .persist();
         copy(mat_phi_next, mat_phi);
     }
 
