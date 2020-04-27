@@ -233,6 +233,12 @@ docker build . -f dockerfile/tensor-dev-ubuntu18.04.dockerfile -t tensor-dev
 git clone https://github.com/matazure/tensor.git
 ```
 
+获取submodule依赖
+
+```
+git submodule update --init -f third_party
+```
+
 使用编译脚本编译相关代码
 
 * ./script/build_windows.bat编译windows版本
