@@ -29,4 +29,10 @@ BENCHMARK(bm_host_tensor2f_level_set)->Arg(1000);
 auto bm_cuda_tensor2f_level_set = bm_level_set<cuda::tensor<float, 2>>;
 BENCHMARK(bm_cuda_tensor2f_level_set)->Arg(10000);
 
+auto bm_host_tensor3f_level_set = bm_level_set<tensor<float, 3>>;
+BENCHMARK(bm_host_tensor3f_level_set)->Arg(100);
+
+auto bm_cuda_tensor3f_level_set = bm_level_set<cuda::tensor<float, 3>>;
+BENCHMARK(bm_cuda_tensor3f_level_set)->Arg(512);
+
 BENCHMARK_MAIN();
