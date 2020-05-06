@@ -205,4 +205,11 @@ using static_vector = local_tensor<_ValueType, _Ext>;
 template <typename _ValueType, typename _Ext>
 struct is_tensor<local_tensor<_ValueType, _Ext>> : bool_constant<true> {};
 
+template <typename _ValueType, typename _Dim>
+struct zero<local_tensor<_ValueType, _Dim>> {
+    constexpr static local_tensor<_ValueType, _Dim> value() {
+        return local_tensor<_ValueType, _Dim>{0};
+    }
+};
+
 }  // namespace matazure

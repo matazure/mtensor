@@ -28,6 +28,8 @@ BENCHMARK(bm_cuda_tensor2a4f_copy)->Arg(2_K);
 
 auto bm_host_tensor2f_fill = bm_tensor_fill<tensor<float, 2>>;
 BENCHMARK(bm_host_tensor2f_fill)->Arg(10_K);
+auto bm_host_tensor2lt_fill = bm_tensor_fill<tensor<local_tensor<float, dim<2, 2>>, 2>>;
+BENCHMARK(bm_host_tensor2lt_fill)->Arg(2_K);
 
 auto bm_host_tensor2f_for_each = bm_tensor_for_each<tensor<float, 2>>;
 BENCHMARK(bm_host_tensor2f_for_each)->Arg(10_K);

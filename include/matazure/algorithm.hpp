@@ -25,7 +25,6 @@ pointi<_Rank> get_array_index_by_layout(pointi<_Rank> pt, row_major_layout<_Rank
  * @param ts the source tensor
  * @param fun the functor, (element &) -> none pattern
  */
-MATAZURE_NV_EXE_CHECK_DISABLE
 template <typename _ExectutionPolicy, typename _Tensor, typename _Fun>
 inline void for_each(_ExectutionPolicy policy, _Tensor&& ts, _Fun fun,
                      enable_if_t<are_linear_index<decay_t<_Tensor>>::value &&
