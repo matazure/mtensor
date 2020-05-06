@@ -27,6 +27,8 @@ struct array {
     /// returns the length of meta::array
     MATAZURE_GENERAL static constexpr int_t size() { return sizeof...(_Values); }
 
+    const static int_t rank = size();
+
     /// returns a runtime pointi equal to meta::array
     MATAZURE_GENERAL static constexpr pointi<sizeof...(_Values)> value() {
         return __walkground::get_pointi<_Values...>();

@@ -15,6 +15,8 @@ class column_major_layout {
    public:
     const static int_t rank = _Rank;
 
+    MATAZURE_GENERAL column_major_layout() : column_major_layout(pointi<rank>{0}){};
+
     MATAZURE_GENERAL column_major_layout(const pointi<rank>& shape) : shape_(shape) {
         stride_[0] = shape[0];
         for (int_t i = 1; i < rank; ++i) {
@@ -64,10 +66,13 @@ class column_major_layout {
     pointi<rank> stride_;
 };
 
+// now only suppor layout
 template <int_t _Rank>
 class row_major_layout {
    public:
     const static int_t rank = _Rank;
+
+    MATAZURE_GENERAL row_major_layout() : row_major_layout(pointi<rank>{0}){};
 
     MATAZURE_GENERAL row_major_layout(const pointi<rank>& shape) : shape_(shape) {
         stride_[rank - 1] = shape[rank - 1];
@@ -114,5 +119,21 @@ class row_major_layout {
     pointi<rank> shape_;
     pointi<rank> stride_;
 };
+
+namespace internal {
+
+template <int_t _Rank>
+inline constexpr pointi<_Rank> get_array_index_by_layout(pointi<_Rank> pt,
+                                                         column_major_layout<_Rank>) {
+    return pt;
+}
+
+template <int_t _Rank>
+inline constexpr pointi<_Rank> get_array_index_by_layout(pointi<_Rank> pt,
+                                                         row_major_layout<_Rank>) {
+    return reverse(pt);
+}
+
+}  // namespace internal
 
 }  // namespace matazure

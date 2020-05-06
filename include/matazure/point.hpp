@@ -276,25 +276,25 @@ inline MATAZURE_GENERAL pointi<_Rank> cumulative_prod(pointi<_Rank> ex) {
 }
 
 template <typename _T, int_t _Rank>
-inline point<_T, _Rank> reverse(point<_T, _Rank> pt);
+inline constexpr point<_T, _Rank> reverse(point<_T, _Rank> pt);
 
 template <typename _T>
-inline point<_T, 1> reverse(point<_T, 1> pt) {
+inline constexpr point<_T, 1> reverse(point<_T, 1> pt) {
     return pt;
 }
 
 template <typename _T>
-inline point<_T, 2> reverse(point<_T, 2> pt) {
+inline constexpr point<_T, 2> reverse(point<_T, 2> pt) {
     return {pt[1], pt[0]};
 }
 
 template <typename _T>
-inline point<_T, 3> reverse(point<_T, 3> pt) {
+inline constexpr point<_T, 3> reverse(point<_T, 3> pt) {
     return {pt[2], pt[1], pt[0]};
 }
 
 template <typename _T>
-inline point<_T, 4> reverse(point<_T, 4> pt) {
+inline constexpr point<_T, 4> reverse(point<_T, 4> pt) {
     return {pt[3], pt[2], pt[1], pt[0]};
 }
 

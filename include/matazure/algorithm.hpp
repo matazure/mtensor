@@ -5,20 +5,6 @@
 
 namespace matazure {
 
-namespace internal {
-
-template <int_t _Rank>
-pointi<_Rank> get_array_index_by_layout(pointi<_Rank> pt, column_major_layout<_Rank>) {
-    return pt;
-}
-
-template <int_t _Rank>
-pointi<_Rank> get_array_index_by_layout(pointi<_Rank> pt, row_major_layout<_Rank>) {
-    return inverse(pt);
-}
-
-}  // namespace internal
-
 /**
  * @brief for each element of a linear indexing tensor, apply fun
  * @param policy the execution policy

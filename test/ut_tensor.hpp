@@ -43,6 +43,7 @@ TEST(TensorTests, ConstructByZero) {
 }
 
 TEST(TensorTests, Layout) {
+    // column major is the memory continue layout
     tensor<float, 2, column_major_layout<2>> ts_column{{00, 01, 02}, {10, 11, 12}};
     std::cout << "column major layout: " << std::endl;
     for (int_t i = 0; i < ts_column.size(); ++i) {

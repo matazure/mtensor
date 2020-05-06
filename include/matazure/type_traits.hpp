@@ -4,11 +4,6 @@
 
 namespace matazure {
 
-struct first_major {};
-struct last_major {};
-typedef first_major col_major_t;
-typedef last_major row_major_t;
-
 struct linear_index {};
 struct array_index {};
 
