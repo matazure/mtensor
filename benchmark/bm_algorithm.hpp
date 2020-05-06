@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include "bm_config.hpp"
 
 template <typename tensor_type>

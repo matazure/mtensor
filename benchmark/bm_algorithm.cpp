@@ -21,6 +21,11 @@ auto bm_host_tensor2f_copy = bm_tensor_copy<tensor<float, 2>>;
 BENCHMARK(bm_host_tensor1f_copy)->Arg(100_M);
 BENCHMARK(bm_host_tensor2f_copy)->Arg(10_K);
 
+auto bm_cuda_tensor2p4f_copy = bm_tensor_copy<tensor<point4f, 2>>;
+BENCHMARK(bm_cuda_tensor2p4f_copy)->Arg(2_K);
+auto bm_cuda_tensor2a4f_copy = bm_tensor_copy<tensor<std::array<float, 4>, 2>>;
+BENCHMARK(bm_cuda_tensor2a4f_copy)->Arg(2_K);
+
 auto bm_host_tensor2f_fill = bm_tensor_fill<tensor<float, 2>>;
 BENCHMARK(bm_host_tensor2f_fill)->Arg(10_K);
 
