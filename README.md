@@ -207,16 +207,6 @@ int main(int argc, char* argv[]) {
 
 [sample](sample)下有更多的示例可供参考
 
-## 环境要求
-
-* 需要编译器开启C++11的支持
-* GPU上运行，需CUDA10.0及其以上版本, 并加入编译参数"--expt-extended-lambda"和"-std=c++11"
-
-## 环境要求
-
-* 需要编译器开启C++11的支持
-* GPU上运行，需CUDA10.0及其以上版本, 并加入编译参数"--expt-extended-lambda"和"-std=c++11"
-
 ## 编译
 
 需先安装[git](https://git-scm.com/)和[CMake](https://cmake.org/)及相应的编译工具g++/clang
@@ -251,13 +241,20 @@ git submodule update --init -f third_party
 ./script/build_native.sh -DWITH_CUDA=ON
 ```
 
+### 环境要求
+
+* 需要编译器支持C++11的支持, g++4.8及其以上版本
+* 需要CMAKE3.8以上版本
+* 需要git支持submodule特性,较新版本均支持
+
+
 目前CUDA的tensor编译还有几个关于主机设备函数调用的warning， 主要是std::shared_ptr和std::allocator产生， 可以忽略
 
 ## 如何在你的项目中集成
 
 在你的项目的头文件路径中包含include目录路径即可，无第三方库和动态库依赖。
 
-对于CUDA项目，需要nvcc加入编译参数"--expt-extended-lambda"和"-std=c++11", CUDA的官方文档有nvcc编译参数设置的详细说明, 若使用CMake构建项目, 也可参考本项目的CMakeLists.txt。
+除了需要你的C++编译器支持C++11外, 对于CUDA项目，需要nvcc加入编译参数"--expt-extended-lambda"和"-std=c++11", CUDA的官方文档有nvcc编译参数设置的详细说明, 若使用CMake构建项目, 也可参考本项目的CMakeLists.txt。
 
 ```cmake
     set(CMAKE_CUDA_STANDARD 11)
