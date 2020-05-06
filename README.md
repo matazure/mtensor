@@ -261,6 +261,10 @@ git submodule update --init -f third_party
     set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-extended-lambda")
 ```
 
+## Advanced
+
+在tensor中，并不强调row和column，故column_major_layout仅表示第一维坐标是内存连续的, row_major_layout表示最后一维坐标是内存联系的
+
 ## 和其他开源库的比较
 
 * mtensor的延迟计算技术比Eigen，xtensor等更加简洁，lambda_tensor的函数式实现比模板表达式更加通用简介
