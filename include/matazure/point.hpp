@@ -299,35 +299,35 @@ inline constexpr point<_T, 4> reverse(point<_T, 4> pt) {
 }
 
 // pointi<3>
-template <int_t _SliceDimIdx>
-inline pointi<2> slice_point(pointi<3> pt);
+template <int_t _UnstackDimIdx>
+inline pointi<2> unstack_point(pointi<3> pt);
 
 template <>
-inline pointi<2> slice_point<0>(pointi<3> pt) {
+inline pointi<2> unstack_point<0>(pointi<3> pt) {
     return pointi<2>{get<1>(pt), get<2>(pt)};
 }
 
 template <>
-inline pointi<2> slice_point<1>(pointi<3> pt) {
+inline pointi<2> unstack_point<1>(pointi<3> pt) {
     return pointi<2>{get<0>(pt), get<2>(pt)};
 }
 
 template <>
-inline pointi<2> slice_point<2>(pointi<3> pt) {
+inline pointi<2> unstack_point<2>(pointi<3> pt) {
     return pointi<2>{get<0>(pt), get<1>(pt)};
 }
 
 // pointi<2>
-template <int_t _SliceDimIdx>
-inline pointi<1> slice_point(pointi<2> pt);
+template <int_t _UnstackDimIdx>
+inline pointi<1> unstack_point(pointi<2> pt);
 
 template <>
-inline pointi<1> slice_point<0>(pointi<2> pt) {
+inline pointi<1> unstack_point<0>(pointi<2> pt) {
     return pointi<1>{get<1>(pt)};
 }
 
 template <>
-inline pointi<1> slice_point<1>(pointi<2> pt) {
+inline pointi<1> unstack_point<1>(pointi<2> pt) {
     return pointi<1>{get<0>(pt)};
 }
 

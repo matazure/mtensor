@@ -160,10 +160,10 @@ inline image_type make_border_copy(image_type img, std::integral_constant<int_t,
     copy(img, view::crop(img_border, padding, img.shape()));
 
     auto shape = img_border.shape();
-    copy(view::slice<0>(img_border, 1), view::slice<0>(img_border, 0));
-    copy(view::slice<0>(img_border, shape[0] - 2), view::slice<0>(img_border, shape[0] - 1));
-    copy(view::slice<1>(img_border, 1), view::slice<1>(img_border, 0));
-    copy(view::slice<1>(img_border, shape[1] - 2), view::slice<1>(img_border, shape[1] - 1));
+    copy(view::unstack<0>(img_border, 1), view::unstack<0>(img_border, 0));
+    copy(view::unstack<0>(img_border, shape[0] - 2), view::unstack<0>(img_border, shape[0] - 1));
+    copy(view::unstack<1>(img_border, 1), view::unstack<1>(img_border, 0));
+    copy(view::unstack<1>(img_border, shape[1] - 2), view::unstack<1>(img_border, shape[1] - 1));
 
     return img_border;
 }
@@ -180,12 +180,12 @@ inline image_type make_border_copy(image_type img, std::integral_constant<int_t,
 
     auto shape = img_border.shape();
 
-    copy(view::slice<0>(img_border, 1), view::slice<0>(img_border, 0));
-    copy(view::slice<0>(img_border, shape[0] - 2), view::slice<0>(img_border, shape[0] - 1));
-    copy(view::slice<1>(img_border, 1), view::slice<1>(img_border, 0));
-    copy(view::slice<1>(img_border, shape[1] - 2), view::slice<1>(img_border, shape[1] - 1));
-    copy(view::slice<2>(img_border, 1), view::slice<2>(img_border, 0));
-    copy(view::slice<2>(img_border, shape[2] - 2), view::slice<2>(img_border, shape[2] - 1));
+    copy(view::unstack<0>(img_border, 1), view::unstack<0>(img_border, 0));
+    copy(view::unstack<0>(img_border, shape[0] - 2), view::unstack<0>(img_border, shape[0] - 1));
+    copy(view::unstack<1>(img_border, 1), view::unstack<1>(img_border, 0));
+    copy(view::unstack<1>(img_border, shape[1] - 2), view::unstack<1>(img_border, shape[1] - 1));
+    copy(view::unstack<2>(img_border, 1), view::unstack<2>(img_border, 0));
+    copy(view::unstack<2>(img_border, shape[2] - 2), view::unstack<2>(img_border, shape[2] - 1));
 
     return img_border;
 }
@@ -223,10 +223,10 @@ template <typename image_type>
 inline void neumann_bound_conf(image_type image, std::integral_constant<int_t, 2>) {
     auto end = image.shape() - 1;
     // border
-    copy(view::slice<0>(image, 2), view::slice<0>(image, 0));
-    copy(view::slice<0>(image, end[0] - 2), view::slice<0>(image, end[0]));
-    copy(view::slice<1>(image, 2), view::slice<1>(image, 0));
-    copy(view::slice<1>(image, end[1] - 2), view::slice<1>(image, end[1]));
+    copy(view::unstack<0>(image, 2), view::unstack<0>(image, 0));
+    copy(view::unstack<0>(image, end[0] - 2), view::unstack<0>(image, end[0]));
+    copy(view::unstack<1>(image, 2), view::unstack<1>(image, 0));
+    copy(view::unstack<1>(image, end[1] - 2), view::unstack<1>(image, end[1]));
 
     // corner bug with cuda, not effect result
     // image(0,      0)        = image(2,          2);
@@ -239,12 +239,12 @@ template <typename image_type>
 inline void neumann_bound_conf(image_type image, std::integral_constant<int_t, 3>) {
     auto end = image.shape() - 1;
     // border
-    copy(view::slice<0>(image, 2), view::slice<0>(image, 0));
-    copy(view::slice<0>(image, end[0] - 2), view::slice<0>(image, end[0]));
-    copy(view::slice<1>(image, 2), view::slice<1>(image, 0));
-    copy(view::slice<1>(image, end[1] - 2), view::slice<1>(image, end[1]));
-    copy(view::slice<2>(image, 2), view::slice<2>(image, 0));
-    copy(view::slice<2>(image, end[2] - 2), view::slice<2>(image, end[2]));
+    copy(view::unstack<0>(image, 2), view::unstack<0>(image, 0));
+    copy(view::unstack<0>(image, end[0] - 2), view::unstack<0>(image, end[0]));
+    copy(view::unstack<1>(image, 2), view::unstack<1>(image, 0));
+    copy(view::unstack<1>(image, end[1] - 2), view::unstack<1>(image, end[1]));
+    copy(view::unstack<2>(image, 2), view::unstack<2>(image, 0));
+    copy(view::unstack<2>(image, end[2] - 2), view::unstack<2>(image, end[2]));
 }
 
 template <typename image_type>

@@ -14,8 +14,8 @@ struct nested_initializer_list {
     static _ValueType access(const type& init, pointi<_Rank> idx) {
         auto tmp_i = idx[_Rank - 1];
         auto& sub_init = *(init.begin() + tmp_i);
-        return nested_initializer_list<_ValueType, _Rank - 1>::access(sub_init,
-                                                                      slice_point<_Rank - 1>(idx));
+        return nested_initializer_list<_ValueType, _Rank - 1>::access(
+            sub_init, unstack_point<_Rank - 1>(idx));
     }
 
     static pointi<_Rank> shape(const type& init) {
