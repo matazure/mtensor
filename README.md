@@ -9,7 +9,7 @@ Tensor主要用于多维数组及其计算，其可以便利高效的在CPU/GPU�
 * 支持CPU和GPU端的tensor，lambda_tensor等的多维数组
 * 支持CPU和GPU端的延迟计算技术
 * 包含基本的fill, for_each, copy, transform等算法
-* 基于延迟计算，在view名字空间下实现了crop， stride， clamp， unstack等算子
+* 基于延迟计算，在view名字空间下实现了slice， stride， clamp， unstack等算子
 <!-- * 向量化指令集 -->
 
 ## 示例

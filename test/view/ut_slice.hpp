@@ -1,6 +1,6 @@
 #include "../ut_foundation.hpp"
 
-TEST(ViewTests, Crop) {
+TEST(ViewTests, Slice) {
     tensor<float, 2> ts(pointi<2>{4, 4});
     ts(0, 0) = 1;
     ts(0, 1) = 2;

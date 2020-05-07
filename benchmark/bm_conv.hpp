@@ -25,7 +25,7 @@ inline void bm_tensor_general_roll_conv(benchmark::State& state) {
     auto kernel_radius = kernel_shape / 2;
     tensor_type ts_dst(shape);
     tensor_type ts_src_container(shape + (kernel_shape + 1) / 2);
-    auto ts_src = view::crop(ts_src_container, kernel_radius, shape);
+    auto ts_src = view::slice(ts_src_container, kernel_radius, shape);
 
     while (state.KeepRunning()) {
         _tmp::for_index(ts_dst.shape(), [=] __matazure__(pointi<rank> idx) {
@@ -59,7 +59,7 @@ inline void bm_tensor_general_unroll_conv(benchmark::State& state) {
     auto kernel_radius = kernel_shape / 2;
     tensor_type ts_dst(shape);
     tensor_type ts_src_container(shape + (kernel_shape + 1) / 2);
-    auto ts_src = view::crop(ts_src_container, kernel_radius, shape);
+    auto ts_src = view::slice(ts_src_container, kernel_radius, shape);
 
     while (state.KeepRunning()) {
         _tmp::for_index(ts_dst.shape(), [=] __matazure__(pointi<rank> idx) {

@@ -3,14 +3,14 @@
 #include "bm_config.hpp"
 
 template <typename tensor_type>
-inline void bm_tensor_crop(benchmark::State& state) {
+inline void bm_tensor_slice(benchmark::State& state) {
     tensor_type ts_src(pointi<tensor_type::rank>::all(state.range(0)));
     auto center = ts_src.shape() / 4;
     auto dst_shape = ts_src.shape() / 2;
     tensor_type ts_dst(dst_shape);
 
     while (state.KeepRunning()) {
-        copy(view::crop(ts_src, center, dst_shape), ts_dst);
+        copy(view::slice(ts_src, center, dst_shape), ts_dst);
         benchmark::DoNotOptimize(ts_dst.data());
     }
 

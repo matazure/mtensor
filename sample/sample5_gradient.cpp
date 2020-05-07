@@ -15,7 +15,7 @@ int main(int argc, char* argv[]) {
     pointi<2> padding{1, 1};  //需要padding避免越界
     tensor<byte, 2> img_padding_container(img_gray.shape() + 2);
     //该操作是img_padding_view具备越界访问的能力
-    auto img_padding_view = view::crop(img_padding_container, padding, img_gray.shape());
+    auto img_padding_view = view::slice(img_padding_container, padding, img_gray.shape());
     //将边界置零
     for_border(img_padding_view.shape(), padding, padding,
                [=](pointi<2> idx) { img_padding_view(idx) = 0; });

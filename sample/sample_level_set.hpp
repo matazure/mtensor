@@ -157,7 +157,7 @@ inline image_type make_border_copy(image_type img, std::integral_constant<int_t,
     fill(padding, 1);
 
     image_type img_border(img.shape() + padding * 2);
-    copy(img, view::crop(img_border, padding, img.shape()));
+    copy(img, view::slice(img_border, padding, img.shape()));
 
     auto shape = img_border.shape();
     copy(view::unstack<0>(img_border, 1), view::unstack<0>(img_border, 0));
@@ -176,7 +176,7 @@ inline image_type make_border_copy(image_type img, std::integral_constant<int_t,
     fill(padding, 1);
 
     image_type img_border(img.shape() + padding * 2);
-    copy(img, view::crop(img_border, padding, img.shape()));
+    copy(img, view::slice(img_border, padding, img.shape()));
 
     auto shape = img_border.shape();
 
@@ -192,22 +192,22 @@ inline image_type make_border_copy(image_type img, std::integral_constant<int_t,
 
 template <typename image_type>
 inline auto gradient(image_type image) -> decltype(
-    view::gradient(view::crop(image, pointi<image_type::rank>{}, image.shape())).persist()) {
+    view::gradient(view::slice(image, pointi<image_type::rank>{}, image.shape())).persist()) {
     auto image_with_border =
         make_border_copy(image, std::integral_constant<int_t, image_type::rank>{});
     pointi<image_type::rank> padding;
     fill(padding, 1);
-    return view::gradient(view::crop(image_with_border, padding, image.shape())).persist();
+    return view::gradient(view::slice(image_with_border, padding, image.shape())).persist();
 }
 
 template <typename image_type>
-inline auto div(image_type image)
-    -> decltype(view::div(view::crop(image, pointi<image_type::rank>{}, image.shape())).persist()) {
+inline auto div(image_type image) -> decltype(
+    view::div(view::slice(image, pointi<image_type::rank>{}, image.shape())).persist()) {
     auto image_with_border =
         make_border_copy(image, std::integral_constant<int_t, image_type::rank>{});
     pointi<image_type::rank> padding;
     fill(padding, 1);
-    return view::div(view::crop(image_with_border, padding, image.shape())).persist();
+    return view::div(view::slice(image_with_border, padding, image.shape())).persist();
 }
 
 template <typename image_type>
@@ -216,7 +216,7 @@ inline image_type laplace(image_type image) {
         make_border_copy(image, std::integral_constant<int_t, image_type::rank>{});
     pointi<image_type::rank> padding;
     fill(padding, 1);
-    return view::laplace(view::crop(image_with_border, padding, image.shape())).persist();
+    return view::laplace(view::slice(image_with_border, padding, image.shape())).persist();
 }
 
 template <typename image_type>

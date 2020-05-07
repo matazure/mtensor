@@ -20,8 +20,8 @@ int main(int argc, char* argv[]) {
     tensor<float, 2> mat_phi0(img_float.shape());
     float c0 = 2.0f;
     fill(mat_phi0, c0);
-    fill(view::crop(mat_phi0, point2i{20, 25}, point2i{10, 10}), -c0);
-    fill(view::crop(mat_phi0, point2i{40, 25}, point2i{10, 10}), -c0);
+    fill(view::slice(mat_phi0, point2i{20, 25}, point2i{10, 10}), -c0);
+    fill(view::slice(mat_phi0, point2i{40, 25}, point2i{10, 10}), -c0);
 
     float lambda = 5;
     float alfa = -3;
