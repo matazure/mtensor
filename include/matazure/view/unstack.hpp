@@ -21,8 +21,8 @@ struct unstack_functor {
     unstack_functor(_Tensor ts, int_t unstack_i) : ts_(ts), unstack_i_(unstack_i) {}
 
     MATAZURE_GENERAL auto operator()(pointi<_Tensor::rank - 1> idx) const
-        -> decltype((ts_(cat_point<_UnstackDimIdx>(idx, unstack_i_)))) {
-        return ts_(cat_point<_UnstackDimIdx>(idx, unstack_i_));
+        -> decltype((ts_(statck_point<_UnstackDimIdx>(idx, unstack_i_)))) {
+        return ts_(statck_point<_UnstackDimIdx>(idx, unstack_i_));
     }
 };
 

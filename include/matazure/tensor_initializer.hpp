@@ -19,7 +19,7 @@ struct nested_initializer_list {
     }
 
     static pointi<_Rank> shape(const type& init) {
-        return cat_point<_Rank - 1>(
+        return statck_point<_Rank - 1>(
             nested_initializer_list<_ValueType, _Rank - 1>::shape(*init.begin()),
             static_cast<int_t>(init.size()));
     };
