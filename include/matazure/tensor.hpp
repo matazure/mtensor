@@ -191,6 +191,8 @@ class tensor : public tensor_expression<tensor<_ValueType, _Rank, _Layout, _Allo
     /// @return the shape of tensor
     pointi<rank> shape() const { return shape_; }
 
+    int_t shape(int_t i) const { return shape()[i]; }
+
     /// return the total size of tensor elements
     int_t size() const { return layout_.size(); }
 

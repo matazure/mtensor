@@ -131,6 +131,8 @@ class dynamic_tensor {
 
     shape_type shape() const { return ts_shape_; }
 
+    int_t shape(int_t i) const { return ts_shape_[i]; }
+
     int_t rank() const { return ts_shape_.size(); }
 
     int_t size() const { return size_; }

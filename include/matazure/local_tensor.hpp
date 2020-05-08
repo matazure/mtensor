@@ -201,6 +201,8 @@ class local_tensor {
     /// @return the shape of tensor
     MATAZURE_GENERAL constexpr pointi<rank> shape() const { return meta_shape_type::value(); }
 
+    MATAZURE_GENERAL constexpr int_t shape(int_t i) const { return shape()[i]; }
+
     /// @return the stride of tensor
     MATAZURE_GENERAL constexpr pointi<rank> stride() const { return traits_t::stride(); }
 

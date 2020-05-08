@@ -77,6 +77,8 @@ class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout, _Allocator
 
     MATAZURE_GENERAL pointi<rank> shape() const { return shape_; }
 
+    MATAZURE_GENERAL int_t shape(int_t i) const { return shape_[i]; };
+
     MATAZURE_GENERAL pointi<rank> stride() const { return layout_.stride(); }
     MATAZURE_GENERAL int_t size() const { return layout_.size(); }
 

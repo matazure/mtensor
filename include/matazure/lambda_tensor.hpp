@@ -109,6 +109,8 @@ class lambda_tensor : public tensor_expression<lambda_tensor<_Rank, _Func, _Layo
     /// @return the shape of lambed_tensor
     pointi<rank> shape() const { return shape_; }
 
+    int_t shape(int_t i) const { return shape_[i]; }
+
     /// return the total size of lambda_tensor elements
     int_t size() const { return layout_.size(); }
 
