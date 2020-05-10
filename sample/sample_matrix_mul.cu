@@ -22,6 +22,7 @@ int main(int argc, char* argv[]) {
     cuda::tensor<float, 2> cmat_b(point2i{K, N});
     cuda::tensor<float, 2> cmat_c(point2i{M, N});
 
+    // block_for_index需要给一个编译时的block尺寸， grid_dim是运行时的grid尺寸
     cuda::block_for_index<BLOCK_DIM>(grid_dim,
                                      [=] __device__(cuda::block_index<BLOCK_DIM> block_idx) {
                                          auto row = block_idx.local[0];
