@@ -10,8 +10,8 @@ target_link_libraries(sample2 mtensor)
 add_library(image_helper INTERFACE)
 target_include_directories(image_helper INTERFACE  ${PROJECT_SOURCE_DIR}/third_party/stb)
 
-add_executable(sample5_gradient sample5_gradient.cpp)
-target_link_libraries(sample5_gradient mtensor image_helper)
+add_executable(sample_gradient sample_gradient.cpp)
+target_link_libraries(sample_gradient mtensor image_helper)
 
 add_executable(sample_level_set sample_level_set.cpp)
 target_link_libraries(sample_level_set mtensor image_helper)
@@ -25,9 +25,6 @@ if (WITH_CUDA)
 
     add_executable(sample4 sample4.cu)
     target_link_libraries(sample4 mtensor image_helper)
-
-    add_executable(sample6_convolution_halo sample6_convolution_halo.cu)
-    target_link_libraries(sample6_convolution_halo mtensor image_helper)
 
     add_executable(sample6_convolution sample6_convolution.cu)
     target_link_libraries(sample6_convolution mtensor image_helper)

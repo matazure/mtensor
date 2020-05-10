@@ -57,7 +57,7 @@ int main(int argc, char* argv[]) {
     tensor<pointb<3>, 2> img_mean(cimg_mean_byte.shape());
     mem_copy(cimg_mean_byte, img_mean);
 
-    write_rgb_png("mean_" + std::string(argv[1]), img_mean);
+    write_rgb_png("conv.png", img_mean);
 
     return 0;
 }
