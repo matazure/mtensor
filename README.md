@@ -225,7 +225,7 @@ git clone https://github.com/matazure/tensor.git
 
 获取submodule依赖
 
-```
+```bash
 git submodule update --init -f third_party
 ```
 
@@ -246,7 +246,6 @@ git submodule update --init -f third_party
 * 需要编译器支持C++11的支持, g++4.8及其以上版本
 * 需要CMAKE3.8以上版本
 * 需要git支持submodule特性,较新版本均支持
-
 
 目前CUDA的tensor编译还有几个关于主机设备函数调用的warning， 主要是std::shared_ptr和std::allocator产生， 可以忽略
 
