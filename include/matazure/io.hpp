@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <matazure/algorithm.hpp>
 #include <matazure/tensor.hpp>
 
 namespace matazure {
@@ -21,7 +22,8 @@ inline std::ostream& operator<<(std::ostream& out, const point<_ValueType, _Rank
 }
 
 /**
- * @brief read the binary raw data of a data container(such as tensor, std::vector) from an istream
+ * @brief read the binary raw data of a data container(such as tensor, std::vector) from an
+ istream
  * @param istr an input istream
  * @param container dest container
  * @todo 考虑非POD的类型
@@ -44,6 +46,37 @@ void write_raw_data(std::ostream& ostr, const _T& container) {
     ostr.write(reinterpret_cast<const char*>(container.data()),
                container.size() * sizeof(decltype((*container.data()))));
 }
+
+// /**
+//  * @brief read the binary raw data of a data container(such as tensor, std::vector) from an
+//  istream
+//  * @param istr an input istream
+//  * @param container dest container
+//  * @todo 考虑非POD的类型
+//  */
+// template <typename _T>
+// void read_raw_data(std::istream& istr, _T& container) {
+//     istr.exceptions(std::ifstream::failbit | std::ifstream::badbit | std::ifstream::eofbit);
+//     istr.read(reinterpret_cast<char*>(container.data()),
+//               container.size() * sizeof(decltype((*container.data()))));
+
+//     for_each(container, [&](typename _T::value_type& v) {
+//         istr.read(reinterpret_cast<char*>(&v), sizeof(v));
+//     });
+// }
+
+// /**
+//  * @brief write binary raw data of a data container(such as tensor, std::vector) to an istream
+//  * @param ostr an output istream
+//  * @param container source container
+//  */
+// template <typename _T>
+// void write_raw_data(std::ostream& ostr, const _T& container) {
+//     ostr.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+//     for_each(container, [&](typename _T::value_type& v) {
+//         ostr.write(reinterpret_cast<char*>(&v), sizeof(v));
+//     });
+// }
 
 /**
  * @brief read the binary raw data of a data container(such as tensor, std::vector) from a file

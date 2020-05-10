@@ -16,6 +16,8 @@ target_link_libraries(sample5_gradient mtensor image_helper)
 add_executable(sample_level_set sample_level_set.cpp)
 target_link_libraries(sample_level_set mtensor image_helper)
 
+add_executable(sample_image_split_channel sample_image_split_channel.cpp)
+target_link_libraries(sample_image_split_channel mtensor image_helper)
 
 if (WITH_CUDA)
     add_executable(sample3 sample3.cu)
