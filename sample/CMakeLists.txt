@@ -32,8 +32,8 @@ if (WITH_CUDA)
     add_executable(sample6_convolution sample6_convolution.cu)
     target_link_libraries(sample6_convolution mtensor image_helper)
 
-    add_executable(sample7_matrix_mul sample7_matrix_mul.cu)
-    target_link_libraries(sample7_matrix_mul mtensor image_helper)
+    add_executable(sample_matrix_mul sample_matrix_mul.cu)
+    target_link_libraries(sample_matrix_mul mtensor image_helper)
 
     add_executable(sample_cuda_level_set sample_level_set.cu)
     target_link_libraries(sample_cuda_level_set mtensor image_helper)
