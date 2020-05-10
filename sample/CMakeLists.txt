@@ -1,11 +1,11 @@
 # add_subdirectory(host)
 # add_subdirectory(cuda)
 
-add_executable(sample1 sample1.cpp)
-target_link_libraries(sample1 mtensor)
+add_executable(sample_for_index sample_for_index.cpp)
+target_link_libraries(sample_for_index mtensor)
 
-add_executable(sample2 sample2.cpp)
-target_link_libraries(sample2 mtensor)
+add_executable(sample_make_lambda sample_make_lambda.cpp)
+target_link_libraries(sample_make_lambda mtensor)
 
 add_library(image_helper INTERFACE)
 target_include_directories(image_helper INTERFACE  ${PROJECT_SOURCE_DIR}/third_party/stb)
@@ -23,13 +23,13 @@ add_executable(sample_mandelbrot sample_mandelbrot.cpp)
 target_link_libraries(sample_mandelbrot mtensor image_helper)
 
 if (WITH_CUDA)
-    add_executable(sample3 sample3.cu)
-    target_link_libraries(sample3 mtensor)
+    add_executable(sample_cuda_add sample_add.cu)
+    target_link_libraries(sample_cuda_add mtensor)
 
     add_executable(sample_cuda_mandelbrot sample_mandelbrot.cu)
     target_link_libraries(sample_cuda_mandelbrot mtensor image_helper)
 
-    add_executable(sample_cuda_convolution sample6_convolution.cu)
+    add_executable(sample_cuda_convolution sample_convolution.cu)
     target_link_libraries(sample_cuda_convolution mtensor image_helper)
 
     add_executable(sample_cuda_matrix_mul sample_matrix_mul.cu)

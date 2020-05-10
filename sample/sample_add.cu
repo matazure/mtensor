@@ -31,8 +31,8 @@ int main(int argc, char* argv[]) {
     mem_copy(cts_c, ts_c);
 
     //打印输出
-    for_each(ts_c, [](float e) { printf("%f, ", e); });
-    printf("\n");
+    for_each(ts_c, [](float e) { std::cout << e << ", "; });
+    std::cout << std::endl;
 
     return 0;
 }
