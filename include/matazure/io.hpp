@@ -4,6 +4,7 @@
 #include <iostream>
 #include <matazure/algorithm.hpp>
 #include <matazure/tensor.hpp>
+#include <matazure/view/view.hpp>
 
 namespace matazure {
 
@@ -18,6 +19,59 @@ inline std::ostream& operator<<(std::ostream& out, const point<_ValueType, _Rank
     }
     out << "}";
 
+    return out;
+}
+
+template <typename _Tensor, int_t _Rank>
+struct printer {
+    static void print(std::ostream& out, _Tensor ts) {
+        out << "{";
+        for (int_t i = 0; i < ts.shape(_Rank - 1); ++i) {
+            auto tmp_view = view::unstack<_Rank - 1>(ts, i);
+            printer<decltype(tmp_view), _Rank - 1>::print(out, tmp_view);
+            if (i != ts.shape(_Rank - 1) - 1) {
+                out << ", " << std::endl;
+            }
+        }
+        out << "}";
+    }
+
+    // static std::enable_if_t<is_same<typename _Tensor::layout_type,
+    // row_major_layout<_Rank>>::value> print(std::ostream& out, _Tensor ts) {
+    //     out << "{";
+    //     for (int_t i = 0; i < ts.shape(_Rank - 1); ++i) {
+    //         auto tmp_view = view::unstack<_Rank - 1>(ts, i);
+    //         printer<decltype(tmp_view), _Rank - 1>::print(out, tmp_view);
+
+    //         if (i != ts.shape(_Rank - 1) - 1) {
+    //             out << ", " << std::endl;
+    //         }
+    //     }
+
+    // out << "}";
+    // }
+};  // namespace matazure
+
+template <typename _Tensor>
+struct printer<_Tensor, 1> {
+    static void print(std::ostream& out, _Tensor ts) {
+        out << "{";
+        for (int_t i = 0; i < ts.size(); ++i) {
+            out << ts(i);
+            if (i != ts.size() - 1) {
+                out << ", ";
+            }
+        }
+        out << "}";
+    }
+};
+
+//目前仅支持
+template <typename _Tensor>
+inline std::ostream& operator<<(std::ostream& out, const tensor_expression<_Tensor>& e_ts) {
+    // auto p = e_ts();
+    auto ts = e_ts();
+    printer<_Tensor, _Tensor::rank>::print(out, ts);
     return out;
 }
 
