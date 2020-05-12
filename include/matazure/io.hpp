@@ -26,30 +26,16 @@ template <typename _Tensor, int_t _Rank>
 struct printer {
     static void print(std::ostream& out, _Tensor ts) {
         out << "{";
-        for (int_t i = 0; i < ts.shape(_Rank - 1); ++i) {
-            auto tmp_view = view::unstack<_Rank - 1>(ts, i);
+        for (int_t i = 0; i < ts.shape(0); ++i) {
+            auto tmp_view = view::unstack<0>(ts, i);
             printer<decltype(tmp_view), _Rank - 1>::print(out, tmp_view);
-            if (i != ts.shape(_Rank - 1) - 1) {
+            if (i != ts.shape(0) - 1) {
                 out << ", " << std::endl;
             }
         }
         out << "}";
     }
 
-    // static std::enable_if_t<is_same<typename _Tensor::layout_type,
-    // row_major_layout<_Rank>>::value> print(std::ostream& out, _Tensor ts) {
-    //     out << "{";
-    //     for (int_t i = 0; i < ts.shape(_Rank - 1); ++i) {
-    //         auto tmp_view = view::unstack<_Rank - 1>(ts, i);
-    //         printer<decltype(tmp_view), _Rank - 1>::print(out, tmp_view);
-
-    //         if (i != ts.shape(_Rank - 1) - 1) {
-    //             out << ", " << std::endl;
-    //         }
-    //     }
-
-    // out << "}";
-    // }
 };  // namespace matazure
 
 template <typename _Tensor>

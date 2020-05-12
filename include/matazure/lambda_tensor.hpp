@@ -32,7 +32,8 @@ struct get_functor_accessor_type {
  * @tparam _Func the functor type of tensor, should be Index -> Value pattern
  * @see tensor
  */
-template <int_t _Rank, typename _Func, typename _Layout = column_major_layout<_Rank>>
+template <int_t _Rank, typename _Func,
+          typename _Layout = typename default_layout<global_t, _Rank>::type>
 class lambda_tensor : public tensor_expression<lambda_tensor<_Rank, _Func, _Layout>> {
     typedef function_traits<_Func> functor_traits;
 

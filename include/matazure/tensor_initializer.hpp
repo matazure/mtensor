@@ -12,16 +12,15 @@ struct nested_initializer_list {
         std::initializer_list<typename nested_initializer_list<_ValueType, _Rank - 1>::type>;
 
     static _ValueType access(const type& init, pointi<_Rank> idx) {
-        auto tmp_i = idx[_Rank - 1];
+        auto tmp_i = idx[0];
         auto& sub_init = *(init.begin() + tmp_i);
-        return nested_initializer_list<_ValueType, _Rank - 1>::access(
-            sub_init, unstack_point<_Rank - 1>(idx));
+        return nested_initializer_list<_ValueType, _Rank - 1>::access(sub_init,
+                                                                      unstack_point<0>(idx));
     }
 
     static pointi<_Rank> shape(const type& init) {
-        return statck_point<_Rank - 1>(
-            nested_initializer_list<_ValueType, _Rank - 1>::shape(*init.begin()),
-            static_cast<int_t>(init.size()));
+        return statck_point<0>(nested_initializer_list<_ValueType, _Rank - 1>::shape(*init.begin()),
+                               static_cast<int_t>(init.size()));
     };
 };
 

@@ -120,6 +120,13 @@ class row_major_layout {
     pointi<rank> stride_;
 };
 
+struct global_t {};
+
+template <typename _T, int_t _Rank>
+struct default_layout {
+    typedef row_major_layout<_Rank> type;
+};
+
 namespace internal {
 
 template <int_t _Rank>
