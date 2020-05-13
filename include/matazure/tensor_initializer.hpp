@@ -32,11 +32,4 @@ struct nested_initializer_list<_ValueType, 1> {
     static pointi<1> shape(const type& init) { return pointi<1>{static_cast<int_t>(init.size())}; };
 };
 
-template <typename _ValueType, int_t _Rank>
-_ValueType array_index_access(const nested_initializer_list<_ValueType, _Rank>& init,
-                              pointi<_Rank> idx) {}
-
-template <typename _ValueType>
-_ValueType array_index_access(const nested_initializer_list<_ValueType, 1>& init, pointi<1> idx) {}
-
 }  // namespace matazure
