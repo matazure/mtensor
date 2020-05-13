@@ -35,7 +35,7 @@ class lambda_tensor : public tensor_expression<lambda_tensor<_Rank, _Func, _Layo
 
     template <typename... _Idx>
     MATAZURE_GENERAL reference operator()(_Idx... idx) const {
-        return (*this)[pointi<rank>{idx...}];
+        return (*this)(pointi<rank>{idx...});
     }
 
     template <typename _ExecutionPolicy>

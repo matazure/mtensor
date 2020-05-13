@@ -59,29 +59,36 @@ int main(int argc, char *argv[]) {
 
 ### for_index
 
-for_index和cuda::for_index是最基本的计算接口, mtensor中的大部分计算都是由for_index来驱动的
+for_index和cuda::for_index是最基本的计算接口, mtensor中的大部分计算都是由for_index来驱动的, 下面的例子演示了
+一个由for_index来实现tensor的加法操作
 
 ```c++
-include <mtensor.hpp>
+#include <mtensor.hpp>
 
 using namespace matazure;
 
 int main(int argc, char* argv[]) {
-    pointi<2> origin{0, 0};
-    pointi<2> shape{2, 5};
-    //该算子会打印传入的坐标
-    auto functor = [](pointi<2> idx) { std::cout << "(" << idx[0] << ", " << idx[1] << "); "; };
-    //遍历shape大小的坐标， 原点为(0, 0)
-    for_index(origin, shape, functor);
-    std::cout << std::endl;
+    pointi<2> shape{2, 3};
+    tensor<float, 2> ts_a(shape);
+    tensor<float, 2> ts_b(shape);
+    tensor<float, 2> ts_c(shape);
+    fill(ts_a, 1.0f);
+    fill(ts_b, 2.0f);
+    //使用cuda  lambda算子 需要申明__device__ __host__
+    auto functor = [=](pointi<2> idx) { ts_c(idx) = ts_a(idx) + ts_b(idx); };
+    // 计算
+    for_index(shape, functor);
+    // 输出结果
+    std::cout << ts_c << std::endl;
     return 0;
 }
 ```
 
 输出
 
-```terminal
-(0, 0); (1, 0); (0, 1); (1, 1); (0, 2); (1, 2); (0, 3); (1, 3); (0, 4); (1, 4);
+```console
+{{3, 3, 3}, 
+{3, 3, 3}}
 ```
 
 ### 延迟计算
@@ -173,19 +180,10 @@ int main(int argc, char *argv[]) {
 ,在将cuda的数据拷贝会tensor. 这样cuda的运算结果最终和c++的结果是一致的. 在上图中, 每个阶段的"common implement"是用模板泛型实现的, 其调用的函数需要申明_\_device\_\_ \_\_host\_\_
 
 ```c++
-am
+
 ```
 
 [smaple/sample_mandelbrot.hpp](sample/sample_mandelbrot.hpp)是另一个列子
-
-[sample](sample)下有更多的示例可供参考
-
-## mtensor的性能是否高效
-
-* mtensor编写了大量的benchmark来确保所做的封装带来极大便利性的同时, 不会带来额外的性能损失
-* mtensor的延迟计算可以有效的避免内存频繁拷贝, 可以带来性能上的加成
-* mtensor的泛型实现, 可以很容易的获得simd, fp16等带来的性能提升, 你只需将其设置为相应的模板类型就好
-* mtensor的计算由for_index驱动, 你可以很方便的拓展for_index来获取特定的效果, 比如在c++端已实现了openmp的并行for_index
 
 ### GPU的分块计算block_for_index
 
@@ -261,6 +259,23 @@ int main(int argc, char* argv[]) {
 
 ```
 
+## mtensor的性能是否高效
+
+mtensor在绝大部分场景下都不会带来额外的性能开销, 并且方便开发人员编写出高效的代码
+
+* mtensor的延迟计算可以有效的避免内存频繁拷贝, 可以带来性能上的加成
+* mtensor的泛型实现, 可以很容易的获得simd, fp16等带来的性能提升, 你只需将其设置为相应的模板类型就好
+* mtensor的计算由for_index驱动, 你可以很方便的拓展for_index来获取特定的效果, 比如在c++端已实现了openmp的并行for_index
+
+除此之外, mtensor还编写了大量的benchmark来确保性能指标
+
+```console
+bm_cuda_tensor1f_copy/1000000000                   24080055 ns   24078003 ns         29   154.718GB/s   38.6794G items/s
+bm_cuda_tensor2f_copy/32000                        24512069 ns   24509982 ns         29   155.639GB/s   38.9096G items/s
+bm_cuda_tensor2f_column_major_layout_copy/32000    24564743 ns   24562660 ns         29   155.305GB/s   38.8262G items/s
+bm_cuda_tensor2f_row_layout_copy/32000             24556949 ns   24554887 ns         29   155.354GB/s   38.8385G items/s
+```
+
 ## 如何在你的项目中集成
 
 在你的项目的头文件路径中包含include目录路径即可, 无第三方库和动态库依赖。
@@ -310,7 +325,7 @@ git submodule update --init -f third_party
 还可以添加参数来选择是否编译CUDA版本
 
 ```bash
-./script/build_native.sh -DWITH_CUDA=ON
+./script/build_native.sh -DWITH_CUDA=ON -DWITH_OPENMP=ON -DWITH_SSE=ON
 ```
 
 目前CUDA的mtensor编译还有几个关于主机设备函数调用的warning, 主要是std::shared_ptr和std::allocator产生, 可以忽略

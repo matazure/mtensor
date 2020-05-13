@@ -96,15 +96,7 @@ class lambda_tensor : public tensor_expression<lambda_tensor<_Rank, _Func, _Layo
      */
     template <typename... _Idx>
     reference operator()(_Idx... idx) const {
-        return (*this)[pointi<rank>{idx...}];
-    }
-
-    /// prevents operator() const matching with pointi<rank> argument
-    template <typename _Idx>
-    reference operator()(_Idx idx) const {
-        static_assert(std::is_same<_Idx, int_t>::value && rank == 1,
-                      "only operator [] support access data by pointi");
-        return (*this)[pointi<1>{idx}];
+        return (*this)(pointi<rank>{idx...});
     }
 
     /// @return the shape of lambed_tensor

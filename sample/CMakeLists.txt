@@ -23,8 +23,8 @@ add_executable(sample_mandelbrot sample_mandelbrot.cpp)
 target_link_libraries(sample_mandelbrot mtensor image_helper)
 
 if (WITH_CUDA)
-    add_executable(sample_cuda_add sample_add.cu)
-    target_link_libraries(sample_cuda_add mtensor)
+    add_executable(sample_cuda_for_index sample_for_index.cu)
+    target_link_libraries(sample_cuda_for_index mtensor)
 
     add_executable(sample_cuda_mandelbrot sample_mandelbrot.cu)
     target_link_libraries(sample_cuda_mandelbrot mtensor image_helper)
