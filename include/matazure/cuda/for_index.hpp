@@ -51,7 +51,7 @@ struct for_index_array_access_functor {
     __device__ void operator()(int_t i) { fun(layout.offset2index(i) + origin); }
 
     _Fun fun;
-    column_major_layout<_Rank> layout;
+    row_major_layout<_Rank> layout;
     pointi<_Rank> origin;
 };
 
@@ -62,7 +62,7 @@ inline void for_index(_ExecutionPolicy policy, pointi<_Rank> origin, pointi<_Ran
     auto extent = end - origin;
     auto stride = matazure::cumulative_prod(extent);
 
-    column_major_layout<_Rank> layout(extent);
+    row_major_layout<_Rank> layout(extent);
     auto max_size = layout.index2offset(end - 1) + 1;  //要包含最后一个元素
 
     internal::for_index_array_access_functor<_Fun, _Rank> functor{fun, layout, origin};

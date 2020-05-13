@@ -72,8 +72,8 @@ MATAZURE_NV_EXE_CHECK_DISABLE
 template <typename _Func>
 MATAZURE_GENERAL inline void for_index(sequence_policy, pointi<2> origin, pointi<2> end,
                                        _Func fun) {
-    for (int_t j = origin[1]; j < end[1]; ++j) {
-        for (int_t i = origin[0]; i < end[0]; ++i) {
+    for (int_t i = origin[0]; i < end[0]; ++i) {
+        for (int_t j = origin[1]; j < end[1]; ++j) {
             fun(pointi<2>{{i, j}});
         }
     }
@@ -89,9 +89,9 @@ MATAZURE_NV_EXE_CHECK_DISABLE
 template <typename _Func>
 MATAZURE_GENERAL inline void for_index(sequence_policy, pointi<3> origin, pointi<3> end,
                                        _Func fun) {
-    for (int_t k = origin[2]; k < end[2]; ++k) {
+    for (int_t i = origin[0]; i < end[0]; ++i) {
         for (int_t j = origin[1]; j < end[1]; ++j) {
-            for (int_t i = origin[0]; i < end[0]; ++i) {
+            for (int_t k = origin[2]; k < end[2]; ++k) {
                 fun(pointi<3>{{i, j, k}});
             }
         }
@@ -108,10 +108,10 @@ MATAZURE_NV_EXE_CHECK_DISABLE
 template <typename _Func>
 MATAZURE_GENERAL inline void for_index(sequence_policy, pointi<4> origin, pointi<4> end,
                                        _Func fun) {
-    for (int_t l = origin[3]; l < end[3]; ++l) {
-        for (int_t k = origin[2]; k < end[2]; ++k) {
-            for (int_t j = origin[1]; j < end[1]; ++j) {
-                for (int_t i = origin[0]; i < end[0]; ++i) {
+    for (int_t i = origin[0]; i < end[0]; ++i) {
+        for (int_t j = origin[1]; j < end[1]; ++j) {
+            for (int_t k = origin[2]; k < end[2]; ++k) {
+                for (int_t l = origin[3]; k < end[3]; ++k) {
                     fun(pointi<4>{{i, j, k, l}});
                 }
             }

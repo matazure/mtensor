@@ -62,8 +62,8 @@ inline void for_index(omp_policy, pointi<1> origin, pointi<1> end, _Func fun) {
 template <typename _Func>
 inline void for_index(omp_policy, pointi<2> origin, pointi<2> end, _Func fun) {
     MATAZURE_OPENMP_PARALLEL_FOR(2)
-    for (int_t j = origin[1]; j < end[1]; ++j) {
-        for (int_t i = origin[0]; i < end[0]; ++i) {
+    for (int_t i = origin[0]; i < end[0]; ++i) {
+        for (int_t j = origin[1]; j < end[1]; ++j) {
             fun(pointi<2>{{i, j}});
         }
     }
@@ -78,9 +78,9 @@ inline void for_index(omp_policy, pointi<2> origin, pointi<2> end, _Func fun) {
 template <typename _Func>
 inline void for_index(omp_policy, pointi<3> origin, pointi<3> end, _Func fun) {
     MATAZURE_OPENMP_PARALLEL_FOR(3)
-    for (int_t k = origin[2]; k < end[2]; ++k) {
+    for (int_t i = origin[0]; i < end[0]; ++i) {
         for (int_t j = origin[1]; j < end[1]; ++j) {
-            for (int_t i = origin[0]; i < end[0]; ++i) {
+            for (int_t k = origin[2]; k < end[2]; ++k) {
                 fun(pointi<3>{{i, j, k}});
             }
         }
@@ -96,10 +96,10 @@ inline void for_index(omp_policy, pointi<3> origin, pointi<3> end, _Func fun) {
 template <typename _Func>
 inline void for_index(omp_policy, pointi<4> origin, pointi<4> end, _Func fun) {
     MATAZURE_OPENMP_PARALLEL_FOR(4)
-    for (int_t l = origin[3]; l < end[3]; ++l) {
-        for (int_t k = origin[2]; k < end[2]; ++k) {
-            for (int_t j = origin[1]; j < end[1]; ++j) {
-                for (int_t i = origin[0]; i < end[0]; ++i) {
+    for (int_t i = origin[0]; i < end[0]; ++i) {
+        for (int_t j = origin[1]; j < end[1]; ++j) {
+            for (int_t k = origin[2]; k < end[2]; ++k) {
+                for (int_t l = origin[3]; k < end[3]; ++k) {
                     fun(pointi<4>{{i, j, k, l}});
                 }
             }
