@@ -14,8 +14,8 @@ inline matazure::tensor<matazure::pointb<3>, 2> read_rgb_image(const std::string
     using namespace matazure;
 
     pointi<3> shape{};
-    auto data = stbi_load(image_path.c_str(), &shape[1], &shape[2], &shape[0], false);
-    if (shape[0] != 3 || !data) {
+    auto data = stbi_load(image_path.c_str(), &shape[2], &shape[1], &shape[3], false);
+    if (shape[3] != 3 || !data) {
         printf("need a 3 channel image");
         throw std::runtime_error("only support 3 channel rgb image");
     }
@@ -40,8 +40,8 @@ inline matazure::tensor<byte, 2> read_gray_image(const std::string& image_path) 
 }
 
 void write_rgb_png(const std::string& image_path, matazure::tensor<matazure::pointb<3>, 2> ts_rgb) {
-    auto re = stbi_write_png(image_path.c_str(), ts_rgb.shape()[0], ts_rgb.shape()[1], 3,
-                             ts_rgb.data(), ts_rgb.shape()[0] * 3);
+    auto re = stbi_write_png(image_path.c_str(), ts_rgb.shape()[1], ts_rgb.shape()[0], 3,
+                             ts_rgb.data(), ts_rgb.shape()[1] * 3);
     if (re == 0) {
         throw std::runtime_error("failed to write ts_rgb to png image, error code: " +
                                  std::to_string(re));

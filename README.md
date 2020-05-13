@@ -12,55 +12,16 @@ mtensor主要用于多维数组及其计算, 其可以结构化高效地在CPU/G
 * 支持point, mtensor, local_mtensor等多种易用的泛型数据结构
 * 通过lambda_mtensor实现了比模板表达式更强更简洁的延迟计算
 * 实现了stl类似的fill, for_each, copy, transform等常用算法(algorithm).
-* 基于延迟计算, 在view名字空间下实现了map, slice, stride, unstack等视图(view)
+* 基于延迟计算, 在view名字空间下实现了map, slice, stride, unstack等视图(view), 其返回的结果为相应的lambda_tensor.
 * 算法和视图的接口为对于cuda和c++来说是统一的
 
 除此之外, mtensor是一个遵循c++11的项目, 其是header only的, 我们可以很方便的在先用项目中集成使用它.
 
-## 示例
+## 用法
 
-### 基本用法
+### 基本数据结构
 
-mtensor会提供泛型多维数组的数据结构及相应的算法
-
-```c++
-#include <mtensor.hpp>
-
-using namespace matazure;
-
-int main(int argc, char *argv[]) {
-    constexpr int rank = 2;
-    int col = 10;
-    int row = 5;
-    pointi<rank> shape{col, row};
-    tensor<float, rank> ts(shape);
-
-    // ts是关于2维坐标的赋值函数
-    auto ts_setter = [ts](pointi<rank> index) { //ts是引用拷贝
-        //将ts的元素每列递增1, 每行递增10
-        ts(index) = index[0] + index[1] * 10;
-    };
-
-    //遍历shape大小的所有坐标, 默认原点是(0, 0)
-    for_index(ts.shape(), ts_setter);
-
-    //将ts的元素按行输出
-    for (int j = 0; j < row; ++j) {
-        for (int i = 0; i < col; ++i) {
-            pointi<rank> index = {i, j};
-            std::cout << ts(index) << ", ";
-        }
-        std::cout << std::endl;
-    }
-
-    return 0;
-}
-```
-
-### for_index
-
-for_index和cuda::for_index是最基本的计算接口, mtensor中的大部分计算都是由for_index来驱动的, 下面的例子演示了
-一个由for_index来实现tensor的加法操作
+下面是常用的基本数据结构, 可在[sample/sample_basic_structure.cpp](sample/sample_basic_structure.cpp)查看更多示例
 
 ```c++
 #include <mtensor.hpp>
@@ -68,20 +29,51 @@ for_index和cuda::for_index是最基本的计算接口, mtensor中的大部分�
 using namespace matazure;
 
 int main(int argc, char* argv[]) {
-    pointi<2> shape{2, 3};
-    tensor<float, 2> ts_a(shape);
-    tensor<float, 2> ts_b(shape);
-    tensor<float, 2> ts_c(shape);
-    fill(ts_a, 1.0f);
-    fill(ts_b, 2.0f);
-    //使用cuda  lambda算子 需要申明__device__ __host__
-    auto functor = [=](pointi<2> idx) { ts_c(idx) = ts_a(idx) + ts_b(idx); };
-    // 计算
-    for_index(shape, functor);
-    // 输出结果
-    std::cout << ts_c << std::endl;
-    return 0;
+    point<float, 3> pt = {0.0f, 1.0f, 2.0f};
+    std::cout << "pt: " << pt << std::endl;
+    std::cout << "pt offset 1 value: " << pt[1] << std::endl;
+
+    tensor<int, 2> ts = {{0, 1}, {2, 3}, {4, 5}};
+    std::cout << "ts: " << std::endl << ts << std::endl;
+    std::cout << "ts linear access 3 value : " << ts[3] << std::endl;
+    auto idx = pointi<2>{1, 1};
+    std::cout << "ts array access " << idx << " value : " << ts(idx) << std::endl;
 }
+```
+
+输出
+
+```console
+pt: {0, 1, 2}
+pt offset 1 value: 1
+ts: 
+{{0, 1}, 
+{2, 3}, 
+{4, 5}}
+ts linear access 3 value : 3
+ts array access {1, 1} value : 3
+```
+
+### for_index
+
+for_index和cuda::for_index是最基本的计算接口, mtensor中的大部分计算都是由for_index来驱动的, 下面的例子是在gpu设备上， 
+使用cuda::for_index来实现cuda::tensor的加法运算， 完整示例可查看[sample/sample_for_index.cu](sample/sample_for_index.cu)
+
+```c++
+pointi<2> shape{2, 3};
+cuda::tensor<float, 2> ts_a(shape);
+cuda::tensor<float, 2> ts_b(shape);
+cuda::tensor<float, 2> ts_c(shape);
+fill(ts_a, 1.0f);
+fill(ts_b, 2.0f);
+//使用cuda  lambda算子 需要申明__device__
+auto functor = [=] MATAZURE_DEVICE(pointi<2> idx) { ts_c(idx) = ts_a(idx) + ts_b(idx); };
+// 计算
+cuda::for_index(shape, functor);
+// 拷贝到主机tensor, 输出结果
+tensor<float, 2> ts_re(shape);
+mem_copy(ts_c, ts_re);
+std::cout << ts_re << std::endl;
 ```
 
 输出
@@ -91,83 +83,79 @@ int main(int argc, char* argv[]) {
 {3, 3, 3}}
 ```
 
-### 延迟计算
+可以和[sample/sample_for_index.cpp](sample/sample_for_index.cpp)中的cpu端示例对比，看一下cpu和gpu的实现由什么区别
 
-我们使用Lambda mtensor来延迟计算技术, Lambda mtensor是一个抽象的多维数组, 该数组不会指向具体的存储而是通过一个关于坐标的函数（算子）来描述。
+### 一个更复杂的例子
+
+下述代码片段是[sample/sample_gradient.cpp](sample/sample_gradient.cpp)中的片段, 该例子中使用了view名字空间下的slice和cast视图, 
+也通过了make_lambda来自定义了梯度视图和norm1视图, 并最终通过这些操作计算了图像的梯度强度
 
 ```c++
-#include <mtensor.hpp>
-
-using namespace matazure;
-
-int main(int argc, char *argv[]) {
-    //定义一个lambda算子用来描述抽象的一维数组, 其元素值等于坐标
-    auto functor_a = [](int i) -> int {
-        return i;
-    };
-    //lambda_mtensor不仅需要算子, 也需要尺寸
-    pointi<1> shape = { 100 };
-    //构造lts_a, 其是一个lambda_mtensor
-    auto lts_a = make_lambda(shape, functor_a);
-
-    //构造lts_b, 其元素值等于坐标的两倍
-    auto functor_b = [] (int i) -> int{
-        return i * 2;
-    };
-    auto lts_b = make_lambda(shape, functor_b);
-
-    //构造lts_a加lts_b的lambda_mtensor
-    auto functor_add = [lts_a, lts_b] (int i) -> int {
-        return lts_a[i] + lts_b[i];
-    };
-    auto lts_a_add_b = make_lambda(shape, functor_add);
-
-    //上述的定义不会执行具体的运算, 当我们去获取某一个具体坐标的值时其才会真正的去调用对应的算子
-    std::cout << "offset 50 value is " << lts_a_add_b[50] << std::endl;
-}
+tensor<byte, 2> img_gray = read_gray_image(argv[1]);
+pointi<2> padding{1, 1};
+tensor<byte, 2> image_pad_container(img_gray.shape() + padding * 2);
+//该操作使得img具备越界一个元素访问的能力， 因为img(-1, -1)对应着image_pad_container(0, 0)
+auto img_padding_view = view::slice(image_pad_container, padding, img_gray.shape());
+copy(img_gray, img_padding_view);
+//使用make_lambda构建梯度视图lambda_tensor
+auto img_float_view = view::cast<float>(img_padding_view);
+auto img_grad_view = make_lambda(img_float_view.shape(), [=](pointi<2> idx) {
+    point<byte, 2> grad;
+    grad[0] = img_float_view(idx + pointi<2>{1, 0}) - img_float_view(idx - pointi<2>{1, 0});
+    grad[1] = img_float_view(idx + pointi<2>{0, 1}) - img_float_view(idx - pointi<2>{0, 1});
+    return grad;
+});
+//将梯度转为norm1
+auto grad_norm1_view = make_lambda(img_grad_view.shape(), [=](pointi<2> idx) {
+    auto grad = img_grad_view(idx);
+    return std::abs(grad[0]) + std::abs(grad[1]);
+});
+//转为byte类型并固化的tensor中, 将lambda_tensor固化到tensor结构中
+auto grad_norm1 = view::cast<byte>(grad_norm1_view).persist();
+//写入梯度到图像
+write_gray_png("grad.png", grad_norm1);
 ```
 
-### 基于GPU的并行计算
+### gpu的分块计算block_for_index
+
+下面的示例展示了如何在block_for_index中使用shared内存来实现矩阵乘法,完整示例[sample/sample_matrix_mul.cu](sample/sample_matrix_mul.cu)
 
 ```c++
-#include <iostream>
-#include <mtensor.hpp>
-
-using namespace matazure;
-
-int main(int argc, char *argv[]) {
-    pointi<2> shape {5, 5};
-    tensor<float, 2> ts_a(shape);
-    tensor<float, 2> ts_b(shape);
-    tensor<float, 2> ts_c(shape);
-    fill(ts_a, 1.0f);
-    fill(ts_b, 2.0f);
-
-    //构造gpu上的mtensor
-    cuda::tensor<float, 2> cts_a(shape);
-    cuda::tensor<float, 2> cts_b(shape);
-    cuda::tensor<float, 2> cts_c(shape);
-
-    //将cpu上的数据拷贝到gpu上
-    mem_copy(ts_a, cts_a);
-    mem_copy(ts_b, cts_b);
-
-    //在gpu上执行加法操作, 这里使用了__device__ lambda, 需要加上nvcc的编译参数--expt-extended-lambda, 
-    cuda::for_index(shape, [cts_a, cts_b, cts_c] __device__ (pointi<2> index) {
-        cts_c(index) = cts_a(index) + cts_b(index);
-    });
-
-    //将gpu上数据拷贝会cpu
-    mem_copy(cts_c, ts_c);
-
-    //打印输出
-    for_each(ts_c, [](float e) {
-        printf("%f, ", e);
-    });
-    printf("/n");
-
-    return 0;
-}
+const int BLOCK_SIZE = 16;                      // block尺寸位16x16
+typedef dim<BLOCK_SIZE, BLOCK_SIZE> BLOCK_DIM;  // 需要用一个dim<16, 16>来表示编译时block尺寸
+point2i block_dim = BLOCK_DIM::value();  //将编译时的block尺寸转换为运行时point2i类型
+point2i grid_dim{8, 8};                  // grid的尺寸，决定block的数目，布局
+point2i global_dim = block_dim * grid_dim;  // 全局尺寸
+int M = global_dim[0];
+int N = global_dim[1];
+int K = BLOCK_SIZE * 4;
+cuda::tensor<float, 2> cmat_a(point2i{M, K});
+cuda::tensor<float, 2> cmat_b(point2i{K, N});
+cuda::tensor<float, 2> cmat_c(point2i{M, N});
+// block_for_index需要给一个编译时的block尺寸， grid_dim是运行时的grid尺寸
+cuda::block_for_index<BLOCK_DIM>(grid_dim,
+                                 [=] __device__(cuda::block_index<BLOCK_DIM> block_idx) {
+                                     auto row = block_idx.local[0];
+                                     auto col = block_idx.local[1];
+                                     auto global_row = block_idx.global[0];
+                                     auto global_col = block_idx.global[1];
+                                     //位于shared内存的分块矩阵
+                                     __shared__ local_tensor<float, BLOCK_DIM> local_a;
+                                     __shared__ local_tensor<float, BLOCK_DIM> local_b;
+                                     float sum = 0.0f;
+                                     for (int_t i = 0; i < K; i += BLOCK_SIZE) {
+                                         //拷贝局部矩阵块
+                                         local_a(row, col) = cmat_a(global_row, col + i);
+                                         local_b(row, col) = cmat_b(row + i, global_col);
+                                         cuda::syncthreads();
+                                         //矩阵块乘法
+                                         for (int_t N = 0; N < BLOCK_SIZE; N++) {
+                                             sum += local_a(row, N) * local_b(N, col);
+                                         }
+                                         cuda::syncthreads();
+                                     }
+                                     cmat_c(block_idx.global) = sum;
+                                 });
 ```
 
 ### c++和cuda通用代码实现
@@ -177,87 +165,10 @@ int main(int argc, char *argv[]) {
 *一个通用实现阶段*
 
 大部分需要同时支持cuda和c++的程序可以由若干个由上图所示的阶段构成, 在该阶段中会把tensor的数据拷贝的cuda::tensor,然后cuda和c++端均可以执行一个通用的实现
-,在将cuda的数据拷贝会tensor. 这样cuda的运算结果最终和c++的结果是一致的. 在上图中, 每个阶段的"common implement"是用模板泛型实现的, 其调用的函数需要申明_\_device\_\_ \_\_host\_\_
-
-```c++
-
-```
-
-[smaple/sample_mandelbrot.hpp](sample/sample_mandelbrot.hpp)是另一个列子
-
-### GPU的分块计算block_for_index
-
-下面是一个卷积实现,该实现仅为了展示block_for_index,其每个块的边界是无效值
-
-```c++
-#include <mtensor.hpp>
-#include "image_helper.hpp"
-
-using namespace matazure;
-
-int main(int argc, char* argv[]) {
-    if (argc < 2) {
-        std::cout << "sample6_convolution input_image" << std::endl;
-        return -1;
-    }
-
-    //读取图像
-    tensor<pointb<3>, 2> img_rgb = read_rgb_image(argv[1]);
-    //使用均值滤波器
-    tensor<pointf<3>, 2> kernel_mean(pointi<2>{3, 3});
-    fill(kernel_mean, pointf<3>{0.111f, 0.111f, 0.111f});
-
-    //向GPU拷贝数据
-    cuda::tensor<pointb<3>, 2> cimg_rgb(img_rgb.shape());
-    mem_copy(img_rgb, cimg_rgb);
-    cuda::tensor<pointf<3>, 2> ckernel_mean(kernel_mean.shape());
-    mem_copy(kernel_mean, ckernel_mean);
-
-    //结果图像
-    cuda::tensor<pointf<3>, 2> cimg_mean(img_rgb.shape());
-
-    typedef dim<16, 16> BLOCK_DIM;
-    pointi<2> block_dim = BLOCK_DIM::value();
-    auto grid_dim = (img_rgb.shape() + block_dim - pointi<2>{1, 1}) / block_dim;
-    auto padding = kernel_mean.shape() / 2;
-
-    cuda::block_for_index<BLOCK_DIM>(grid_dim, [=] __device__(
-                                                   cuda::block_index<BLOCK_DIM> block_idx) {
-        //使用shared memory以获取更好的速度
-        __shared__ local_tensor<pointf<3>, BLOCK_DIM> sh_ts_block;
-        //若是无效区域则填充0
-        if (inside_rect(block_idx.global, pointi<2>{0, 0}, cimg_rgb.shape())) {
-            sh_ts_block(block_idx.local) = point_cast<float>(cimg_rgb(block_idx.global));
-        } else {
-            sh_ts_block(block_idx.local) = pointf<3>{0, 0, 0};
-        }
-
-        cuda::syncthreads();
-
-        if (inside_rect(block_idx.local, padding, block_idx.block_dim - ckernel_mean.shape() + 1) &&
-            inside_rect(block_idx.global, pointi<2>{0, 0}, cimg_rgb.shape())) {
-            auto sum = pointf<3>{0, 0, 0};
-            //在__device__ lambda算子里, 一样可以使用matazure::for_index操作
-            for_index(pointi<2>{0, 0}, ckernel_mean.shape(), [&](const pointi<2>& idx) {
-                sum += sh_ts_block(block_idx.local + idx - padding) * ckernel_mean(idx);
-            });
-            cimg_mean(block_idx.global) = sum;
-        }
-    });
-
-    //转换float类型到byte类型
-    cuda::tensor<pointb<3>, 2> cimg_mean_byte(cimg_mean.shape());
-    cuda::transform(cimg_mean, cimg_mean_byte,
-                    [] __device__(pointf<3> pixel) { return point_cast<byte>(pixel); });
-    //向主机写入图像
-    tensor<pointb<3>, 2> img_mean(cimg_mean_byte.shape());
-    mem_copy(cimg_mean_byte, img_mean);
-    write_rgb_png("mean_" + std::string(argv[1]), img_mean);
-
-    return 0;
-}
-
-```
+,在将cuda的数据拷贝会tensor. 这样cuda的运算结果最终和c++的结果是一致的. 在上图中, 每个阶段的"common implement"是用模板泛型实现的, 
+其调用的函数需要申明_\_device\_\_ \_\_host\_\_
+. 更多的细节看参考示例[smaple/sample_mandelbrot.hpp](sample/sample_mandelbrot.hpp). 
+除此之外[include/matazure/view](include/matazure/view)下的实现都是cpu和gpu通用的(同一份代码实现), sample下的levelset分割算法是一个更复杂的泛型多维度异构通用实现.
 
 ## mtensor的性能是否高效
 

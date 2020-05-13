@@ -1,5 +1,5 @@
-# add_subdirectory(host)
-# add_subdirectory(cuda)
+add_executable(sample_basic_structure sample_basic_structure.cpp)
+target_link_libraries(sample_basic_structure mtensor)
 
 add_executable(sample_for_index sample_for_index.cpp)
 target_link_libraries(sample_for_index mtensor)

@@ -53,9 +53,9 @@ x64
 .vscode
 core*
 
-./*.png
-./*.jpg
-./*.bmp
+*.png
+*.jpg
+*.bmp
 
 lenna.png
 
