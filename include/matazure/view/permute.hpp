@@ -25,27 +25,11 @@ struct permute_functor {
     }
 };
 
-template <int_t _I0, int_t _I1, typename _Tensor>
+template <int_t... _Idx, typename _Tensor>
 inline auto permute(_Tensor ts)
-    -> decltype(make_lambda(ts.shape(), permute_functor<_Tensor, _I0, _I1>(ts),
+    -> decltype(make_lambda(ts.shape(), permute_functor<_Tensor, _Idx...>(ts),
                             typename _Tensor::memory_type{})) {
-    return make_lambda(ts.shape(), permute_functor<_Tensor, _I0, _I1>(ts),
-                       typename _Tensor::memory_type{});
-}
-
-template <int_t _I0, int_t _I1, int_t _I2, typename _Tensor>
-inline auto permute(_Tensor ts)
-    -> decltype(make_lambda(ts.shape(), permute_functor<_Tensor, _I0, _I1, _I2>(ts),
-                            typename _Tensor::memory_type{})) {
-    return make_lambda(ts.shape(), permute_functor<_Tensor, _I0, _I1, _I2>(ts),
-                       typename _Tensor::memory_type{});
-}
-
-template <int_t _I0, int_t _I1, int_t _I2, int_t _I3, typename _Tensor>
-inline auto permute(_Tensor ts)
-    -> decltype(make_lambda(ts.shape(), permute_functor<_Tensor, _I0, _I1, _I2, _I3>(ts),
-                            typename _Tensor::memory_type{})) {
-    return make_lambda(ts.shape(), permute_functor<_Tensor, _I0, _I1, _I2, _I3>(ts),
+    return make_lambda(ts.shape(), permute_functor<_Tensor, _Idx...>(ts),
                        typename _Tensor::memory_type{});
 }
 

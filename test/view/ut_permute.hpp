@@ -9,7 +9,7 @@ TEST(ViewTests, Permute) {
       {12, 13, 14, 15}};
     // clang-format on
 
-    //转置
+    //转置参数输在模板参数里
     auto ts_permute_view = view::permute<1, 0>(ts);
     auto ts_permute = ts_permute_view.persist();
 
