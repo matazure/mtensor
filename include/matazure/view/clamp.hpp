@@ -12,12 +12,12 @@ namespace matazure {
 namespace view {
 
 template <typename _Tensor>
-struct clamp_op {
+struct clamp_zero_functor {
    private:
     _Tensor ts_;
 
    public:
-    clamp_op(_Tensor ts) : ts_(ts) {}
+    clamp_zero_functor(_Tensor ts) : ts_(ts) {}
 
     MATAZURE_GENERAL auto operator()(pointi<_Tensor::rank> idx) const
         -> decltype(zero<decay_t<typename _Tensor::value_type>>::value()) {
@@ -36,9 +36,10 @@ struct clamp_op {
  */
 template <typename _Tensor>
 inline auto clamp_zero(_Tensor ts)
-    -> decltype(make_lambda(ts.shape(), clamp_op<decay_t<_Tensor>>(ts),
+    -> decltype(make_lambda(ts.shape(), clamp_zero_functor<decay_t<_Tensor>>(ts),
                             typename _Tensor::memory_type{})) {
-    return make_lambda(ts.shape(), clamp_op<decay_t<_Tensor>>(ts), typename _Tensor::memory_type{});
+    return make_lambda(ts.shape(), clamp_zero_functor<decay_t<_Tensor>>(ts),
+                       typename _Tensor::memory_type{});
 }
 
 }  // namespace view

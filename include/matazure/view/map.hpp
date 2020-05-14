@@ -13,13 +13,13 @@ namespace matazure {
 namespace view {
 
 template <typename _Tensor, typename _Func>
-struct linear_map_op {
+struct linear_map_functor {
    private:
     const _Tensor ts_;
     const _Func functor_;
 
    public:
-    linear_map_op(_Tensor ts, _Func fun) : ts_(ts), functor_(fun) {}
+    linear_map_functor(_Tensor ts, _Func fun) : ts_(ts), functor_(fun) {}
 
     MATAZURE_GENERAL auto operator()(int_t i) const -> decltype(this->functor_(this->ts_[i])) {
         return functor_(ts_[i]);
@@ -27,13 +27,13 @@ struct linear_map_op {
 };
 
 template <typename _Tensor, typename _Func>
-struct array_map_op {
+struct array_map_functor {
    private:
     const _Tensor ts_;
     const _Func functor_;
 
    public:
-    array_map_op(_Tensor ts, _Func fun) : ts_(ts), functor_(fun) {}
+    array_map_functor(_Tensor ts, _Func fun) : ts_(ts), functor_(fun) {}
 
     MATAZURE_GENERAL auto operator()(pointi<_Tensor::rank> idx) const
         -> decltype(this->functor_(this->ts_(idx))) {
@@ -49,9 +49,9 @@ struct array_map_op {
 template <typename _Tensor, typename _Func>
 inline auto map(_Tensor ts, _Func fun,
                 enable_if_t<is_same<linear_index, typename _Tensor::index_type>::value>* = 0)
-    -> decltype(make_lambda(ts.shape(), linear_map_op<_Tensor, _Func>(ts, fun),
+    -> decltype(make_lambda(ts.shape(), linear_map_functor<_Tensor, _Func>(ts, fun),
                             typename _Tensor::memory_type{})) {
-    return make_lambda(ts.shape(), linear_map_op<_Tensor, _Func>(ts, fun),
+    return make_lambda(ts.shape(), linear_map_functor<_Tensor, _Func>(ts, fun),
                        typename _Tensor::memory_type{});
 }
 
@@ -63,9 +63,9 @@ inline auto map(_Tensor ts, _Func fun,
 template <typename _Tensor, typename _Func>
 inline auto map(_Tensor ts, _Func fun,
                 enable_if_t<is_same<array_index, typename _Tensor::index_type>::value>* = 0)
-    -> decltype(make_lambda(ts.shape(), array_map_op<_Tensor, _Func>(ts, fun),
+    -> decltype(make_lambda(ts.shape(), array_map_functor<_Tensor, _Func>(ts, fun),
                             typename _Tensor::memory_type{})) {
-    return make_lambda(ts.shape(), array_map_op<_Tensor, _Func>(ts, fun),
+    return make_lambda(ts.shape(), array_map_functor<_Tensor, _Func>(ts, fun),
                        typename _Tensor::memory_type{});
 }
 
