@@ -15,12 +15,13 @@ struct nested_initializer_list {
         auto tmp_i = idx[0];
         auto& sub_init = *(init.begin() + tmp_i);
         return nested_initializer_list<_ValueType, _Rank - 1>::access(sub_init,
-                                                                      unstack_point<0>(idx));
+                                                                      gather_point<0>(idx));
     }
 
     static pointi<_Rank> shape(const type& init) {
-        return statck_point<0>(nested_initializer_list<_ValueType, _Rank - 1>::shape(*init.begin()),
-                               static_cast<int_t>(init.size()));
+        return scatter_point<0>(
+            nested_initializer_list<_ValueType, _Rank - 1>::shape(*init.begin()),
+            static_cast<int_t>(init.size()));
     };
 };
 

@@ -27,7 +27,7 @@ struct printer {
     static void print(std::ostream& out, _Tensor ts) {
         out << "{";
         for (int_t i = 0; i < ts.shape(0); ++i) {
-            auto tmp_view = view::unstack<0>(ts, i);
+            auto tmp_view = view::gather<0>(ts, i);
             printer<decltype(tmp_view), _Rank - 1>::print(out, tmp_view);
             if (i != ts.shape(0) - 1) {
                 out << ", " << std::endl;

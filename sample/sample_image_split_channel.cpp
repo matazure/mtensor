@@ -16,9 +16,9 @@ int main(int argc, char* argv[]) {
 
     tensor3f img_split(3, img_gray.shape(0), img_gray.shape(1));
     //在img_split的基础上获取各个通道
-    auto img_split_r_view = view::unstack<2>(img_split, 0);  // red通道视图
-    auto img_split_b_view = view::unstack<2>(img_split, 1);  // blue通道视图
-    auto img_split_g_view = view::unstack<2>(img_split, 2);  // green通道视图
+    auto img_split_r_view = view::gather<2>(img_split, 0);  // red通道视图
+    auto img_split_b_view = view::gather<2>(img_split, 1);  // blue通道视图
+    auto img_split_g_view = view::gather<2>(img_split, 2);  // green通道视图
     //拷贝数据到img_split中
     for_index(img_gray.shape(), [=](point2i idx) {
         auto tmp = img_scale_view(idx);
