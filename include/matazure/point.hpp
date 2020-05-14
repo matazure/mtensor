@@ -362,19 +362,6 @@ MATAZURE_GENERAL inline constexpr pointi<3> statck_point<2>(pointi<2> pt, int_t 
     return pointi<3>{get<0>(pt), get<1>(pt), cat_i};
 }
 
-template <int_t _I0, int_t _I1>
-MATAZURE_GENERAL inline constexpr pointi<2> permute_point(pointi<2> pt);
-
-template <>
-MATAZURE_GENERAL inline constexpr pointi<2> permute_point<0, 1>(pointi<2> pt) {
-    return pt;
-}
-
-template <>
-MATAZURE_GENERAL inline constexpr pointi<2> permute_point<1, 0>(pointi<2> pt) {
-    return pointi<2>{pt[1], pt[0]};
-}
-
 template <int_t... _Idx>
 MATAZURE_GENERAL inline constexpr pointi<sizeof...(_Idx)> permute_point(
     pointi<sizeof...(_Idx)> pt) {
