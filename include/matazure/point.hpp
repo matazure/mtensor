@@ -36,7 +36,7 @@ class point {
      * @param i element index
      * @return element referece
      */
-    MATAZURE_GENERAL reference operator[](int_t i) { return elements_[i]; }
+    MATAZURE_GENERAL constexpr reference operator[](int_t i) { return elements_[i]; }
 
     /// return the length of point
     MATAZURE_GENERAL constexpr int_t size() const { return rank; }
@@ -360,6 +360,46 @@ MATAZURE_GENERAL inline constexpr pointi<3> statck_point<1>(pointi<2> pt, int_t 
 template <>
 MATAZURE_GENERAL inline constexpr pointi<3> statck_point<2>(pointi<2> pt, int_t cat_i) {
     return pointi<3>{get<0>(pt), get<1>(pt), cat_i};
+}
+
+template <int_t _I0, int_t _I1>
+MATAZURE_GENERAL inline constexpr pointi<2> permute_point(pointi<2> pt);
+
+template <>
+MATAZURE_GENERAL inline constexpr pointi<2> permute_point<0, 1>(pointi<2> pt) {
+    return pt;
+}
+
+template <>
+MATAZURE_GENERAL inline constexpr pointi<2> permute_point<1, 0>(pointi<2> pt) {
+    return pointi<2>{pt[1], pt[0]};
+}
+
+template <int_t _I0, int_t _I1, int_t _I2>
+MATAZURE_GENERAL inline constexpr pointi<3> permute_point(pointi<3> pt);
+template <>
+MATAZURE_GENERAL inline constexpr pointi<3> permute_point<0, 1, 2>(pointi<3> pt) {
+    return pointi<3>{pt[0], pt[1], pt[2]};
+}
+template <>
+MATAZURE_GENERAL inline constexpr pointi<3> permute_point<0, 2, 1>(pointi<3> pt) {
+    return pointi<3>{pt[0], pt[2], pt[1]};
+}
+template <>
+MATAZURE_GENERAL inline constexpr pointi<3> permute_point<1, 0, 2>(pointi<3> pt) {
+    return pointi<3>{pt[1], pt[0], pt[2]};
+}
+template <>
+MATAZURE_GENERAL inline constexpr pointi<3> permute_point<1, 2, 0>(pointi<3> pt) {
+    return pointi<3>{pt[1], pt[2], pt[0]};
+}
+template <>
+MATAZURE_GENERAL inline constexpr pointi<3> permute_point<2, 0, 1>(pointi<3> pt) {
+    return pointi<3>{pt[2], pt[0], pt[1]};
+}
+template <>
+MATAZURE_GENERAL inline constexpr pointi<3> permute_point<2, 1, 0>(pointi<3> pt) {
+    return pointi<3>{pt[2], pt[1], pt[0]};
 }
 
 }  // namespace matazure
