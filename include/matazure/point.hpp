@@ -300,65 +300,65 @@ inline constexpr point<_T, 4> reverse(point<_T, 4> pt) {
 
 // pointi<3>
 template <int_t _UnstackDimIdx>
-inline pointi<2> unstack_point(pointi<3> pt);
+MATAZURE_GENERAL inline constexpr pointi<2> unstack_point(pointi<3> pt);
 
 template <>
-inline pointi<2> unstack_point<0>(pointi<3> pt) {
+MATAZURE_GENERAL inline constexpr pointi<2> unstack_point<0>(pointi<3> pt) {
     return pointi<2>{get<1>(pt), get<2>(pt)};
 }
 
 template <>
-inline pointi<2> unstack_point<1>(pointi<3> pt) {
+MATAZURE_GENERAL inline constexpr pointi<2> unstack_point<1>(pointi<3> pt) {
     return pointi<2>{get<0>(pt), get<2>(pt)};
 }
 
 template <>
-inline pointi<2> unstack_point<2>(pointi<3> pt) {
+MATAZURE_GENERAL inline constexpr pointi<2> unstack_point<2>(pointi<3> pt) {
     return pointi<2>{get<0>(pt), get<1>(pt)};
 }
 
 // pointi<2>
 template <int_t _UnstackDimIdx>
-inline pointi<1> unstack_point(pointi<2> pt);
+MATAZURE_GENERAL inline constexpr pointi<1> unstack_point(pointi<2> pt);
 
 template <>
-inline pointi<1> unstack_point<0>(pointi<2> pt) {
+MATAZURE_GENERAL inline constexpr pointi<1> unstack_point<0>(pointi<2> pt) {
     return pointi<1>{get<1>(pt)};
 }
 
 template <>
-inline pointi<1> unstack_point<1>(pointi<2> pt) {
+MATAZURE_GENERAL inline constexpr pointi<1> unstack_point<1>(pointi<2> pt) {
     return pointi<1>{get<0>(pt)};
 }
 
 template <int_t _CatDimIdx>
-inline pointi<2> statck_point(pointi<1> pt, int_t cat_i);
+MATAZURE_GENERAL inline constexpr pointi<2> statck_point(pointi<1> pt, int_t cat_i);
 
 template <>
-inline pointi<2> statck_point<0>(pointi<1> pt, int_t cat_i) {
+MATAZURE_GENERAL inline constexpr pointi<2> statck_point<0>(pointi<1> pt, int_t cat_i) {
     return pointi<2>{cat_i, get<0>(pt)};
 }
 
 template <>
-inline pointi<2> statck_point<1>(pointi<1> pt, int_t cat_i) {
+MATAZURE_GENERAL inline constexpr pointi<2> statck_point<1>(pointi<1> pt, int_t cat_i) {
     return pointi<2>{get<0>(pt), cat_i};
 }
 
 template <int_t _CatDimIdx>
-inline pointi<3> statck_point(pointi<2> pt, int_t cat_i);
+MATAZURE_GENERAL inline constexpr pointi<3> statck_point(pointi<2> pt, int_t cat_i);
 
 template <>
-inline pointi<3> statck_point<0>(pointi<2> pt, int_t cat_i) {
+MATAZURE_GENERAL inline constexpr pointi<3> statck_point<0>(pointi<2> pt, int_t cat_i) {
     return pointi<3>{cat_i, get<0>(pt), get<1>(pt)};
 }
 
 template <>
-inline pointi<3> statck_point<1>(pointi<2> pt, int_t cat_i) {
+MATAZURE_GENERAL inline constexpr pointi<3> statck_point<1>(pointi<2> pt, int_t cat_i) {
     return pointi<3>{get<0>(pt), cat_i, get<1>(pt)};
 }
 
 template <>
-inline pointi<3> statck_point<2>(pointi<2> pt, int_t cat_i) {
+MATAZURE_GENERAL inline constexpr pointi<3> statck_point<2>(pointi<2> pt, int_t cat_i) {
     return pointi<3>{get<0>(pt), get<1>(pt), cat_i};
 }
 

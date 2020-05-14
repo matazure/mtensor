@@ -87,7 +87,7 @@ class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout, _Allocator
 
     allocator_type get_allocator() const { return allocator_; }
 
-    ~tensor() {}
+    MATAZURE_GENERAL ~tensor() {}
 
    private:
     shared_ptr<value_type> malloc_shared_memory(int_t size) {

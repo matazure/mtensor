@@ -42,7 +42,7 @@ inline auto gradient(image_type image)
     -> decltype(make_lambda(image.shape(), gradient_op<image_type, image_type::rank>{image},
                             typename image_type::memory_type{})) {
     using value_type = typename image_type::value_type;
-    static const int_t rank = image_type::rank;
+    // static const int_t rank = image_type::rank;
 
     return make_lambda(image.shape(), gradient_op<image_type, image_type::rank>{image},
                        typename image_type::memory_type{});
@@ -78,7 +78,7 @@ template <typename image_type>
 inline auto div(image_type image)
     -> decltype(make_lambda(image.shape(), div_op<image_type, image_type::rank>{image},
                             typename image_type::memory_type{})) {
-    static const int_t rank = image_type::rank;
+    // static const int_t rank = image_type::rank;
     typedef typename image_type::value_type image_value_type;
     typedef typename image_value_type::value_type value_type;
 
@@ -124,7 +124,7 @@ auto laplace(image_type image)
     -> decltype(make_lambda(image.shape(), laplace_op<image_type, image_type::rank>{image},
                             typename image_type::memory_type{})) {
     using value_type = typename image_type::value_type;
-    static const int_t rank = image_type::rank;
+    // static const int_t rank = image_type::rank;
     return make_lambda(image.shape(), laplace_op<image_type, image_type::rank>{image},
                        typename image_type::memory_type{});
 }

@@ -54,7 +54,7 @@ namespace matazure {
         value_type v_;                                                                         \
                                                                                                \
        public:                                                                                 \
-        name(_T x, value_type v) : x_(x), v_(v) {}                                             \
+        MATAZURE_GENERAL name(_T x, value_type v) : x_(x), v_(v) {}                            \
                                                                                                \
         MATAZURE_GENERAL auto operator()(int_t i) const -> decltype(this->x_[i] op this->v_) { \
             return x_[i] op v_;                                                                \
@@ -71,7 +71,7 @@ namespace matazure {
         value_type v_;                                                      \
                                                                             \
        public:                                                              \
-        name(_T x, value_type v) : x_(x), v_(v) {}                          \
+        MATAZURE_GENERAL name(_T x, value_type v) : x_(x), v_(v) {}         \
                                                                             \
         MATAZURE_GENERAL auto operator()(const pointi<_T::rank>& idx) const \
             -> decltype(this->x_(idx) op this->v_) {                        \
@@ -89,7 +89,7 @@ namespace matazure {
         _T x_;                                                               \
                                                                              \
        public:                                                               \
-        name(value_type v, _T x) : v_(v), x_(x) {}                           \
+        MATAZURE_GENERAL name(value_type v, _T x) : v_(v), x_(x) {}          \
                                                                              \
         MATAZURE_GENERAL auto operator()(const int_t& i) const               \
             -> decltype((this->v_)op(this->x_[i])) {                         \
@@ -107,7 +107,7 @@ namespace matazure {
         _T x_;                                                              \
                                                                             \
        public:                                                              \
-        name(_T x, value_type v) : v_(v), x_(x) {}                          \
+        MATAZURE_GENERAL name(_T x, value_type v) : v_(v), x_(x) {}         \
                                                                             \
         MATAZURE_GENERAL auto operator()(const pointi<_T::rank>& idx) const \
             -> decltype(this->v_ op this->x_(idx)) {                        \

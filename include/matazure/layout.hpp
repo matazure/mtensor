@@ -115,6 +115,8 @@ class row_major_layout {
 
     MATAZURE_GENERAL pointi<rank> stride() const { return stride_; }
 
+    MATAZURE_GENERAL ~row_major_layout() {}
+
    private:
     pointi<rank> shape_;
     pointi<rank> stride_;
