@@ -134,28 +134,28 @@ cuda::tensor<float, 2> cmat_b(point2i{K, N});
 cuda::tensor<float, 2> cmat_c(point2i{M, N});
 // block_for_index需要给一个编译时的block尺寸， grid_dim是运行时的grid尺寸
 cuda::block_for_index<BLOCK_DIM>(grid_dim,
-                                 [=] __device__(cuda::block_index<BLOCK_DIM> block_idx) {
-                                     auto row = block_idx.local[0];
-                                     auto col = block_idx.local[1];
-                                     auto global_row = block_idx.global[0];
-                                     auto global_col = block_idx.global[1];
-                                     //位于shared内存的分块矩阵
-                                     __shared__ local_tensor<float, BLOCK_DIM> local_a;
-                                     __shared__ local_tensor<float, BLOCK_DIM> local_b;
-                                     float sum = 0.0f;
-                                     for (int_t i = 0; i < K; i += BLOCK_SIZE) {
-                                         //拷贝局部矩阵块
-                                         local_a(row, col) = cmat_a(global_row, col + i);
-                                         local_b(row, col) = cmat_b(row + i, global_col);
-                                         cuda::syncthreads();
-                                         //矩阵块乘法
-                                         for (int_t N = 0; N < BLOCK_SIZE; N++) {
-                                             sum += local_a(row, N) * local_b(N, col);
-                                         }
-                                         cuda::syncthreads();
-                                     }
-                                     cmat_c(block_idx.global) = sum;
-                                 });
+    [=] __device__(cuda::block_index<BLOCK_DIM> block_idx) {
+        auto row = block_idx.local[0];
+        auto col = block_idx.local[1];
+        auto global_row = block_idx.global[0];
+        auto global_col = block_idx.global[1];
+        //位于shared内存的分块矩阵
+        __shared__ local_tensor<float, BLOCK_DIM> local_a;
+        __shared__ local_tensor<float, BLOCK_DIM> local_b;
+        float sum = 0.0f;
+        for (int_t i = 0; i < K; i += BLOCK_SIZE) {
+            //拷贝局部矩阵块
+            local_a(row, col) = cmat_a(global_row, col + i);
+            local_b(row, col) = cmat_b(row + i, global_col);
+            cuda::syncthreads();
+            //矩阵块乘法
+            for (int_t N = 0; N < BLOCK_SIZE; N++) {
+                sum += local_a(row, N) * local_b(N, col);
+            }
+            cuda::syncthreads();
+        }
+        cmat_c(block_idx.global) = sum;
+    });
 ```
 
 ### c++和cuda通用代码实现
@@ -181,10 +181,10 @@ mtensor在绝大部分场景下都不会带来额外的性能开销, 并且方�
 除此之外, mtensor还编写了大量的benchmark来确保性能指标
 
 ```console
-bm_cuda_tensor1f_copy/1000000000                   24080055 ns   24078003 ns         29   154.718GB/s   38.6794G items/s
-bm_cuda_tensor2f_copy/32000                        24512069 ns   24509982 ns         29   155.639GB/s   38.9096G items/s
-bm_cuda_tensor2f_column_major_layout_copy/32000    24564743 ns   24562660 ns         29   155.305GB/s   38.8262G items/s
-bm_cuda_tensor2f_row_layout_copy/32000             24556949 ns   24554887 ns         29   155.354GB/s   38.8385G items/s
+bm_cuda_tensor1f_copy/1000000000                      154.718GB/s   38.6794G items/s
+bm_cuda_tensor2f_copy/32000                           155.639GB/s   38.9096G items/s
+bm_cuda_tensor2f_column_major_layout_copy/32000       155.305GB/s   38.8262G items/s
+bm_cuda_tensor2f_row_layout_copy/32000                155.354GB/s   38.8385G items/s
 ```
 
 ## 如何在你的项目中集成
