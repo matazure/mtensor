@@ -8,9 +8,9 @@ int main(int argc, char* argv[]) {
 
     //若支持openmp， 则开启， 需要编译的时候加入-fopenmp
 #ifdef MATAZURE_OPENMP
-    auto img_mandelbrot_rgb = mandelbrot(shape, host_tag{}).persist(omp_policy{});
+    auto img_mandelbrot_rgb = mandelbrot(shape, host_t{}).persist(omp_policy{});
 #else
-    auto img_mandelbrot_rgb = mandelbrot(shape, host_tag{}).persist();
+    auto img_mandelbrot_rgb = mandelbrot(shape, host_t{}).persist();
 #endif
 
     write_rgb_png(output_mandelbrot_path, img_mandelbrot_rgb);

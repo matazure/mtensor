@@ -7,8 +7,8 @@
 
 using namespace matazure;
 
-using matazure::device_tag;
-using matazure::host_tag;
+using matazure::device_t;
+using matazure::host_t;
 
 constexpr int_t operator"" _G(unsigned long long v) {
     return static_cast<int_t>(1000 * 1000 * 1000 * v);

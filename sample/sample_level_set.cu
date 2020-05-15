@@ -9,7 +9,7 @@ int main(int argc, char* argv[]) {
     }
 
     tensor<byte, 2> img_gray = read_gray_image(argv[1]);
-    auto cu_img_gray = mem_clone(img_gray, device_tag{});
+    auto cu_img_gray = mem_clone(img_gray, device_t{});
     auto img_float = view::cast<float>(cu_img_gray).persist();
     auto img_grad = gradient(img_float);
     auto mat_g = view::map(img_grad,
@@ -42,7 +42,7 @@ int main(int argc, char* argv[]) {
         return static_cast<uint8_t>(min(255.0f, max(0.0f, -v * 100.f)));
     });
 
-    write_gray_png("phi.png", mem_clone(img_phi, host_tag{}));
+    write_gray_png("phi.png", mem_clone(img_phi, host_t{}));
 
     return 0;
 }

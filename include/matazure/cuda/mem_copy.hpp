@@ -43,7 +43,7 @@ inline void memset(tensor<_ValueType, _Rank> ts, int v) {
 inline void MATAZURE_DEVICE syncthreads() { __syncthreads(); }
 
 template <typename _Type, int_t _Rank, typename _Layout>
-inline tensor<_Type, _Rank, _Layout> mem_clone(tensor<_Type, _Rank, _Layout> ts, device_tag) {
+inline tensor<_Type, _Rank, _Layout> mem_clone(tensor<_Type, _Rank, _Layout> ts, device_t) {
     tensor<decay_t<_Type>, _Rank, _Layout> ts_re(ts.shape());
     mem_copy(ts, ts_re);
     return ts_re;
@@ -51,20 +51,19 @@ inline tensor<_Type, _Rank, _Layout> mem_clone(tensor<_Type, _Rank, _Layout> ts,
 
 template <typename _Type, int_t _Rank, typename _Layout>
 inline tensor<_Type, _Rank, _Layout> mem_clone(tensor<_Type, _Rank, _Layout> ts) {
-    return mem_clone(ts, device_tag{});
+    return mem_clone(ts, device_t{});
 }
 
 template <typename _Type, int_t _Rank, typename _Layout>
 inline tensor<_Type, _Rank, _Layout> mem_clone(matazure::tensor<_Type, _Rank, _Layout> ts,
-                                               device_tag) {
+                                               device_t) {
     tensor<decay_t<_Type>, _Rank, _Layout> ts_re(ts.shape());
     mem_copy(ts, ts_re);
     return ts_re;
 }
 
 template <typename _Type, int_t _Rank, typename _Layout>
-inline matazure::tensor<_Type, _Rank, _Layout> mem_clone(tensor<_Type, _Rank, _Layout> ts,
-                                                         host_tag) {
+inline matazure::tensor<_Type, _Rank, _Layout> mem_clone(tensor<_Type, _Rank, _Layout> ts, host_t) {
     matazure::tensor<decay_t<_Type>, _Rank, _Layout> ts_re(ts.shape());
     mem_copy(ts, ts_re);
     return ts_re;

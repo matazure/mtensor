@@ -52,7 +52,7 @@ class lambda_tensor : public tensor_expression<lambda_tensor<_Rank, _Func, _Layo
     typedef typename internal::get_functor_accessor_type<_Rank, _Func>::type index_type;
 
     typedef _Layout layout_type;
-    typedef host_tag memory_type;
+    typedef host_t memory_type;
 
    public:
     /**
@@ -172,7 +172,7 @@ inline auto make_lambda(pointi<_Rank> extent, _Func fun) -> lambda_tensor<_Rank,
  * @param the functor, a index -> value pattern
  */
 template <int_t _Rank, typename _Func>
-inline auto make_lambda(pointi<_Rank> extent, _Func fun, host_tag) -> lambda_tensor<_Rank, _Func> {
+inline auto make_lambda(pointi<_Rank> extent, _Func fun, host_t) -> lambda_tensor<_Rank, _Func> {
     return lambda_tensor<_Rank, _Func>(extent, fun);
 }
 

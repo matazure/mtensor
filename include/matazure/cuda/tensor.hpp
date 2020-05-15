@@ -23,7 +23,7 @@ class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout, _Allocator
     typedef value_type* pointer;
     typedef linear_index index_type;
     typedef _Layout layout_type;
-    typedef device_tag memory_type;
+    typedef device_t memory_type;
     typedef _Allocator allocator_type;
 
     tensor() : tensor(zero<pointi<rank>>::value()) {}

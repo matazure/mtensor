@@ -67,7 +67,7 @@ class tensor : public tensor_expression<tensor<_ValueType, _Rank, _Layout, _Allo
     /// primitive linear access mode
     typedef linear_index index_type;
     /// host memory type
-    typedef host_tag memory_type;
+    typedef host_t memory_type;
     typedef _Allocator allocator_type;
 
    public:
