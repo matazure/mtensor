@@ -1,0 +1,21 @@
+<svg width="10em" height="10em"  xmlns="http://www.w3.org/2000/svg">
+    <g fill="none">
+        <line x1="0%" y1="0%" x2="0%" y2="100%" style="stroke:black;stroke-width:2"/>
+        <line x1="33%" y1="0%" x2="33%" y2="100%" style="stroke:black;stroke-width:1"/>
+        <line x1="66%" y1="0%" x2="66%" y2="100%" style="stroke:black;stroke-width:1"/>
+        <line x1="100%" y1="0%" x2="100%" y2="100%" style="stroke:black;stroke-width:2"/>
+        <line y1="0%" x1="0%" y2="0%" x2="100%" style="stroke:black;stroke-width:2"/>
+        <line y1="33%" x1="0%" y2="33%" x2="100%" style="stroke:black;stroke-width:1"/>
+        <line y1="66%" x1="0%" y2="66%" x2="100%" style="stroke:black;stroke-width:1"/>
+        <line y1="100%" x1="0%" y2="100%" x2="100%" style="stroke:black;stroke-width:2"/>
+        <text x="5%" y="20%" fill="blue">(0,0)</text>
+        <text x="38%" y="20%" fill="blue">(0,1)</text>
+        <text x="71%" y="20%" fill="blue">(0,2)</text>
+        <text x="5%" y="53%" fill="blue">(1,0)</text>
+        <text x="38%" y="53%" fill="blue">(1,1)</text>
+        <text x="71%" y="53%" fill="blue">(1,2)</text>
+        <text x="5%" y="86%" fill="blue">(2,0)</text>
+        <text x="38%" y="86%" fill="blue">(2,1)</text>
+        <text x="71%" y="86%" fill="blue">(2,2)</text>
+    </g>
+</svg>  

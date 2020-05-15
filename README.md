@@ -17,6 +17,33 @@ mtensor主要用于多维数组及其计算, 其可以结构化高效地在CPU/G
 
 除此之外, mtensor是一个遵循c++11的项目, 其是header only的, 我们可以很方便的在先用项目中集成使用它.
 
+## 函数式的延迟计算实现lambda_tensor
+
+延迟计算有多种实现方式, 最为常见的是eigen里面所采用的模板表达式, 但该种方式每实现一种新的运算就需要实现一个完整的模板表达式类,
+过程非常繁琐, 不便于拓展新的运算.
+
+<table>
+    <tr>
+        <td left="10%" position="absolute">
+            <img src="./doc/idx_tensor.svg">
+            <div align="center"><em>array index</em></dev>
+        </td>
+        <td right="10%" position="absolute">
+            <img src="./doc/f_tensor.svg">
+            <div align="center"<em>lambda tensor</em></div>
+        </td>
+    </tr>
+</table>
+
+上图中的lambda tensor, 可以通过如下定义获得
+
+```c++
+auto lambda_ts = make_lambda(pointi{3, 3}, f);
+```
+
+事实上, 对于任何一个tensor, 我们都可以通过定义一个数组(线性)坐标到值的函数(算子)来获得.
+得以于c++强大的优化能力, 正常情况lambda_tensor即使嵌套多层也不会带来额外的性能开销.
+
 ## 用法
 
 ### 基本数据结构
