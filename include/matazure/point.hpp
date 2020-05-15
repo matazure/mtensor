@@ -275,27 +275,38 @@ inline MATAZURE_GENERAL pointi<_Rank> cumulative_prod(pointi<_Rank> ex) {
     return stride;
 }
 
+// template <typename _T, int_t _Rank>
+// inline constexpr point<_T, _Rank> reverse_point(point<_T, _Rank> pt);
+
+// template <typename _T>
+// inline constexpr point<_T, 1> reverse_point(point<_T, 1> pt) {
+//     return pt;
+// }
+
+// template <typename _T>
+// inline constexpr point<_T, 2> reverse_point(point<_T, 2> pt) {
+//     return {pt[1], pt[0]};
+// }
+
+// template <typename _T>
+// inline constexpr point<_T, 3> reverse_point(point<_T, 3> pt) {
+//     return {pt[2], pt[1], pt[0]};
+// }
+
+// template <typename _T>
+// inline constexpr point<_T, 4> reverse_point(point<_T, 4> pt) {
+//     return {pt[3], pt[2], pt[1], pt[0]};
+// }
+
+template <typename _T, int_t _Rank, int_t... _Indices>
+inline constexpr point<_T, _Rank> reverse_point_imp(point<_T, _Rank> pt,
+                                                    integer_sequence<_T, _Indices...>) {
+    return {pt[_Rank - 1 - _Indices]...};
+}
+
 template <typename _T, int_t _Rank>
-inline constexpr point<_T, _Rank> reverse(point<_T, _Rank> pt);
-
-template <typename _T>
-inline constexpr point<_T, 1> reverse(point<_T, 1> pt) {
-    return pt;
-}
-
-template <typename _T>
-inline constexpr point<_T, 2> reverse(point<_T, 2> pt) {
-    return {pt[1], pt[0]};
-}
-
-template <typename _T>
-inline constexpr point<_T, 3> reverse(point<_T, 3> pt) {
-    return {pt[2], pt[1], pt[0]};
-}
-
-template <typename _T>
-inline constexpr point<_T, 4> reverse(point<_T, 4> pt) {
-    return {pt[3], pt[2], pt[1], pt[0]};
+inline constexpr point<_T, _Rank> reverse_point(point<_T, _Rank> pt) {
+    return reverse_point_imp<_T, _Rank>(pt, make_integer_sequence<int_t, _Rank>{});
 }
 
 // pointi<3>

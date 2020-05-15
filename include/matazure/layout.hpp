@@ -134,7 +134,7 @@ namespace internal {
 template <int_t _Rank>
 inline constexpr pointi<_Rank> get_array_index_by_layout(pointi<_Rank> pt,
                                                          column_major_layout<_Rank>) {
-    return reverse(pt);
+    return reverse_point(pt);
 }
 
 template <int_t _Rank>
