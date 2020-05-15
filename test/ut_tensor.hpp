@@ -46,18 +46,20 @@ TEST(TensorTests, Layout) {
     tensor<float, 2, row_major_layout<2>> ts_row{{00, 01, 02}, {10, 11, 12}};
     ASSERT_EQ(2, ts_row.shape(0));
     ASSERT_EQ(3, ts_row.shape(1));
-    std::cout << "row major layout: " << std::endl;
-    for (int_t i = 0; i < ts_row.size(); ++i) {
-        std::cout << ts_row[i] << ", ";
-    }
-    std::cout << std::endl;
+    ASSERT_EQ(0, ts_row[0]);
+    ASSERT_EQ(1, ts_row[1]);
+    ASSERT_EQ(2, ts_row[2]);
+    ASSERT_EQ(10, ts_row[3]);
+    ASSERT_EQ(11, ts_row[4]);
+    ASSERT_EQ(12, ts_row[5]);
 
     tensor<float, 2, column_major_layout<2>> ts_column{{00, 01, 02}, {10, 11, 12}};
-    ASSERT_EQ(2, ts_row.shape(0));
-    ASSERT_EQ(3, ts_row.shape(1));
-    std::cout << "column major layout: " << std::endl;
-    for (int_t i = 0; i < ts_column.size(); ++i) {
-        std::cout << ts_column[i] << ", ";
-    }
-    std::cout << std::endl;
+    ASSERT_EQ(2, ts_column.shape(0));
+    ASSERT_EQ(3, ts_column.shape(1));
+    ASSERT_EQ(0, ts_column[0]);
+    ASSERT_EQ(10, ts_column[1]);
+    ASSERT_EQ(1, ts_column[2]);
+    ASSERT_EQ(11, ts_column[3]);
+    ASSERT_EQ(2, ts_column[4]);
+    ASSERT_EQ(12, ts_column[5]);
 }

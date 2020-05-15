@@ -13,5 +13,5 @@ TEST(ViewTests, Permute) {
     auto ts_permute_view = view::permute<1, 0>(ts);
     auto ts_permute = ts_permute_view.persist();
 
-    std::cout << ts_permute << std::endl;
+    for_index(ts.shape(), [=](point2i idx) { EXPECT_EQ(ts(idx), ts_permute(idx[1], idx[0])); });
 }
