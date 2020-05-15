@@ -24,7 +24,7 @@ inline void mem_copy(_TensorSrc ts_src, _TensorDst ts_dst,
  * @return a new tensor which clones source tensor
  */
 template <typename _ValueType, int_t _Rank, typename _Layout>
-inline tensor<_ValueType, _Rank, _Layout> mem_clone(tensor<_ValueType, _Rank, _Layout> ts, host_t) {
+inline tensor<_ValueType, _Rank, _Layout> identify(tensor<_ValueType, _Rank, _Layout> ts, host_t) {
     tensor<decay_t<_ValueType>, _Rank, _Layout> ts_re(ts.shape());
     mem_copy(ts, ts_re);
     return ts_re;
@@ -36,7 +36,7 @@ inline tensor<_ValueType, _Rank, _Layout> mem_clone(tensor<_ValueType, _Rank, _L
  * @return a new tensor which clones source tensor
  */
 template <typename _ValueType, int_t _Rank, typename _Layout>
-inline auto mem_clone(tensor<_ValueType, _Rank, _Layout> ts) -> decltype(mem_clone(ts, host_t{})) {
-    return mem_clone(ts, host_t{});
+inline auto identify(tensor<_ValueType, _Rank, _Layout> ts) -> decltype(identify(ts, host_t{})) {
+    return identify(ts, host_t{});
 }
 }  // namespace matazure

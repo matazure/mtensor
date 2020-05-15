@@ -20,7 +20,7 @@ int main(int argc, char* argv[]) {
     policy.grid_dim({34, 1, 1});
     auto cu_img_mandelbrot_rgb = mandelbrot(shape, device_t{}).persist(policy);
 
-    auto img_mandelbrot_rgb = mem_clone(cu_img_mandelbrot_rgb, host_t{});
+    auto img_mandelbrot_rgb = identify(cu_img_mandelbrot_rgb, host_t{});
     write_rgb_png(output_mandelbrot_path, img_mandelbrot_rgb);
 
     return 0;

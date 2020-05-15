@@ -257,7 +257,7 @@ image_type drlse_edge(image_type mat_phi0, image_type mat_g, float lambda, float
              [](bool e) { MATAZURE_ASSERT(e, "shape must be matched"); });
 
     auto mat_g_grad = gradient(mat_g);
-    auto mat_phi = mem_clone(mat_phi0, typename image_type::memory_type{});
+    auto mat_phi = identify(mat_phi0, typename image_type::memory_type{});
 
     while (counter--) {
         neumann_bound_conf(mat_phi, std::integral_constant<int_t, rank>{});
