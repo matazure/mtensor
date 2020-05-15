@@ -36,7 +36,7 @@ class point {
      * @param i element index
      * @return element referece
      */
-    MATAZURE_GENERAL constexpr reference operator[](int_t i) { return elements_[i]; }
+    MATAZURE_GENERAL reference operator[](int_t i) { return elements_[i]; }
 
     /// return the length of point
     MATAZURE_GENERAL constexpr int_t size() const { return rank; }

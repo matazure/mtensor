@@ -133,7 +133,7 @@ auto laplace(image_type image)
 }  // namespace matazure
 
 template <typename _ValueType, int_t _Rank>
-MATAZURE_GENERAL inline auto normalize(const point<_ValueType, _Rank>& vec) {
+MATAZURE_GENERAL inline point<_ValueType, _Rank> normalize(const point<_ValueType, _Rank>& vec) {
     _ValueType sum_norm2 = 0;
     for (int_t i = 0; i < _Rank; ++i) {
         sum_norm2 += vec[i] * vec[i];

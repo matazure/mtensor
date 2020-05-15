@@ -7,4 +7,3 @@
 #include <matazure/view/permute.hpp>
 #include <matazure/view/slice.hpp>
 #include <matazure/view/stride.hpp>
-#include <matazure/view/zip.hpp>
