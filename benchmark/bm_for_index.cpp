@@ -34,8 +34,9 @@ void bm_tensor_for_array_index_copy(benchmark::State& state) {
     tensor_type ts_dst(shape);
 
     while (state.KeepRunning()) {
-        for_index(shape,
-                  [ts_src, ts_dst] __matazure__(pointi<rank> idx) { ts_dst(idx) = ts_src(idx); });
+        for_index(shape, [ts_src, ts_dst] MATAZURE_GENERAL(pointi<rank> idx) {
+            ts_dst(idx) = ts_src(idx);
+        });
         // cuda::copy(ts_src, ts_dst);
         benchmark::DoNotOptimize(ts_dst.data());
     }

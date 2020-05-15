@@ -13,7 +13,7 @@ int main(int argc, char* argv[]) {
     auto img_float = view::cast<float>(cu_img_gray).persist();
     auto img_grad = gradient(img_float);
     auto mat_g = view::map(img_grad,
-                           [] __matazure__(point<float, 2> grad) -> float {
+                           [] MATAZURE_GENERAL(point<float, 2> grad) -> float {
                                return 1.0f / (1.0f + grad[0] * grad[0] + grad[1] * grad[1]);
                            })
                      .persist();
@@ -38,7 +38,7 @@ int main(int argc, char* argv[]) {
     std::cout << "cost time " << (t1 - t0).count() << " ns" << std::endl;
 
     cuda::tensor<byte, 2> img_phi(mat_phi.shape());
-    transform(mat_phi, img_phi, [] __matazure__(float v) {
+    transform(mat_phi, img_phi, [] MATAZURE_GENERAL(float v) {
         return static_cast<uint8_t>(min(255.0f, max(0.0f, -v * 100.f)));
     });
 

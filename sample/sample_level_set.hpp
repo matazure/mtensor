@@ -13,7 +13,8 @@ struct gradient_op;
 
 template <typename _Tensor>
 struct gradient_op<_Tensor, 2> {
-    __matazure__ point<typename _Tensor::value_type, _Tensor::rank> operator()(point2i idx) const {
+    MATAZURE_GENERAL point<typename _Tensor::value_type, _Tensor::rank> operator()(
+        point2i idx) const {
         point<typename _Tensor::value_type, 2> re;
         re[0] = image(idx + point2i{1, 0}) - image(idx + point2i{-1, 0});
         re[1] = image(idx + point2i{0, 1}) - image(idx + point2i{0, -1});
@@ -26,7 +27,8 @@ struct gradient_op<_Tensor, 2> {
 
 template <typename _Tensor>
 struct gradient_op<_Tensor, 3> {
-    __matazure__ point<typename _Tensor::value_type, _Tensor::rank> operator()(point3i idx) const {
+    MATAZURE_GENERAL point<typename _Tensor::value_type, _Tensor::rank> operator()(
+        point3i idx) const {
         point<typename _Tensor::value_type, 3> re;
         re[0] = image(idx + point3i{1, 0, 0}) - image(idx + point3i{-1, 0, 0});
         re[1] = image(idx + point3i{0, 1, 0}) - image(idx + point3i{0, -1, 0});
@@ -53,7 +55,7 @@ struct div_op;
 
 template <typename _Tensor>
 struct div_op<_Tensor, 2> {
-    __matazure__ typename _Tensor::value_type::value_type operator()(point2i idx) const {
+    MATAZURE_GENERAL typename _Tensor::value_type::value_type operator()(point2i idx) const {
         auto nxx = image(idx + point2i{1, 0})[0] - image(idx + point2i{-1, 0})[0];
         auto nyy = image(idx + point2i{0, 1})[1] - image(idx + point2i{0, -1})[1];
         return nxx + nyy;
@@ -64,7 +66,7 @@ struct div_op<_Tensor, 2> {
 
 template <typename _Tensor>
 struct div_op<_Tensor, 3> {
-    __matazure__ typename _Tensor::value_type::value_type operator()(point3i idx) const {
+    MATAZURE_GENERAL typename _Tensor::value_type::value_type operator()(point3i idx) const {
         auto nxx = image(idx + point3i{1, 0, 0})[0] - image(idx + point3i{-1, 0, 0})[0];
         auto nyy = image(idx + point3i{0, 1, 0})[1] - image(idx + point3i{0, -1, 0})[1];
         auto nzz = image(idx + point3i{0, 0, 1})[2] - image(idx + point3i{0, 0, -1})[2];
@@ -91,7 +93,7 @@ struct laplace_op;
 
 template <typename _Tensor>
 struct laplace_op<_Tensor, 2> {
-    __matazure__ typename _Tensor::value_type operator()(point2i idx) const {
+    MATAZURE_GENERAL typename _Tensor::value_type operator()(point2i idx) const {
         auto tmp = -4 * image(idx);
         tmp = tmp + image(idx + pointi<2>{-1, 0});
         tmp = tmp + image(idx + pointi<2>{1, 0});
@@ -105,7 +107,7 @@ struct laplace_op<_Tensor, 2> {
 
 template <typename _Tensor>
 struct laplace_op<_Tensor, 3> {
-    __matazure__ typename _Tensor::value_type operator()(point3i idx) const {
+    MATAZURE_GENERAL typename _Tensor::value_type operator()(point3i idx) const {
         auto tmp = -6 * image(idx);
         tmp = tmp + image(idx + pointi<3>{-1, 0, 0});
         tmp = tmp + image(idx + pointi<3>{1, 0, 0});
@@ -264,19 +266,19 @@ image_type drlse_edge(image_type mat_phi0, image_type mat_g, float lambda, float
         auto mat_phi_grad = gradient(mat_phi);
         auto mat_normalized_gradient_phi =
             view::map(mat_phi_grad,
-                      [] __matazure__(point<value_type, rank> p) { return normalize(p); })
+                      [] MATAZURE_GENERAL(point<value_type, rank> p) { return normalize(p); })
                 .persist();
         auto mat_curvature = div(mat_normalized_gradient_phi);
         auto mat_dist_term = laplace(mat_phi) - mat_curvature;
 
-        auto mat_dirac_phi = view::map(mat_phi, [epsilon] __matazure__(value_type x) {
+        auto mat_dirac_phi = view::map(mat_phi, [epsilon] MATAZURE_GENERAL(value_type x) {
             if (std::abs(x) > epsilon) return 0.0f;
             return (1.0f / (2 * epsilon)) * (1.0f + std::cos(3.1415926f * x / epsilon));
         });
         auto mat_area_term = mat_dirac_phi * mat_g;
 
         auto mat_temp = mat_g_grad * mat_phi_grad;
-        auto mat_temp_sum = view::map(mat_temp, [] __matazure__(point<value_type, rank> x) {
+        auto mat_temp_sum = view::map(mat_temp, [] MATAZURE_GENERAL(point<value_type, rank> x) {
             auto tmp = zero<value_type>::value();
             for (int_t i = 0; i < x.size(); ++i) {
                 tmp = tmp + x[i];

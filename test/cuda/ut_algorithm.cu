@@ -9,18 +9,18 @@
 // __device__ void print(int i) { printf("%d,", i); }
 
 // struct print_op {
-//     __matazure__ void operator()(int i) { printf("%d, ", i); }
+//     MATAZURE_GENERAL void operator()(int i) { printf("%d, ", i); }
 // };
 
 // // #pragma nv_exec_check_disable
-// // __matazure__ void printhd(int i) { print(i); }
+// // MATAZURE_GENERAL void printhd(int i) { print(i); }
 
 // TEST(LauchTest, OnlySupportDeviceLambda) {
 //     cuda::launch([] __device__() { /*printf("thread x: %d\n", threadIdx.x);*/ });
 // }
 
 // TEST(ForIndexTest, Lambda) {
-//     cuda::for_index(0, 10, [] __matazure__(int i) { printf("%d,", i); });
+//     cuda::for_index(0, 10, [] MATAZURE_GENERAL(int i) { printf("%d,", i); });
 //     printf("\n");
 
 //     cuda::for_index(0, 10, [] __device__(int i) { printf("%d,", i); });

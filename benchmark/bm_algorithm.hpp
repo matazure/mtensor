@@ -36,7 +36,7 @@ inline void bm_tensor_for_each(benchmark::State& state) {
     tensor_type ts_dst(shape);
 
     while (state.KeepRunning()) {
-        for_each(ts_dst, [v] __matazure__(typename tensor_type::value_type & e) { e = v; });
+        for_each(ts_dst, [v] MATAZURE_GENERAL(typename tensor_type::value_type & e) { e = v; });
 
         benchmark::DoNotOptimize(ts_dst.data());
     }
@@ -79,7 +79,7 @@ inline void bm_tensor_transform(benchmark::State& state) {
     typedef typename tensor_type::value_type value_type;
 
     while (state.KeepRunning()) {
-        transform(ts_src, ts_dst, [] __matazure__(value_type & v) { return v; });
+        transform(ts_src, ts_dst, [] MATAZURE_GENERAL(value_type & v) { return v; });
         benchmark::DoNotOptimize(ts_dst.data());
     }
 

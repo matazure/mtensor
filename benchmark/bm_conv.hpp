@@ -28,7 +28,7 @@ inline void bm_tensor_general_roll_conv(benchmark::State& state) {
     auto ts_src = view::slice(ts_src_container, kernel_radius, shape);
 
     while (state.KeepRunning()) {
-        _tmp::for_index(ts_dst.shape(), [=] __matazure__(pointi<rank> idx) {
+        _tmp::for_index(ts_dst.shape(), [=] MATAZURE_GENERAL(pointi<rank> idx) {
             auto re = zero<value_type>::value();
             for_index(zero<pointi<rank>>::value(), kernel_shape, [&](pointi<rank> idx_offset) {
                 re += ts_kernel(idx_offset) * ts_src(idx + idx_offset - kernel_radius);
@@ -62,7 +62,7 @@ inline void bm_tensor_general_unroll_conv(benchmark::State& state) {
     auto ts_src = view::slice(ts_src_container, kernel_radius, shape);
 
     while (state.KeepRunning()) {
-        _tmp::for_index(ts_dst.shape(), [=] __matazure__(pointi<rank> idx) {
+        _tmp::for_index(ts_dst.shape(), [=] MATAZURE_GENERAL(pointi<rank> idx) {
             // clang-format off
             auto re = zero<value_type>::value();
             re += ts_kernel(pointi<2>{0, 0}) * ts_src(idx + pointi<2>{-1, -1});
@@ -102,7 +102,7 @@ inline void bm_tensor_padding_layout_general_unroll_conv(benchmark::State& state
                                                                 kernel_radius);
 
     while (state.KeepRunning()) {
-        _tmp::for_index(ts_dst.shape(), [=] __matazure__(pointi<rank> idx) {
+        _tmp::for_index(ts_dst.shape(), [=] MATAZURE_GENERAL(pointi<rank> idx) {
             // clang-format off
             auto re = zero<value_type>::value();
             re += ts_kernel(pointi<2>{0, 0}) * ts_src(idx + pointi<2>{-1, -1});
