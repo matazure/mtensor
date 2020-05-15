@@ -170,6 +170,10 @@ cuda::block_for_index<BLOCK_DIM>(grid_dim,
 . 更多的细节看参考示例[smaple/sample_mandelbrot.hpp](sample/sample_mandelbrot.hpp). 
 除此之外[include/matazure/view](include/matazure/view)下的实现都是cpu和gpu通用的(同一份代码实现), sample下的levelset分割算法是一个更复杂的泛型多维度异构通用实现.
 
+### 其他
+
+除此之外mandelbrot的例子还向我们展示了如何在mtensor中及其方便的使用openmp和使用特定尺寸的gpu资源
+
 ## mtensor的性能是否高效
 
 mtensor在绝大部分场景下都不会带来额外的性能开销, 并且方便开发人员编写出高效的代码
