@@ -181,10 +181,13 @@ mtensor在绝大部分场景下都不会带来额外的性能开销, 并且方�
 除此之外, mtensor还编写了大量的benchmark来确保性能指标
 
 ```console
-bm_cuda_tensor1f_copy/1000000000                      154.718GB/s   38.6794G items/s
-bm_cuda_tensor2f_copy/32000                           155.639GB/s   38.9096G items/s
-bm_cuda_tensor2f_column_major_layout_copy/32000       155.305GB/s   38.8262G items/s
-bm_cuda_tensor2f_row_layout_copy/32000                155.354GB/s   38.8385G items/s
+bm_cuda_raw1f_for_copy/1000000000                    154.62GB/s    38.655G items/s
+bm_cuda_tensor1f_for_array_index_copy/1000000000     154.782GB/s   38.6955G items/s
+bm_cuda_tensor2f_for_array_index_copy/32000          151.656GB/s    37.914G items/s
+bm_cuda_tensor1f_copy/1000000000                     154.465GB/s   38.6163G items/s
+bm_cuda_tensor2f_copy/32000                          155.446GB/s   38.8614G items/s
+bm_cuda_tensor2p4f_copy/8000                         240.697GB/s   15.0436G items/s
+bm_cuda_tensor2a4f_copy/8000                         240.725GB/s   15.0453G items/s
 ```
 
 ## 如何在你的项目中集成
