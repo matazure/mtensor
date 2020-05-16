@@ -1,5 +1,6 @@
 #pragma once
 
+#include <matazure/view/broadcast.hpp>
 #include <matazure/view/cast.hpp>
 #include <matazure/view/clamp_zero.hpp>
 #include <matazure/view/eye.hpp>

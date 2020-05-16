@@ -10,6 +10,7 @@ add_executable(ut_host_mtensor
     view/ut_zero.cpp
     view/ut_meshgrid.cpp
     view/ut_eye.cpp
+    view/ut_broadcast.cpp
 )
 target_link_libraries(ut_host_mtensor gtest mtensor)
 
