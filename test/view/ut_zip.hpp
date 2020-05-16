@@ -1,4 +1,5 @@
-#include <type_traits>
+#pragma once
+
 #include "../ut_foundation.hpp"
 
 #include <tuple>

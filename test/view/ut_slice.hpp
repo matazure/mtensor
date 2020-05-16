@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../ut_foundation.hpp"
 
 TEST(ViewTests, Slice) {

@@ -6,6 +6,9 @@ add_executable(ut_host_mtensor
     view/ut_slice.cpp
     view/ut_permute.cpp
     view/ut_zip.cpp
+    view/ut_one.cpp
+    view/ut_zero.cpp
+    view/ut_meshgrid.cpp
 )
 target_link_libraries(ut_host_mtensor gtest mtensor)
 

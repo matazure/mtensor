@@ -84,7 +84,7 @@ ts array access {1, 1} value : 3
 ### for_index
 
 for_index和cuda::for_index是最基本的计算接口, mtensor中的大部分计算都是由for_index来驱动的, 下面的例子是在gpu设备上， 
-使用cuda::for_index来实现cuda::tensor的加法运算. 可以看出我们不必花过多精力在内存的申请释放上, 并且也无需计算thread坐标,
+使用cuda::for_index来实现cuda::tensor的加法运算. 可以看出我们不必花过多精力在内存的申请释放上, 也无需计算thread坐标,
 只需实现关于坐标的算子即可. 完整示例可查看[sample/sample_for_index.cu](sample/sample_for_index.cu)
 
 ```c++
@@ -117,7 +117,7 @@ std::cout << ts_re << std::endl;
 
 下述代码片段是[sample/sample_gradient.cpp](sample/sample_gradient.cpp)中的片段, 该例子中使用了view名字空间下的slice和cast视图, 
 也通过了make_lambda来自定义了梯度视图和norm1视图, 并最终通过这些操作计算了图像的梯度强度. 
-上以上过程中, 每个视图运算和make_lambda并不会真的去计算结果而只是把计算的方式存下来, 在最后的persist函数调用时才会申请内存,并遍历计算结果写入中.
+上以上过程中, 每个视图运算和make_lambda并不会真的去计算结果而只是把计算的方式存下来, 在最后的persist函数调用时才会申请内存,并遍历计算写入内存中.
 
 ```c++
 tensor<byte, 2> img_gray = read_gray_image(argv[1]);
