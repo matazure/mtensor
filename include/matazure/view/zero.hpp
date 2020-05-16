@@ -13,9 +13,7 @@ namespace view {
 
 template <typename _ValueType, int_t _Rank>
 struct zero_functor {
-    MATAZURE_GENERAL _ValueType operator()(pointi<_Rank> idx) const {
-        return zero<_ValueType>::value();
-    }
+    MATAZURE_GENERAL _ValueType operator()(pointi<_Rank> idx) const { return _ValueType{0}; }
 };
 
 /**

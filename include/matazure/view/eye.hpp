@@ -15,9 +15,9 @@ template <typename _ValueType>
 struct eye_functor {
     MATAZURE_GENERAL _ValueType operator()(point2i idx) const {
         if (idx[0] == idx[1]) {
-            return _ValueType{1};
+            return _ValueType(1);
         } else {
-            return _ValueType{0};
+            return _ValueType(0);
         }
     }
 };
