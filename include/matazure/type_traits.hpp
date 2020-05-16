@@ -10,7 +10,7 @@ struct array_index {};
 
 struct host_t {};
 struct device_t {};
-struct local_tag {};
+struct local_t {};
 
 struct pinned {};
 struct unpinned {};

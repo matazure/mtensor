@@ -22,7 +22,7 @@ class point {
     typedef value_type& reference;
     typedef const value_type& const_reference;
     typedef linear_index index_type;
-    typedef local_tag runtime_type;
+    typedef local_t runtime_type;
 
     /**
      * @brief accesses element by index
