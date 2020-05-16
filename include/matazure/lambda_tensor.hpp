@@ -127,6 +127,8 @@ class lambda_tensor : public tensor_expression<lambda_tensor<_Rank, _Func, _Layo
 
     layout_type layout() const { return layout_; }
 
+    constexpr runtime_type runtime() const { return runtime_type{}; }
+
     functor_type functor() const { return functor_; }
 
    private:

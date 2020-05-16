@@ -57,6 +57,10 @@ class lambda_tensor : public tensor_expression<lambda_tensor<_Rank, _Func, _Layo
 
     MATAZURE_GENERAL int_t size() const { return layout_.size(); }
 
+    MATAZURE_GENERAL layout_type layout() const { return layout_; }
+
+    MATAZURE_GENERAL constexpr runtime_type runtime() const { return runtime_type{}; }
+
    public:
 #pragma nv_exec_check_disable
     template <typename _Mode>

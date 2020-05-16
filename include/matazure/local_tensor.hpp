@@ -217,6 +217,8 @@ class local_tensor {
 
     MATAZURE_GENERAL constexpr int_t element_size() const { return sizeof(value_type); }
 
+    MATAZURE_GENERAL constexpr runtime_type runtime() const { return runtime_type{}; }
+
    public:
     value_type elements_[traits_t::size()];
 };

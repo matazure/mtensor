@@ -85,6 +85,10 @@ class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout, _Allocator
 
     MATAZURE_GENERAL pointer data() const { return data_; }
 
+    MATAZURE_GENERAL layout_type layout() const { return layout_; }
+
+    MATAZURE_GENERAL constexpr runtime_type runtime() const { return runtime_type{}; }
+
     allocator_type get_allocator() const { return allocator_; }
 
     MATAZURE_GENERAL ~tensor() {}

@@ -207,6 +207,8 @@ class tensor : public tensor_expression<tensor<_ValueType, _Rank, _Layout, _Allo
 
     layout_type layout() const { return layout_; }
 
+    constexpr runtime_type runtime() const { return runtime_type{}; }
+
     allocator_type get_allocator() const { return allocator_; }
 
    private:
