@@ -52,7 +52,7 @@ class lambda_tensor : public tensor_expression<lambda_tensor<_Rank, _Func, _Layo
     typedef typename internal::get_functor_accessor_type<_Rank, _Func>::type index_type;
 
     typedef _Layout layout_type;
-    typedef host_t memory_type;
+    typedef host_t runtime_type;
 
    public:
     /**

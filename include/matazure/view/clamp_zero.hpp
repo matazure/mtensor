@@ -37,9 +37,9 @@ struct clamp_zero_functor {
 template <typename _Tensor>
 inline auto clamp_zero(_Tensor ts)
     -> decltype(make_lambda(ts.shape(), clamp_zero_functor<decay_t<_Tensor>>(ts),
-                            typename _Tensor::memory_type{})) {
+                            typename _Tensor::runtime_type{})) {
     return make_lambda(ts.shape(), clamp_zero_functor<decay_t<_Tensor>>(ts),
-                       typename _Tensor::memory_type{});
+                       typename _Tensor::runtime_type{});
 }
 
 }  // namespace view

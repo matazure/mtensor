@@ -38,8 +38,8 @@ struct mandelbrot_functor {
     int_t max_iteration = 256 * 16;
 };
 
-template <typename memory_type>
-auto mandelbrot(pointi<2> shape, memory_type mem_tag)
+template <typename runtime_type>
+auto mandelbrot(pointi<2> shape, runtime_type mem_tag)
     -> decltype(make_lambda(shape, mandelbrot_functor(shape), mem_tag)) {
     return make_lambda(shape, mandelbrot_functor(shape), mem_tag);
 }

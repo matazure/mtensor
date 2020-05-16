@@ -21,7 +21,7 @@ class lambda_tensor : public tensor_expression<lambda_tensor<_Rank, _Func, _Layo
     typedef typename functor_traits::result_type reference;
     typedef remove_reference_t<reference> value_type;
     typedef typename matazure::internal::get_functor_accessor_type<_Rank, _Func>::type index_type;
-    typedef device_t memory_type;
+    typedef device_t runtime_type;
     typedef _Layout layout_type;
 
    public:

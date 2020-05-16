@@ -80,8 +80,8 @@ struct _Is_linear_array : bool_constant<is_tensor<_Type>::value> {};
         : bool_constant<is_same<typename _Tensor::tag_name, tag>::value && \
                         name<_OtherTensors...>::value> {};
 
-MATAZURE_DEFINE_ARE_TAG(are_host_memory, memory_type, host_t)
-MATAZURE_DEFINE_ARE_TAG(are_device_memory, memory_type, device_t)
+MATAZURE_DEFINE_ARE_TAG(are_host_memory, runtime_type, host_t)
+MATAZURE_DEFINE_ARE_TAG(are_device_memory, runtime_type, device_t)
 MATAZURE_DEFINE_ARE_TAG(are_linear_index, index_type, linear_index)
 MATAZURE_DEFINE_ARE_TAG(are_array_index, index_type, array_index)
 
@@ -98,8 +98,8 @@ MATAZURE_DEFINE_ARE_TAG(are_array_index, index_type, array_index)
         : bool_constant<!is_same<typename _Tensor::tag_name, tag>::value && \
                         name<_OtherTensors...>::value> {};
 
-MATAZURE_DEFINE_NONE_TAG(none_host_memory, memory_type, host_t)
-MATAZURE_DEFINE_NONE_TAG(none_device_memory, memory_type, device_t)
+MATAZURE_DEFINE_NONE_TAG(none_host_memory, runtime_type, host_t)
+MATAZURE_DEFINE_NONE_TAG(none_device_memory, runtime_type, device_t)
 MATAZURE_DEFINE_NONE_TAG(none_are_linear_index, index_type, linear_index)
 MATAZURE_DEFINE_NONE_TAG(none_array_access, index_type, array_index)
 

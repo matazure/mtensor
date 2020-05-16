@@ -35,9 +35,9 @@ struct stride_functor {
 template <typename _Tensor, typename _StrideType>
 inline auto stride(_Tensor ts, _StrideType stride)
     -> decltype(make_lambda(ts.shape() / stride, stride_functor<_Tensor, _StrideType>(ts, stride),
-                            typename _Tensor::memory_type{})) {
+                            typename _Tensor::runtime_type{})) {
     return make_lambda(ts.shape() / stride, stride_functor<_Tensor, _StrideType>(ts, stride),
-                       typename _Tensor::memory_type{});
+                       typename _Tensor::runtime_type{});
 }
 
 }  // namespace view

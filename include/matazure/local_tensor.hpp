@@ -132,7 +132,7 @@ class local_tensor {
     typedef const value_type& const_reference;
     typedef _Layout layout_type;
     typedef linear_index index_type;
-    typedef local_tag memory_type;
+    typedef local_tag runtime_type;
 
    private:
     typedef

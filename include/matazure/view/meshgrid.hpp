@@ -31,10 +31,10 @@ template <typename _T0, typename _T1>
 inline auto meshgrid(_T0 x, _T1 y)
     -> decltype(make_lambda(pointi<2>{x.size(), y.size()},
                             meshgrid_functor<typename _T0::value_type>(x, y),
-                            typename _T0::memory_type{})) {
+                            typename _T0::runtime_type{})) {
     return make_lambda(pointi<2>{x.size(), y.size()},
                        meshgrid_functor<typename _T0::value_type>(x, y),
-                       typename _T0::memory_type{});
+                       typename _T0::runtime_type{});
 }
 
 }  // namespace view

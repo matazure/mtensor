@@ -42,12 +42,12 @@ struct gradient_op<_Tensor, 3> {
 template <typename image_type>
 inline auto gradient(image_type image)
     -> decltype(make_lambda(image.shape(), gradient_op<image_type, image_type::rank>{image},
-                            typename image_type::memory_type{})) {
+                            typename image_type::runtime_type{})) {
     using value_type = typename image_type::value_type;
     // static const int_t rank = image_type::rank;
 
     return make_lambda(image.shape(), gradient_op<image_type, image_type::rank>{image},
-                       typename image_type::memory_type{});
+                       typename image_type::runtime_type{});
 }
 
 template <typename _Tensor, int_t _Rank>
@@ -79,13 +79,13 @@ struct div_op<_Tensor, 3> {
 template <typename image_type>
 inline auto div(image_type image)
     -> decltype(make_lambda(image.shape(), div_op<image_type, image_type::rank>{image},
-                            typename image_type::memory_type{})) {
+                            typename image_type::runtime_type{})) {
     // static const int_t rank = image_type::rank;
     typedef typename image_type::value_type image_value_type;
     typedef typename image_value_type::value_type value_type;
 
     return make_lambda(image.shape(), div_op<image_type, image_type::rank>{image},
-                       typename image_type::memory_type{});
+                       typename image_type::runtime_type{});
 }
 
 template <typename _Tensor, int_t _Rank>
@@ -124,11 +124,11 @@ struct laplace_op<_Tensor, 3> {
 template <typename image_type>
 auto laplace(image_type image)
     -> decltype(make_lambda(image.shape(), laplace_op<image_type, image_type::rank>{image},
-                            typename image_type::memory_type{})) {
+                            typename image_type::runtime_type{})) {
     using value_type = typename image_type::value_type;
     // static const int_t rank = image_type::rank;
     return make_lambda(image.shape(), laplace_op<image_type, image_type::rank>{image},
-                       typename image_type::memory_type{});
+                       typename image_type::runtime_type{});
 }
 
 }  // namespace view
@@ -259,7 +259,7 @@ image_type drlse_edge(image_type mat_phi0, image_type mat_g, float lambda, float
              [](bool e) { MATAZURE_ASSERT(e, "shape must be matched"); });
 
     auto mat_g_grad = gradient(mat_g);
-    auto mat_phi = identify(mat_phi0, typename image_type::memory_type{});
+    auto mat_phi = identify(mat_phi0, typename image_type::runtime_type{});
 
     while (counter--) {
         neumann_bound_conf(mat_phi, std::integral_constant<int_t, rank>{});

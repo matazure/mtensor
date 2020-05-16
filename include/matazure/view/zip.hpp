@@ -37,9 +37,9 @@ struct zip_functor {
 template <typename... _Tensors>
 inline auto zip_imp(tuple<_Tensors...> tensors)
     -> decltype(make_lambda(get<0>(tensors).shape(), zip_functor<_Tensors...>(tensors),
-                            typename tuple_element<0, tuple<_Tensors...>>::type::memory_type{})) {
+                            typename tuple_element<0, tuple<_Tensors...>>::type::runtime_type{})) {
     return make_lambda(get<0>(tensors).shape(), zip_functor<_Tensors...>(tensors),
-                       typename tuple_element<0, tuple<_Tensors...>>::type::memory_type{});
+                       typename tuple_element<0, tuple<_Tensors...>>::type::runtime_type{});
 }
 
 template <typename... _Tensors>

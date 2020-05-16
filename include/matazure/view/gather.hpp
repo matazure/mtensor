@@ -37,10 +37,10 @@ template <int_t _DimIdx, typename _Tensor>
 inline auto gather(_Tensor ts, int_t positon_index)
     -> decltype(make_lambda(gather_point<_DimIdx>(ts.shape()),
                             gather_functior<_Tensor, _DimIdx>(ts, positon_index),
-                            typename _Tensor::memory_type{})) {
+                            typename _Tensor::runtime_type{})) {
     return make_lambda(gather_point<_DimIdx>(ts.shape()),
                        gather_functior<_Tensor, _DimIdx>(ts, positon_index),
-                       typename _Tensor::memory_type{});
+                       typename _Tensor::runtime_type{});
 }
 
 }  // namespace view
