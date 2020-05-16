@@ -1,5 +1,6 @@
 #pragma once
 
+#include <matazure/bool_pack.hpp>
 #include <matazure/config.hpp>
 #include <matazure/integer_sequence.hpp>
 

@@ -25,10 +25,10 @@ struct one_functor {
  * @tparam _ValueType the dest tensor value type
  * @return a lambda_tensor whose value_type is _ValueType
  */
-template <typename _ValueType, int_t _Rank, typename _Memory_type>
-inline auto one(pointi<_Rank> shape, _Memory_type)
-    -> decltype(make_lambda(shape, one_functor<_ValueType, _Rank>{}, _Memory_type{})) {
-    return make_lambda(shape, one_functor<_ValueType, _Rank>{}, _Memory_type{});
+template <typename _ValueType, int_t _Rank, typename _RuntimeType>
+inline auto one(pointi<_Rank> shape, _RuntimeType)
+    -> decltype(make_lambda(shape, one_functor<_ValueType, _Rank>{}, _RuntimeType{})) {
+    return make_lambda(shape, one_functor<_ValueType, _Rank>{}, _RuntimeType{});
 }
 
 }  // namespace view
