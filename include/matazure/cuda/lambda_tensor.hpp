@@ -99,8 +99,9 @@ inline auto make_lambda(pointi<_Rank> ext, _Func fun) -> lambda_tensor<_Rank, _F
 }
 
 template <int_t _Rank, typename _Func, typename _Layout>
-inline auto make_lambda(pointi<_Rank> ext, _Func fun, _Layout) -> lambda_tensor<_Rank, _Func> {
-    return lambda_tensor<_Rank, _Func>(ext, fun);
+inline auto make_lambda(pointi<_Rank> ext, _Func fun, _Layout)
+    -> lambda_tensor<_Rank, _Func, _Layout> {
+    return lambda_tensor<_Rank, _Func, _Layout>(ext, fun);
 }
 
 }  // namespace cuda

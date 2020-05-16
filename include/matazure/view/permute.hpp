@@ -28,9 +28,9 @@ struct permute_functor {
 template <int_t... _Idx, typename _Tensor>
 inline auto permute(_Tensor ts)
     -> decltype(make_lambda(ts.shape(), permute_functor<_Tensor, _Idx...>(ts),
-                            typename _Tensor::runtime_type{})) {
+                            typename _Tensor::runtime_type{}, typename _Tensor::layout_type{})) {
     return make_lambda(ts.shape(), permute_functor<_Tensor, _Idx...>(ts),
-                       typename _Tensor::runtime_type{});
+                       typename _Tensor::runtime_type{}, typename _Tensor::layout_type{});
 }
 
 }  // namespace view

@@ -129,8 +129,20 @@ struct default_layout {
     typedef row_major_layout<_Rank> type;
 };
 
-namespace internal {
+template <typename _Layout, int_t N>
+struct layout_getter;
 
+template <int_t M, int_t N>
+struct layout_getter<row_major_layout<M>, N> {
+    typedef row_major_layout<N> type;
+};
+
+template <int_t M, int_t N>
+struct layout_getter<column_major_layout<M>, N> {
+    typedef column_major_layout<N> type;
+};
+
+namespace internal {
 template <int_t _Rank>
 inline constexpr pointi<_Rank> get_array_index_by_layout(pointi<_Rank> pt,
                                                          column_major_layout<_Rank>) {

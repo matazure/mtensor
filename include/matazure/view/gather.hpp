@@ -34,13 +34,14 @@ struct gather_functior {
  * @return a sub-dim lambda_tensor
  */
 template <int_t _DimIdx, typename _Tensor>
-inline auto gather(_Tensor ts, int_t positon_index)
-    -> decltype(make_lambda(gather_point<_DimIdx>(ts.shape()),
-                            gather_functior<_Tensor, _DimIdx>(ts, positon_index),
-                            typename _Tensor::runtime_type{})) {
-    return make_lambda(gather_point<_DimIdx>(ts.shape()),
-                       gather_functior<_Tensor, _DimIdx>(ts, positon_index),
-                       typename _Tensor::runtime_type{});
+inline auto gather(_Tensor ts, int_t positon_index) -> decltype(make_lambda(
+    gather_point<_DimIdx>(ts.shape()), gather_functior<_Tensor, _DimIdx>(ts, positon_index),
+    typename _Tensor::runtime_type{},
+    typename layout_getter<typename _Tensor::layout_type, _Tensor::rank - 1>::type{})) {
+    return make_lambda(
+        gather_point<_DimIdx>(ts.shape()), gather_functior<_Tensor, _DimIdx>(ts, positon_index),
+        typename _Tensor::runtime_type{},
+        typename layout_getter<typename _Tensor::layout_type, _Tensor::rank - 1>::type{});
 }
 
 }  // namespace view

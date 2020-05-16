@@ -50,9 +50,9 @@ template <typename _Tensor, typename _Func>
 inline auto map(_Tensor ts, _Func fun,
                 enable_if_t<is_same<linear_index, typename _Tensor::index_type>::value>* = 0)
     -> decltype(make_lambda(ts.shape(), linear_map_functor<_Tensor, _Func>(ts, fun),
-                            typename _Tensor::runtime_type{})) {
+                            typename _Tensor::runtime_type{}, typename _Tensor::layout_type{})) {
     return make_lambda(ts.shape(), linear_map_functor<_Tensor, _Func>(ts, fun),
-                       typename _Tensor::runtime_type{});
+                       typename _Tensor::runtime_type{}, typename _Tensor::layout_type{});
 }
 
 /**
@@ -64,9 +64,9 @@ template <typename _Tensor, typename _Func>
 inline auto map(_Tensor ts, _Func fun,
                 enable_if_t<is_same<array_index, typename _Tensor::index_type>::value>* = 0)
     -> decltype(make_lambda(ts.shape(), array_map_functor<_Tensor, _Func>(ts, fun),
-                            typename _Tensor::runtime_type{})) {
+                            typename _Tensor::runtime_type{}, typename _Tensor::layout_type{})) {
     return make_lambda(ts.shape(), array_map_functor<_Tensor, _Func>(ts, fun),
-                       typename _Tensor::runtime_type{});
+                       typename _Tensor::runtime_type{}, typename _Tensor::layout_type{});
 }
 
 }  // namespace view

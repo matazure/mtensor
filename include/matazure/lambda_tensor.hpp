@@ -185,13 +185,13 @@ inline auto make_lambda(pointi<_Rank> extent, _Func fun, host_t) -> lambda_tenso
 
 template <int_t _Rank, typename _Func, typename _Layout>
 inline auto make_lambda(pointi<_Rank> extent, _Func fun, host_t, _Layout)
-    -> lambda_tensor<_Rank, _Func> {
+    -> lambda_tensor<_Rank, _Func, _Layout> {
     return lambda_tensor<_Rank, _Func, _Layout>(extent, fun);
 }
 
 template <int_t _Rank, typename _Func, typename _Layout>
 inline auto make_lambda(pointi<_Rank> extent, _Func fun, _Layout, host_t)
-    -> lambda_tensor<_Rank, _Func> {
+    -> lambda_tensor<_Rank, _Func, _Layout> {
     return lambda_tensor<_Rank, _Func, _Layout>(extent, fun);
 }
 
