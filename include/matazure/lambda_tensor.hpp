@@ -168,6 +168,11 @@ inline auto make_lambda(pointi<_Rank> extent, _Func fun) -> lambda_tensor<_Rank,
     return lambda_tensor<_Rank, _Func>(extent, fun);
 }
 
+template <int_t _Rank, typename _Func, typename _Layout>
+inline auto make_lambda(pointi<_Rank> extent, _Func fun, _Layout) -> lambda_tensor<_Rank, _Func> {
+    return lambda_tensor<_Rank, _Func, _Layout>(extent, fun);
+}
+
 /**
  * @brief make a lambda_tensor
  * @param the shape
@@ -176,6 +181,18 @@ inline auto make_lambda(pointi<_Rank> extent, _Func fun) -> lambda_tensor<_Rank,
 template <int_t _Rank, typename _Func>
 inline auto make_lambda(pointi<_Rank> extent, _Func fun, host_t) -> lambda_tensor<_Rank, _Func> {
     return lambda_tensor<_Rank, _Func>(extent, fun);
+}
+
+template <int_t _Rank, typename _Func, typename _Layout>
+inline auto make_lambda(pointi<_Rank> extent, _Func fun, host_t, _Layout)
+    -> lambda_tensor<_Rank, _Func> {
+    return lambda_tensor<_Rank, _Func, _Layout>(extent, fun);
+}
+
+template <int_t _Rank, typename _Func, typename _Layout>
+inline auto make_lambda(pointi<_Rank> extent, _Func fun, _Layout, host_t)
+    -> lambda_tensor<_Rank, _Func> {
+    return lambda_tensor<_Rank, _Func, _Layout>(extent, fun);
 }
 
 }  // namespace matazure

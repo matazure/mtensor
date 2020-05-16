@@ -93,18 +93,13 @@ class lambda_tensor : public tensor_expression<lambda_tensor<_Rank, _Func, _Layo
     const _Func functor_;
 };
 
-template <int_t _Rank, typename _Func,
-          typename _Layout = typename default_layout<global_t, _Rank>::type>
-using device_lambda_tensor = lambda_tensor<_Rank, _Func, _Layout>;
-
-template <int_t _Rank, typename _Func>
-inline auto make_device_lambda(pointi<_Rank> ext, _Func fun)
-    -> cuda::device_lambda_tensor<_Rank, _Func> {
-    return cuda::device_lambda_tensor<_Rank, _Func>(ext, fun);
-}
-
 template <int_t _Rank, typename _Func>
 inline auto make_lambda(pointi<_Rank> ext, _Func fun) -> lambda_tensor<_Rank, _Func> {
+    return lambda_tensor<_Rank, _Func>(ext, fun);
+}
+
+template <int_t _Rank, typename _Func, typename _Layout>
+inline auto make_lambda(pointi<_Rank> ext, _Func fun, _Layout) -> lambda_tensor<_Rank, _Func> {
     return lambda_tensor<_Rank, _Func>(ext, fun);
 }
 
@@ -114,6 +109,18 @@ template <int_t _Rank, typename _Func>
 inline auto make_lambda(pointi<_Rank> ext, _Func fun, device_t)
     -> decltype(cuda::make_lambda(ext, fun)) {
     return cuda::make_lambda(ext, fun);
+}
+
+template <int_t _Rank, typename _Func, typename _Layout>
+inline auto make_lambda(pointi<_Rank> ext, _Func fun, device_t, _Layout layout)
+    -> decltype(cuda::make_lambda(ext, fun, layout)) {
+    return cuda::make_lambda(ext, fun, layout);
+}
+
+template <int_t _Rank, typename _Func, typename _Layout>
+inline auto make_lambda(pointi<_Rank> ext, _Func fun, _Layout layout, device_t)
+    -> decltype(cuda::make_lambda(ext, fun, layout)) {
+    return cuda::make_lambda(ext, fun, layout);
 }
 
 }  // namespace matazure
