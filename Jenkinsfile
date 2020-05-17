@@ -169,6 +169,9 @@ pipeline{
                             }
                         }
                         stage('benchmark') {
+                            when {
+                                triggeredBy "TimerTrigger"
+                            }
                             steps {
                                 powershell './build_win/bin/Release/bm_host_mtensor.exe --benchmark_min_time=1'
                             }
