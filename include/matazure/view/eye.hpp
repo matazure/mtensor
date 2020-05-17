@@ -28,15 +28,6 @@ struct eye_functor {
     }
 };
 
-/**
- * @brief eye a tensor to another value_type lambda_tensor
- *
- * support primitive type static_cast and point_cast.
- *
- * @param tensor the source tensor
- * @tparam _ValueType the dest tensor value type
- * @return a lambda_tensor whose value_type is _ValueType
- */
 template <typename _ValueType, int_t _Rank, typename _RuntimeType = host_t,
           typename _Layout = default_layout<global_t, 2>::type>
 inline auto eye(pointi<_Rank> shape, _RuntimeType runtime = host_t{},

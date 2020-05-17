@@ -30,14 +30,14 @@ struct slice_functor {
  * @brief produces a subsection lambda_tensor of the source tensor
  * @param ts the source tensor
  * @param origin the origin of the slice
- * @param ext the extent of the slice
+ * @param shape the shape of the slice
  * @return a subsection lambda_tensor
  */
 template <typename _Tensor>
-inline auto slice(_Tensor ts, pointi<_Tensor::rank> origin, pointi<_Tensor::rank> ext)
-    -> decltype(make_lambda(ext, slice_functor<decay_t<_Tensor>>(ts, origin),
+inline auto slice(_Tensor ts, pointi<_Tensor::rank> origin, pointi<_Tensor::rank> shape)
+    -> decltype(make_lambda(shape, slice_functor<decay_t<_Tensor>>(ts, origin),
                             typename _Tensor::runtime_type{}, typename _Tensor::layout_type{})) {
-    return make_lambda(ext, slice_functor<decay_t<_Tensor>>(ts, origin),
+    return make_lambda(shape, slice_functor<decay_t<_Tensor>>(ts, origin),
                        typename _Tensor::runtime_type{}, typename _Tensor::layout_type{});
 }
 
