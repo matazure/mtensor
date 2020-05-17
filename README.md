@@ -15,7 +15,7 @@ mtensor主要用于多维数组及其计算, 其可以结构化高效地在CPU/G
 * 基于延迟计算, 在view名字空间下实现了map, slice, stride, gather(view), 其返回的结果为相应的lambda_tensor.
 * 算法和视图的接口为对于cuda和c++来说是统一的
 
-除此之外, mtensor是一个遵循c++11的项目, 其是header only的, 我们可以很方便的在先用项目中集成使用它.
+除此之外, mtensor是一个遵循c++11的项目, 其是header only的, 我们可以很方便的在现有项目中集成使用它.
 
 ## 函数式的延迟计算实现lambda_tensor
 
