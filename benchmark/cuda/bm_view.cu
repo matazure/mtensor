@@ -6,6 +6,13 @@ BENCHMARK(bm_cuda_tensor2f_view_slice)->Arg(10_K);
 auto bm_cuda_tensor2f_view_stride = bm_tensor_view_stride<cuda::tensor<float, 2>>;
 BENCHMARK(bm_cuda_tensor2f_view_stride)->Arg(10_K);
 
+auto bm_cuda_tensor2f_view_gather_scalar_axis0 =
+    bm_tensor_view_gather_scalar_axis0<cuda::tensor<float, 2>>;
+BENCHMARK(bm_cuda_tensor2f_view_gather_scalar_axis0)->Arg(100_M);
+auto bm_cuda_tensor2f_view_gather_scalar_axis1 =
+    bm_tensor_view_gather_scalar_axis1<cuda::tensor<float, 2>>;
+BENCHMARK(bm_cuda_tensor2f_view_gather_scalar_axis1)->Arg(100_M);
+
 auto bm_cuda_tensor2f_view_zip = bm_tensor_view_zip2<cuda::tensor<float, 2>>;
 BENCHMARK(bm_cuda_tensor2f_view_zip)->Arg(10_K);
 

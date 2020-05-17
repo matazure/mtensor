@@ -35,6 +35,44 @@ inline void bm_tensor_view_stride(benchmark::State& state) {
 }
 
 template <typename tensor_type>
+inline void bm_tensor_view_gather_scalar_axis0(benchmark::State& state) {
+    typedef typename tensor_selector<typename tensor_type::runtime_type,
+                                     typename tensor_type::value_type, tensor_type::rank - 1>::type
+        dst_tensor_type;
+    tensor_type ts_src(point2i{10, state.range(0)});
+    dst_tensor_type ts_dst(gather_point<0>(ts_src.shape()));
+
+    int i = 0;
+    while (state.KeepRunning()) {
+        ++i;
+        copy(view::gather<0>(ts_src, i % ts_src.shape(0)), ts_dst);
+        benchmark::DoNotOptimize(ts_dst.data());
+    }
+
+    state.SetBytesProcessed(state.iterations() * ts_dst.size() * sizeof(ts_dst[0]));
+    state.SetItemsProcessed(state.iterations() * ts_dst.size());
+}
+
+template <typename tensor_type>
+inline void bm_tensor_view_gather_scalar_axis1(benchmark::State& state) {
+    typedef typename tensor_selector<typename tensor_type::runtime_type,
+                                     typename tensor_type::value_type, tensor_type::rank - 1>::type
+        dst_tensor_type;
+    tensor_type ts_src(point2i{state.range(0), 10});
+    dst_tensor_type ts_dst(gather_point<1>(ts_src.shape()));
+
+    int i = 0;
+    while (state.KeepRunning()) {
+        ++i;
+        copy(view::gather<1>(ts_src, i % ts_src.shape(1)), ts_dst);
+        benchmark::DoNotOptimize(ts_dst.data());
+    }
+
+    state.SetBytesProcessed(state.iterations() * ts_dst.size() * sizeof(ts_dst[0]));
+    state.SetItemsProcessed(state.iterations() * ts_dst.size());
+}
+
+template <typename tensor_type>
 inline void bm_tensor_view_zip2(benchmark::State& state) {
     tensor_type ts0(pointi<tensor_type::rank>::all(state.range(0)));
     tensor_type ts1(ts0.shape());
