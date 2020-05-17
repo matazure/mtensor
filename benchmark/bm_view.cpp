@@ -12,5 +12,5 @@ BENCHMARK(bm_host_tensor2f_view_zip)->Arg(10_K);
 auto bm_host_tensor2f_view_eye = bm_tensor_view_eye<tensor<float, 2>>;
 BENCHMARK(bm_host_tensor2f_view_eye)->Arg(10_K);
 
-// auto bm_host_tensor2f_view_meshgrid = bm_tensor_view_meshgrid2<host_t, float>;
-// BENCHMARK(bm_host_tensor2f_view_meshgrid)->Arg(10_K);
+auto bm_host_tensor2f_view_meshgrid = bm_tensor_view_meshgrid2<host_t, float>;
+BENCHMARK(bm_host_tensor2f_view_meshgrid)->Arg(10_K);

@@ -11,37 +11,60 @@
 namespace matazure {
 namespace view {
 
-template <typename _ValueType>
+template <typename... _Axes>
 struct meshgrid_functor {
-    meshgrid_functor(tensor<_ValueType, 1> x, tensor<_ValueType, 1> y) : x_(x), y_(y) {}
+    typedef typename tuple_element<0, tuple<_Axes...>>::type first_tensor_type;
+    typedef typename first_tensor_type::value_type value_type;
+    const static int_t rank = sizeof...(_Axes);
 
-    MATAZURE_GENERAL point<_ValueType, 2> operator()(pointi<2> idx) const {
-        return point<_ValueType, 2>{x_[idx[0]], y_[idx[1]]};
+    meshgrid_functor(tuple<_Axes...> axes) : axes_(axes) {}
+
+    MATAZURE_GENERAL point<value_type, rank> operator()(pointi<rank> idx) const {
+        return access_imp(idx, make_integer_sequence<int_t, sizeof...(_Axes)>{});
     }
 
    private:
-    tensor<_ValueType, 1> x_;
-    tensor<_ValueType, 1> y_;
+    template <int_t... _Indices>
+    MATAZURE_GENERAL point<value_type, rank> access_imp(
+        pointi<rank> idx, integer_sequence<int_t, _Indices...>) const {
+        return point<value_type, rank>{get<_Indices>(axes_)[idx[_Indices]]...};
+    }
+
+   private:
+    tuple<_Axes...> axes_;
 };
 
-/**
- * @brief meshgrid a tensor to another value_type lambda_tensor
- *
- * support primitive type static_cast and point_cast.
- *
- * @param tensor the source tensor
- * @tparam _ValueType the dest tensor value type
- * @return a lambda_tensor whose value_type is _ValueType
- */
-template <typename _T0, typename _T1>
-inline auto meshgrid(_T0 x, _T1 y)
-    -> decltype(make_lambda(pointi<2>{x.size(), y.size()},
-                            meshgrid_functor<typename _T0::value_type>(x, y),
-                            typename _T0::runtime_type{},
-                            typename layout_getter<typename _T0::layout_type, 2>::type{})) {
+namespace internal {
+
+template <typename... _Axes, int_t... _Indices>
+inline auto get_meshgrid_shape_imp(tuple<_Axes...> axes, integer_sequence<int_t, _Indices...>)
+    -> pointi<sizeof...(_Axes)> {
+    return pointi<sizeof...(_Axes)>{get<_Indices>(axes).size()...};
+}
+
+template <typename... _Axes>
+inline auto get_meshgrid_shape(tuple<_Axes...> axes) -> pointi<sizeof...(_Axes)> {
+    return get_meshgrid_shape_imp(axes, make_integer_sequence<int_t, sizeof...(_Axes)>{});
+}
+
+}  // namespace internal
+
+template <typename... _Axes>
+inline auto meshgrid_imp(tuple<_Axes...> axes) -> decltype(make_lambda(
+    internal::get_meshgrid_shape(axes), meshgrid_functor<_Axes...>(axes),
+    typename tuple_element<0, tuple<_Axes...>>::type::runtime_type{},
+    typename layout_getter<typename tuple_element<0, tuple<_Axes...>>::type::layout_type,
+                           sizeof...(_Axes)>::type{})) {
     return make_lambda(
-        pointi<2>{x.size(), y.size()}, meshgrid_functor<typename _T0::value_type>(x, y),
-        typename _T0::runtime_type{}, typename layout_getter<typename _T0::layout_type, 2>::type{});
+        internal::get_meshgrid_shape(axes), meshgrid_functor<_Axes...>(axes),
+        typename tuple_element<0, tuple<_Axes...>>::type::runtime_type{},
+        typename layout_getter<typename tuple_element<0, tuple<_Axes...>>::type::layout_type,
+                               sizeof...(_Axes)>::type{});
+}
+
+template <typename... _Axes>
+inline auto meshgrid(_Axes... axes) -> decltype(meshgrid_imp(tuple<_Axes...>(axes...))) {
+    return meshgrid_imp(tuple<_Axes...>(axes...));
 }
 
 }  // namespace view
