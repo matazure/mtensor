@@ -12,14 +12,14 @@ mtensor主要用于多维数组及其计算, 其可以结构化高效地在CPU/G
 * 支持point, mtensor, local_mtensor等多种易用的泛型数据结构
 * 通过lambda_mtensor实现了比模板表达式更强更简洁的延迟计算
 * 实现了stl类似的fill, for_each, copy, transform等常用算法(algorithm).
-* 基于延迟计算, 在view名字空间下实现了map, slice, stride, unstack等视图(view), 其返回的结果为相应的lambda_tensor.
+* 基于延迟计算, 在view名字空间下实现了map, slice, stride, gather(view), 其返回的结果为相应的lambda_tensor.
 * 算法和视图的接口为对于cuda和c++来说是统一的
 
 除此之外, mtensor是一个遵循c++11的项目, 其是header only的, 我们可以很方便的在先用项目中集成使用它.
 
 ## 函数式的延迟计算实现lambda_tensor
 
-延迟计算有多种实现方式, 最为常见的是eigen里面所采用的模板表达式, 但该种方式每实现一种新的运算就需要实现一个完整的模板表达式类,
+延迟计算有多种实现方式, 最为常见的是eigen里面所采用的模板表达式, 但该种方式每实现一种新的运算就要实现一个完整的模板表达式类,
 过程非常繁琐, 不便于拓展新的运算.
 
 <table>
@@ -35,14 +35,14 @@ mtensor主要用于多维数组及其计算, 其可以结构化高效地在CPU/G
     </tr>
 </table>
 
-上图中的lambda tensor, 可以通过如下定义获得
+上图中的lambda tensor, 可以通过如下代码获得
 
 ```c++
 auto lambda_ts = make_lambda(pointi{3, 3}, f);
 ```
 
-事实上, 对于任何一个tensor, 我们都可以通过定义一个数组(线性)坐标到值的函数(算子)来获得.
-得以于c++强大的优化能力, 正常情况lambda_tensor即使嵌套多层也不会带来额外的性能开销.
+事实上, 对于任何一个tensor, 我们都可以定义一个数组(线性)坐标到值的函数(算子)来获得.
+得以于c++强大的优化能力, 大部分情况下lambda_tensor即使嵌套多层也不会带来额外的性能开销.
 
 ## 用法
 
@@ -83,9 +83,9 @@ ts array access {1, 1} value : 3
 
 ### for_index
 
-for_index和cuda::for_index是最基本的计算接口, mtensor中的大部分计算都是由for_index来驱动的, 下面的例子是在gpu设备上， 
-使用cuda::for_index来实现cuda::tensor的加法运算. 可以看出我们不必花过多精力在内存的申请释放上, 也无需计算thread坐标,
-只需实现关于坐标的算子即可. 完整示例可查看[sample/sample_for_index.cu](sample/sample_for_index.cu)
+for_index和cuda::for_index是最基本的计算接口, mtensor中的大部分计算都是由for_index来执行的, 下面例子是在gpu设备上， 
+使用cuda::for_index来实现cuda::tensor的加法运算. 可以看出我们不必花过多精力在内存的申请释放上, 也无需手动计算thread坐标,
+只要关注关于坐标的算子实现即可. 完整示例可查看[sample/sample_for_index.cu](sample/sample_for_index.cu)
 
 ```c++
 pointi<2> shape{2, 3};
@@ -111,13 +111,14 @@ std::cout << ts_re << std::endl;
 {3, 3, 3}}
 ```
 
-可以和[sample/sample_for_index.cpp](sample/sample_for_index.cpp)中的cpu端示例对比，看一下cpu和gpu的实现由什么区别
+可以和[sample/sample_for_index.cpp](sample/sample_for_index.cpp)中的cpu端示例对比，可以看出算子需要申明__device__才可以在gpu端运行.
 
 ### 一个更复杂的例子
 
-下述代码片段是[sample/sample_gradient.cpp](sample/sample_gradient.cpp)中的片段, 该例子中使用了view名字空间下的slice和cast视图, 
-也通过了make_lambda来自定义了梯度视图和norm1视图, 并最终通过这些操作计算了图像的梯度强度. 
-上以上过程中, 每个视图运算和make_lambda并不会真的去计算结果而只是把计算的方式存下来, 在最后的persist函数调用时才会申请内存,并遍历计算写入内存中.
+下述代码是[sample/sample_gradient.cpp](sample/sample_gradient.cpp)中的, 该例子中使用了view名字空间下的slice和cast视图, 
+还通过make_lambda来自定义了梯度和norm1, 并最终通过这些操作计算了图像的梯度强度.
+上以上过程中, 每个视图运算和make_lambda并不会真的去计算结果而只是把算子存下来.
+在最后的persist函数调用时, 程序才会申请内存,并遍历坐标调用算子将其结果写入内存中.
 
 ```c++
 tensor<byte, 2> img_gray = read_gray_image(argv[1]);
@@ -147,7 +148,8 @@ write_gray_png("grad.png", grad_norm1);
 
 ### gpu的分块计算block_for_index
 
-下面的示例展示了如何在block_for_index中使用shared内存来实现矩阵乘法,完整示例[sample/sample_matrix_mul.cu](sample/sample_matrix_mul.cu)
+下面的示例展示了如何在block_for_index中使用shared内存来实现矩阵乘法,
+完整示例[sample/sample_matrix_mul.cu](sample/sample_matrix_mul.cu)
 
 ```c++
 const int BLOCK_SIZE = 16;                      // block尺寸位16x16
@@ -194,8 +196,8 @@ cuda::block_for_index<BLOCK_DIM>(grid_dim,
 *一个通用实现阶段*
 
 大部分需要同时支持cuda和c++的程序可以由若干个由上图所示的阶段构成, 在该阶段中会把tensor的数据拷贝的cuda::tensor, 
-然后cuda和c++端均可以执行一个通用的实现, 在将cuda的数据拷贝会tensor. 这样cuda的运算结果最终和c++的结果是一致的. 
-在上图中, 每个阶段的"common implement"是用模板泛型实现的, 其调用的函数需要申明_\_device\_\_ \_\_host\_\_
+然后cuda和c++端均可以执行一个通用的实现, 再将cuda的数据拷贝会tensor. 这样cuda的运算结果最终和c++的结果是一致的. 
+在上图中, 每个阶段的"common implement"是可以用模板实现的, 其调用的函数需要申明_\_device\_\_ \_\_host\_\_
 . 更多的细节看参考示例[smaple/sample_mandelbrot.hpp](sample/sample_mandelbrot.hpp). 
 除此之外[include/matazure/view](include/matazure/view)下的实现都是cpu和gpu通用的(同一份代码实现), 
 sample下的levelset分割算法是一个更复杂的泛型多维度异构通用实现.
@@ -203,17 +205,18 @@ sample下的levelset分割算法是一个更复杂的泛型多维度异构通用
 ### 其他
 
 除此之外mandelbrot的例子还向我们展示了如何在mtensor中及其方便的使用openmp和使用特定尺寸的gpu资源
+ 若示例中没有使用到的函数可以通过单元测试查看用法.
 
 ## mtensor的性能是否高效
 
-mtensor在绝大部分场景下都不会带来额外的性能开销, 并且方便开发人员编写出高效的代码
+mtensor在绝大部分场景下都不会带来额外的性能开销, 并且方便研发人员编写出高效清晰的代码
 
-* mtensor的延迟计算可以有效的避免内存频繁拷贝, 可以带来性能上的加成
-* mtensor的泛型实现, 可以很容易的获得simd, fp16等带来的性能提升, 你只需将其设置为相应的模板类型就好
-* mtensor的计算由for_index驱动, 你可以很方便的拓展for_index来获取特定的效果, 比如在c++端已实现了openmp的并行for_index
+* mtensor的延迟计算可以有效的避免内存的频繁拷贝
+* mtensor的泛型实现, 可以很容易地在已有代码中使用simd, fp16等
+* mtensor的计算是由for_index执行的, 你可以很方便的拓展for_index的各种执行策略, mtensor已实现了openmp并行, 全gpu资源等策略
 
-除此之外, mtensor还编写了大量的benchmark来确保性能指标, 
-可以看出原生cuda的copy性能和mtensor封装后是一致, 甚至我们通过使用长字节的类型还很容易获取性能的提升
+除此之外, mtensor还编写了大量的benchmark来确保性能, 
+可以看出原生cuda的copy性能和mtensor封装后是一致, 甚至我们通过使用长字节的类型还获得了性能的提升
 
 ```console
 bm_cuda_raw1f_for_copy/1000000000                    154.62GB/s    38.655G items/s
@@ -227,10 +230,10 @@ bm_cuda_tensor2a4f_copy/8000                         240.725GB/s   15.0453G item
 
 ## 如何在你的项目中集成
 
-在你的项目的头文件路径中包含include目录路径即可, 无第三方库和动态库依赖。
+在你的项目的头文件路径中包含include目录路径即可, 无第三方库和动态库依赖(c++和cuda标准库除外).
 
-除了需要你的C++编译器支持C++11外, 对于CUDA项目, 需要nvcc加入编译参数"--expt-extended-lambda --expt-relaxed-constexpr"和"-std=c++11",
- CUDA的官方文档有nvcc编译参数设置的详细说明, 若使用CMake构建项目, 也可参考本项目的CMakeLists.txt。
+除了需要你的C++编译器支持C++11外, 对于CUDA项目, 还需要nvcc加入编译参数"--expt-extended-lambda --expt-relaxed-constexpr"和"-std=c++11",
+ CUDA的官方文档有nvcc编译参数设置的详细说明, 若使用CMake构建项目, 也可参考本项目的CMakeLists.txt, 当然你也可以使用c++14
 
 ```cmake
     set(CMAKE_CUDA_STANDARD 11)
@@ -278,11 +281,11 @@ git submodule update --init -f third_party
 ./script/build_native.sh -DWITH_CUDA=ON -DWITH_OPENMP=ON -DWITH_SSE=ON
 ```
 
-目前CUDA的mtensor编译还有几个关于主机设备函数调用的warning, 主要是std::shared_ptr和std::allocator产生, 可以忽略
+目前CUDA的mtensor编译还有几个关于主机设备函数调用的warning(无法消除), 主要是std::shared_ptr产生, 可以忽略
 
 ### 测试
 
-单元测试以ut开头, host表示主机cpu测试, cuda表示需要cuda环境的gpu测试
+单元测试以ut开头, host表示主机cpu测试, cuda表示gpu测试, 所有执行程序均在build/bin目录下
 
 ```bash
 ./build/bin/ut_host_mtensor
