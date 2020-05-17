@@ -229,12 +229,12 @@ bm_cuda_tensor2a4f_copy/8000                         240.725GB/s   15.0453G item
 
 在你的项目的头文件路径中包含include目录路径即可, 无第三方库和动态库依赖。
 
-除了需要你的C++编译器支持C++11外, 对于CUDA项目, 需要nvcc加入编译参数"--expt-extended-lambda"和"-std=c++11",
+除了需要你的C++编译器支持C++11外, 对于CUDA项目, 需要nvcc加入编译参数"--expt-extended-lambda --expt-relaxed-constexpr"和"-std=c++11",
  CUDA的官方文档有nvcc编译参数设置的详细说明, 若使用CMake构建项目, 也可参考本项目的CMakeLists.txt。
 
 ```cmake
     set(CMAKE_CUDA_STANDARD 11)
-    set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-extended-lambda")
+    set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-extended-lambda --expt-relaxed-constexpr")
 ```
 
 ## 编译测试

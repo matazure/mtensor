@@ -57,4 +57,4 @@ auto bm_cuda_tensor1f_for_array_index_copy = bm_tensor_for_array_index_copy<cuda
 auto bm_cuda_tensor2f_for_array_index_copy = bm_tensor_for_array_index_copy<cuda::tensor<float, 2>>;
 BENCHMARK(bm_cuda_tensor1f_for_array_index_copy)->Arg(1_G);
 // cuda中二维的坐标是会耗时更多， 大概有2%的损耗，说明编译器无法将数组访问形式的代码优化点
-BENCHMARK(bm_cuda_tensor2f_for_array_index_copy)->Arg(32_K);
+BENCHMARK(bm_cuda_tensor2f_for_array_index_copy)->Arg(10_K);

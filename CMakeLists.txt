@@ -12,7 +12,12 @@ endif()
 
 project(Matazure.Tensor CXX)
 
-set(CMAKE_CXX_STANDARD 11)
+if (NOT CXX_STANDARD)
+	set(CXX_STANDARD 11)
+endif()
+
+set(CMAKE_CXX_STANDARD ${CXX_STANDARD})
+set(CUDA_STANDARD ${CXX_STANDARD})
 set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -36,7 +41,7 @@ if(WITH_CUDA)
 	endif()
 
 	enable_language(CUDA)
-	set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-extended-lambda -arch=sm_75")
+	set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-extended-lambda --expt-relaxed-constexpr -arch=sm_75")
 endif()
 
 option(WITH_OPENMP "With OpenMP" OFF)

@@ -35,6 +35,28 @@ inline void bm_tensor_view_stride(benchmark::State& state) {
 }
 
 template <typename tensor_type>
+inline void bm_tensor_view_zip2(benchmark::State& state) {
+    tensor_type ts0(pointi<tensor_type::rank>::all(state.range(0)));
+    tensor_type ts1(ts0.shape());
+
+    typedef typename tensor_selector<
+        typename tensor_type::runtime_type,
+        tuple<typename tensor_type::value_type, typename tensor_type::value_type>,
+        tensor_type::rank>::type tensor_tuple_type;
+
+    tensor_tuple_type ts_dst(ts0.shape());
+
+    while (state.KeepRunning()) {
+        copy(view::zip(ts0, ts1), ts_dst);
+        benchmark::DoNotOptimize(ts_dst.data());
+    }
+
+    state.SetBytesProcessed(state.iterations() * ts_dst.size() *
+                            sizeof(typename tensor_tuple_type::value_type));
+    state.SetItemsProcessed(state.iterations() * ts_dst.size());
+}
+
+template <typename tensor_type>
 inline void bm_tensor_view_eye(benchmark::State& state) {
     tensor_type ts_dst(pointi<tensor_type::rank>::all(state.range(0)));
     auto center = ts_dst.shape() / 4;
@@ -48,4 +70,23 @@ inline void bm_tensor_view_eye(benchmark::State& state) {
 
     state.SetBytesProcessed(state.iterations() * ts_dst.size() * sizeof(ts_dst[0]));
     state.SetItemsProcessed(state.iterations() * ts_dst.size());
+}
+
+template <typename runtime_type, typename value_type>
+inline void bm_tensor_view_meshgrid2(benchmark::State& state) {
+    point2i shape{state.range(0), state.range(0)};
+    typedef typename tensor_selector<runtime_type, point<value_type, 2>, 2>::type tensor_type;
+    tensor_type ts(shape);
+
+    typedef typename tensor_selector<runtime_type, value_type, 1>::type vector_type;
+    vector_type v0(shape[0]);
+    vector_type v1(shape[1]);
+
+    while (state.KeepRunning()) {
+        copy(view::meshgrid(v0, v1), ts);
+        benchmark::DoNotOptimize(ts.data());
+    }
+
+    state.SetBytesProcessed(state.iterations() * ts.size() * sizeof(ts[0]));
+    state.SetItemsProcessed(state.iterations() * ts.size());
 }

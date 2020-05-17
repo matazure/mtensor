@@ -7,6 +7,7 @@
 #include <matazure/mem_copy.hpp>
 #include <matazure/meta.hpp>
 #include <matazure/reshape.hpp>
+#include <matazure/tensor_selector.hpp>
 #include <matazure/view/view.hpp>
 
 #ifdef MATAZURE_OPENMP
