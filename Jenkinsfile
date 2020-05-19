@@ -33,9 +33,23 @@ pipeline{
                                 sh './build/bin/ut_host_mtensor'
                             }
                         }
+                        stage('sample') {
+                            steps {
+                                sh './build/bin/sample_for_index'
+                                sh './build/bin/sample_basic_structure'
+                                sh './build/bin/sample_gradient data/lena.jpg'
+                                sh './build/bin/sample_mandelbrot'
+                                sh './build/bin/sample_make_lambda'
+                            }
+                        }
                         stage('benchmark') {
                             steps {
                                 sh './build/bin/bm_host_mtensor --benchmark_min_time=1'
+                            }
+                        }
+                        stage('archive') {
+                            steps {
+                                archiveArtifacts artifacts: '*.png', fingerprint: true 
                             }
                         }
                     }
@@ -65,9 +79,22 @@ pipeline{
                                 sh './build/bin/ut_cuda_mtensor'
                             }
                         }
+                        stage('sample') {
+                            steps {
+                                sh './build/bin/sample_cuda_for_index'
+                                sh './build/bin/sample_cuda_convolution data/lena.jpg'
+                                sh './build/bin/sample_cuda_mandelbrot'
+                                sh './build/bin/sample_cuda_matrix_mul'
+                            }
+                        }
                         stage('benchmark') {
                             steps {
                                 sh './build/bin/bm_cuda_mtensor'
+                            }
+                        }
+                        stage('archive') {
+                            steps {
+                                archiveArtifacts artifacts: '*.png', fingerprint: true 
                             }
                         }
                     }

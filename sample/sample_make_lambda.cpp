@@ -20,4 +20,6 @@ int main(int argc, char* argv[]) {
 
     //上述的定义不会执行具体的运算，当我们去获取某一个具体坐标的值时其才会真正的去调用对应的算子
     std::cout << "offset 50 value is " << lts_a_add_b[50] << std::endl;
+
+    return 0;
 }

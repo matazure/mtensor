@@ -14,5 +14,6 @@ int main(int argc, char* argv[]) {
     for_index(shape, functor);
     // 输出结果
     std::cout << ts_c << std::endl;
+
     return 0;
 }

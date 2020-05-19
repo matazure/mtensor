@@ -12,4 +12,6 @@ int main(int argc, char* argv[]) {
     std::cout << "ts linear access 3 value : " << ts[3] << std::endl;
     auto idx = pointi<2>{1, 1};
     std::cout << "ts array access " << idx << " value : " << ts(idx) << std::endl;
+
+    return 0;
 }

@@ -17,5 +17,6 @@ int main(int argc, char* argv[]) {
     tensor<float, 2> ts_re(shape);
     mem_copy(ts_c, ts_re);
     std::cout << ts_re << std::endl;
+
     return 0;
 }
