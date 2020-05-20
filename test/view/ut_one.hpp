@@ -3,7 +3,7 @@
 #include "../ut_foundation.hpp"
 
 TEST(ViewTests, One) {
-    auto ts_one = view::one<float>(point2i{2, 3}, host_t{}).persist();
+    auto ts_one = view::ones<float>(point2i{2, 3}, host_t{}).persist();
 
     EXPECT_EQ(ts_one(0, 0), 1);
     EXPECT_EQ(ts_one(0, 1), 1);

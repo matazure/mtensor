@@ -12,14 +12,14 @@ namespace matazure {
 namespace view {
 
 template <typename _ValueType, int_t _Rank>
-struct one_functor {
-    MATAZURE_GENERAL _ValueType operator()(pointi<_Rank> idx) const { return _ValueType{1}; }
+struct zeros_functor {
+    MATAZURE_GENERAL _ValueType operator()(pointi<_Rank> idx) const { return _ValueType{0}; }
 };
 
 template <typename _ValueType, int_t _Rank, typename _RuntimeType>
-inline auto one(pointi<_Rank> shape, _RuntimeType)
-    -> decltype(make_lambda(shape, one_functor<_ValueType, _Rank>{}, _RuntimeType{})) {
-    return make_lambda(shape, one_functor<_ValueType, _Rank>{}, _RuntimeType{});
+inline auto zeros(pointi<_Rank> shape, _RuntimeType)
+    -> decltype(make_lambda(shape, zeros_functor<_ValueType, _Rank>{}, _RuntimeType{})) {
+    return make_lambda(shape, zeros_functor<_ValueType, _Rank>{}, _RuntimeType{});
 }
 
 }  // namespace view

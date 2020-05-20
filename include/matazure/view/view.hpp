@@ -3,15 +3,16 @@
 #include <matazure/view/broadcast.hpp>
 #include <matazure/view/cast.hpp>
 #include <matazure/view/clamp_zero.hpp>
+#include <matazure/view/conv.hpp>
 #include <matazure/view/eye.hpp>
 #include <matazure/view/gather.hpp>
 #include <matazure/view/map.hpp>
 #include <matazure/view/meshgrid.hpp>
-#include <matazure/view/one.hpp>
+#include <matazure/view/ones.hpp>
 #include <matazure/view/permute.hpp>
 #include <matazure/view/slice.hpp>
 #include <matazure/view/stride.hpp>
-#include <matazure/view/zero.hpp>
+#include <matazure/view/zeros.hpp>
 #ifndef MATAZURE_CUDA
 #include <matazure/view/zip.hpp>
 #else

@@ -261,7 +261,13 @@ inline MATAZURE_GENERAL bool equal(const point<_Ty, _Rank>& lhs, const point<_Ty
 /// special zero for point
 template <typename _T, int_t _Rank>
 struct zero<point<_T, _Rank>> {
-    MATAZURE_GENERAL static constexpr point<_T, _Rank> value() { return {0}; };
+    MATAZURE_GENERAL static point<_T, _Rank> value() {
+        point<_T, _Rank> re;
+        for (int_t i = 0; i < re.size(); ++i) {
+            re[i] = zero<_T>::value();
+        }
+        return re;
+    };
 };
 
 /// return cumulative prod of point elements
