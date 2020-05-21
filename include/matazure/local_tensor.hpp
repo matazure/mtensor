@@ -41,9 +41,10 @@ using dim = meta::array<_Values...>;
 /**
  * @brief a compile time tensor which uses static memory
  * @tparam _ValueType element value type, must be pod
- * @tparam _Ext a fixed shape, must be dim(meta::array) type
+ * @tparam _Shape a fixed shape, must be dim(meta::array) type
  */
-template <typename _ValueType, typename _Ext, typename _Layout = column_major_layout<_Ext::rank>>
+template <typename _ValueType, typename _Shape,
+          typename _Layout = column_major_layout<_Shape::rank>>
 class local_tensor {
    private:
     template <bool _IsColumn, int_t... _Values>
@@ -123,7 +124,7 @@ class local_tensor {
 
    public:
     /// the meta shape type which has compile time ext
-    typedef _Ext meta_shape_type;
+    typedef _Shape meta_shape_type;
     static const int_t rank = meta_shape_type::rank;
     typedef _ValueType value_type;
     typedef value_type* pointer;
@@ -135,9 +136,8 @@ class local_tensor {
     typedef local_t runtime_type;
 
    private:
-    typedef
-        typename traits_helper<std::is_same<_Layout, column_major_layout<rank>>::value, _Ext>::type
-            traits_t;
+    typedef typename traits_helper<std::is_same<_Layout, column_major_layout<rank>>::value,
+                                   _Shape>::type traits_t;
 
     /// @todo should check each dim
     static_assert(traits_t::size() > 0, "");
@@ -223,20 +223,30 @@ class local_tensor {
     value_type elements_[traits_t::size()];
 };
 
+template <typename _Tensor>
+struct is_local_tensor {
+    static const bool value = false;
+};
+
+template <typename _ValueType, typename _Shape, typename _Layout>
+struct is_local_tensor<local_tensor<_ValueType, _Shape, _Layout>> {
+    static const bool value = true;
+};
+
 static_assert(std::is_pod<local_tensor<float, dim<3, 3>>>::value,
               "local_tensor should be pod type");
 
 /// alias of local_tensor<_ValueType, 2>
-template <typename _ValueType, typename _Ext, typename _Tmp = enable_if_t<_Ext::size() == 2>>
-using static_matrix = local_tensor<_ValueType, _Ext>;
+template <typename _ValueType, typename _Shape, typename _Tmp = enable_if_t<_Shape::size() == 2>>
+using static_matrix = local_tensor<_ValueType, _Shape>;
 
 /// alias of local_tensor<_ValueType, 1>
-template <typename _ValueType, typename _Ext, typename _Tmp = enable_if_t<_Ext::size() == 1>>
-using static_vector = local_tensor<_ValueType, _Ext>;
+template <typename _ValueType, typename _Shape, typename _Tmp = enable_if_t<_Shape::size() == 1>>
+using static_vector = local_tensor<_ValueType, _Shape>;
 
 /// special for local_tensor
-template <typename _ValueType, typename _Ext>
-struct is_tensor<local_tensor<_ValueType, _Ext>> : bool_constant<true> {};
+template <typename _ValueType, typename _Shape>
+struct is_tensor<local_tensor<_ValueType, _Shape>> : bool_constant<true> {};
 
 template <typename _ValueType, typename _Dim>
 struct zero<local_tensor<_ValueType, _Dim>> {

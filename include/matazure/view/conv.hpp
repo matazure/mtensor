@@ -10,8 +10,39 @@
 namespace matazure {
 namespace view {
 
+template <typename _Tensor, typename _Kernel, bool _IsLocalTensor>
+struct conv_functor;
+
 template <typename _Tensor, typename _Kernel>
-struct conv_functor {
+struct conv_functor<_Tensor, _Kernel, false> {
+   private:
+    typedef typename _Tensor::value_type value_type;
+    static const int_t rank = _Tensor::rank;
+
+    const _Tensor ts_;
+    const _Kernel kernel_;
+    const pointi<rank> kernel_shape_;
+    const pointi<rank> kernel_radius_;
+
+   public:
+    conv_functor(_Tensor ts, _Kernel kernel)
+        : ts_(ts),
+          kernel_(kernel),
+          kernel_shape_(kernel.shape()),
+          kernel_radius_(kernel.shape() / 2) {}
+
+    MATAZURE_GENERAL value_type operator()(pointi<_Tensor::rank> idx) const {
+        auto re = matazure::zero<value_type>::value();
+        for_index(kernel_shape_, [&](pointi<rank> neigbor_idx) {
+            re += kernel_(neigbor_idx) * ts_(idx + neigbor_idx - kernel_radius_);
+        });
+
+        return re;
+    }
+};
+
+template <typename _Tensor, typename _Kernel>
+struct conv_functor<_Tensor, _Kernel, true> {
    private:
     typedef typename _Tensor::value_type value_type;
     static const int_t rank = _Tensor::rank;
@@ -66,10 +97,11 @@ struct conv_neighbors_weights_functor {
 };
 
 template <typename _Tensor, typename _Kernel>
-inline auto conv(_Tensor ts, _Kernel kernel)
-    -> decltype(make_lambda(ts.shape(), conv_functor<_Tensor, _Kernel>(ts, kernel),
-                            typename _Tensor::runtime_type{}, typename _Tensor::layout_type{})) {
-    return make_lambda(ts.shape(), conv_functor<_Tensor, _Kernel>(ts, kernel),
+inline auto conv(_Tensor ts, _Kernel kernel) -> decltype(make_lambda(
+    ts.shape(), conv_functor<_Tensor, _Kernel, is_local_tensor<_Kernel>::value>(ts, kernel),
+    typename _Tensor::runtime_type{}, typename _Tensor::layout_type{})) {
+    return make_lambda(ts.shape(),
+                       conv_functor<_Tensor, _Kernel, is_local_tensor<_Kernel>::value>(ts, kernel),
                        typename _Tensor::runtime_type{}, typename _Tensor::layout_type{});
 }
 

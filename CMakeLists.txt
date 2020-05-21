@@ -58,7 +58,10 @@ if(WITH_OPENMP)
 	endif()
 endif()
 
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+option(NATIVE "-march=native" OFF)
+if (NATIVE)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+endif()
 
 option(BUILD_EXAMPLE "Build Example" ON)
 option(BUILD_TEST "Build Test" ON)
@@ -66,7 +69,6 @@ option(BUILD_BENCHMARK "Build Benchmark" ON)
 
 message("current compiler is ${CMAKE_CXX_COMPILER}")
 
-# include_directories(.)
 set_property( GLOBAL PROPERTY USE_FOLDERS ON)
 
 
