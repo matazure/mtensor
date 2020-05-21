@@ -69,6 +69,45 @@ struct conv_functor<_Tensor, _Kernel, true> {
     }
 };
 
+// add 3x3 unroll special,
+template <typename _Tensor, typename _ValueType, typename _Layout>
+struct conv_functor<_Tensor, local_tensor<_ValueType, dim<3, 3>, _Layout>, true> {
+   private:
+    typedef typename _Tensor::value_type value_type;
+    static const int_t rank = _Tensor::rank;
+
+    typedef local_tensor<_ValueType, dim<3, 3>, _Layout> kernel_type;
+
+    _Tensor ts_;
+    kernel_type kernel_;
+    pointi<rank> kernel_shape_;
+    pointi<rank> kernel_radius_;
+
+   public:
+    conv_functor(_Tensor ts, kernel_type kernel)
+        : ts_(ts),
+          kernel_(kernel),
+          kernel_shape_(kernel.shape()),
+          kernel_radius_(kernel.shape() / 2) {}
+
+    MATAZURE_GENERAL value_type operator()(pointi<_Tensor::rank> idx) const {
+        // clang-format off
+        auto re = zero<value_type>::value();
+        re += kernel_(pointi<2>{0, 0}) * ts_(idx + pointi<2>{-1, -1});
+        re += kernel_(pointi<2>{1, 0}) * ts_(idx + pointi<2>{ 0, -1});
+        re += kernel_(pointi<2>{2, 0}) * ts_(idx + pointi<2>{ 1, -1});
+        re += kernel_(pointi<2>{0, 1}) * ts_(idx + pointi<2>{-1,  0});
+        re += kernel_(pointi<2>{1, 1}) * ts_(idx + pointi<2>{ 0,  0});
+        re += kernel_(pointi<2>{2, 1}) * ts_(idx + pointi<2>{ 1,  0});
+        re += kernel_(pointi<2>{0, 2}) * ts_(idx + pointi<2>{-1,  1});
+        re += kernel_(pointi<2>{1, 2}) * ts_(idx + pointi<2>{ 0,  1});
+        re += kernel_(pointi<2>{2, 2}) * ts_(idx + pointi<2>{ 1,  1});
+        // clang-format on
+
+        return re;
+    }
+};
+
 template <typename _Tensor>
 struct conv_neighbors_weights_functor {
    private:
