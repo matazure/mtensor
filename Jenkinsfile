@@ -25,7 +25,7 @@ pipeline{
                     stages {
                         stage('build') {
                             steps {
-                                sh './script/build_native.sh'
+                                sh './script/build_native.sh -DNATIVE=ON'
                             }
                         }
                         stage('test') {
@@ -54,8 +54,49 @@ pipeline{
                         }
                     }
                 }
-
-
+                stage('linux-x64-clang') {
+                    agent { 
+                        dockerfile {
+                            filename 'tensor-dev-ubuntu18.04.dockerfile'
+                            dir 'dockerfile'
+                        }
+                    }
+                    environment {
+                        CXX = 'clang++'
+                        CC = 'clang'
+                    }
+                    stages {
+                        stage('build') {
+                            steps {
+                                sh './script/build_native.sh -DNATIVE=ON'
+                            }
+                        }
+                        stage('test') {
+                            steps {
+                                sh './build/bin/ut_host_mtensor'
+                            }
+                        }
+                        stage('sample') {
+                            steps {
+                                sh './build/bin/sample_for_index'
+                                sh './build/bin/sample_basic_structure'
+                                sh './build/bin/sample_gradient data/lena.jpg'
+                                sh './build/bin/sample_mandelbrot'
+                                sh './build/bin/sample_make_lambda'
+                            }
+                        }
+                        stage('benchmark') {
+                            steps {
+                                sh './build/bin/bm_host_mtensor --benchmark_min_time=1'
+                            }
+                        }
+                        stage('archive') {
+                            steps {
+                                archiveArtifacts artifacts: '*.png', fingerprint: true 
+                            }
+                        }
+                    }
+                }
                 stage('linux-x64-cuda') {
                     agent {
                         dockerfile {
@@ -71,7 +112,7 @@ pipeline{
                     stages {
                         stage('build') {
                             steps {
-                                sh './script/build_native.sh -DWITH_CUDA=ON'
+                                sh './script/build_native.sh -DNATIVE=ON -DWITH_CUDA=ON'
                             }
                         }
                         stage('test') {
