@@ -135,8 +135,8 @@ auto bm_cuda_tensor2_view_conv_local_tensor3x3 =
     bm_tensor2_view_conv_local_tensor3x3<cuda::tensor<float, 2>>;
 BENCHMARK(bm_cuda_tensor2_view_conv_local_tensor3x3)->Arg(512)->Arg(10_K);
 
-auto bm_cuda_tensor_view_conv_tensor = bm_tensor_view_conv_tensor<cuda::tensor<float, 2>>;
-BENCHMARK(bm_cuda_tensor_view_conv_tensor)->Arg(128)->Arg(10_K);
+auto bm_cuda_tensor_view_conv_tensor3x3 = bm_tensor_view_conv_tensor3x3<cuda::tensor<float, 2>>;
+BENCHMARK(bm_cuda_tensor_view_conv_tensor3x3)->Arg(128)->Arg(10_K);
 
 BENCHMARK(bm_cuda_tensor_block_conv_halo)->Arg(512)->Arg(1_K)->Arg(2_K);
 BENCHMARK(bm_cuda_tensor_block_conv_overlap)->Arg(512)->Arg(1_K)->Arg(2_K);

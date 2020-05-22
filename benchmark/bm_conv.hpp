@@ -153,7 +153,7 @@ inline void bm_tensor2_view_conv_local_tensor3x3(benchmark::State& state) {
 }
 
 template <typename tensor_type>
-inline void bm_tensor_view_conv_tensor(benchmark::State& state) {
+inline void bm_tensor_view_conv_tensor3x3(benchmark::State& state) {
     const static int_t rank = tensor_type::rank;
     typedef typename tensor_type::value_type value_type;
 

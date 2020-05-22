@@ -5,6 +5,7 @@
 #pragma once
 
 #include <matazure/algorithm.hpp>
+#include <matazure/allocator.hpp>
 #include <matazure/exception.hpp>
 #include <matazure/for_index.hpp>
 #include <matazure/layout.hpp>
@@ -50,7 +51,7 @@ class tensor_expression {
 */
 template <typename _ValueType, int_t _Rank,
           typename _Layout = typename default_layout<global_t, _Rank>::type,
-          typename _Allocator = std::allocator<_ValueType>>
+          typename _Allocator = aligned_allocator<_ValueType, 32>>
 class tensor : public tensor_expression<tensor<_ValueType, _Rank, _Layout, _Allocator>> {
    public:
     /// the rank of tensor
