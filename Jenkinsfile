@@ -25,7 +25,7 @@ pipeline{
                     stages {
                         stage('build') {
                             steps {
-                                sh './script/build_native.sh -DNATIVE=ON -DWITH_OPENMP=ON'
+                                sh './script/build_native.sh -DNATIVE=ON -DWITH_OPENMP=OFF'
                             }
                         }
                         stage('test') {
@@ -44,7 +44,7 @@ pipeline{
                         }
                         stage('benchmark') {
                             steps {
-                                sh './build/bin/bm_host_mtensor --benchmark_min_time=1'
+                                sh './build/bin/bm_host_mtensor'
                             }
                         }
                         stage('archive') {
@@ -68,7 +68,7 @@ pipeline{
                     stages {
                         stage('build') {
                             steps {
-                                sh './script/build_native.sh -DNATIVE=ON -DWITH_OPENMP=ON'
+                                sh './script/build_native.sh -DNATIVE=ON -DWITH_OPENMP=OFF'
                             }
                         }
                         stage('test') {
@@ -87,7 +87,7 @@ pipeline{
                         }
                         stage('benchmark') {
                             steps {
-                                sh './build/bin/bm_host_mtensor --benchmark_min_time=1'
+                                sh './build/bin/bm_host_mtensor'
                             }
                         }
                         stage('archive') {
@@ -112,7 +112,7 @@ pipeline{
                     stages {
                         stage('build') {
                             steps {
-                                sh './script/build_native.sh -DNATIVE=ON -DWITH_OPENMP=ON -DWITH_CUDA=ON'
+                                sh './script/build_native.sh -DNATIVE=ON -DWITH_OPENMP=OFF -DWITH_CUDA=ON'
                             }
                         }
                         stage('test') {
