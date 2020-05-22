@@ -25,7 +25,7 @@ pipeline{
                     stages {
                         stage('build') {
                             steps {
-                                sh './script/build_native.sh -DNATIVE=ON -DWITH_OPENMP=OFF'
+                                sh './script/build_native.sh -DNATIVE=ON -DWITH_OPENMP=ON'
                             }
                         }
                         stage('test') {
@@ -68,7 +68,7 @@ pipeline{
                     stages {
                         stage('build') {
                             steps {
-                                sh './script/build_native.sh -DNATIVE=ON -DWITH_OPENMP=OFF'
+                                sh './script/build_native.sh -DNATIVE=ON -DWITH_OPENMP=ON'
                             }
                         }
                         stage('test') {
@@ -112,7 +112,7 @@ pipeline{
                     stages {
                         stage('build') {
                             steps {
-                                sh './script/build_native.sh -DNATIVE=ON -DWITH_OPENMP=OFF -DWITH_CUDA=ON'
+                                sh './script/build_native.sh -DNATIVE=ON -DWITH_OPENMP=ON -DWITH_CUDA=ON'
                             }
                         }
                         stage('test') {

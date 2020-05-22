@@ -10,9 +10,11 @@ void bm_tesnor1f_for_index_flops(benchmark::State& state) {
     typedef pointf<8> simd_type;
 #endif
 
+    typedef point<simd_type, element_size> value_type;
+
     pointi<1> shape{100_K};
-    tensor<point<simd_type, element_size>, 1> ts_src(shape);
-    tensor<point<simd_type, element_size>, 1> ts_dst(shape);
+    tensor<value_type, 1, row_major_layout<1>, aligned_allocator<value_type, 32>> ts_src(shape);
+    tensor<value_type, 1, row_major_layout<1>, aligned_allocator<value_type, 32>> ts_dst(shape);
 
     int_t iterations = 1000;
 
@@ -40,9 +42,11 @@ void bm_tesnor1f_omp_for_index_flops(benchmark::State& state) {
     typedef pointf<8> simd_type;
 #endif
 
+    typedef point<simd_type, element_size> value_type;
+
     pointi<1> shape{100_K};
-    tensor<point<simd_type, element_size>, 1> ts_src(shape);
-    tensor<point<simd_type, element_size>, 1> ts_dst(shape);
+    tensor<value_type, 1, row_major_layout<1>, aligned_allocator<value_type, 32>> ts_src(shape);
+    tensor<value_type, 1, row_major_layout<1>, aligned_allocator<value_type, 32>> ts_dst(shape);
 
     int_t iterations = 1000;
 

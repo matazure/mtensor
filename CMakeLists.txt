@@ -46,16 +46,7 @@ endif()
 
 option(WITH_OPENMP "With OpenMP" OFF)
 if(WITH_OPENMP)
-	find_package(OpenMP REQUIRED)
-	# clang not surpport
-	# if(NOT OPENMP_FOUND)
-	# 	message(FATAL_ERROR "OPENMP_FOUND is not found")
-	# endif()
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-
-	if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
-	endif()
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
 endif()
 
 option(NATIVE "-march=native" OFF)

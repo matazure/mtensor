@@ -16,5 +16,7 @@ RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
 RUN add-apt-repository "deb http://apt.llvm.org/bionic/   llvm-toolchain-bionic-9  main"
 RUN apt-get update 
 RUN apt-get install -y clang-9 lldb-9 lld-9 clangd-9
+RUN apt-get install -y libomp5
+RUN apt-get install -y libomp-dev
 ENV ANDROID_NDK=/android-ndk-r16b
 
