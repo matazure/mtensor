@@ -1,5 +1,3 @@
-#pragma once
-
 #include "ut_foundation.hpp"
 
 TEST(ZeroAndOneTests, Point) {

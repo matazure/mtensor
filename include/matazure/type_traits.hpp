@@ -29,8 +29,17 @@ struct one;
 /// special for most type, value() return 0 directly;
 template <typename _Type>
 struct zero {
-    MATAZURE_GENERAL static constexpr _Type value() { return _Type{0}; };
+    static constexpr _Type value() { return _Type{0}; };
 };
+
+// typedef float _f32x4_t __attribute__((vector_size(16)));
+// template <>
+// struct zero<_f32x4_t> {
+//     static _f32x4_t value() {
+//         _f32x4_t re = {0.0f, 0.0f, 0.0f, 0.0f};
+//         return re;
+//     }
+// };
 
 /// forward declare of tensor_expression
 template <typename _Tensor>

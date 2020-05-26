@@ -1,0 +1,34 @@
+<svg viewBox="0 0 100 140" width="10em" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5"
+        markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M 0 0 L 5  5 L 0 10 z" />
+    </marker>
+    <pattern id="rw" viewBox="0,0,20,20" width="25%" height="100%">
+      <rect x="5" y="5" width="10" height="10" fill="none"  rx="5" ry="5" style="stroke:black;stroke-width:1.0"/>
+    </pattern>/
+    <pattern id="linearrow" viewBox="0,0, 20, 20" width="25%" height="20%">
+      <line x1="10" y1="0" x2="10" y2="10" stroke="black" marker-end="url(#arrow)" style="stroke:black;stroke-width:1.0"/>
+    </pattern>
+    <pattern id="map" viewBox="0,0,20,20"  width="25%" height="25%">
+      <rect x="5" y="5" width="10" height="10" fill="none" style="stroke:black;stroke-width:1" />
+    </pattern>
+    <pattern id="center" viewBox="0,0,100, 80" width="100%" height="100%">
+        <rect x="0"  y="0" width="100" height="80" fill="none" style="stroke:black;stroke-width:1"/>
+        <rect x="0"  y="0" width="100" height="80" fill="url(#map)" style="stroke:black;stroke-width:0"/>
+        <rect x="0"  y="-5" width="100" height="100" fill="url(#linearrow)" style="stroke:black;stroke-width:0"/>
+    </pattern>
+    <pattern id="rwline" viewBox="0, 0, 100, 20" width="100%" height="100%">
+        <rect x="0"  y="0" width="100" height="20" rx="5" ry="5" fill="none" style="stroke:black;stroke-width:1"/>
+        <rect x="0"  y="0" width="100" height="20" fill="url(#rw)" style="stroke:black;stroke-width:0"/>
+    </pattern>
+    <pattern id="rwla" viewBox="0,0, 20, 30" width="25%" height="100%">
+      <line x1="10" y1="0" x2="10" y2="20" stroke="black" marker-end="url(#arrow)" style="stroke:black;stroke-width:1.0"/>
+    </pattern>
+  </defs>
+  <rect x="0" y="15" width="100" height="30" fill="url(#rwla)" />
+  <rect x="0" y="105" width="100" height="30" fill="url(#rwla)" />
+  <rect x="0" y="0" width="100" height="20" fill="url(#rwline)" />
+  <rect x="0" y="30" width="100" height="80" fill="url(#center)" />
+  <rect x="0" y="120" width="100" height="20" fill="url(#rwline)" />
+</svg>

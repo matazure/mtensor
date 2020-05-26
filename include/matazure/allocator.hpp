@@ -8,9 +8,9 @@ namespace matazure {
 template <typename _Type, int_t _Alignment>
 class aligned_allocator : public std::allocator<_Type> {
    public:
-    MATAZURE_GENERAL aligned_allocator() {}
-    MATAZURE_GENERAL aligned_allocator(const aligned_allocator& rhs) {}
-    MATAZURE_GENERAL aligned_allocator& operator=(const aligned_allocator& rhs) {}
+    aligned_allocator() {}
+    aligned_allocator(const aligned_allocator& rhs) {}
+    aligned_allocator& operator=(const aligned_allocator& rhs) {}
 
     _Type* allocate(size_t size) {
 #ifdef __GNUC__
@@ -29,7 +29,7 @@ class aligned_allocator : public std::allocator<_Type> {
 #endif
     }
 
-    MATAZURE_GENERAL ~aligned_allocator(){};
+    ~aligned_allocator(){};
 };
 
 }  // namespace matazure

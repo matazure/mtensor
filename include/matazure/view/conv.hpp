@@ -19,22 +19,18 @@ struct conv_functor<_Tensor, _Kernel, false> {
     typedef typename _Tensor::value_type value_type;
     static const int_t rank = _Tensor::rank;
 
-    const _Tensor ts_;
-    const _Kernel kernel_;
-    const pointi<rank> kernel_shape_;
-    const pointi<rank> kernel_radius_;
+    _Tensor ts_;
+    _Kernel kernel_;
+    pointi<rank> kernel_shape_;
 
    public:
     conv_functor(_Tensor ts, _Kernel kernel)
-        : ts_(ts),
-          kernel_(kernel),
-          kernel_shape_(kernel.shape()),
-          kernel_radius_(kernel.shape() / 2) {}
+        : ts_(ts), kernel_(kernel), kernel_shape_(kernel.shape()) {}
 
     MATAZURE_GENERAL value_type operator()(pointi<_Tensor::rank> idx) const {
         auto re = matazure::zero<value_type>::value();
         for_index(kernel_shape_, [&](pointi<rank> neigbor_idx) {
-            re += kernel_(neigbor_idx) * ts_(idx + neigbor_idx - kernel_radius_);
+            re += kernel_(neigbor_idx) * ts_(idx + neigbor_idx - kernel_shape_ / 2);
         });
 
         return re;

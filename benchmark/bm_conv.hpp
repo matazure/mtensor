@@ -213,3 +213,31 @@ inline void bm_tensor2_view_conv_neighbors_weights3x3(benchmark::State& state) {
     state.SetItemsProcessed(state.iterations() * static_cast<size_t>(ts_dst.size()) *
                             neightbors_weights.size() * 2);
 }
+
+template <typename tensor_type>
+inline void bm_tensor2_view_conv_stride2_relu6_local_tensor3x3(benchmark::State& state) {
+    const static int_t rank = tensor_type::rank;
+    typedef typename tensor_type::value_type value_type;
+
+    pointi<rank> shape;
+    fill(shape, state.range(0));
+    local_tensor<value_type, dim<3, 3>> kernel;
+
+    tensor_type ts_src_pad(shape + kernel.shape() - 1);
+    auto ts_src_view = view::slice(ts_src_pad, kernel.shape() / 2, shape);
+    tensor_type ts_dst(shape / 2);
+
+    while (state.KeepRunning()) {
+        auto ts_conv_view = view::conv(ts_src_view, kernel);
+        auto ts_conv_stride_view = view::stride(ts_conv_view, pointi<2>{2, 2});
+        auto ts_conv_stride_relu6_view =
+            view::map(ts_conv_stride_view, [] MATAZURE_GENERAL(value_type v) { return v; });
+        copy(ts_conv_stride_view, ts_dst);
+        benchmark::DoNotOptimize(ts_dst.data());
+    }
+
+    state.SetBytesProcessed(state.iterations() * static_cast<size_t>(ts_src_pad.size()) *
+                            sizeof(ts_src_view[0]));
+    state.SetItemsProcessed(state.iterations() * static_cast<size_t>(ts_dst.size()) *
+                            kernel.size() * 2);
+}

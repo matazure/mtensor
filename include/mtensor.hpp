@@ -1,5 +1,6 @@
 #pragma once
 
+#include <matazure/allocator.hpp>
 #include <matazure/binary_operator.hpp>
 #include <matazure/dynamic_tensor.hpp>
 #include <matazure/geometry.hpp>

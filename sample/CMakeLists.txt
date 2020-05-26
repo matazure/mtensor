@@ -22,6 +22,9 @@ target_link_libraries(sample_image_split_channel mtensor image_helper)
 add_executable(sample_mandelbrot sample_mandelbrot.cpp)
 target_link_libraries(sample_mandelbrot mtensor image_helper)
 
+add_executable(sample_keynote sample_keynote.cpp)
+target_link_libraries(sample_keynote mtensor image_helper)
+
 if (WITH_CUDA)
     add_executable(sample_cuda_for_index sample_for_index.cu)
     target_link_libraries(sample_cuda_for_index mtensor)
@@ -38,8 +41,8 @@ if (WITH_CUDA)
     add_executable(sample_cuda_level_set sample_level_set.cu)
     target_link_libraries(sample_cuda_level_set mtensor image_helper)
 
-    add_executable(bm_cuda_level_set bm_level_set.cu)
-    target_link_libraries(bm_cuda_level_set mtensor benchmark)
+    add_executable(sample_cuda_keynote sample_keynote.cu)
+    target_link_libraries(sample_cuda_keynote mtensor image_helper)
 endif ()
 
 
