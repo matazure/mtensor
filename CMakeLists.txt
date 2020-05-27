@@ -43,7 +43,7 @@ if(WITH_CUDA)
 	endif()
 
 	enable_language(CUDA)
-	set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-extended-lambda --expt-relaxed-constexpr -arch=sm_75")
+	# set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-extended-lambda --expt-relaxed-constexpr -arch=sm_75")
 endif()
 
 option(WITH_OPENMP "With OpenMP" OFF)

@@ -10,3 +10,5 @@ add_executable(ut_cuda_mtensor
     ut_meshgrid.cu
 )
 target_link_libraries(ut_cuda_mtensor mtensor gtest)
+target_compile_options(ut_cuda_mtensor PRIVATE --expt-extended-lambda)
+

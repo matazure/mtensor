@@ -10,7 +10,7 @@ class aligned_allocator : public std::allocator<_Type> {
    public:
     aligned_allocator() {}
     aligned_allocator(const aligned_allocator& rhs) {}
-    aligned_allocator& operator=(const aligned_allocator& rhs) {}
+    aligned_allocator& operator=(const aligned_allocator& rhs) { return *this; }
 
     _Type* allocate(size_t size) {
 #ifdef __GNUC__

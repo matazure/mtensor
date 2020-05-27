@@ -11,12 +11,14 @@ set(bm_cuda_src
     bm_matrix_mul.cu
 )
 
-set(WITH_TENSORCORE ON)
-if (WITH_TENSORCORE)
-    list(APPEND bm_cuda_src bm_tensor_core.cu)
-endif()
+# set(WITH_TENSORCORE ON)
+# if (WITH_TENSORCORE)
+#     list(APPEND bm_cuda_src bm_tensor_core.cu)
+# endif()
 
-add_executable(bm_cuda_mtensor 
-${bm_cuda_src}
-)
+add_executable(bm_cuda_mtensor ${bm_cuda_src})
 target_link_libraries(bm_cuda_mtensor mtensor benchmark)
+target_compile_options(bm_cuda_mtensor PRIVATE --expt-extended-lambda)
+# target_compile_options(bm_cuda_mtensor PRIVATE -arch=sm_75)
+
+

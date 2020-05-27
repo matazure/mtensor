@@ -31,21 +31,27 @@ class block_index {
     const pointi<rank> global;
 };
 
+template <typename _Ext, typename _Fun>
+struct block_for_index_functor {
+    MATAZURE_DEVICE void operator()() const {
+        auto local = internal::uint3_to_pointi<_Ext::size()>(threadIdx);
+        auto block = internal::uint3_to_pointi<_Ext::size()>(blockIdx);
+        auto block_dim = internal::dim3_to_pointi<_Ext::size()>(blockDim);
+        auto global = block * block_dim + local;
+        block_index<_Ext> block_idx(grid_ext, local, block, global);
+        fun(block_idx);
+    }
+
+    pointi<_Ext::rank> grid_ext;
+    _Fun fun;
+};
+
 template <typename _Ext, typename _Fun, typename _ExecutionPolicy>
 inline void block_for_index(_ExecutionPolicy policy, pointi<_Ext::size()> grid_ext, _Fun fun) {
     auto grid_dim = internal::pointi_to_dim3(grid_ext);
     auto block_dim = internal::pointi_to_dim3(_Ext::value());
     kernel<<<grid_dim, block_dim, policy.shared_mem_bytes(), policy.stream()>>>(
-        [=] MATAZURE_DEVICE() {
-            auto local = internal::uint3_to_pointi<_Ext::size()>(threadIdx);
-            auto block = internal::uint3_to_pointi<_Ext::size()>(blockIdx);
-            auto block_dim = internal::dim3_to_pointi<_Ext::size()>(blockDim);
-            auto global = block * block_dim + local;
-            block_index<_Ext> block_idx(grid_ext, local, block, global);
-            fun(block_idx);
-        });
-
-    cudaStreamSynchronize(nullptr);
+        block_for_index_functor<_Ext, _Fun>{grid_ext, fun});
 
     assert_runtime_success(cudaGetLastError());
 }
@@ -54,14 +60,7 @@ template <typename _Ext, typename _Fun>
 inline void block_for_index(pointi<_Ext::size()> grid_ext, _Fun fun) {
     auto grid_dim = internal::pointi_to_dim3(grid_ext);
     auto block_dim = internal::pointi_to_dim3(_Ext::value());
-    kernel<<<grid_dim, block_dim>>>([=] MATAZURE_DEVICE() {
-        auto local = internal::uint3_to_pointi<_Ext::size()>(threadIdx);
-        auto block = internal::uint3_to_pointi<_Ext::size()>(blockIdx);
-        auto block_dim = internal::dim3_to_pointi<_Ext::size()>(blockDim);
-        auto global = block * block_dim + local;
-        block_index<_Ext> block_idx(grid_ext, local, block, global);
-        fun(block_idx);
-    });
+    kernel<<<grid_dim, block_dim>>>(block_for_index_functor<_Ext, _Fun>{grid_ext, fun});
 
     cudaStreamSynchronize(nullptr);
 
