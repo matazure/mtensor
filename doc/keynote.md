@@ -9,7 +9,7 @@ mtensor是一个tensor计算库, 支持cuda的延迟计算, 项目地址为<http
 
 ## 简介
 
-![image](../architecture.jpg)
+![image](./images/architecture.jpg)
 
 mtensor主要用于多维数组及其计算, 其可以结构化高效地在CPU/GPU上实现遍历, 滤波, 转换等多种操作。也便于数据在CPU与GPU之间的传输交互。mtensor提供以下核心功能
 
@@ -27,7 +27,7 @@ mtensor主要用于多维数组及其计算, 其可以结构化高效地在CPU/G
 
 |     |     |
 |:---:|:---:|
-| ![img](../idx_tensor.svg) | ![img](../f_tensor.svg) |
+| ![img](./images/idx_tensor.svg) | ![img](./images/f_tensor.svg) |
 | array index | lambda tensor |
 
 上图的lambda tensor, 可以通过如下代码定义. 其中f是一个自定义的闭包算子
@@ -174,7 +174,7 @@ view::conv|stride|map并不会执行真正的计算, 而只是把算子记录下
 
 |   |   |   |
 |:-:|:-:|:-:|
-| ![img](./map_seq.svg) | ![img](./seq_map.svg) | ![img](./seq_map_opt.svg) |
+| ![img](./images/map_seq.svg) | ![img](./images/seq_map.svg) | ![img](./images/seq_map_opt.svg) |
 | 计算的序列 | 算子序列的计算 | 算子融合后的计算 |
 
 上图计算的序列所示, 一旦我们把计算的结果写入内存(上图用圆表示), 则c++编译器就无法穿透优化他们, 因为内存有可能在其他的地方被修改. 而我们延迟计算所表示的闭包算子系列(上图中的小矩形)的计算对于编译器来说是典型的局部优化问题, 编译器可以很容易地优化它们.

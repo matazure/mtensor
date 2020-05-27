@@ -1,4 +1,6 @@
 cmake_minimum_required(VERSION 3.8)
+#cuda need 3.8
+#add_link_options need 3.13
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   # using Clang
@@ -47,11 +49,16 @@ endif()
 option(WITH_OPENMP "With OpenMP" OFF)
 if(WITH_OPENMP)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
+	set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler \"-fopenmp\"")
+	# need manully set link options
+	# add_link_options($<$<COMPILE_LANGUAGE:CUDA>:-lgomp>)
+	set(MTENSOR_CUDA_LINK_FLAGS "${LINK_FLAGS} -lgomp")
 endif()
 
 option(NATIVE "-march=native" OFF)
 if (NATIVE)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler \"-march=native\"")
 endif()
 
 option(BUILD_EXAMPLE "Build Example" ON)

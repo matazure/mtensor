@@ -10,7 +10,7 @@ mtensor是一个tensor计算库, 支持cuda的延迟计算, 项目地址为<http
 
 ## 简介
 
-![image](../architecture.jpg)
+![image](./doc/images/architecture.jpg)
 
 mtensor主要用于多维数组及其计算, 其可以结构化高效地在CPU/GPU上实现遍历, 滤波, 转换等多种操作。也便于数据在CPU与GPU之间的传输交互。mtensor提供以下核心功能
 
@@ -22,14 +22,14 @@ mtensor主要用于多维数组及其计算, 其可以结构化高效地在CPU/G
 * 视图和算法均在c++和cuda上接口是统一的
 * 使用方便, 仅需包含头文件和添加必要的cuda编译参数即可
 
-### 延迟计算实现lambda_tensor
+### 延迟计算实现lambda_tensor   `
 
 延迟计算有多种实现方式, 最为常见的是eigen所采用的模板表达式, 但该种方式每实现一种新的运算就要实现一个完整的模板表达式class,
 过程非常繁琐. 不便于拓展新的运算. mtensor自研的基于[闭包算子](#闭包算子)的lambda tensor是一种更为通用简洁的延迟计算实现. 下面两张图一个是坐标空间, 另一个是值空间
 
 |     |     |
 |:---:|:---:|
-| ![img](../idx_tensor.svg) | ![img](../f_tensor.svg) |
+| ![img](./doc/images/idx_tensor.svg) | ![img](./doc/images/f_tensor.svg) |
 | array index | lambda tensor |
 
 上图的lambda tensor, 可以通过如下代码定义. 其中f是一个自定义的闭包算子
@@ -188,7 +188,7 @@ cuda::block_for_index<BLOCK_DIM>(grid_dim,
 
 |   |
 |:-:|
-|![img](doc/common_implement.jpg)|
+|![img](./doc/images/common_implement.jpg)|
 |*一个通用实现阶段*|
 
 大部分需要同时支持cuda和c++的程序可以由若干个由上图所示的阶段构成, 在该阶段中会把tensor的数据拷贝的cuda::tensor,

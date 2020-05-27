@@ -43,6 +43,9 @@ if (WITH_CUDA)
 
     add_executable(sample_cuda_keynote sample_keynote.cu)
     target_link_libraries(sample_cuda_keynote mtensor image_helper)
+    if (WITH_OPENMP)
+        target_link_libraries(sample_cuda_keynote mtensor gomp)
+    endif()
 endif ()
 
 
