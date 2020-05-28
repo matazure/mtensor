@@ -17,8 +17,9 @@ int main(int argc, char* argv[]) {
     copy(img_gray, img_padding_view);
     //使用make_lambda构建梯度视图lambda_tensor
     auto img_float_view = view::cast<float>(img_padding_view);
+#if 1
     auto img_grad_view = make_lambda(img_float_view.shape(), [=](pointi<2> idx) {
-        point<byte, 2> grad;
+        point<float, 2> grad;
         grad[0] = img_float_view(idx + pointi<2>{1, 0}) - img_float_view(idx - pointi<2>{1, 0});
         grad[1] = img_float_view(idx + pointi<2>{0, 1}) - img_float_view(idx - pointi<2>{0, 1});
         return grad;
@@ -28,6 +29,14 @@ int main(int argc, char* argv[]) {
         auto grad = img_grad_view(idx);
         return std::abs(grad[0]) + std::abs(grad[1]);
     });
+#else
+    auto img_grad_x_view =
+        view::shift(img_float_view, point2i{0, 1}) - view::shift(img_float_view, point2i{0, -1});
+    auto img_grad_y_view =
+        view::shift(img_float_view, point2i{1, 0}) - view::shift(img_float_view, point2i{-1, 0});
+    auto grad_norm1_view = view::map(img_grad_x_view, [](float v) { return std::abs(v); }) +
+                           view::map(img_grad_y_view, [](float v) { return std::abs(v); });
+#endif
     //转为byte类型并固化的tensor中, 将lambda_tensor固化到tensor结构中
     auto grad_norm1 = view::cast<byte>(grad_norm1_view).persist();
     //写入梯度到图像
