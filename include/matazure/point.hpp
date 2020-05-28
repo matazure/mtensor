@@ -272,7 +272,7 @@ struct zero<point<_T, _Rank>> {
 
 /// return cumulative prod of point elements
 template <int_t _Rank>
-inline MATAZURE_GENERAL pointi<_Rank> cumulative_prod(pointi<_Rank> ex) {
+inline MATAZURE_GENERAL pointi<_Rank> scan_multiply(pointi<_Rank> ex) {
     pointi<_Rank> stride;
     stride[0] = ex[0];
     for (int_t i = 1; i < _Rank; ++i) {

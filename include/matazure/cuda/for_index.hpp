@@ -60,7 +60,7 @@ struct for_index_array_access_functor {
 template <typename _ExecutionPolicy, int_t _Rank, typename _Fun>
 inline void for_index(_ExecutionPolicy policy, pointi<_Rank> origin, pointi<_Rank> end, _Fun fun) {
     auto extent = end - origin;
-    auto stride = matazure::cumulative_prod(extent);
+    auto stride = matazure::scan_multiply(extent);
 
     row_major_layout<_Rank> layout(extent);
     auto max_size = layout.index2offset(end - 1) + 1;  //要包含最后一个元素
