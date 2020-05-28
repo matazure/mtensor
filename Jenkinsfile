@@ -11,7 +11,7 @@ pipeline{
         stage('TENSOR CI'){
             parallel {
                 
-                stage('linux-x64') {
+                stage('x64-linux') {
                     agent { 
                         dockerfile {
                             filename 'tensor-dev-ubuntu18.04.dockerfile'
@@ -54,7 +54,7 @@ pipeline{
                         }
                     }
                 }
-                stage('linux-x64-clang') {
+                stage('clang-x64-linux') {
                     agent { 
                         dockerfile {
                             filename 'tensor-dev-ubuntu18.04.dockerfile'
@@ -97,7 +97,7 @@ pipeline{
                         }
                     }
                 }
-                stage('linux-x64-cuda') {
+                stage('cuda-x64-linux') {
                     agent {
                         dockerfile {
                             filename 'tensor-dev-ubuntu18.04.dockerfile'
@@ -141,7 +141,7 @@ pipeline{
                     }
                 }
 
-                stage('linux-aarch64') {
+                stage('aarch64-linux') {
                     agent {
                         dockerfile {
                             filename 'tensor-dev-ubuntu18.04.dockerfile'
@@ -181,7 +181,7 @@ pipeline{
                     }
                 }
 
-                stage('linux-armv7') {
+                stage('armv7-linux') {
                     agent {
                         dockerfile {
                             filename 'tensor-dev-ubuntu18.04.dockerfile'
@@ -219,7 +219,7 @@ pipeline{
                     }
                 }
                                  
-                stage('windows-x64') {
+                stage('x64-windows') {
                     agent {
                         label 'Windows'
                     }
@@ -247,7 +247,7 @@ pipeline{
                     }
                 }
                 
-                stage('android-armv7') {
+                stage('armv7-android') {
                     agent {
                         dockerfile {
                             filename 'tensor-dev-ubuntu18.04.dockerfile'
