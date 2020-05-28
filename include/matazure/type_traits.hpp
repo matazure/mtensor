@@ -29,7 +29,7 @@ struct one;
 /// special for most type, value() return 0 directly;
 template <typename _Type>
 struct zero {
-    static constexpr _Type value() { return _Type{0}; };
+    MATAZURE_GENERAL static constexpr _Type value() { return _Type{0}; };
 };
 
 // typedef float _f32x4_t __attribute__((vector_size(16)));

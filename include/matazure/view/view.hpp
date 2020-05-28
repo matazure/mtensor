@@ -12,6 +12,7 @@
 #include <matazure/view/shift.hpp>
 #include <matazure/view/slice.hpp>
 #include <matazure/view/stride.hpp>
+#include <matazure/view/unary.hpp>
 #include <matazure/view/zeros.hpp>
 #ifndef MATAZURE_CUDA
 #include <matazure/view/meshgrid.hpp>

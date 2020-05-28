@@ -14,7 +14,7 @@ auto bm_host_tensor2f_view_gather_scalar_axis1 =
 BENCHMARK(bm_host_tensor2f_view_gather_scalar_axis1)->Arg(10_M);
 
 auto bm_host_tensor2f_view_zip = bm_tensor_view_zip2<tensor<float, 2>>;
-BENCHMARK(bm_host_tensor2f_view_zip)->Arg(10_K);
+BENCHMARK(bm_host_tensor2f_view_zip)->Arg(5_K);
 
 auto bm_host_tensor2f_view_eye = bm_tensor_view_eye<tensor<float, 2>>;
 BENCHMARK(bm_host_tensor2f_view_eye)->Arg(10_K);

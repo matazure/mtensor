@@ -34,8 +34,7 @@ int main(int argc, char* argv[]) {
         view::shift(img_float_view, point2i{0, 1}) - view::shift(img_float_view, point2i{0, -1});
     auto img_grad_y_view =
         view::shift(img_float_view, point2i{1, 0}) - view::shift(img_float_view, point2i{-1, 0});
-    auto grad_norm1_view = view::map(img_grad_x_view, [](float v) { return std::abs(v); }) +
-                           view::map(img_grad_y_view, [](float v) { return std::abs(v); });
+    auto grad_norm1_view = view::abs(img_grad_x_view) + view::abs(img_grad_y_view);
 #endif
     //转为byte类型并固化的tensor中, 将lambda_tensor固化到tensor结构中
     auto grad_norm1 = view::cast<byte>(grad_norm1_view).persist();

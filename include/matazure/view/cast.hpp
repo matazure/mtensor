@@ -4,7 +4,7 @@
 
 namespace matazure {
 namespace view {
-
+inline namespace unary {
 template <typename _OutValueType>
 struct cast_functor {
     template <typename _InValueType>
@@ -37,5 +37,6 @@ inline auto cast(_Tensor tensor, enable_if_t<is_tensor<_Tensor>::value>* = 0)
     return map(tensor, cast_functor<_ValueType>());
 }
 
+}  // namespace unary
 }  // namespace view
 }  // namespace matazure
