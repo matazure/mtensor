@@ -13,6 +13,9 @@ target_include_directories(image_helper INTERFACE  ${PROJECT_SOURCE_DIR}/third_p
 add_executable(sample_gradient sample_gradient.cpp)
 target_link_libraries(sample_gradient mtensor image_helper)
 
+add_executable(sample_mask_bit sample_mask_bit.cpp)
+target_link_libraries(sample_mask_bit mtensor image_helper)
+
 add_executable(sample_level_set sample_level_set.cpp)
 target_link_libraries(sample_level_set mtensor image_helper)
 

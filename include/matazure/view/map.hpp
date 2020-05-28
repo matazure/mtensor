@@ -21,7 +21,7 @@ struct linear_map_functor {
    public:
     linear_map_functor(_Tensor ts, _Func fun) : ts_(ts), functor_(fun) {}
 
-    MATAZURE_GENERAL auto operator()(int_t i) const -> decltype(this->functor_(this->ts_[i])) {
+    MATAZURE_GENERAL auto operator()(int_t i) const -> decltype((functor_(ts_[i]))) {
         return functor_(ts_[i]);
     }
 };
@@ -36,7 +36,7 @@ struct array_map_functor {
     array_map_functor(_Tensor ts, _Func fun) : ts_(ts), functor_(fun) {}
 
     MATAZURE_GENERAL auto operator()(pointi<_Tensor::rank> idx) const
-        -> decltype(this->functor_(this->ts_(idx))) {
+        -> decltype((functor_(ts_(idx)))) {
         return functor_(ts_(idx));
     }
 };

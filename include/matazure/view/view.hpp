@@ -1,5 +1,6 @@
 #pragma once
 
+#include <matazure/view/binary.hpp>
 #include <matazure/view/broadcast.hpp>
 #include <matazure/view/cast.hpp>
 #include <matazure/view/clamp_zero.hpp>
@@ -7,6 +8,7 @@
 #include <matazure/view/eye.hpp>
 #include <matazure/view/gather.hpp>
 #include <matazure/view/map.hpp>
+#include <matazure/view/mask.hpp>
 #include <matazure/view/ones.hpp>
 #include <matazure/view/permute.hpp>
 #include <matazure/view/shift.hpp>
