@@ -97,6 +97,49 @@ pipeline{
                         }
                     }
                 }
+                stage('g++4.8-x64-linux') {
+                    agent { 
+                        dockerfile {
+                            filename 'tensor-dev-g++4.8.5-centos7.dockerfile'
+                            dir 'dockerfile'
+                        }
+                    }
+                    environment {
+                        CXX = 'g++'
+                        CC = 'gcc'
+                    }
+                    stages {
+                        stage('build') {
+                            steps {
+                                sh './script/build_native.sh -DNATIVE=ON -DWITH_OPENMP=ON'
+                            }
+                        }
+                        stage('test') {
+                            steps {
+                                sh './build/bin/ut_host_mtensor'
+                            }
+                        }
+                        stage('sample') {
+                            steps {
+                                sh './build/bin/sample_for_index'
+                                sh './build/bin/sample_basic_structure'
+                                sh './build/bin/sample_gradient data/lena.jpg'
+                                sh './build/bin/sample_mandelbrot'
+                                sh './build/bin/sample_make_lambda'
+                            }
+                        }
+                        stage('benchmark') {
+                            steps {
+                                sh './build/bin/bm_host_mtensor'
+                            }
+                        }
+                        stage('archive') {
+                            steps {
+                                archiveArtifacts artifacts: '*.png', fingerprint: true 
+                            }
+                        }
+                    }
+                }
                 stage('cuda10.0-x64-linux') {
                     agent {
                         dockerfile {

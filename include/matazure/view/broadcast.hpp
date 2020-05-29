@@ -30,14 +30,14 @@ struct broadcast_functor {
         }
     }
 
-    MATAZURE_GENERAL auto operator()(pointi<_Rank> idx) const -> decltype((ts_(idx))) const {
+    MATAZURE_GENERAL typename _Tensor::reference operator()(pointi<_Rank> idx) const {
         return access_imp(idx, make_integer_sequence<int_t, _Tensor::rank>{});
     }
 
    private:
     template <int_t... _Indices>
-    MATAZURE_GENERAL auto access_imp(pointi<_Rank> idx, integer_sequence<int_t, _Indices...>) const
-        -> decltype((ts_[0])) {
+    MATAZURE_GENERAL typename _Tensor::reference access_imp(
+        pointi<_Rank> idx, integer_sequence<int_t, _Indices...>) const {
         return ts_(idx[_Rank - _Tensor::rank + _Indices]...);
     }
 };
