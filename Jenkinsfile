@@ -97,7 +97,7 @@ pipeline{
                         }
                     }
                 }
-                stage('cuda-x64-linux') {
+                stage('cuda10.0-x64-linux') {
                     agent {
                         dockerfile {
                             filename 'tensor-dev-ubuntu18.04.dockerfile'
@@ -113,6 +113,50 @@ pipeline{
                         stage('build') {
                             steps {
                                 sh './script/build_native.sh -DNATIVE=ON -DWITH_OPENMP=ON -DWITH_CUDA=ON'
+                            }
+                        }
+                        stage('test') {
+                            steps {
+                                sh './build/bin/ut_cuda_mtensor'
+                            }
+                        }
+                        stage('sample') {
+                            steps {
+                                sh './build/bin/sample_cuda_for_index'
+                                sh './build/bin/sample_cuda_convolution data/lena.jpg'
+                                sh './build/bin/sample_cuda_mandelbrot'
+                                sh './build/bin/sample_cuda_matrix_mul'
+                            }
+                        }
+                        stage('benchmark') {
+                            steps {
+                                sh './build/bin/bm_cuda_mtensor'
+                            }
+                        }
+                        stage('archive') {
+                            steps {
+                                archiveArtifacts artifacts: '*.png', fingerprint: true 
+                            }
+                        }
+                    }
+                }
+
+                stage('cuda9.0-x64-linux') {
+                    agent {
+                        dockerfile {
+                            filename 'tensor-dev-cuda9.0-ubuntu18.04.dockerfile'
+                            dir 'dockerfile'
+                            args '--gpus all'
+                        }
+                    }
+                    environment {
+                        CXX = 'g++'
+                        CC = 'gcc'
+                    }
+                    stages {
+                        stage('build') {
+                            steps {
+                                sh './script/build_native.sh -DNATIVE=ON -DWITH_OPENMP=OFF -DWITH_CUDA=ON'
                             }
                         }
                         stage('test') {
