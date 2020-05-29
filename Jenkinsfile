@@ -8,7 +8,7 @@ pipeline{
         cron('H H(0-7) * * *')
     }
     stages {
-        stage('TENSOR CI'){
+        stage('MTENSOR CI'){
             parallel {
                 
                 stage('x64-linux') {
