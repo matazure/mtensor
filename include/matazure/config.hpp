@@ -19,7 +19,7 @@
 #error clang minimum version is 9 for cuda
 #endif
 #else
-#if __CUDACC_VER_MAJOR__ < 10
+#if __CUDACC_VER_MAJOR__ < 9
 #error CUDA minimum version is 10.0
 #endif
 #endif

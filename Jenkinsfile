@@ -144,7 +144,7 @@ pipeline{
                 stage('cuda9.0-x64-linux') {
                     agent {
                         dockerfile {
-                            filename 'tensor-dev-cuda9.0-ubuntu18.04.dockerfile'
+                            filename 'tensor-dev-cuda9.0-ubuntu16.04.dockerfile'
                             dir 'dockerfile'
                             args '--gpus all'
                         }
@@ -159,29 +159,29 @@ pipeline{
                                 sh './script/build_native.sh -DNATIVE=ON -DWITH_OPENMP=OFF -DWITH_CUDA=ON'
                             }
                         }
-                        stage('test') {
-                            steps {
-                                sh './build/bin/ut_cuda_mtensor'
-                            }
-                        }
-                        stage('sample') {
-                            steps {
-                                sh './build/bin/sample_cuda_for_index'
-                                sh './build/bin/sample_cuda_convolution data/lena.jpg'
-                                sh './build/bin/sample_cuda_mandelbrot'
-                                sh './build/bin/sample_cuda_matrix_mul'
-                            }
-                        }
-                        stage('benchmark') {
-                            steps {
-                                sh './build/bin/bm_cuda_mtensor'
-                            }
-                        }
-                        stage('archive') {
-                            steps {
-                                archiveArtifacts artifacts: '*.png', fingerprint: true 
-                            }
-                        }
+                        // stage('test') {
+                        //     steps {
+                        //         sh './build/bin/ut_cuda_mtensor'
+                        //     }
+                        // }
+                        // stage('sample') {
+                        //     steps {
+                        //         sh './build/bin/sample_cuda_for_index'
+                        //         sh './build/bin/sample_cuda_convolution data/lena.jpg'
+                        //         sh './build/bin/sample_cuda_mandelbrot'
+                        //         sh './build/bin/sample_cuda_matrix_mul'
+                        //     }
+                        // }
+                        // stage('benchmark') {
+                        //     steps {
+                        //         sh './build/bin/bm_cuda_mtensor'
+                        //     }
+                        // }
+                        // stage('archive') {
+                        //     steps {
+                        //         archiveArtifacts artifacts: '*.png', fingerprint: true 
+                        //     }
+                        // }
                     }
                 }
 

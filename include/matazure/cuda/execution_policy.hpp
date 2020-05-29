@@ -48,7 +48,7 @@ inline size_t availableSharedBytesPerBlock(size_t sharedMemPerMultiprocessor,
 class execution_policy {
    public:
     execution_policy(
-        pointi<3> grid_dim = {0, 1, 1}, pointi<3> block_dim = {0, 1, 1},
+        pointi<3> grid_dim = {{0, 1, 1}}, pointi<3> block_dim = {{0, 1, 1}},
         size_t shared_mem_bytes = 0,
         std::shared_ptr<cudaStream_t> sp_stream = std::make_shared<cudaStream_t>(nullptr))
         : grid_dim_(grid_dim),
@@ -81,8 +81,8 @@ class execution_policy {
     void synchronize() { assert_runtime_success(cudaStreamSynchronize(stream())); }
 
    protected:
-    pointi<3> grid_dim_ = {0, 1, 1};
-    pointi<3> block_dim_ = {0, 1, 1};
+    pointi<3> grid_dim_ = {{0, 1, 1}};
+    pointi<3> block_dim_ = {{0, 1, 1}};
     // 0 represents not use dynamic shared memory
     size_t shared_mem_bytes_ = 0;
     std::shared_ptr<cudaStream_t> sp_stream_ = nullptr;
@@ -91,8 +91,8 @@ class execution_policy {
 class default_execution_policy : public execution_policy {
    public:
    protected:
-    pointi<3> grid_dim_ = {0, 1, 1};
-    pointi<3> block_dim_ = {0, 1, 1};
+    pointi<3> grid_dim_ = {{0, 1, 1}};
+    pointi<3> block_dim_ = {{0, 1, 1}};
     // 0 represents not use dynamic shared memory
     size_t shared_mem_bytes_ = 0;
     cudaStream_t stream_ = nullptr;
