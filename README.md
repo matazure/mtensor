@@ -276,7 +276,7 @@ git submodule update --init -f third_party
 ./script/build_native.sh -DWITH_CUDA=ON -DWITH_OPENMP=ON -DWITH_SSE=ON
 ```
 
-目前CUDA的mtensor编译还有几个关于主机设备函数调用的warning(无法消除), 主要是std::shared_ptr产生, 可以忽略
+mtensor在编译中添加了"-w"禁止不必要的warning， 如必要可打开, 目前CUDA的mtensor编译还有几个关于主机设备函数调用的warning(无法消除), 主要是std::shared_ptr产生, 可以忽略.
 
 ### 测试
 
