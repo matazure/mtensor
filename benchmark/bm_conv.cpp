@@ -21,6 +21,10 @@ BENCHMARK(bm_host_tensor2_view_conv_stride2_relu6_local_tensor3x3)->Arg(128)->Ar
 //     bm_tensor2_view_conv_neighbors_weights3x3<tensor<float, 2>>;
 // BENCHMARK(bm_host_tensor2_view_conv_neighbors_weights3x3)->Arg(128)->Arg(10_K);
 
+auto bm_host_tensor2point4f_view_conv_local_tensor3x3 =
+    bm_tensor2_view_conv_local_tensor3x3<tensor<point4f, 2>>;
+BENCHMARK(bm_host_tensor2point4f_view_conv_local_tensor3x3)->Arg(128)->Arg(2_K);
+
 #ifdef __GNUC__
 #ifdef __AVX__
 typedef float simd_type __attribute__((vector_size(32)));
