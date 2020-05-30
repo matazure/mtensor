@@ -47,6 +47,8 @@
 #define MATAZURE_OPENMP
 #endif
 
+#define MLAMBDA [=] MATAZURE_GENERAL
+
 // for using
 namespace matazure {
 

@@ -48,6 +48,5 @@ TEST(CudaLambdaTensorTests, MakeByArrayAndLinearIndex) {
         cuda::make_lambda(shape, [] __host__ __device__(pointi<2> idx) -> int { return idx[0]; })
             .persist();
 
-    auto ts_test2 =
-        cuda::make_lambda(shape, [] __host__ __device__(int_t i) -> int { return i; }).persist();
+    auto ts_test2 = cuda::make_lambda(shape, MLAMBDA(int_t i)->int { return i; }).persist();
 }
