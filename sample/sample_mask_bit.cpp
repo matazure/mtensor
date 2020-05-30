@@ -1,6 +1,8 @@
 #include <mtensor.hpp>
 #include "image_helper.hpp"
 
+using std::is_convertible;
+
 using namespace matazure;
 
 int main(int argc, char* argv[]) {
@@ -8,6 +10,8 @@ int main(int argc, char* argv[]) {
         std::cout << "sample5_gradient input_image" << std::endl;
         return -1;
     }
+
+    auto v = std::is_convertible<int, float>::value;
 
     tensor<point3b, 2> img_rgb = read_rgb_image(argv[1]);
     auto img_gray_view = view::map(img_rgb, [](point3b rgb) {

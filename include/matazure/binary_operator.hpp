@@ -61,7 +61,7 @@ namespace matazure {
         }                                                                                      \
     };
 
-#define __MATAZURE_array_indexENSOR_WITH_VALUE_BINARY_OPERATOR(name, op)    \
+#define __MATAZURE_ARRAY_INDEX_TENSOR_WITH_VALUE_BINARY_OPERATOR(name, op)  \
     template <typename _T>                                                  \
     struct name {                                                           \
        private:                                                             \
@@ -97,7 +97,7 @@ namespace matazure {
         }                                                                    \
     };
 
-#define __MATAZURE_VALUE_WITH_array_indexENSOR_BINARY_OPERATOR(name, op)    \
+#define __MATAZURE_VALUE_WITH_ARRAY_INDEX_TENSOR_BINARY_OPERATOR(name, op)  \
     template <typename _T>                                                  \
     struct name {                                                           \
        private:                                                             \
@@ -164,8 +164,9 @@ namespace matazure {
                            typename _TS::layout_type{});                                        \
     }                                                                                           \
                                                                                                 \
-    __MATAZURE_array_indexENSOR_WITH_VALUE_BINARY_OPERATOR(                                     \
-        __##name##_array_indexensor_with_value__, op) template <typename _TS>                   \
+    __MATAZURE_ARRAY_INDEX_TENSOR_WITH_VALUE_BINARY_OPERATOR(                                   \
+        __##name##_array_indexensor_with_value__, op)                                           \
+    template <typename _TS>                                                                     \
     inline enable_if_t<none_device_memory<_TS>::value && !are_linear_index<_TS>::value,         \
                        lambda_tensor<_TS::rank, __##name##_array_indexensor_with_value__<_TS>>> \
     operator op(const tensor_expression<_TS>& e_ts, typename _TS::value_type v) {               \
@@ -174,8 +175,9 @@ namespace matazure {
                            typename _TS::layout_type{});                                        \
     }                                                                                           \
                                                                                                 \
-    __MATAZURE_VALUE_WITH_array_indexENSOR_BINARY_OPERATOR(                                     \
-        __##name##_value_with_array_indexensor__, op) template <typename _TS>                   \
+    __MATAZURE_VALUE_WITH_ARRAY_INDEX_TENSOR_BINARY_OPERATOR(                                   \
+        __##name##_value_with_array_indexensor__, op)                                           \
+    template <typename _TS>                                                                     \
     inline enable_if_t<none_device_memory<_TS>::value && !are_linear_index<_TS>::value,         \
                        lambda_tensor<_TS::rank, __##name##_value_with_array_indexensor__<_TS>>> \
     operator op(typename _TS::value_type v, const tensor_expression<_TS>& e_ts) {               \
