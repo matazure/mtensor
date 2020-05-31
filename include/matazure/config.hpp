@@ -49,6 +49,11 @@
 
 #define MLAMBDA [=] MATAZURE_GENERAL
 
+#if __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1900)
+#else
+#error "use c++11 at least"
+#endif
+
 // for using
 namespace matazure {
 
