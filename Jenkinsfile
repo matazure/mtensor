@@ -54,7 +54,7 @@ pipeline{
                         }
                     }
                 }
-                stage('clang-x64-linux') {
+                stage('clang-6.0-x64-linux') {
                     agent { 
                         dockerfile {
                             filename 'tensor-dev-ubuntu18.04.dockerfile'
@@ -64,6 +64,49 @@ pipeline{
                     environment {
                         CXX = 'clang++-6.0'
                         CC = 'clang-6.0'
+                    }
+                    stages {
+                        stage('build') {
+                            steps {
+                                sh './script/build_native.sh -DNATIVE=ON -DWITH_OPENMP=ON'
+                            }
+                        }
+                        stage('test') {
+                            steps {
+                                sh './build/bin/ut_host_mtensor'
+                            }
+                        }
+                        stage('sample') {
+                            steps {
+                                sh './build/bin/sample_for_index'
+                                sh './build/bin/sample_basic_structure'
+                                sh './build/bin/sample_gradient data/lena.jpg'
+                                sh './build/bin/sample_mandelbrot'
+                                sh './build/bin/sample_make_lambda'
+                            }
+                        }
+                        stage('benchmark') {
+                            steps {
+                                sh './build/bin/bm_host_mtensor'
+                            }
+                        }
+                        stage('archive') {
+                            steps {
+                                archiveArtifacts artifacts: '*.png', fingerprint: true 
+                            }
+                        }
+                    }
+                }
+                stage('clang-9-x64-linux') {
+                    agent { 
+                        dockerfile {
+                            filename 'tensor-dev-ubuntu18.04.dockerfile'
+                            dir 'dockerfile'
+                        }
+                    }
+                    environment {
+                        CXX = 'clang++-9'
+                        CC = 'clang-9'
                     }
                     stages {
                         stage('build') {
