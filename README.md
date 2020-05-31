@@ -241,8 +241,13 @@ bm_cuda_tensor2a4f_copy/8000                         240.725GB/s   15.0453G item
 * 需要编译器支持C++11的支持, g++4.8.5及其以上版本
 * 需要CMAKE3.8以上版本
 * 需要git支持submodule特性,较新版本均支持
-* 若需cuda支持,则需要cuda9.0及其以上版本, cuda9.0未测试, 9.0以下是无法支持的
 * 其实也可使用clang的cuda编译选项, 待cmake完成clang的cuda支持再加入
+
+clang编译cuda如下
+
+```bash
+clang++-9 -std=c++11 -Ithird_party/stb/ -Iinclude sample/sample_mandelbrot.cu --cuda-gpu-arch=sm_75 -L/usr/local/cuda/lib64 -lcudart
+```
 
 也可以构建本项目的docker环境作为开发环境
 

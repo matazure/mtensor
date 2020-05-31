@@ -62,13 +62,18 @@ pipeline{
                         }
                     }
                     environment {
-                        CXX = 'clang++'
-                        CC = 'clang'
+                        CXX = 'clang++-6.0'
+                        CC = 'clang-6.0'
                     }
                     stages {
                         stage('build') {
                             steps {
                                 sh './script/build_native.sh -DNATIVE=ON -DWITH_OPENMP=ON'
+                            }
+                        }
+                        stage('build-cuda') {
+                            steps {
+                                sh 'clang++-9 -std=c++11 -Ithird_party/stb/ -Iinclude sample/sample_mandelbrot.cu --cuda-gpu-arch=sm_75 -L/usr/local/cuda/lib64 -lcudart'
                             }
                         }
                         stage('test') {
