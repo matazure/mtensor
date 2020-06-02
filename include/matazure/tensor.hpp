@@ -49,8 +49,7 @@ class tensor_expression {
 @ tparam _Rank the rank of tensor
 @ tparam _Layout the memory layout of tensor, the default is first major
 */
-template <typename _ValueType, int_t _Rank,
-          typename _Layout = typename default_layout<global_t, _Rank>::type,
+template <typename _ValueType, int_t _Rank, typename _Layout = row_major_layout<_Rank>,
           typename _Allocator = aligned_allocator<_ValueType, 32>>
 class tensor : public tensor_expression<tensor<_ValueType, _Rank, _Layout, _Allocator>> {
    public:
@@ -234,8 +233,7 @@ class tensor : public tensor_expression<tensor<_ValueType, _Rank, _Layout, _Allo
     value_type* data_;
 };
 
-template <typename _Type, int_t _Rank,
-          typename _Layout = typename default_layout<global_t, _Rank>::type>
+template <typename _Type, int_t _Rank, typename _Layout = row_major_layout<_Rank>>
 auto make_tensor(pointi<_Rank> ext, _Type* p_data) -> tensor<_Type, _Rank, _Layout> {
     std::shared_ptr<_Type> sp_data(p_data, [](_Type* p) {});
     return tensor<_Type, _Rank, _Layout>(ext, sp_data);
@@ -250,15 +248,15 @@ template <typename _ValueType, typename _Layout = row_major_layout<3>>
 using volume = tensor<_ValueType, 3, _Layout>;
 #endif
 
-template <int_t _Rank, typename _Layout = typename default_layout<global_t, _Rank>::type>
+template <int_t _Rank, typename _Layout = row_major_layout<_Rank>>
 using tensorb = tensor<byte, _Rank, row_major_layout<_Rank>>;
-template <int_t _Rank, typename _Layout = typename default_layout<global_t, _Rank>::type>
+template <int_t _Rank, typename _Layout = row_major_layout<_Rank>>
 using tensors = tensor<short, _Rank, row_major_layout<_Rank>>;
-template <int_t _Rank, typename _Layout = typename default_layout<global_t, _Rank>::type>
+template <int_t _Rank, typename _Layout = row_major_layout<_Rank>>
 using tensori = tensor<int_t, _Rank, row_major_layout<_Rank>>;
-template <int_t _Rank, typename _Layout = typename default_layout<global_t, _Rank>::type>
+template <int_t _Rank, typename _Layout = row_major_layout<_Rank>>
 using tensorf = tensor<float, _Rank, row_major_layout<_Rank>>;
-template <int_t _Rank, typename _Layout = typename default_layout<global_t, _Rank>::type>
+template <int_t _Rank, typename _Layout = row_major_layout<_Rank>>
 using tensord = tensor<double, _Rank, row_major_layout<_Rank>>;
 
 using tensor1b = tensorb<1>;

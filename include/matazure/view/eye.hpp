@@ -31,7 +31,7 @@ struct eye_functor {
 template <typename _ValueType, int_t _Rank, typename _RuntimeType = host_t,
           typename _Layout = default_layout<global_t, 2>::type>
 inline auto eye(pointi<_Rank> shape, _RuntimeType runtime = host_t{},
-                _Layout layout = typename default_layout<global_t, _Rank>::type{})
+                _Layout layout = row_major_layout<_Rank>{})
     -> decltype(make_lambda(shape, eye_functor<_ValueType, _Rank>{}, _RuntimeType{}, _Layout{})) {
     return make_lambda(shape, eye_functor<_ValueType, _Rank>{}, _RuntimeType{}, _Layout{});
 }

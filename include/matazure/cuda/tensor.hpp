@@ -12,8 +12,7 @@
 namespace matazure {
 namespace cuda {
 
-template <typename _Type, int_t _Rank,
-          typename _Layout = typename default_layout<global_t, _Rank>::type,
+template <typename _Type, int_t _Rank, typename _Layout = row_major_layout<_Rank>,
           typename _Allocator = cuda::allocator<_Type>>
 class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout, _Allocator>> {
    public:
@@ -109,24 +108,24 @@ class tensor : public tensor_expression<tensor<_Type, _Rank, _Layout, _Allocator
 };
 
 #ifndef MATAZURE_DISABLE_MATRIX_VECTOR_ALIAS
-template <typename _ValueType, typename _Layout = column_major_layout<1>>
+template <typename _ValueType, typename _Layout = row_major_layout<1>>
 using vector = tensor<_ValueType, 1, _Layout>;
-template <typename _ValueType, typename _Layout = column_major_layout<2>>
+template <typename _ValueType, typename _Layout = row_major_layout<2>>
 using matrix = tensor<_ValueType, 2, _Layout>;
-template <typename _ValueType, typename _Layout = column_major_layout<3>>
+template <typename _ValueType, typename _Layout = row_major_layout<3>>
 using volume = tensor<_ValueType, 3, _Layout>;
 #endif
 
-template <int_t _Rank, typename _Layout = typename default_layout<global_t, _Rank>::type>
-using tensorb = tensor<byte, _Rank, column_major_layout<_Rank>>;
-template <int_t _Rank, typename _Layout = typename default_layout<global_t, _Rank>::type>
-using tensors = tensor<short, _Rank, column_major_layout<_Rank>>;
-template <int_t _Rank, typename _Layout = typename default_layout<global_t, _Rank>::type>
-using tensori = tensor<int_t, _Rank, column_major_layout<_Rank>>;
-template <int_t _Rank, typename _Layout = typename default_layout<global_t, _Rank>::type>
-using tensorf = tensor<float, _Rank, column_major_layout<_Rank>>;
-template <int_t _Rank, typename _Layout = typename default_layout<global_t, _Rank>::type>
-using tensord = tensor<double, _Rank, column_major_layout<_Rank>>;
+template <int_t _Rank, typename _Layout = row_major_layout<_Rank>>
+using tensorb = tensor<byte, _Rank, row_major_layout<_Rank>>;
+template <int_t _Rank, typename _Layout = row_major_layout<_Rank>>
+using tensors = tensor<short, _Rank, row_major_layout<_Rank>>;
+template <int_t _Rank, typename _Layout = row_major_layout<_Rank>>
+using tensori = tensor<int_t, _Rank, row_major_layout<_Rank>>;
+template <int_t _Rank, typename _Layout = row_major_layout<_Rank>>
+using tensorf = tensor<float, _Rank, row_major_layout<_Rank>>;
+template <int_t _Rank, typename _Layout = row_major_layout<_Rank>>
+using tensord = tensor<double, _Rank, row_major_layout<_Rank>>;
 
 // nvcc walkaround, sometimes you need declare the cuda::tensor_type before using
 using tensor1b = tensorb<1>;

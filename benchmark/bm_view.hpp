@@ -36,8 +36,8 @@ inline void bm_tensor_view_stride(benchmark::State& state) {
 
 template <typename tensor_type>
 inline void bm_tensor_view_gather_scalar_axis0(benchmark::State& state) {
-    typedef typename tensor_selector<typename tensor_type::runtime_type,
-                                     typename tensor_type::value_type, tensor_type::rank - 1>::type
+    typedef utensor<typename tensor_type::runtime_type, typename tensor_type::value_type,
+                    tensor_type::rank - 1>
         dst_tensor_type;
     tensor_type ts_src(point2i{10, state.range(0)});
     dst_tensor_type ts_dst(gather_point<0>(ts_src.shape()));
@@ -55,8 +55,8 @@ inline void bm_tensor_view_gather_scalar_axis0(benchmark::State& state) {
 
 template <typename tensor_type>
 inline void bm_tensor_view_gather_scalar_axis1(benchmark::State& state) {
-    typedef typename tensor_selector<typename tensor_type::runtime_type,
-                                     typename tensor_type::value_type, tensor_type::rank - 1>::type
+    typedef utensor<typename tensor_type::runtime_type, typename tensor_type::value_type,
+                    tensor_type::rank - 1>
         dst_tensor_type;
     tensor_type ts_src(point2i{state.range(0), 10});
     dst_tensor_type ts_dst(gather_point<1>(ts_src.shape()));
@@ -78,10 +78,10 @@ inline void bm_tensor_view_zip2(benchmark::State& state) {
     tensor_type ts0(pointi<tensor_type::rank>::all(state.range(0)));
     tensor_type ts1(ts0.shape());
 
-    typedef typename tensor_selector<
-        typename tensor_type::runtime_type,
-        tuple<typename tensor_type::value_type, typename tensor_type::value_type>,
-        tensor_type::rank>::type tensor_tuple_type;
+    typedef utensor<typename tensor_type::runtime_type,
+                    tuple<typename tensor_type::value_type, typename tensor_type::value_type>,
+                    tensor_type::rank>
+        tensor_tuple_type;
 
     tensor_tuple_type ts_dst(ts0.shape());
 
@@ -116,10 +116,10 @@ inline void bm_tensor_view_eye(benchmark::State& state) {
 template <typename runtime_type, typename value_type>
 inline void bm_tensor_view_meshgrid2(benchmark::State& state) {
     point2i shape{state.range(0), state.range(0)};
-    typedef typename tensor_selector<runtime_type, point<value_type, 2>, 2>::type tensor_type;
+    typedef utensor<runtime_type, point<value_type, 2>, 2> tensor_type;
     tensor_type ts(shape);
 
-    typedef typename tensor_selector<runtime_type, value_type, 1>::type vector_type;
+    typedef utensor<runtime_type, value_type, 1> vector_type;
     vector_type v0(shape[0]);
     vector_type v1(shape[1]);
 
