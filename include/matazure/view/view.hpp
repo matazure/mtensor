@@ -10,6 +10,7 @@
 #include <matazure/view/map.hpp>
 #include <matazure/view/mask.hpp>
 #include <matazure/view/ones.hpp>
+#include <matazure/view/pad.hpp>
 #include <matazure/view/permute.hpp>
 #include <matazure/view/shift.hpp>
 #include <matazure/view/slice.hpp>

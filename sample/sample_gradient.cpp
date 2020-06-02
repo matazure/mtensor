@@ -10,10 +10,10 @@ int main(int argc, char* argv[]) {
     }
 
     tensor<byte, 2> img_gray = read_gray_image(argv[1]);
-    pointi<2> padding{1, 1};
+    int_t padding = 1;
     tensor<byte, 2> image_pad_container(img_gray.shape() + padding * 2);
     //该操作使得img具备越界一个元素访问的能力， 因为img(-1, -1)对应着image_pad_container(0, 0)
-    auto img_padding_view = view::slice(image_pad_container, padding, img_gray.shape());
+    auto img_padding_view = view::pad(image_pad_container, padding);
     copy(img_gray, img_padding_view);
     //使用make_lambda构建梯度视图lambda_tensor
     auto img_float_view = view::cast<float>(img_padding_view);
