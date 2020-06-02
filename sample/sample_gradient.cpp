@@ -18,14 +18,14 @@ int main(int argc, char* argv[]) {
     //使用make_lambda构建梯度视图lambda_tensor
     auto img_float_view = view::cast<float>(img_padding_view);
 #if 1
-    auto img_grad_view = make_lambda(img_float_view.shape(), [=](pointi<2> idx) {
+    auto img_grad_view = make_lambda(img_float_view.shape(), MLAMBDA(pointi<2> idx) {
         point<float, 2> grad;
         grad[0] = img_float_view(idx + pointi<2>{1, 0}) - img_float_view(idx - pointi<2>{1, 0});
         grad[1] = img_float_view(idx + pointi<2>{0, 1}) - img_float_view(idx - pointi<2>{0, 1});
         return grad;
     });
     //将梯度转为norm1
-    auto grad_norm1_view = make_lambda(img_grad_view.shape(), [=](pointi<2> idx) {
+    auto grad_norm1_view = make_lambda(img_grad_view.shape(), MLAMBDA(pointi<2> idx) {
         auto grad = img_grad_view(idx);
         return std::abs(grad[0]) + std::abs(grad[1]);
     });

@@ -36,7 +36,7 @@ int main(int argc, char* argv[]) {
     //
     auto grad_mask_view = view::binary(grad_norm1_view, [](float v) { return v > 50; });
     auto img_rgb_grad_mask = view::mask(img_rgb, grad_mask_view);
-    for_index(img_rgb_grad_mask.shape(), [=](point2i idx) {
+    for_index(img_rgb_grad_mask.shape(), MLAMBDA(point2i idx) {
         img_rgb_grad_mask(idx) = point3b{0, 255, 0};
     });
     // fill(img_rgb_grad_mask, point3b{0, 0, 0});

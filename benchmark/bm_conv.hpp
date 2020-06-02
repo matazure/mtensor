@@ -28,7 +28,7 @@ inline void bm_tensor2f_general_roll_conv(benchmark::State& state) {
     auto ts_src_view = view::slice(ts_src_pad, kernel_radius, shape);
 
     while (state.KeepRunning()) {
-        _tmp::for_index(ts_dst.shape(), [=] MATAZURE_GENERAL(pointi<rank> idx) {
+        _tmp::for_index(ts_dst.shape(), MLAMBDA(pointi<rank> idx) {
             auto re = zero<value_type>::value();
             for_index(zero<pointi<rank>>::value(), kernel_shape, [&](pointi<rank> neigbor_idx) {
                 re += kernel(neigbor_idx) * ts_src_view(idx + neigbor_idx - kernel_radius);
@@ -62,7 +62,7 @@ inline void bm_tensor2f_general_unroll_conv(benchmark::State& state) {
     auto ts_src_view = view::slice(ts_src_pad, kernel_radius, shape);
 
     while (state.KeepRunning()) {
-        _tmp::for_index(ts_dst.shape(), [=] MATAZURE_GENERAL(pointi<rank> idx) {
+        _tmp::for_index(ts_dst.shape(), MLAMBDA(pointi<rank> idx) {
             // clang-format off
             auto re = zero<value_type>::value();
             re += kernel(pointi<2>{0, 0}) * ts_src_view(idx + pointi<2>{-1, -1});
@@ -103,7 +103,7 @@ inline void bm_tensor2f_padding_layout_general_unroll_conv(benchmark::State& sta
                                                                 kernel_radius);
 
     while (state.KeepRunning()) {
-        _tmp::for_index(ts_dst.shape(), [=] MATAZURE_GENERAL(pointi<rank> idx) {
+        _tmp::for_index(ts_dst.shape(), MLAMBDA(pointi<rank> idx) {
             // clang-format off
             auto re = zero<value_type>::value();
             re += kernel(pointi<2>{0, 0}) * ts_src(idx + pointi<2>{-1, -1});

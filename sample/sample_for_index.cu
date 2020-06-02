@@ -10,7 +10,7 @@ int main(int argc, char* argv[]) {
     fill(ts_a, 1.0f);
     fill(ts_b, 2.0f);
     //使用cuda  lambda算子 需要申明__device__
-    auto functor = [=] MATAZURE_DEVICE(pointi<2> idx) { ts_c(idx) = ts_a(idx) + ts_b(idx); };
+    auto functor = MLAMBDA(pointi<2> idx) { ts_c(idx) = ts_a(idx) + ts_b(idx); };
     // 计算
     cuda::for_index(shape, functor);
     // 拷贝到主机tensor, 输出结果

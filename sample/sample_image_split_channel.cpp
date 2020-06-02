@@ -20,7 +20,7 @@ int main(int argc, char* argv[]) {
     auto img_split_b_view = view::gather<2>(img_split, 1);  // blue通道视图
     auto img_split_g_view = view::gather<2>(img_split, 2);  // green通道视图
     //拷贝数据到img_split中
-    for_index(img_gray.shape(), [=](point2i idx) {
+    for_index(img_gray.shape(), MLAMBDA(point2i idx) {
         auto tmp = img_scale_view(idx);
         img_split_r_view(idx) = tmp[0];
         img_split_b_view(idx) = tmp[1];

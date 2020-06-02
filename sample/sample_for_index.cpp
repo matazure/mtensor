@@ -9,7 +9,7 @@ int main(int argc, char* argv[]) {
     tensor<float, 2> ts_c(shape);
     fill(ts_a, 1.0f);
     fill(ts_b, 2.0f);
-    auto functor = [=](pointi<2> idx) { ts_c(idx) = ts_a(idx) + ts_b(idx); };
+    auto functor = MLAMBDA(pointi<2> idx) { ts_c(idx) = ts_a(idx) + ts_b(idx); };
     // 计算
     for_index(shape, functor);
     // 输出结果
