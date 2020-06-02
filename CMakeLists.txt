@@ -46,6 +46,10 @@ if(WITH_CUDA)
 	# set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-extended-lambda --expt-relaxed-constexpr -arch=sm_75")
 	set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -w")
 
+	if (CUDA_ARCH) 
+		set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -arch=${CUDA_ARCH}")
+	endif()
+
 endif()
 
 option(WITH_OPENMP "With OpenMP" OFF)

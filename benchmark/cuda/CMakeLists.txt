@@ -11,10 +11,10 @@ set(bm_cuda_src
     bm_matrix_mul.cu
 )
 
-# set(WITH_TENSORCORE ON)
-# if (WITH_TENSORCORE)
-#     list(APPEND bm_cuda_src bm_tensor_core.cu)
-# endif()
+option(WITH_TENSORCORE "With TensorCore" OFF)
+if (WITH_TENSORCORE)
+    list(APPEND bm_cuda_src bm_tensor_core.cu)
+endif()
 
 add_executable(bm_cuda_mtensor ${bm_cuda_src})
 target_link_libraries(bm_cuda_mtensor mtensor benchmark)

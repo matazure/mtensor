@@ -203,7 +203,7 @@ pipeline{
                     stages {
                         stage('build') {
                             steps {
-                                sh './script/build_native.sh -DNATIVE=ON -DWITH_OPENMP=ON -DWITH_CUDA=ON'
+                                sh './script/build_native.sh -DNATIVE=ON -DWITH_OPENMP=ON -DWITH_CUDA=ON -DCUDA_ARCH=sm_75 -DWITH_TENSORCORE=ON'
                             }
                         }
                         stage('test') {
