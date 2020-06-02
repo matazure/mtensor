@@ -81,4 +81,15 @@ inline void for_index(pointi<_Rank> end, _Fun fun) {
     cuda::for_index(zero<pointi<_Rank>>::value(), end, fun);
 }
 }  // namespace cuda
+
+template <typename... _Args>
+inline void for_index(host_t, _Args... args) {
+    matazure::for_index(args...);
+}
+
+template <typename... _Args>
+inline void for_index(device_t, _Args... args) {
+    matazure::cuda::for_index(args...);
+}
+
 }  // namespace matazure
