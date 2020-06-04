@@ -38,3 +38,17 @@ benchmark不work和环境有关， centos和ubuntu均出现该现象， 未定�
 ## Heterogeneouse
 
 gnu compiler向量化扩展是不支持的， 因为在cu文件里MATAZURE_GENERAL会被激活， 所以得确保gcc得特性是被device代码所支持， 显然向量化拓展的语法是不支持的， 需要自定义simd类型， 并用__CUDA_ARCH__来切换才行
+
+## compile error
+
+```c++
+static_assert(_T1::rank == _T2::rank, "the ranks is not matched");;
+static_assert(std::is_same<typename _T1::value_type, typename _T2::value_type>::value, "the value types is not matched");
+static_assert(std::is_same<typename _T1::runtime_type, typename _T2::runtime_type>::value, "the runtime types is not matched");
+```
+
+## runtime error
+
+```c++
+MATAZURE_ASSERT(equal(ts1.shape(), ts2.shape()), "the shapes is not matched");
+```

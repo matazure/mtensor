@@ -31,8 +31,8 @@ struct omp_policy {};
  * @param last the last index
  * @param fun the functor,  int_t -> value pattern.
  */
-template <typename _Func>
-inline void for_index(omp_policy policy, int_t first, int_t last, _Func fun) {
+template <typename _Fun>
+inline void for_index(omp_policy policy, int_t first, int_t last, _Fun fun) {
     MATAZURE_OPENMP_PARALLEL_FOR(1)
     for (int_t i = first; i < last; ++i) {
         fun(i);
@@ -45,8 +45,8 @@ inline void for_index(omp_policy policy, int_t first, int_t last, _Func fun) {
  * @param end the end index
  * @param fun the functor,  pointi<1> -> value pattern.
  */
-template <typename _Func>
-inline void for_index(omp_policy, pointi<1> origin, pointi<1> end, _Func fun) {
+template <typename _Fun>
+inline void for_index(omp_policy, pointi<1> origin, pointi<1> end, _Fun fun) {
     MATAZURE_OPENMP_PARALLEL_FOR(1)
     for (int_t i = origin[0]; i < end[0]; ++i) {
         fun(pointi<1>{{i}});
@@ -59,8 +59,8 @@ inline void for_index(omp_policy, pointi<1> origin, pointi<1> end, _Func fun) {
  * @param end the end index
  * @param fun the functor,  pointi<2> -> value pattern.
  */
-template <typename _Func>
-inline void for_index(omp_policy, pointi<2> origin, pointi<2> end, _Func fun) {
+template <typename _Fun>
+inline void for_index(omp_policy, pointi<2> origin, pointi<2> end, _Fun fun) {
     MATAZURE_OPENMP_PARALLEL_FOR(2)
     for (int_t i = origin[0]; i < end[0]; ++i) {
         for (int_t j = origin[1]; j < end[1]; ++j) {
@@ -75,8 +75,8 @@ inline void for_index(omp_policy, pointi<2> origin, pointi<2> end, _Func fun) {
  * @param end the end index
  * @param fun the functor,  pointi<3> -> value pattern.
  */
-template <typename _Func>
-inline void for_index(omp_policy, pointi<3> origin, pointi<3> end, _Func fun) {
+template <typename _Fun>
+inline void for_index(omp_policy, pointi<3> origin, pointi<3> end, _Fun fun) {
     MATAZURE_OPENMP_PARALLEL_FOR(3)
     for (int_t i = origin[0]; i < end[0]; ++i) {
         for (int_t j = origin[1]; j < end[1]; ++j) {
@@ -93,8 +93,8 @@ inline void for_index(omp_policy, pointi<3> origin, pointi<3> end, _Func fun) {
  * @param end the end index
  * @param fun the functor,  pointi<4> -> value pattern.
  */
-template <typename _Func>
-inline void for_index(omp_policy, pointi<4> origin, pointi<4> end, _Func fun) {
+template <typename _Fun>
+inline void for_index(omp_policy, pointi<4> origin, pointi<4> end, _Fun fun) {
     MATAZURE_OPENMP_PARALLEL_FOR(4)
     for (int_t i = origin[0]; i < end[0]; ++i) {
         for (int_t j = origin[1]; j < end[1]; ++j) {

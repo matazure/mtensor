@@ -3,8 +3,8 @@
 namespace matazure {
 
 /// a type traits to get the argument type and result type of a functor
-template <typename _Func>
-struct function_traits : public function_traits<decltype(&_Func::operator())> {};
+template <typename _Fun>
+struct function_traits : public function_traits<decltype(&_Fun::operator())> {};
 
 /// implements
 template <typename _ClassType, typename _ReturnType, typename... _Args>

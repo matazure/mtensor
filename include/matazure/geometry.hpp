@@ -22,9 +22,9 @@ inline MATAZURE_GENERAL bool inside_rect(point<int_t, _Rank> idx, point<int_t, _
     return true;
 }
 
-template <typename _Func>
+template <typename _Fun>
 inline void for_border(const pointi<2>& extent, const pointi<2>& origin_padding,
-                       const pointi<2>& end_padding, _Func fun) {
+                       const pointi<2>& end_padding, _Fun fun) {
     // top
     for (int j = -origin_padding[1]; j < 0; ++j) {
         for (int i = -origin_padding[0]; i < extent[0] + end_padding[0]; ++i) {

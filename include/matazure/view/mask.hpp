@@ -37,6 +37,11 @@ struct mask_functor {
 template <typename _T1, typename _T2>
 inline auto mask(_T1 ts1, _T2 ts2)
     -> decltype(make_lambda(ts1.shape(), mask_functor<_T1, _T2>{ts1, ts2})) {
+    static_assert(_T1::rank == _T2::rank, "the ranks is not matched");
+    static_assert(std::is_same<typename _T1::runtime_type, typename _T2::runtime_type>::value,
+                  "the runtime types is not matched");
+    MATAZURE_ASSERT(equal(ts1.shape(), ts2.shape()), "the shapes is not matched");
+
     return make_lambda(ts1.shape(), mask_functor<_T1, _T2>{ts1, ts2});
 }
 

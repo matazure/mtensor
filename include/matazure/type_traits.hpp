@@ -19,6 +19,24 @@ struct unpinned {};
 
 struct aligned {};
 
+template <typename _Tensor>
+using value_t = typename _Tensor::value_type;
+
+template <typename _Tensor>
+using runtime_t = typename _Tensor::runtime_type;
+
+template <typename _Tensor>
+using layout_t = typename _Tensor::layout_type;
+
+template <typename _Tensor>
+using index_t = typename _Tensor::index_type;
+
+template <typename _Tensor>
+using allocator_t = typename _Tensor::allocator_type;
+
+template <typename _Tensor>
+using reference_t = typename _Tensor::reference_type;
+
 /// define a generical compile time zero
 template <typename _T>
 struct zero;

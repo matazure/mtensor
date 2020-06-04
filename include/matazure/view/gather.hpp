@@ -55,6 +55,7 @@ inline auto gather(_Tensor ts, _Vector indices)
     -> decltype(make_lambda(internal::get_gather_vector_shape<_Axis>(ts.shape(), indices.size()),
                             gather_vector_functor<_Tensor, _Vector, _Axis>(ts, indices),
                             typename _Tensor::runtime_type{}, typename _Tensor::layout_type{})) {
+    static_assert(_Axis >= 0 && _Axis < _Tensor::rank, "_Axis must be >=0 or < _Tensor::rank");
     return make_lambda(internal::get_gather_vector_shape<_Axis>(ts.shape(), indices.size()),
                        gather_vector_functor<_Tensor, _Vector, _Axis>(ts, indices),
                        typename _Tensor::runtime_type{}, typename _Tensor::layout_type{});
@@ -65,6 +66,7 @@ inline auto gather(_Tensor ts, int_t positon_index) -> decltype(make_lambda(
     gather_point<_Axis>(ts.shape()), gather_scalar_functor<_Tensor, _Axis>(ts, positon_index),
     typename _Tensor::runtime_type{},
     typename layout_getter<typename _Tensor::layout_type, _Tensor::rank - 1>::type{})) {
+    static_assert(_Axis >= 0 && _Axis < _Tensor::rank, "_Axis must be >=0 or < _Tensor::rank");
     return make_lambda(
         gather_point<_Axis>(ts.shape()), gather_scalar_functor<_Tensor, _Axis>(ts, positon_index),
         typename _Tensor::runtime_type{},

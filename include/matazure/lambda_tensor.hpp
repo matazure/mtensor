@@ -10,12 +10,12 @@ namespace matazure {
 
 namespace internal {
 
-template <int_t _Rank, typename _Func>
+template <int_t _Rank, typename _Fun>
 struct get_functor_accessor_type {
    private:
-    typedef function_traits<_Func> functor_traits;
-    static_assert(functor_traits::arguments_size == 1, "functor must be unary");
-    typedef decay_t<typename functor_traits::template arguments<0>::type> _tmp_type;
+    typedef function_traits<_Fun> function_traits_t;
+    static_assert(function_traits_t::arguments_size == 1, "functor must be unary");
+    typedef decay_t<typename function_traits_t::template arguments<0>::type> _tmp_type;
 
    public:
     typedef conditional_t<
@@ -29,17 +29,17 @@ struct get_functor_accessor_type {
 /**
  * @brief a tensor without memory defined by the shape and lambda(functor)
  * @tparam _Rank the rank of tensor
- * @tparam _Func the functor type of tensor, should be Index -> Value pattern
+ * @tparam _Fun the functor type of tensor, should be Index -> Value pattern
  * @see tensor
  */
-template <int_t _Rank, typename _Func, typename _Layout = row_major_layout<_Rank>>
-class lambda_tensor : public tensor_expression<lambda_tensor<_Rank, _Func, _Layout>> {
-    typedef function_traits<_Func> functor_traits;
+template <int_t _Rank, typename _Fun, typename _Layout = row_major_layout<_Rank>>
+class lambda_tensor : public tensor_expression<lambda_tensor<_Rank, _Fun, _Layout>> {
+    typedef function_traits<_Fun> function_traits_t;
 
    public:
     static const int_t rank = _Rank;
-    typedef _Func functor_type;
-    typedef typename functor_traits::result_type reference;
+    typedef _Fun functor_type;
+    typedef typename function_traits_t::result_type reference;
     /// the value type of lambdd_tensor, it's the result type of functor_type
     typedef remove_reference_t<reference> value_type;
     /**
@@ -48,7 +48,7 @@ class lambda_tensor : public tensor_expression<lambda_tensor<_Rank, _Func, _Layo
      * when the functor is int_t -> value pattern, the access mode is linear access.
      * when the functor is pointi<rank> -> value pattern, the access mode is array access.
      */
-    typedef typename internal::get_functor_accessor_type<_Rank, _Func>::type index_type;
+    typedef typename internal::get_functor_accessor_type<_Rank, _Fun>::type index_type;
 
     typedef _Layout layout_type;
     typedef host_t runtime_type;
@@ -59,7 +59,7 @@ class lambda_tensor : public tensor_expression<lambda_tensor<_Rank, _Func, _Layo
      * @param ext the shape of tensor
      * @param fun the functor of lambdd_tensor, should be Index -> Value pattern
      */
-    lambda_tensor(const pointi<rank>& ext, _Func fun) : shape_(ext), layout_(ext), functor_(fun) {}
+    lambda_tensor(const pointi<rank>& ext, _Fun fun) : shape_(ext), layout_(ext), functor_(fun) {}
 
     /**
      * @brief copy constructor
@@ -154,7 +154,7 @@ class lambda_tensor : public tensor_expression<lambda_tensor<_Rank, _Func, _Layo
    private:
     const pointi<rank> shape_;
     const layout_type layout_;
-    const _Func functor_;
+    const _Fun functor_;
 };
 
 /**
@@ -162,14 +162,14 @@ class lambda_tensor : public tensor_expression<lambda_tensor<_Rank, _Func, _Layo
  * @param the shape
  * @param the functor, a index -> value pattern
  */
-template <int_t _Rank, typename _Func>
-inline auto make_lambda(pointi<_Rank> extent, _Func fun) -> lambda_tensor<_Rank, _Func> {
-    return lambda_tensor<_Rank, _Func>(extent, fun);
+template <int_t _Rank, typename _Fun>
+inline auto make_lambda(pointi<_Rank> extent, _Fun fun) -> lambda_tensor<_Rank, _Fun> {
+    return lambda_tensor<_Rank, _Fun>(extent, fun);
 }
 
-template <int_t _Rank, typename _Func, typename _Layout>
-inline auto make_lambda(pointi<_Rank> extent, _Func fun, _Layout) -> lambda_tensor<_Rank, _Func> {
-    return lambda_tensor<_Rank, _Func, _Layout>(extent, fun);
+template <int_t _Rank, typename _Fun, typename _Layout>
+inline auto make_lambda(pointi<_Rank> extent, _Fun fun, _Layout) -> lambda_tensor<_Rank, _Fun> {
+    return lambda_tensor<_Rank, _Fun, _Layout>(extent, fun);
 }
 
 /**
@@ -177,21 +177,21 @@ inline auto make_lambda(pointi<_Rank> extent, _Func fun, _Layout) -> lambda_tens
  * @param the shape
  * @param the functor, a index -> value pattern
  */
-template <int_t _Rank, typename _Func>
-inline auto make_lambda(pointi<_Rank> extent, _Func fun, host_t) -> lambda_tensor<_Rank, _Func> {
-    return lambda_tensor<_Rank, _Func>(extent, fun);
+template <int_t _Rank, typename _Fun>
+inline auto make_lambda(pointi<_Rank> extent, _Fun fun, host_t) -> lambda_tensor<_Rank, _Fun> {
+    return lambda_tensor<_Rank, _Fun>(extent, fun);
 }
 
-template <int_t _Rank, typename _Func, typename _Layout>
-inline auto make_lambda(pointi<_Rank> extent, _Func fun, host_t, _Layout)
-    -> lambda_tensor<_Rank, _Func, _Layout> {
-    return lambda_tensor<_Rank, _Func, _Layout>(extent, fun);
+template <int_t _Rank, typename _Fun, typename _Layout>
+inline auto make_lambda(pointi<_Rank> extent, _Fun fun, host_t, _Layout)
+    -> lambda_tensor<_Rank, _Fun, _Layout> {
+    return lambda_tensor<_Rank, _Fun, _Layout>(extent, fun);
 }
 
-template <int_t _Rank, typename _Func, typename _Layout>
-inline auto make_lambda(pointi<_Rank> extent, _Func fun, _Layout, host_t)
-    -> lambda_tensor<_Rank, _Func, _Layout> {
-    return lambda_tensor<_Rank, _Func, _Layout>(extent, fun);
+template <int_t _Rank, typename _Fun, typename _Layout>
+inline auto make_lambda(pointi<_Rank> extent, _Fun fun, _Layout, host_t)
+    -> lambda_tensor<_Rank, _Fun, _Layout> {
+    return lambda_tensor<_Rank, _Fun, _Layout>(extent, fun);
 }
 
 }  // namespace matazure

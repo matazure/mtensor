@@ -11,20 +11,20 @@
 namespace matazure {
 namespace cuda {
 
-template <int_t _Rank, typename _Func, typename _Layout = row_major_layout<_Rank>>
-class lambda_tensor : public tensor_expression<lambda_tensor<_Rank, _Func, _Layout>> {
-    typedef function_traits<_Func> functor_traits;
+template <int_t _Rank, typename _Fun, typename _Layout = row_major_layout<_Rank>>
+class lambda_tensor : public tensor_expression<lambda_tensor<_Rank, _Fun, _Layout>> {
+    typedef function_traits<_Fun> functor_traits;
 
    public:
     static const int_t rank = _Rank;
     typedef typename functor_traits::result_type reference;
     typedef remove_reference_t<reference> value_type;
-    typedef typename matazure::internal::get_functor_accessor_type<_Rank, _Func>::type index_type;
+    typedef typename matazure::internal::get_functor_accessor_type<_Rank, _Fun>::type index_type;
     typedef device_t runtime_type;
     typedef _Layout layout_type;
 
    public:
-    lambda_tensor(const pointi<rank>& ext, _Func fun) : shape_(ext), layout_(ext), functor_(fun) {}
+    lambda_tensor(const pointi<rank>& ext, _Fun fun) : shape_(ext), layout_(ext), functor_(fun) {}
 
     MATAZURE_GENERAL reference operator[](int_t i) const { return offset_imp<index_type>(i); }
 
@@ -89,36 +89,36 @@ class lambda_tensor : public tensor_expression<lambda_tensor<_Rank, _Func, _Layo
    private:
     const pointi<rank> shape_;
     const layout_type layout_;
-    const _Func functor_;
+    const _Fun functor_;
 };
 
-template <int_t _Rank, typename _Func>
-inline auto make_lambda(pointi<_Rank> ext, _Func fun) -> lambda_tensor<_Rank, _Func> {
-    return lambda_tensor<_Rank, _Func>(ext, fun);
+template <int_t _Rank, typename _Fun>
+inline auto make_lambda(pointi<_Rank> ext, _Fun fun) -> lambda_tensor<_Rank, _Fun> {
+    return lambda_tensor<_Rank, _Fun>(ext, fun);
 }
 
-template <int_t _Rank, typename _Func, typename _Layout>
-inline auto make_lambda(pointi<_Rank> ext, _Func fun, _Layout)
-    -> lambda_tensor<_Rank, _Func, _Layout> {
-    return lambda_tensor<_Rank, _Func, _Layout>(ext, fun);
+template <int_t _Rank, typename _Fun, typename _Layout>
+inline auto make_lambda(pointi<_Rank> ext, _Fun fun, _Layout)
+    -> lambda_tensor<_Rank, _Fun, _Layout> {
+    return lambda_tensor<_Rank, _Fun, _Layout>(ext, fun);
 }
 
 }  // namespace cuda
 
-template <int_t _Rank, typename _Func>
-inline auto make_lambda(pointi<_Rank> ext, _Func fun, device_t)
+template <int_t _Rank, typename _Fun>
+inline auto make_lambda(pointi<_Rank> ext, _Fun fun, device_t)
     -> decltype(cuda::make_lambda(ext, fun)) {
     return cuda::make_lambda(ext, fun);
 }
 
-template <int_t _Rank, typename _Func, typename _Layout>
-inline auto make_lambda(pointi<_Rank> ext, _Func fun, device_t, _Layout layout)
+template <int_t _Rank, typename _Fun, typename _Layout>
+inline auto make_lambda(pointi<_Rank> ext, _Fun fun, device_t, _Layout layout)
     -> decltype(cuda::make_lambda(ext, fun, layout)) {
     return cuda::make_lambda(ext, fun, layout);
 }
 
-template <int_t _Rank, typename _Func, typename _Layout>
-inline auto make_lambda(pointi<_Rank> ext, _Func fun, _Layout layout, device_t)
+template <int_t _Rank, typename _Fun, typename _Layout>
+inline auto make_lambda(pointi<_Rank> ext, _Fun fun, _Layout layout, device_t)
     -> decltype(cuda::make_lambda(ext, fun, layout)) {
     return cuda::make_lambda(ext, fun, layout);
 }
