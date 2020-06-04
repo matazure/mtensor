@@ -36,8 +36,7 @@ inline void bm_tensor_view_stride(benchmark::State& state) {
 
 template <typename tensor_type>
 inline void bm_tensor_view_gather_scalar_axis0(benchmark::State& state) {
-    typedef utensor<typename tensor_type::runtime_type, typename tensor_type::value_type,
-                    tensor_type::rank - 1>
+    typedef utensor<runtime_t<tensor_type>, typename tensor_type::value_type, tensor_type::rank - 1>
         dst_tensor_type;
     tensor_type ts_src(point2i{10, state.range(0)});
     dst_tensor_type ts_dst(gather_point<0>(ts_src.shape()));
@@ -55,8 +54,7 @@ inline void bm_tensor_view_gather_scalar_axis0(benchmark::State& state) {
 
 template <typename tensor_type>
 inline void bm_tensor_view_gather_scalar_axis1(benchmark::State& state) {
-    typedef utensor<typename tensor_type::runtime_type, typename tensor_type::value_type,
-                    tensor_type::rank - 1>
+    typedef utensor<runtime_t<tensor_type>, typename tensor_type::value_type, tensor_type::rank - 1>
         dst_tensor_type;
     tensor_type ts_src(point2i{state.range(0), 10});
     dst_tensor_type ts_dst(gather_point<1>(ts_src.shape()));
@@ -78,7 +76,7 @@ inline void bm_tensor_view_zip2(benchmark::State& state) {
     tensor_type ts0(pointi<tensor_type::rank>::all(state.range(0)));
     tensor_type ts1(ts0.shape());
 
-    typedef utensor<typename tensor_type::runtime_type,
+    typedef utensor<runtime_t<tensor_type>,
                     tuple<typename tensor_type::value_type, typename tensor_type::value_type>,
                     tensor_type::rank>
         tensor_tuple_type;

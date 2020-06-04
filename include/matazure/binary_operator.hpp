@@ -125,7 +125,7 @@ namespace matazure {
     operator op(const tensor_expression<_TS1>& e_lhs, const tensor_expression<_TS2>& e_rhs) {  \
         return make_lambda(e_lhs().shape(),                                                    \
                            __##name##_are_linear_index_tensor__<_TS1, _TS2>(e_lhs(), e_rhs()), \
-                           host_t{}, typename _TS1::layout_type{});                            \
+                           host_t{}, layout_t<_TS1>{});                                        \
     }                                                                                          \
     __MATAZURE_ARRAY_INDEX_TENSOR_BINARY_OPERATOR(__##name##_array_indexensor__, op)           \
     template <typename _TS1, typename _TS2>                                                    \
@@ -135,7 +135,7 @@ namespace matazure {
     operator op(const tensor_expression<_TS1>& e_lhs, const tensor_expression<_TS2>& e_rhs) {  \
         return make_lambda(e_lhs().shape(),                                                    \
                            __##name##_array_indexensor__<_TS1, _TS2>(e_lhs(), e_rhs()),        \
-                           typename _TS1::layout_type{});                                      \
+                           layout_t<_TS1>{});                                                  \
     }
 
 #define TENSOR_WITH_VALUE_BINARY_OPERATOR(name, op)                                             \
@@ -149,7 +149,7 @@ namespace matazure {
     operator op(const tensor_expression<_TS>& e_ts, typename _TS::value_type v) {               \
         return make_lambda(e_ts().shape(),                                                      \
                            __##name##_are_linear_index_tensor_with_value__<_TS>(e_ts(), v),     \
-                           typename _TS::layout_type{});                                        \
+                           layout_t<_TS>{});                                                    \
     }                                                                                           \
                                                                                                 \
     __MATAZURE_VALUE_WITH_LINEAR_ACCESS_TENSOR_BINARY_OPERATOR(                                 \
@@ -161,7 +161,7 @@ namespace matazure {
     operator op(typename _TS::value_type v, const tensor_expression<_TS>& e_ts) {               \
         return make_lambda(e_ts().shape(),                                                      \
                            __##name##_value_with_are_linear_index_tensor__<_TS>(v, e_ts()),     \
-                           typename _TS::layout_type{});                                        \
+                           layout_t<_TS>{});                                                    \
     }                                                                                           \
                                                                                                 \
     __MATAZURE_ARRAY_INDEX_TENSOR_WITH_VALUE_BINARY_OPERATOR(                                   \
@@ -172,7 +172,7 @@ namespace matazure {
     operator op(const tensor_expression<_TS>& e_ts, typename _TS::value_type v) {               \
         return make_lambda(e_ts().shape(),                                                      \
                            __##name##_array_indexensor_with_value__<_TS>(e_ts(), v),            \
-                           typename _TS::layout_type{});                                        \
+                           layout_t<_TS>{});                                                    \
     }                                                                                           \
                                                                                                 \
     __MATAZURE_VALUE_WITH_ARRAY_INDEX_TENSOR_BINARY_OPERATOR(                                   \
@@ -183,7 +183,7 @@ namespace matazure {
     operator op(typename _TS::value_type v, const tensor_expression<_TS>& e_ts) {               \
         return make_lambda(e_ts().shape(),                                                      \
                            __##name##_value_with_array_indexensor__<_TS>(e_ts(), v),            \
-                           typename _TS::layout_type{});                                        \
+                           layout_t<_TS>{});                                                    \
     }
 
 // device tensor operations
@@ -195,7 +195,7 @@ namespace matazure {
     operator op(const tensor_expression<_TS1>& e_lhs, const tensor_expression<_TS2>& e_rhs) {      \
         return make_lambda(e_lhs().shape(),                                                        \
                            __##name##_are_linear_index_tensor__<_TS1, _TS2>(e_lhs(), e_rhs()),     \
-                           device_t{}, typename _TS1::layout_type{});                              \
+                           device_t{}, layout_t<_TS1>{});                                          \
     }                                                                                              \
     template <typename _TS1, typename _TS2>                                                        \
     inline enable_if_t<are_device_memory<_TS1, _TS2>::value &&                                     \
@@ -204,7 +204,7 @@ namespace matazure {
     operator op(const tensor_expression<_TS1>& e_lhs, const tensor_expression<_TS2>& e_rhs) {      \
         return make_lambda(e_lhs().shape(),                                                        \
                            __##name##_array_indexensor__<_TS1, _TS2>(e_lhs(), e_rhs()),            \
-                           device_t{}, typename _TS1::layout_type{});                              \
+                           device_t{}, layout_t<_TS1>{});                                          \
     }
 
 #define CU_TENSOR_WITH_VALUE_BINARY_OPERATOR(name, op)                                           \
@@ -216,7 +216,7 @@ namespace matazure {
     operator op(const tensor_expression<_TS>& e_ts, typename _TS::value_type v) {                \
         return make_lambda(e_ts().shape(),                                                       \
                            __##name##_are_linear_index_tensor_with_value__<_TS>(e_ts(), v),      \
-                           device_t{}, typename _TS::layout_type{});                             \
+                           device_t{}, layout_t<_TS>{});                                         \
     }                                                                                            \
                                                                                                  \
     template <typename _TS>                                                                      \
@@ -226,7 +226,7 @@ namespace matazure {
     operator op(typename _TS::value_type v, const tensor_expression<_TS>& e_ts) {                \
         return make_lambda(e_ts().shape(),                                                       \
                            __##name##_value_with_are_linear_index_tensor__<_TS>(v, e_ts()),      \
-                           device_t{}, typename _TS::layout_type{});                             \
+                           device_t{}, layout_t<_TS>{});                                         \
     }                                                                                            \
                                                                                                  \
     template <typename _TS>                                                                      \
@@ -236,7 +236,7 @@ namespace matazure {
     operator op(const tensor_expression<_TS>& e_ts, typename _TS::value_type v) {                \
         return make_lambda(e_ts().shape(),                                                       \
                            __##name##_array_indexensor_with_value__<_TS>(e_ts(), v), device_t{}, \
-                           typename _TS::layout_type{});                                         \
+                           layout_t<_TS>{});                                                     \
     }                                                                                            \
                                                                                                  \
     template <typename _TS>                                                                      \
@@ -246,7 +246,7 @@ namespace matazure {
     operator op(typename _TS::value_type v, const tensor_expression<_TS>& e_ts) {                \
         return make_lambda(e_ts().shape(),                                                       \
                            __##name##_value_with_array_indexensor__<_TS>(v, e_ts()), device_t{}, \
-                           typename _TS::layout_type{});                                         \
+                           layout_t<_TS>{});                                                     \
     }
 
 // Arithmetic

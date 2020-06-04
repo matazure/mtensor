@@ -29,9 +29,9 @@ struct shift_functor {
 template <typename _Tensor>
 inline auto shift(_Tensor ts, pointi<_Tensor::rank> offset)
     -> decltype(make_lambda(ts.shape(), shift_functor<decay_t<_Tensor>>(ts, offset),
-                            typename _Tensor::runtime_type{}, typename _Tensor::layout_type{})) {
+                            runtime_t<_Tensor>{}, layout_t<_Tensor>{})) {
     return make_lambda(ts.shape(), shift_functor<decay_t<_Tensor>>(ts, offset),
-                       typename _Tensor::runtime_type{}, typename _Tensor::layout_type{});
+                       runtime_t<_Tensor>{}, layout_t<_Tensor>{});
 }
 
 }  // namespace view

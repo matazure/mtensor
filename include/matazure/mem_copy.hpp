@@ -10,10 +10,10 @@ namespace matazure {
  * @param ts_dst dest tensor
  */
 template <typename _TensorSrc, typename _TensorDst>
-inline void mem_copy(_TensorSrc ts_src, _TensorDst ts_dst,
-                     enable_if_t<are_host_memory<_TensorSrc, _TensorDst>::value &&
-                                 is_same<typename _TensorSrc::layout_type,
-                                         typename _TensorDst::layout_type>::value>* = nullptr) {
+inline void mem_copy(
+    _TensorSrc ts_src, _TensorDst ts_dst,
+    enable_if_t<are_host_memory<_TensorSrc, _TensorDst>::value &&
+                is_same<layout_t<_TensorSrc>, layout_t<_TensorDst>>::value>* = nullptr) {
     MATAZURE_STATIC_ASSERT_VALUE_TYPE_MATCHED(_TensorSrc, _TensorDst);
     memcpy(ts_dst.data(), ts_src.data(), sizeof(typename _TensorDst::value_type) * ts_src.size());
 }

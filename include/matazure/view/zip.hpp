@@ -19,15 +19,15 @@ struct zip_functor {
 
     zip_functor(tuple<_Tensors...> tensors) : tensors_(tensors) {}
 
-    MATAZURE_GENERAL tuple<typename _Tensors::reference...> operator()(pointi<rank> idx) const {
+    MATAZURE_GENERAL tuple<reference_t<_Tensors>...> operator()(pointi<rank> idx) const {
         return access_imp(idx, make_integer_sequence<int_t, sizeof...(_Tensors)>{});
     }
 
    private:
     template <int_t... _Indices>
-    MATAZURE_GENERAL tuple<typename _Tensors::reference...> access_imp(
+    MATAZURE_GENERAL tuple<reference_t<_Tensors>...> access_imp(
         pointi<rank> idx, integer_sequence<int_t, _Indices...>) const {
-        return tuple<typename _Tensors::reference...>{get<_Indices>(tensors_)(idx)...};
+        return tuple<reference_t<_Tensors>...>{get<_Indices>(tensors_)(idx)...};
     }
 
    private:

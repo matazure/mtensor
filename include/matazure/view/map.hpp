@@ -48,19 +48,20 @@ struct array_map_functor {
  */
 template <typename _Tensor, typename _Fun>
 inline auto map(_Tensor ts, _Fun fun,
-                enable_if_t<is_same<linear_index, typename _Tensor::index_type>::value>* = 0)
+                enable_if_t<is_same<linear_index, index_t<_Tensor>>::value>* = 0)
     -> decltype(make_lambda(ts.shape(), linear_map_functor<_Tensor, _Fun>(ts, fun),
-                            typename _Tensor::runtime_type{}, typename _Tensor::layout_type{})) {
-    // function_trais has bug
+                            runtime_t<_Tensor>{}, layout_t<_Tensor>{})) {
     // typedef function_traits<_Fun> trais_t;
+    // std::result_of<_Fun>
     // static_assert(trais_t::arguments_size == 1, "_Fun arguments size must be 1");
+    // constexpr int_t t = trais_t::arguments_size;
     // static_assert(
-    //     is_convertible<typename _Tensor::reference,
+    //     is_convertible<reference_t<_Tensor>,
     //                    typename function_traits<_Fun>::template arguments<0>::type>::value,
     //     "_Fun arguments size must be 1");
 
-    return make_lambda(ts.shape(), linear_map_functor<_Tensor, _Fun>(ts, fun),
-                       typename _Tensor::runtime_type{}, typename _Tensor::layout_type{});
+    return make_lambda(ts.shape(), linear_map_functor<_Tensor, _Fun>(ts, fun), runtime_t<_Tensor>{},
+                       layout_t<_Tensor>{});
 }
 
 /**
@@ -70,11 +71,11 @@ inline auto map(_Tensor ts, _Fun fun,
  */
 template <typename _Tensor, typename _Fun>
 inline auto map(_Tensor ts, _Fun fun,
-                enable_if_t<is_same<array_index, typename _Tensor::index_type>::value>* = 0)
+                enable_if_t<is_same<array_index, index_t<_Tensor>>::value>* = 0)
     -> decltype(make_lambda(ts.shape(), array_map_functor<_Tensor, _Fun>(ts, fun),
-                            typename _Tensor::runtime_type{}, typename _Tensor::layout_type{})) {
-    return make_lambda(ts.shape(), array_map_functor<_Tensor, _Fun>(ts, fun),
-                       typename _Tensor::runtime_type{}, typename _Tensor::layout_type{});
+                            runtime_t<_Tensor>{}, layout_t<_Tensor>{})) {
+    return make_lambda(ts.shape(), array_map_functor<_Tensor, _Fun>(ts, fun), runtime_t<_Tensor>{},
+                       layout_t<_Tensor>{});
 }
 
 }  // namespace view

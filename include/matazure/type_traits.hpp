@@ -35,7 +35,7 @@ template <typename _Tensor>
 using allocator_t = typename _Tensor::allocator_type;
 
 template <typename _Tensor>
-using reference_t = typename _Tensor::reference_type;
+using reference_t = typename _Tensor::reference;
 
 /// define a generical compile time zero
 template <typename _T>

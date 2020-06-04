@@ -35,7 +35,7 @@ struct gather_vector_functor {
    public:
     gather_vector_functor(_Tensor ts, _Vector indices) : ts_(ts), indices_(indices) {}
 
-    MATAZURE_GENERAL typename _Tensor::reference operator()(pointi<_Tensor::rank> idx) const {
+    MATAZURE_GENERAL reference_t<_Tensor> operator()(pointi<_Tensor::rank> idx) const {
         idx[_Axis] = indices_[idx[_Axis]];
         return ts_(idx);
     }
@@ -54,23 +54,23 @@ template <int_t _Axis, typename _Tensor, typename _Vector>
 inline auto gather(_Tensor ts, _Vector indices)
     -> decltype(make_lambda(internal::get_gather_vector_shape<_Axis>(ts.shape(), indices.size()),
                             gather_vector_functor<_Tensor, _Vector, _Axis>(ts, indices),
-                            typename _Tensor::runtime_type{}, typename _Tensor::layout_type{})) {
+                            runtime_t<_Tensor>{}, layout_t<_Tensor>{})) {
     static_assert(_Axis >= 0 && _Axis < _Tensor::rank, "_Axis must be >=0 or < _Tensor::rank");
     return make_lambda(internal::get_gather_vector_shape<_Axis>(ts.shape(), indices.size()),
                        gather_vector_functor<_Tensor, _Vector, _Axis>(ts, indices),
-                       typename _Tensor::runtime_type{}, typename _Tensor::layout_type{});
+                       runtime_t<_Tensor>{}, layout_t<_Tensor>{});
 }
 
 template <int_t _Axis, typename _Tensor>
-inline auto gather(_Tensor ts, int_t positon_index) -> decltype(make_lambda(
-    gather_point<_Axis>(ts.shape()), gather_scalar_functor<_Tensor, _Axis>(ts, positon_index),
-    typename _Tensor::runtime_type{},
-    typename layout_getter<typename _Tensor::layout_type, _Tensor::rank - 1>::type{})) {
+inline auto gather(_Tensor ts, int_t positon_index)
+    -> decltype(make_lambda(gather_point<_Axis>(ts.shape()),
+                            gather_scalar_functor<_Tensor, _Axis>(ts, positon_index),
+                            runtime_t<_Tensor>{},
+                            typename layout_getter<layout_t<_Tensor>, _Tensor::rank - 1>::type{})) {
     static_assert(_Axis >= 0 && _Axis < _Tensor::rank, "_Axis must be >=0 or < _Tensor::rank");
     return make_lambda(
         gather_point<_Axis>(ts.shape()), gather_scalar_functor<_Tensor, _Axis>(ts, positon_index),
-        typename _Tensor::runtime_type{},
-        typename layout_getter<typename _Tensor::layout_type, _Tensor::rank - 1>::type{});
+        runtime_t<_Tensor>{}, typename layout_getter<layout_t<_Tensor>, _Tensor::rank - 1>::type{});
 }
 
 }  // namespace view

@@ -57,7 +57,7 @@ template <typename _Tensor>
 struct fill_functor {
     typedef typename _Tensor::value_type value_type;
 
-    MATAZURE_DEVICE void operator()(typename _Tensor::reference e) const { e = v_; }
+    MATAZURE_DEVICE void operator()(reference_t<_Tensor> e) const { e = v_; }
 
     value_type v_;
 };

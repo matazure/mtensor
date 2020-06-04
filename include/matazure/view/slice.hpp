@@ -36,9 +36,9 @@ struct slice_functor {
 template <typename _Tensor>
 inline auto slice(_Tensor ts, pointi<_Tensor::rank> origin, pointi<_Tensor::rank> shape)
     -> decltype(make_lambda(shape, slice_functor<decay_t<_Tensor>>(ts, origin),
-                            typename _Tensor::runtime_type{}, typename _Tensor::layout_type{})) {
-    return make_lambda(shape, slice_functor<decay_t<_Tensor>>(ts, origin),
-                       typename _Tensor::runtime_type{}, typename _Tensor::layout_type{});
+                            runtime_t<_Tensor>{}, layout_t<_Tensor>{})) {
+    return make_lambda(shape, slice_functor<decay_t<_Tensor>>(ts, origin), runtime_t<_Tensor>{},
+                       layout_t<_Tensor>{});
 }
 
 }  // namespace view

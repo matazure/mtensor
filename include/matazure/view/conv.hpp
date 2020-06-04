@@ -134,12 +134,12 @@ struct conv_neighbors_weights_functor {
 template <typename _Tensor, typename _Kernel>
 inline auto conv(_Tensor ts, _Kernel kernel) -> decltype(make_lambda(
     ts.shape(), conv_functor<_Tensor, _Kernel, is_local_tensor<_Kernel>::value>(ts, kernel),
-    typename _Tensor::runtime_type{}, typename _Tensor::layout_type{})) {
+    runtime_t<_Tensor>{}, layout_t<_Tensor>{})) {
     static_assert(is_same<typename _Tensor::value_type, typename _Kernel::value_type>::value,
                   "the value types is not matched");
     return make_lambda(ts.shape(),
                        conv_functor<_Tensor, _Kernel, is_local_tensor<_Kernel>::value>(ts, kernel),
-                       typename _Tensor::runtime_type{}, typename _Tensor::layout_type{});
+                       runtime_t<_Tensor>{}, layout_t<_Tensor>{});
 }
 
 template <typename _Tensor>
@@ -148,9 +148,9 @@ template <typename _Tensor>
     tensor<tuple<pointi<_Tensor::rank>, typename _Tensor::value_type>, 1> neighbors_weights)
     -> decltype(make_lambda(ts.shape(),
                             conv_neighbors_weights_functor<_Tensor>(ts, neighbors_weights),
-                            typename _Tensor::runtime_type{}, typename _Tensor::layout_type{})) {
+                            runtime_t<_Tensor>{}, layout_t<_Tensor>{})) {
     return make_lambda(ts.shape(), conv_neighbors_weights_functor<_Tensor>(ts, neighbors_weights),
-                       typename _Tensor::runtime_type{}, typename _Tensor::layout_type{});
+                       runtime_t<_Tensor>{}, layout_t<_Tensor>{});
 }
 
 }  // namespace view

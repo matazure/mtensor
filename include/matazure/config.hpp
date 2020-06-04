@@ -127,8 +127,8 @@ struct blank_t {};
     static_assert(std::is_same<typename T1::value_type, typename T2::value_type>::value, \
                   "the value type is not matched")
 
-#define MATAZURE_STATIC_ASSERT_MEMORY_TYPE_MATCHED(T1, T2)                                   \
-    static_assert(std::is_same<typename T1::runtime_type, typename T2::runtime_type>::value, \
+#define MATAZURE_STATIC_ASSERT_MEMORY_TYPE_MATCHED(T1, T2)           \
+    static_assert(std::is_same<runtime_t<T1>, runtime_t<T2>>::value, \
                   "the memory type is not matched")
 
 #define MATAZURE_STATIC_ASSERT_MATRIX_RANK(T) \

@@ -6,10 +6,10 @@ namespace matazure {
 namespace cuda {
 
 template <typename _TensorSrc, typename _TensorDst>
-inline void mem_copy(cudaStream_t stream, _TensorSrc ts_src, _TensorDst cts_dst,
-                     enable_if_t<!are_host_memory<_TensorSrc, _TensorDst>::value &&
-                                 is_same<typename _TensorSrc::layout_type,
-                                         typename _TensorDst::layout_type>::value>* = nullptr) {
+inline void mem_copy(
+    cudaStream_t stream, _TensorSrc ts_src, _TensorDst cts_dst,
+    enable_if_t<!are_host_memory<_TensorSrc, _TensorDst>::value &&
+                is_same<layout_t<_TensorSrc>, layout_t<_TensorDst>>::value>* = nullptr) {
     MATAZURE_STATIC_ASSERT_VALUE_TYPE_MATCHED(_TensorSrc, _TensorDst);
 
     assert_runtime_success(cudaMemcpyAsync(cts_dst.data(), ts_src.data(),
@@ -18,10 +18,10 @@ inline void mem_copy(cudaStream_t stream, _TensorSrc ts_src, _TensorDst cts_dst,
 }
 
 template <typename _TensorSrc, typename _TensorDst>
-inline void mem_copy(_TensorSrc ts_src, _TensorDst cts_dst,
-                     enable_if_t<!are_host_memory<_TensorSrc, _TensorDst>::value &&
-                                 is_same<typename _TensorSrc::layout_type,
-                                         typename _TensorDst::layout_type>::value>* = nullptr) {
+inline void mem_copy(
+    _TensorSrc ts_src, _TensorDst cts_dst,
+    enable_if_t<!are_host_memory<_TensorSrc, _TensorDst>::value &&
+                is_same<layout_t<_TensorSrc>, layout_t<_TensorDst>>::value>* = nullptr) {
     MATAZURE_STATIC_ASSERT_VALUE_TYPE_MATCHED(_TensorSrc, _TensorDst);
 
     assert_runtime_success(cudaMemcpy(cts_dst.data(), ts_src.data(),
