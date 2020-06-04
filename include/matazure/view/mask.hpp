@@ -19,6 +19,8 @@ struct mask_value {
 
         return *this;
     }
+
+    typename _T1::value_type opeartor() const { return ts1(idx); }
 };
 
 template <typename _T1, typename _T2>

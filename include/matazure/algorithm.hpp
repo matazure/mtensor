@@ -54,11 +54,13 @@ inline void for_each(
  * @param ts the source tensor
  * @param v the filled value
  */
-template <typename _ExectutionPolicy, typename _Tensor>
-inline void fill(_ExectutionPolicy policy, _Tensor&& ts, typename decay_t<_Tensor>::value_type v,
+template <typename _ExectutionPolicy, typename _Tensor, typename _ValueType>
+inline void fill(_ExectutionPolicy policy, _Tensor&& ts, _ValueType v,
                  enable_if_t<none_device_memory<decay_t<_Tensor>>::value>* = 0) {
+    static_assert(is_assignable<typename decay_t<_Tensor>::reference, _ValueType>::value,
+                  "the type of v is not convertiable to the value_type of ts");
     for_each(policy, std::forward<_Tensor>(ts),
-             [v](typename decay_t<_Tensor>::value_type& x) { x = v; });
+             [v](typename decay_t<_Tensor>::reference x) { x = v; });
 }
 
 /**
@@ -66,9 +68,9 @@ inline void fill(_ExectutionPolicy policy, _Tensor&& ts, typename decay_t<_Tenso
  * @param ts the source tensor
  * @param v the filled value
  */
-template <typename _Tensor>
+template <typename _Tensor, typename _ValueType>
 inline void fill(
-    _Tensor&& ts, typename decay_t<_Tensor>::value_type v,
+    _Tensor&& ts, _ValueType v,
     enable_if_t<none_device_memory<
         enable_if_t<is_linear_array<decay_t<_Tensor>>::value, decay_t<_Tensor>>>::value>* = 0) {
     sequence_policy policy{};

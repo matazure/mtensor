@@ -74,6 +74,9 @@ using std::remove_const;
 using std::remove_cv;
 using std::remove_reference;
 
+using std::is_assignable;
+using std::is_convertible;
+
 using std::conditional;
 using std::enable_if;
 using std::integral_constant;
