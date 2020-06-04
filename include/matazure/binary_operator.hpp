@@ -26,7 +26,7 @@ namespace matazure {
         }                                                           \
     };
 
-#define __MATAZURE_array_indexENSOR_BINARY_OPERATOR(name, op)                \
+#define __MATAZURE_ARRAY_INDEX_TENSOR_BINARY_OPERATOR(name, op)              \
     template <typename _T1, typename _T2>                                    \
     struct name {                                                            \
        private:                                                              \
@@ -127,8 +127,8 @@ namespace matazure {
                            __##name##_are_linear_index_tensor__<_TS1, _TS2>(e_lhs(), e_rhs()), \
                            host_t{}, typename _TS1::layout_type{});                            \
     }                                                                                          \
-    __MATAZURE_array_indexENSOR_BINARY_OPERATOR(__##name##_array_indexensor__,                 \
-                                                op) template <typename _TS1, typename _TS2>    \
+    __MATAZURE_ARRAY_INDEX_TENSOR_BINARY_OPERATOR(__##name##_array_indexensor__, op)           \
+    template <typename _TS1, typename _TS2>                                                    \
     inline enable_if_t<none_device_memory<_TS1, _TS2>::value &&                                \
                            !are_linear_index<_TS1, _TS2>::value,                               \
                        lambda_tensor<_TS1::rank, __##name##_array_indexensor__<_TS1, _TS2>>>   \
