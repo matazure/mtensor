@@ -15,6 +15,9 @@ struct binary_functor {
 template <typename _Tensor, typename _Fun>
 inline auto binary(_Tensor tensor, _Fun fun)
     -> decltype(map(tensor, binary_functor<typename _Tensor::value_type, _Fun>{fun})) {
+    static_assert(is_same<bool, typename function_traits<_Fun>::result_type>::value,
+                  "_Fun result type should be bool");
+
     return map(tensor, binary_functor<typename _Tensor::value_type, _Fun>{fun});
 }
 
