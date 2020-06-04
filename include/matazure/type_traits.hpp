@@ -2,6 +2,7 @@
 
 #include <matazure/bool_pack.hpp>
 #include <matazure/config.hpp>
+#include <matazure/function_traits.hpp>
 #include <matazure/integer_sequence.hpp>
 
 namespace matazure {
@@ -44,23 +45,6 @@ struct zero {
 /// forward declare of tensor_expression
 template <typename _Tensor>
 class tensor_expression;
-
-/// a type traits to get the argument type and result type of a functor
-template <typename _Func>
-struct function_traits : public function_traits<decltype(&_Func::operator())> {};
-
-/// implements
-template <typename _ClassType, typename _ReturnType, typename... _Args>
-struct function_traits<_ReturnType (_ClassType::*)(_Args...) const> {
-    enum { arguments_size = sizeof...(_Args) };
-
-    typedef _ReturnType result_type;
-
-    template <int_t _index>
-    struct arguments {
-        typedef typename std::tuple_element<_index, std::tuple<_Args...>>::type type;
-    };
-};
 
 /// special for the tensor_expression models, they are tensor.
 template <typename _Type>
