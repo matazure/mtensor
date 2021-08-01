@@ -1,6 +1,11 @@
 #pragma once
 
+#ifdef __APPLE__
 #include <stdlib.h>
+#else
+#include <malloc.h>
+#endif
+
 #include <matazure/config.hpp>
 
 namespace matazure {
@@ -13,11 +18,13 @@ class aligned_allocator : public std::allocator<_Type> {
     aligned_allocator& operator=(const aligned_allocator& rhs) { return *this; }
 
     _Type* allocate(size_t size) {
+#ifdef __GNUC__
         _Type* data = nullptr;
-#ifdef __WIN32
-        data = reinterpret_cast<_Type*>(_aligned_malloc(size * sizeof(_Type), _Alignment));
+        posix_memalign(reinterpret_cast<void**>(&data), _Alignment, size * sizeof(_Type));
+        MATAZURE_ASSERT(data != nullptr, "Failed to alloc align memory");
+        // _Type* data = reinterpret_cast<_Type*>(memalign(_Alignment, size * sizeof(_Type)));
 #else
-        posix_memalign(reinterpret_cast<void **>(&data), _Alignment, size * sizeof(_Type));
+        posix_memalign(reinterpret_cast<void**>(&data), _Alignment, size * sizeof(_Type));
 #endif
         return data;
     }
