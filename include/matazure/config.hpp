@@ -120,19 +120,16 @@ struct blank_t {};
 }  // namespace matazure
 
 // for assert
-#define MATAZURE_STATIC_ASSERT_DIM_MATCHED(T1, T2) \
-    static_assert(T1::rank == T2::rank, "the rank is not matched")
+#define MATAZURE_STATIC_ASSERT_DIM_MATCHED(T1, T2) static_assert(T1::rank == T2::rank, "the rank is not matched")
 
 #define MATAZURE_STATIC_ASSERT_VALUE_TYPE_MATCHED(T1, T2)                                \
     static_assert(std::is_same<typename T1::value_type, typename T2::value_type>::value, \
                   "the value type is not matched")
 
-#define MATAZURE_STATIC_ASSERT_MEMORY_TYPE_MATCHED(T1, T2)           \
-    static_assert(std::is_same<runtime_t<T1>, runtime_t<T2>>::value, \
-                  "the memory type is not matched")
+#define MATAZURE_STATIC_ASSERT_MEMORY_TYPE_MATCHED(T1, T2) \
+    static_assert(std::is_same<runtime_t<T1>, runtime_t<T2>>::value, "the memory type is not matched")
 
-#define MATAZURE_STATIC_ASSERT_MATRIX_RANK(T) \
-    static_assert(T::rank == 2, "the matrix rank should be 2")
+#define MATAZURE_STATIC_ASSERT_MATRIX_RANK(T) static_assert(T::rank == 2, "the matrix rank should be 2")
 
 #define MATAZURE_CURRENT_FUNCTION "(unknown)"
 
@@ -149,29 +146,68 @@ struct blank_t {};
 #define MATAZURE_UNLIKELY(x) x
 #endif
 
-#if defined(MATAZURE_DISABLE_ASSERTS)
-
-#define MATAZURE_ASSERT(expr, msg) ((void)0)
-
-#else
-
 namespace matazure {
 
-class assert_failed : public std::runtime_error {
+class assert_failed : public std::exception {
    public:
-    assert_failed(const std::string& msg) : std::runtime_error(msg) {}
+    assert_failed(const string& expr, const string& function, const string& file, size_t line,
+                  const std::string& msg = " ")
+        : _expr(expr), _function(function), _file(file), _line(line), _msg(msg) {
+        _what_str = _expr + ", " + _function + ", " + _file + ", " + std::to_string(_line) + ", " + _msg;
+    }
+
+    virtual const char* what() const noexcept override { return _what_str.c_str(); }
+
+   private:
+    string _expr;
+    string _function;
+    string _file;
+    size_t _line;
+    string _msg;
+    string _what_str;
 };
 
-inline void assertion_failed(char const* expr, char const* msg, char const* function,
-                             char const* file, long line) {
-    throw assert_failed(std::string(msg));
-}
+class verify_failed : public std::exception {
+   public:
+    verify_failed(const string& expr, const string& function, const string& file, size_t line,
+                  const std::string& msg = " ")
+        : _expr(expr), _function(function), _file(file), _line(line), _msg(msg) {
+        _what_str = _expr + ", " + _function + ", " + _file + ", " + std::to_string(_line) + ", " + _msg;
+    }
 
-}  // namespace matazure
+    virtual const char* what() const noexcept override { return _what_str.c_str(); }
 
-#define MATAZURE_ASSERT(expr, msg)                             \
-    (MATAZURE_LIKELY(!!(expr)) ? ((void)0)                     \
-                               : ::matazure::assertion_failed( \
-                                     #expr, msg, MATAZURE_CURRENT_FUNCTION, __FILE__, __LINE__))
+   private:
+    string _expr;
+    string _function;
+    string _file;
+    size_t _line;
+    string _msg;
+    string _what_str;
+};
 
+    inline void raise_assert_failed(const string& expr, const string& function, const string& file, long line,
+                                    const string& msg = " ") {
+        throw assert_failed(expr, function, file, line, msg);
+    }
+
+    inline void raise_verify_failed(const string& expr, const string& function, const string& file, long line,
+                                    const string& msg = " ") {
+        throw verify_failed(expr, function, file, line, msg);
+    }
+
+    }  // namespace matazure
+
+#if defined(MATAZURE_DISABLE_ASSERTS)
+#define MATAZURE_ASSERT(expr, msg) ((void)0)
+#else
+#define MATAZURE_ASSERT(expr, ...) \
+    (MATAZURE_LIKELY(!!(expr))     \
+         ? ((void)0)               \
+         : ::matazure::raise_assert_failed(#expr, MATAZURE_CURRENT_FUNCTION, __FILE__, __LINE__, ##__VA_ARGS__))
 #endif
+
+#define MATAZURE_VERIFY(expr, ...) \
+    (MATAZURE_LIKELY(!!(expr))     \
+         ? ((void)0)               \
+         : ::matazure::raise_verify_failed(#expr, MATAZURE_CURRENT_FUNCTION, __FILE__, __LINE__, ##__VA_ARGS__))

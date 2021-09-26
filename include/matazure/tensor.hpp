@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Defines tensor classes of host end
  */
 
@@ -215,11 +215,11 @@ class tensor : public tensor_expression<tensor<_ValueType, _Rank, _Layout, _Allo
     shared_ptr<value_type> malloc_shared_memory(int_t size) {
         value_type* data = allocator_.allocate(size);
         for (int_t i = 0; i < size; ++i) {
-            allocator_.construct(data + i);
+            new (data + i) value_type;
         }
         return shared_ptr<value_type>(data, [=](value_type* ptr) {
             for (int_t i = 0; i < size; ++i) {
-                allocator_.destroy(data + i);
+                delete (data + i);
             }
             allocator_.deallocate(data, size);
         });
