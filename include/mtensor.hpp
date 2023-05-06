@@ -4,11 +4,9 @@
 #include <matazure/binary_operator.hpp>
 #include <matazure/dynamic_tensor.hpp>
 #include <matazure/geometry.hpp>
-#include <matazure/io.hpp>
 #include <matazure/mem_copy.hpp>
 #include <matazure/reshape.hpp>
 #include <matazure/tensor_selector.hpp>
-#include <matazure/view/view.hpp>
 
 #ifdef MATAZURE_OPENMP
 #include <matazure/omp_for_index.hpp>

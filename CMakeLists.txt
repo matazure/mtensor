@@ -23,7 +23,7 @@ set(CUDA_STANDARD ${CXX_STANDARD})
 set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-if (NOT CMAKE_BUILD_TYPE) 
+if (NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE Release)
 endif()
 
@@ -46,7 +46,7 @@ if(WITH_CUDA)
 	# set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-extended-lambda --expt-relaxed-constexpr -arch=sm_75")
 	set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -w")
 
-	if (CUDA_ARCH) 
+	if (CUDA_ARCH)
 		set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -arch=${CUDA_ARCH}")
 	endif()
 
@@ -68,10 +68,6 @@ set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler \"-march=native\"")
 endif()
 
 option(BUILD_EXAMPLE "Build Example" ON)
-option(BUILD_TEST "Build Test" ON)
-option(BUILD_BENCHMARK "Build Benchmark" ON)
-
-message("current compiler is ${CMAKE_CXX_COMPILER}")
 
 set_property( GLOBAL PROPERTY USE_FOLDERS ON)
 
@@ -90,12 +86,6 @@ if (DOWNLOAD_SUBMODULES)
 	execute_process(COMMAND git submodule update --init . WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 endif()
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/googletest)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/googletest/include)
-
-set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Build gtest's sample programs." FORCE)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/third_party/benchmark)
-
 add_library(mtensor INTERFACE)
 target_include_directories(mtensor
     INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
@@ -104,14 +94,6 @@ target_include_directories(mtensor
 
 if (BUILD_EXAMPLE)
 	add_subdirectory(sample)
-endif()
-
-if (BUILD_BENCHMARK)
-	add_subdirectory(benchmark)
-endif()
-
-if (BUILD_TEST)
-	add_subdirectory(test)
 endif()
 
 install(DIRECTORY include DESTINATION include)
