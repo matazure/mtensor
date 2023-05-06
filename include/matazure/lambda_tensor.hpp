@@ -3,7 +3,6 @@
 
 #include <matazure/for_index.hpp>
 #include <matazure/layout.hpp>
-#include <matazure/local_tensor.hpp>
 #include <matazure/tensor.hpp>
 #include <matazure/type_traits.hpp>
 

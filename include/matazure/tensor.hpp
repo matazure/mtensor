@@ -8,7 +8,6 @@
 #include <matazure/exception.hpp>
 #include <matazure/for_index.hpp>
 #include <matazure/layout.hpp>
-#include <matazure/local_tensor.hpp>
 #include <matazure/tensor_initializer.hpp>
 #include <matazure/type_traits.hpp>
 

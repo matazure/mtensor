@@ -1,6 +1,5 @@
 #pragma once
 
-#include <matazure/bool_pack.hpp>
 #include <matazure/config.hpp>
 #include <matazure/function_traits.hpp>
 #include <matazure/integer_sequence.hpp>
@@ -80,17 +79,16 @@ template <typename _Type>
 struct _Is_linear_array : bool_constant<is_tensor<_Type>::value> {};
 
 // are tag
-#define MATAZURE_DEFINE_ARE_TAG(name, tag_name, tag)                       \
-    template <typename... _Tensor>                                         \
-    struct name;                                                           \
-    template <>                                                            \
-                                                                           \
-    struct name<> : bool_constant<true> {};                                \
-                                                                           \
-    template <typename _Tensor, typename... _OtherTensors>                 \
-    struct name<_Tensor, _OtherTensors...>                                 \
-        : bool_constant<is_same<typename _Tensor::tag_name, tag>::value && \
-                        name<_OtherTensors...>::value> {};
+#define MATAZURE_DEFINE_ARE_TAG(name, tag_name, tag)       \
+    template <typename... _Tensor>                         \
+    struct name;                                           \
+    template <>                                            \
+                                                           \
+    struct name<> : bool_constant<true> {};                \
+                                                           \
+    template <typename _Tensor, typename... _OtherTensors> \
+    struct name<_Tensor, _OtherTensors...>                 \
+        : bool_constant<is_same<typename _Tensor::tag_name, tag>::value && name<_OtherTensors...>::value> {};
 
 MATAZURE_DEFINE_ARE_TAG(are_host_memory, runtime_type, host_t)
 MATAZURE_DEFINE_ARE_TAG(are_device_memory, runtime_type, device_t)
@@ -98,17 +96,16 @@ MATAZURE_DEFINE_ARE_TAG(are_linear_index, index_type, linear_index)
 MATAZURE_DEFINE_ARE_TAG(are_array_index, index_type, array_index)
 
 // none tag
-#define MATAZURE_DEFINE_NONE_TAG(name, tag_name, tag)                       \
-    template <typename... _Tensor>                                          \
-    struct name;                                                            \
-    template <>                                                             \
-                                                                            \
-    struct name<> : bool_constant<true> {};                                 \
-                                                                            \
-    template <typename _Tensor, typename... _OtherTensors>                  \
-    struct name<_Tensor, _OtherTensors...>                                  \
-        : bool_constant<!is_same<typename _Tensor::tag_name, tag>::value && \
-                        name<_OtherTensors...>::value> {};
+#define MATAZURE_DEFINE_NONE_TAG(name, tag_name, tag)      \
+    template <typename... _Tensor>                         \
+    struct name;                                           \
+    template <>                                            \
+                                                           \
+    struct name<> : bool_constant<true> {};                \
+                                                           \
+    template <typename _Tensor, typename... _OtherTensors> \
+    struct name<_Tensor, _OtherTensors...>                 \
+        : bool_constant<!is_same<typename _Tensor::tag_name, tag>::value && name<_OtherTensors...>::value> {};
 
 MATAZURE_DEFINE_NONE_TAG(none_host_memory, runtime_type, host_t)
 MATAZURE_DEFINE_NONE_TAG(none_device_memory, runtime_type, device_t)
