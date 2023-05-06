@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <matazure/algorithm.hpp>
 #include <matazure/allocator.hpp>
 #include <matazure/exception.hpp>
 #include <matazure/for_index.hpp>
@@ -79,10 +78,7 @@ class tensor : public tensor_expression<tensor<_ValueType, _Rank, _Layout, _Allo
      * @prama ext the shape of tensor
      */
     explicit tensor(pointi<rank> ext)
-        : shape_(ext),
-          layout_(ext),
-          sp_data_(malloc_shared_memory(layout_.size())),
-          data_(sp_data_.get()) {}
+        : shape_(ext), layout_(ext), sp_data_(malloc_shared_memory(layout_.size())), data_(sp_data_.get()) {}
 
     /**
      * @brief constructs by the shape
@@ -103,8 +99,7 @@ class tensor : public tensor_expression<tensor<_ValueType, _Rank, _Layout, _Allo
      *
      *
      */
-    explicit tensor(const pointi<rank>& shape, const pointi<rank>& origin_padding,
-                    const pointi<rank>& end_padding)
+    explicit tensor(const pointi<rank>& shape, const pointi<rank>& origin_padding, const pointi<rank>& end_padding)
         : shape_(shape),
           layout_(shape, origin_padding, end_padding),
           sp_data_(malloc_shared_memory(layout_.size())),
@@ -167,9 +162,7 @@ class tensor : public tensor_expression<tensor<_ValueType, _Rank, _Layout, _Allo
      * @param idx array index
      * @return element const reference
      */
-    reference operator()(const pointi<rank>& idx) const {
-        return (*this)[layout_.index2offset(idx)];
-    }
+    reference operator()(const pointi<rank>& idx) const { return (*this)[layout_.index2offset(idx)]; }
 
     /**
      * @brief accesses element by array access mode
@@ -214,15 +207,7 @@ class tensor : public tensor_expression<tensor<_ValueType, _Rank, _Layout, _Allo
    private:
     shared_ptr<value_type> malloc_shared_memory(int_t size) {
         value_type* data = allocator_.allocate(size);
-        for (int_t i = 0; i < size; ++i) {
-            new (data + i) value_type;
-        }
-        return shared_ptr<value_type>(data, [=](value_type* ptr) {
-            for (int_t i = 0; i < size; ++i) {
-                delete (data + i);
-            }
-            allocator_.deallocate(data, size);
-        });
+        return shared_ptr<value_type>(data, [=](value_type* ptr) { allocator_.deallocate(data, size); });
     }
 
    public:

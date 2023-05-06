@@ -1,16 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
-#cuda need 3.8
-#add_link_options need 3.13
-
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  # using Clang
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  # using GCC
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-  # using Intel C++
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-  # using Visual Studio C++
-endif()
+cmake_minimum_required(VERSION 3.14)
 
 project(Matazure.Tensor CXX)
 
@@ -22,10 +10,6 @@ set(CMAKE_CXX_STANDARD ${CXX_STANDARD})
 set(CUDA_STANDARD ${CXX_STANDARD})
 set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-if (NOT CMAKE_BUILD_TYPE)
-	set(CMAKE_BUILD_TYPE Release)
-endif()
 
 set(CMAKE_CUDA_STANDARD ${CMAKE_CXX_STANDARD})
 set(CMAKE_CUDA_STANDARD_REQUIRED ON)
@@ -67,24 +51,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
 set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler \"-march=native\"")
 endif()
 
-option(BUILD_EXAMPLE "Build Example" ON)
-
-set_property( GLOBAL PROPERTY USE_FOLDERS ON)
-
-
-if (WITH_SSE)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.2")
-endif()
-
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-
-option(DOWNLOAD_SUBMODULES "git submodule update --init ." ON)
-
-if (DOWNLOAD_SUBMODULES)
-	execute_process(COMMAND git submodule update --init . WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-endif()
 
 add_library(mtensor INTERFACE)
 target_include_directories(mtensor
@@ -92,8 +58,6 @@ target_include_directories(mtensor
     INTERFACE $<INSTALL_INTERFACE:include>
 )
 
-if (BUILD_EXAMPLE)
-	add_subdirectory(sample)
-endif()
+add_subdirectory(sample)
 
 install(DIRECTORY include DESTINATION include)

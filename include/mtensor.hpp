@@ -2,8 +2,6 @@
 
 #include <matazure/allocator.hpp>
 #include <matazure/binary_operator.hpp>
-#include <matazure/dynamic_tensor.hpp>
-#include <matazure/geometry.hpp>
 #include <matazure/mem_copy.hpp>
 #include <matazure/reshape.hpp>
 #include <matazure/tensor_selector.hpp>

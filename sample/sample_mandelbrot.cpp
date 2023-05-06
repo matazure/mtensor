@@ -4,7 +4,7 @@ int main(int argc, char* argv[]) {
     auto output_mandelbrot_path = argc > 1 ? argv[1] : "mandelbrot.png";
 
     //区域大小
-    pointi<2> shape = {2048, 2048};
+    pointi<2> shape = {124, 124};
 
     //若支持openmp， 则开启， 需要编译的时候加入-fopenmp
 #ifdef MATAZURE_OPENMP

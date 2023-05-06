@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include <matazure/for_index.hpp>
 #include <matazure/layout.hpp>
 #include <matazure/local_tensor.hpp>
 #include <matazure/tensor.hpp>
@@ -18,9 +19,8 @@ struct get_functor_accessor_type {
     typedef decay_t<typename function_traits_t::template arguments<0>::type> _tmp_type;
 
    public:
-    typedef conditional_t<
-        is_same<int_t, _tmp_type>::value, linear_index,
-        conditional_t<is_same<_tmp_type, pointi<_Rank>>::value, array_index, void>>
+    typedef conditional_t<is_same<int_t, _tmp_type>::value, linear_index,
+                          conditional_t<is_same<_tmp_type, pointi<_Rank>>::value, array_index, void>>
         type;
 };
 
@@ -64,8 +64,7 @@ class lambda_tensor : public tensor_expression<lambda_tensor<_Rank, _Fun, _Layou
     /**
      * @brief copy constructor
      */
-    lambda_tensor(const lambda_tensor& rhs)
-        : shape_(rhs.shape_), layout_(rhs.layout_), functor_(rhs.functor_) {}
+    lambda_tensor(const lambda_tensor& rhs) : shape_(rhs.shape_), layout_(rhs.layout_), functor_(rhs.functor_) {}
 
     /**
      * @brief accesses element by linear access mode
@@ -114,7 +113,7 @@ class lambda_tensor : public tensor_expression<lambda_tensor<_Rank, _Fun, _Layou
     template <typename _ExecutionPolicy>
     MATAZURE_GENERAL tensor<decay_t<value_type>, rank> persist(_ExecutionPolicy policy) const {
         tensor<decay_t<value_type>, rank> re(this->shape());
-        copy(policy, *this, re);
+        for_index(policy, this->shape(), [=](pointi<rank> idx) { (*this)(idx) = re(idx); });
         return re;
     }
 
@@ -183,14 +182,12 @@ inline auto make_lambda(pointi<_Rank> extent, _Fun fun, host_t) -> lambda_tensor
 }
 
 template <int_t _Rank, typename _Fun, typename _Layout>
-inline auto make_lambda(pointi<_Rank> extent, _Fun fun, host_t, _Layout)
-    -> lambda_tensor<_Rank, _Fun, _Layout> {
+inline auto make_lambda(pointi<_Rank> extent, _Fun fun, host_t, _Layout) -> lambda_tensor<_Rank, _Fun, _Layout> {
     return lambda_tensor<_Rank, _Fun, _Layout>(extent, fun);
 }
 
 template <int_t _Rank, typename _Fun, typename _Layout>
-inline auto make_lambda(pointi<_Rank> extent, _Fun fun, _Layout, host_t)
-    -> lambda_tensor<_Rank, _Fun, _Layout> {
+inline auto make_lambda(pointi<_Rank> extent, _Fun fun, _Layout, host_t) -> lambda_tensor<_Rank, _Fun, _Layout> {
     return lambda_tensor<_Rank, _Fun, _Layout>(extent, fun);
 }
 
