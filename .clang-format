@@ -2,16 +2,13 @@
 # We'll use defaults from the Google style, but with 4 columns indentation.
 BasedOnStyle: Google
 IndentWidth: 4
-ColumnLimit: 120
+ColumnLimit: 100
 ---
-Language: Cpp
-# Force pointers to the type for C++.
-DerivePointerAlignment: false
-PointerAlignment: Left
-IndentWidth: 4
+ Language: Cpp
+
 ---
 Language: JavaScript
-# Use 100 columns for JS.
+
 ---
 Language: Proto
 # Don't format .proto files.

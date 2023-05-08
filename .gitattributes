@@ -1,7 +1,0 @@
-doc/architecture.jpg filter=lfs diff=lfs merge=lfs -text
-doc/common_implement.jpg filter=lfs diff=lfs merge=lfs -text
-data/gourd.bmp filter=lfs diff=lfs merge=lfs -text
-data/*/** filter=lfs diff=lfs merge=lfs -text
-*.jpg filter=lfs diff=lfs merge=lfs -text
-doc/images/architecture.jpg filter=lfs diff=lfs merge=lfs -text
-doc/images/common_implement.jpg filter=lfs diff=lfs merge=lfs -text

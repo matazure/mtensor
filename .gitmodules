@@ -1,9 +1,3 @@
-[submodule "benchmark/vendor/benchmark"]
-	path = third_party/benchmark
-	url = https://github.com/matazure/benchmark.git
-[submodule "test/vendor/googletest"]
-	path = third_party/googletest
-	url = https://github.com/matazure/googletest.git
 [submodule "third_party/stb"]
 	path = third_party/stb
 	url = https://github.com/nothings/stb.git
