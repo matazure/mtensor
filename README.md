@@ -47,9 +47,9 @@ auto lts = make_lambda_tensor(shape, [](pointi<2> idx)->int{
 for_index(shape, [=](pointi<2> idx){
     cts(idx) = lts(idx);
 }, cts.runtime()); // in cuda runtime, we can only access cuda runtime tensor
+```
 
 We can extend for_index that implement different execution policy, for example we can extend an openmp for_index to use the CPU's multi-core.
-```
 
 ## samples build
 
